@@ -1,0 +1,80 @@
+name: CI
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Install runtime and development dependencies
+        run: python -m pip install -e ".[dev]"
+      - name: Check publication privacy and documentation
+        run: python tools/prepublish_check.py
+      - name: Lint
+        run: ruff check .
+      - name: Unit and integration tests
+        run: python -m pytest -q
+      - name: Hosted site build and API security tests
+        run: |
+          python tools/build_unified_site.py
+          python -m pytest -q tests/test_hosted_web.py
+      - name: Public demonstration calculation tests
+        run: node --test web/tests/demo.test.cjs
+      - name: End-to-end offline smoke test
+        run: python -m quantforge demo --output outputs/ci-demo --rows 330
+      - name: Verify smoke-test artifacts
+        run: |
+          python -c "from pathlib import Path; p=Path('outputs/ci-demo'); assert all((p/f).stat().st_size > 20 for f in ['summary.json','manifest.json','prices.csv','returns.csv','risk_forecasts.csv','risk_coverage.csv','portfolio_comparison.csv','research_dashboard.html','quantforge.duckdb','prices.parquet','returns.parquet']); print('Smoke-test artifacts verified')"
+      - name: V1 development research offline integration
+        run: python -m quantforge v1-demo --rows 520 --output outputs/ci-v1
+      - name: Verify V1 research artifacts
+        run: |
+          python -c "from pathlib import Path; p=Path('outputs/ci-v1'); assert all((p/f).stat().st_size > 30 for f in ['manifest_v1.json','RESEARCH_SUMMARY.md','risk_dashboard.html','risk_forecasts.csv','risk_diagnostics.csv','portfolio_metrics.csv','portfolio_paths.csv','cost_rebalance_sensitivity.csv']); print('V1 research artifacts verified')"
+
+      - name: V2 advanced research integrated simulated smoke test
+        run: python -m quantforge v2-demo --rows 520 --output outputs/ci-v2
+      - name: Verify V2 evidence and research boundaries
+        run: |
+          python -c "from pathlib import Path; p=Path('outputs/ci-v2/v2_results'); assert all((p/f).stat().st_size > 50 for f in ['manifest_v2.json','V2_RESEARCH_REPORT.md','advanced_dashboard.html','advanced_forecasts.csv','forecast_model_scores.csv','var_coverage_comparison.csv','option_model_validation.json','option_sensitivity.csv','portfolio_monte_carlo.json','variance_forecast_stability.csv']); print('V2 integrated artifacts verified')"
+
+      - name: V3 full offline SEC-fixture and DCF smoke test
+        run: python -m quantforge v3-demo --as-of 2026-10-22 --output outputs/ci-v3
+      - name: Verify V3 valuation and source-attribution artifacts
+        run: |
+          python -c "from pathlib import Path; p=Path('outputs/ci-v3'); assert all((p/f).stat().st_size > 100 for f in ['manifest_v3.json','sec_financials.csv','sec_fact_audit.csv','forecast_drivers.csv','dcf_scenarios.csv','dcf_sensitivity.csv','valuation_dashboard.html','INVESTMENT_MEMO.md']); print('V3 synthetic financial and valuation artifacts verified')"
+
+      - name: V4 integrated synthetic research and dashboard smoke test
+        run: python -m quantforge v4-demo --rows 520 --output outputs/ci-v4
+      - name: Verify V4 evidence and provenance
+        run: |
+          python -c "from pathlib import Path; import json; p=Path('outputs/ci-v4/integrated'); req=['evidence_manifest.json','INVESTMENT_MEMO.md','integrated_dashboard.html','capex_stress.json','model_uncertainty.csv','views/advanced_models.html','views/portfolio_risk.html','views/company_valuation.html']; assert all((p/f).stat().st_size>100 for f in req); assert not list(p.glob('RESEARCH_WORKING_PAPER*')); m=json.loads((p/'evidence_manifest.json').read_text()); assert m['market_data_origin']=='simulation' and m['holdout_2019_2025']=='not_accessed'; print('V4 provenance verified; no paper')"
+
+      - name: Public recruiter-site offline demonstration
+        run: python -m quantforge public-demo --rows 390 --output outputs/ci-public
+      - name: Validate public HTML and synthetic labels
+        run: |
+          python -c "from pathlib import Path; p=Path('outputs/ci-public/site/index.html'); t=p.read_text(encoding='utf-8'); assert p.stat().st_size>12000; assert 'SYNTHETIC OFFLINE DEMONSTRATION' in t; assert 'ECB' in t; print('Public site validated')"
+
+      - name: V4.2 stock simulator offline end-to-end smoke test
+        run: python -m quantforge stock-demo --sessions 150 --output outputs/ci-stock
+      - name: Verify stock simulator provenance and website
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('outputs/ci-stock')
+          evidence=json.loads((root/'site/evidence.json').read_text())
+          assert evidence['dataset_origin']=='synthetic'
+          assert (root/'site/index.html').stat().st_size > 30_000
+          assert (root/'stock_bars.csv').stat().st_size > 1000
+          print('V4.2 synthetic site artifacts verified')
+          PY

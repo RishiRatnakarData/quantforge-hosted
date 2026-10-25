@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: quantforge-private-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r cloud/requirements.txt
+    startCommand: PYTHONPATH=src uvicorn cloud.api:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: OWNER_USER_ID
+        sync: false
+      - key: ALPACA_API_KEY_ID
+        sync: false
+      - key: ALPACA_API_SECRET_KEY
+        sync: false
+      - key: QF_PROXY_SECRET
+        sync: false
+      - key: PUBLIC_SITE_ORIGIN
+        sync: false

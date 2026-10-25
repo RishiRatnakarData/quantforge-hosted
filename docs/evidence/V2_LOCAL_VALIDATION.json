@@ -1,0 +1,22 @@
+{
+  "release": "2.0.0-development-core",
+  "date_utc": "2026-10-23T02:50:38.177151+00:00",
+  "platform": "Linux CPython 3.13 source execution",
+  "test_command": "PYTHONPATH=src python -m pytest -q",
+  "tests_passed": 89,
+  "tests_skipped": 1,
+  "skip_reason": "duckdb package absent in this execution environment",
+  "integrated_cli": "PYTHONPATH=src python -m quantforge v2-demo --rows 520 --output outputs/release-check",
+  "integrated_demo_passed": true,
+  "simulated_risk_evaluation_dates": 140,
+  "artifact_files_generated": 9,
+  "python_wheel_built": true,
+  "ruff_verified": false,
+  "ruff_reason": "Ruff binary cannot be fetched in offline container",
+  "duckdb_parquet_verified_for_v2": false,
+  "real_financial_v2_verified": false,
+  "live_provider_request": false,
+  "github_actions_verified": false,
+  "holdout_2019_to_2025_accessed": false,
+  "limitations": "Mathematical/simulated integration does not prove empirical correctness or predictive improvement"
+}

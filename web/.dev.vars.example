@@ -1,0 +1,3 @@
+# Wrangler Pages local development only. Never commit actual .dev.vars.
+PRIVATE_API_ORIGIN=https://YOUR_API.onrender.com
+QF_PROXY_SECRET=GENERATE_64_RANDOM_HEX_CHARACTERS

@@ -1,0 +1,34 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+.coverage
+.env
+.env.*
+!.env.example
+/data/*
+!/data/.gitkeep
+/outputs/*
+!/outputs/.gitkeep
+*.duckdb
+*.duckdb.wal
+.DS_Store
+.vscode/
+.ipynb_checkpoints/
+
+build/
+
+# Local paper portfolio — private, never commit
+*.sqlite3
+*.sqlite3-journal
+*.sqlite3-wal
+*.sqlite3-shm
+.private/
+
+# Cloudflare local secrets / cookies / secret configs
+.dev.vars
+**/.dev.vars
+*.env.local

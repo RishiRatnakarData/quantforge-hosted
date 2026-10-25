@@ -1,0 +1,26 @@
+market_ingestion:
+  mode: tiingo_or_csv
+  required_fields: [date, symbol, adjusted_close]
+  adjusted_close_conventions:
+    - total_return_index
+    - dividend_adjusted_close
+    - split_adjusted_close
+    - unadjusted_close
+  default_source: Tiingo EOD (private licensed use)
+  default_universe: [SPY, IWM, EFA, EEM, IEF, TLT, GLD, LQD]
+  sample_start: "2010-01-01"
+  sample_end: "2025-12-31"
+  required_adjustment_field: adjClose
+  session_calendar: XNYS
+  enforce_requested_date_bounds: true
+  strict_complete_panel: true
+  no_implicit_forward_fill: true
+factors:
+  source: Kenneth R. French data library
+  use_published_research_archive_as_of_date: true
+macroeconomic:
+  source: FRED/ALFRED
+  require_observation_vintage: true
+financial_statements:
+  source: SEC Company Facts
+  preserve_filing_date: true

@@ -1,0 +1,47 @@
+{
+  "company": "Microsoft Corporation",
+  "ticker": "MSFT",
+  "fiscal_year_end": "06-30",
+  "unit": "USD millions except per-share amounts",
+  "status": "EXPLICIT ANALYST ASSUMPTIONS, NOT MARKET CONSENSUS OR COMPANY GUIDANCE",
+  "cost_of_capital": {
+    "risk_free_rate": 0.04,
+    "equity_risk_premium": 0.055,
+    "levered_beta": 1.05,
+    "pretax_cost_of_debt": 0.048,
+    "marginal_tax_rate": 0.21,
+    "assumed_debt_weight": 0.05
+  },
+  "scenarios": {
+    "bear": {
+      "growth": [0.10, 0.08, 0.07, 0.06, 0.05],
+      "margin": [0.42, 0.415, 0.41, 0.41, 0.41],
+      "capex_ratio": [0.36, 0.34, 0.31, 0.29, 0.28],
+      "da_ratio": [0.11, 0.11, 0.115, 0.12, 0.12],
+      "cash_tax_rate": 0.22,
+      "operating_nwc_to_sales": -0.06,
+      "terminal_growth": 0.02,
+      "wacc_delta": 0.01
+    },
+    "base": {
+      "growth": [0.16, 0.14, 0.12, 0.10, 0.08],
+      "margin": [0.46, 0.455, 0.45, 0.45, 0.45],
+      "capex_ratio": [0.32, 0.30, 0.28, 0.26, 0.24],
+      "da_ratio": [0.115, 0.118, 0.12, 0.12, 0.12],
+      "cash_tax_rate": 0.21,
+      "operating_nwc_to_sales": -0.08,
+      "terminal_growth": 0.0275,
+      "wacc_delta": 0.0
+    },
+    "bull": {
+      "growth": [0.20, 0.18, 0.16, 0.13, 0.11],
+      "margin": [0.48, 0.49, 0.50, 0.50, 0.50],
+      "capex_ratio": [0.29, 0.27, 0.25, 0.23, 0.21],
+      "da_ratio": [0.12, 0.12, 0.12, 0.12, 0.12],
+      "cash_tax_rate": 0.20,
+      "operating_nwc_to_sales": -0.09,
+      "terminal_growth": 0.0325,
+      "wacc_delta": -0.01
+    }
+  }
+}

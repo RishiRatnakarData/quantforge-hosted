@@ -1,0 +1,21 @@
+{
+  "milestone": "QuantForge V3.0",
+  "validation_type": "offline_local_only",
+  "tooling": "Python 3.13 on Linux, PYTHONPATH=src",
+  "full_test_suite": {"passed": 107, "skipped": 1, "failed": 0, "skip_reason": "DuckDB unavailable in local runtime"},
+  "synthetic_v3_demo": "end_to_end_success",
+  "artifact_count_validated": 11,
+  "python_compileall": "passed",
+  "wheel_built": "quantforge_financial_research-3.0.0-py3-none-any.whl",
+  "ruff_lint": "not_run_locally; ruff unavailable without network; requires user Windows check",
+  "real_sec_http_request": "not_executed; requires declared agent and user Windows run",
+  "published_github_ci": "not_executed",
+  "live_microsoft_valuation": "not_claimed",
+  "portfolio_2019_2025_final_holdout": "not_accessed",
+  "limits": [
+    "Full SEC-tag mapping and original 2026 10-K statement reconciliation pending",
+    "Numeric demo values are fictional",
+    "Cash flow statement D&A and other does not establish pure D&A",
+    "Model assumptions not based on live observed discount rates or share price"
+  ]
+}

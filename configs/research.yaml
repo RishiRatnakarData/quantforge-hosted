@@ -1,0 +1,31 @@
+project: QuantForge
+research_question: Can volatility/regime models improve out-of-sample risk estimation?
+research_universe:
+  - SPY
+  - IWM
+  - EFA
+  - EEM
+  - IEF
+  - TLT
+  - GLD
+  - LQD
+benchmark: SPY
+historical_window: [2010-01-01, 2025-12-31]
+exploratory_lookback_days: 126
+primary_forecast_horizon_days: 1
+risk_confidence: 0.95
+portfolio_rebalance_trading_days: 21
+max_asset_weight: 0.35
+cost_bps_per_traded_notional: 5
+all_trade_legs_charged: true
+signal_execution_delay_sessions: 1
+v1_risk_window_sessions: 252
+v1_garch_refit_every_sessions: 63
+v1_covariance_diagonal_shrinkage_fixed: 0.25
+v1_portfolio_training_sessions: 126
+v1_confidence: 0.95
+v1_exploration_cutoff: 2018-12-31
+v1_holdout_range: [2019-01-01, 2025-12-31]
+primary_volatility_losses: [QLIKE, MSE]
+# V1 and beyond require legitimately sourced total-return-compatible data.
+# Never label a simulated demo as an empirical market finding.

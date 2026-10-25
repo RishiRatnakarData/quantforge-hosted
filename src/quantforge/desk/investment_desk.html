@@ -1,0 +1,806 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QuantForge | My Investment Desk</title>
+<style>
+:root{--paper:#faf9f6;--white:#fff;--ink:#222f2b;--muted:#64716b;--faint:#909b94;--forest:#1c5346;--forest-dark:#173e35;--line:#e2e5de;--accent:#b27845;--wash:#eff3ee;--negative:#ac534b;--positive:#287354;--serif:Georgia,'Times New Roman',serif;--sans:Inter,'Segoe UI',system-ui,-apple-system,sans-serif}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.6 var(--sans);-webkit-font-smoothing:antialiased}a{color:inherit}button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--forest);outline-offset:3px}
+.site-header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}.header-inner{max-width:1320px;margin:auto;min-height:79px;padding:0 54px;display:flex;align-items:center;justify-content:space-between;gap:28px}.brand{display:flex;align-items:center;gap:11px;text-decoration:none}.brandmark{background:var(--forest);color:#fff;font:italic 23px var(--serif);width:36px;height:36px;border-radius:50%;display:grid;place-items:center}.brandname{font-size:18px;letter-spacing:-.07em;font-weight:750}.header-nav{display:flex;gap:34px;height:79px;align-items:center}.navbutton{border:none;background:none;color:#627169;font-size:13px;font-weight:570;white-space:nowrap;height:100%;border-bottom:2px solid transparent;padding:0 1px}.navbutton.active{color:var(--forest);border-bottom-color:var(--forest)}.private{font-size:11px;color:var(--muted);white-space:nowrap;display:flex;align-items:center;gap:7px}.status-dot{width:7px;height:7px;border-radius:100%;background:#689c7f;flex-shrink:0}
+main{max-width:1320px;padding:45px 54px 95px;margin:auto}.page{display:none;animation:appear .2s ease}.page.active{display:block}@keyframes appear{from{opacity:.5;transform:translateY(5px)}to{opacity:1;transform:none}}.overline{text-transform:uppercase;letter-spacing:.16em;font-size:11px;font-weight:750;color:var(--forest);margin:0 0 15px}.heading{font:normal 49px/1.13 var(--serif);letter-spacing:-.045em;margin:0;color:#1a3028;max-width:890px}.heading em{font-style:italic;color:var(--forest)}.lead{max-width:625px;font-size:16px;line-height:1.75;color:#69756f;margin:18px 0 0}.page-top{margin-bottom:42px}.hairline{border:0;border-top:1px solid var(--line);margin:33px 0}.twocol{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(280px,.85fr);gap:78px}.twocol.tight{gap:46px}.section-title{font:normal 27px/1.25 var(--serif);letter-spacing:-.025em;margin:0 0 10px}.section-sub{color:var(--muted);margin:0 0 25px;font-size:13px}.sectionhead{display:flex;justify-content:space-between;align-items:baseline;gap:20px;margin-bottom:24px}.quiet{color:var(--muted)}.small{font-size:12px}.tiny{font-size:11px;color:var(--muted)}.num{font-variant-numeric:tabular-nums}.thin{font-weight:500}.strong{font-weight:710}.eyebrow{font-size:11px;font-weight:750;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}.good{color:var(--positive)}.bad{color:var(--negative)}
+.welcome{background:#eff2eb;border-radius:7px;padding:34px 36px;margin-bottom:43px;display:grid;grid-template-columns:1.7fr .8fr;gap:28px;align-items:center}.welcome h2{font:normal 26px var(--serif);margin:6px 0 10px}.welcome p{color:#69776b;margin:0;max-width:590px}.welcome .number{font:normal 50px var(--serif);color:#2d5445;letter-spacing:-.055em}.welcome .numberlabel{font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:#587165}.welcome-side{padding-left:25px;border-left:1px solid #d5dfd5}
+.field{margin:0 0 20px}.field label{display:block;font-weight:650;font-size:12px;margin-bottom:8px}.field .hint{display:block;font-size:11px;color:var(--muted);margin-top:6px}input,select,textarea{border:1px solid #d4dbd2;border-radius:5px;padding:12px 13px;width:100%;background:#fff;color:var(--ink);min-height:43px}textarea{min-height:100px;resize:vertical}input::placeholder,textarea::placeholder{color:#9ca6a0}.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 22px}.action{background:var(--forest);color:white;border:1px solid var(--forest);border-radius:4px;min-height:42px;padding:10px 17px;font-weight:650;font-size:12px}.action:hover{background:var(--forest-dark)}.action.outline{background:transparent;color:var(--forest)}.action.outline:hover{background:var(--wash)}.action.plain{background:none;border:0;color:var(--forest);padding:5px 0;min-height:auto}.action.warn{border-color:var(--negative);background:var(--negative)}.link-btn{border:0;background:none;color:var(--forest);font-weight:700;padding:0;text-decoration:underline;text-underline-offset:4px;text-decoration-color:#a5bab1}.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.stage-list{list-style:none;padding:0;margin:20px 0}.stage-list li{border-bottom:1px solid var(--line);padding:19px 0;display:flex;align-items:center;gap:17px}.stage-list li:first-child{border-top:1px solid var(--line)}.stage-no{font:normal 22px var(--serif);color:var(--accent);min-width:30px}.stage-body{flex:1}.stage-body b{display:block;font-size:14px;font-weight:700}.stage-body span{display:block;font-size:12px;color:var(--muted);margin-top:2px}.stage-arrow{color:var(--forest);font-size:22px}.stage-list button{border:none;background:transparent;text-align:left;cursor:pointer;width:100%;display:flex;gap:17px;align-items:center;color:inherit;padding:0}
+.aside-paper{padding:27px 26px;border:1px solid #dae1d9;background:#fff;border-radius:6px}.aside-paper .section-title{font-size:23px}.aside-paper p{font-size:13px;color:var(--muted)}.aside-paper .subtle-rule{height:1px;background:var(--line);margin:22px 0}.watch-item{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:13px 0;gap:12px}.watch-item:last-child{border-bottom:0}.watch-item b{font-size:14px}.watch-item small{display:block;color:var(--muted);font-size:11px}.watch-item button{background:none;border:none;color:var(--forest);font-weight:700;font-size:12px}
+.question{background:#eaf0ea;border-left:3px solid var(--forest);padding:15px 19px;margin:22px 0 27px}.question strong{display:block;font-size:13px}.question p{margin:5px 0 0;font-size:12px;color:#576d5f}.form-inline{display:grid;grid-template-columns:1.35fr .7fr auto;gap:12px;align-items:end}.sheet{border:1px solid var(--line);background:white;border-radius:6px;padding:25px 29px}.sheet-header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:17px}.quote-name{font:normal 29px var(--serif);margin:0}.quote-price{font:normal 31px var(--serif);letter-spacing:-.02em}.quote-top{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-bottom:21px;border-bottom:1px solid var(--line)}.mutedline{font-size:12px;color:var(--muted);line-height:1.7}.interpretation{background:var(--wash);border-radius:4px;padding:15px 17px;font-size:13px;margin-top:17px}.line-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:22px 0}.line-metrics .val{font:normal 25px var(--serif);margin:5px 0 3px}.line-metrics .lbl{color:var(--muted);font-size:11px}.scenario{padding:19px 0;border-top:1px solid var(--line)}.scenario .large{font:normal 30px var(--serif);color:#a04c41;margin:5px 0}.flags{padding:0;list-style:none}.flags li{border-top:1px solid var(--line);padding:12px 0;font-size:12px;color:#5b5348}.flags li:before{content:'•';color:var(--accent);font-size:17px;margin-right:10px}.positive-note{border-top:1px solid var(--line);padding-top:14px;color:var(--forest);font-size:12px}.disclosure{font-size:11px;color:var(--muted);line-height:1.7}.aside-section{border-top:1px solid var(--line);padding-top:25px;margin-top:27px}.lesson{border-left:2px solid var(--accent);padding-left:17px;margin-top:27px}.lesson b{font:normal 21px var(--serif)}.lesson p{color:var(--muted);font-size:12px}
+.ledger-top{border-bottom:1px solid var(--line);padding-bottom:30px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:25px;margin-bottom:40px}.metric-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.09em}.huge{font:normal 36px var(--serif);letter-spacing:-.035em;margin:9px 0 3px}.portfolio-table{width:100%;border-collapse:collapse;text-align:left}.portfolio-table th{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:#7a847d;font-weight:650;border-bottom:1px solid var(--line);padding:13px 10px}.portfolio-table td{padding:17px 10px;border-bottom:1px solid #e8ebe5;font-size:13px}.portfolio-table td:first-child{font-weight:700}.portfolio-table .right{text-align:right}.risk-list{padding:0;margin:0}.risk-list>div{display:flex;justify-content:space-between;gap:18px;border-bottom:1px solid var(--line);padding:15px 0}.risk-list dt{color:var(--muted);font-size:12px}.risk-list dd{margin:0;text-align:right;font-weight:700;font-size:13px}.allocation{height:9px;background:#e3e7e1;border-radius:8px;display:flex;overflow:hidden}.allocation span{display:block;height:100%}.allocation-legend{font-size:12px;line-height:2.1;margin-top:18px}.allocation-legend div{display:flex;align-items:center;justify-content:space-between}.key{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px}.notice{border-left:2px solid var(--accent);padding:9px 0 9px 15px;color:#735b43;background:transparent;font-size:12px;margin:20px 0}.two-panel{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(270px,1fr);gap:55px}.report-values{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin:32px 0}.report-values div{padding-top:15px;border-top:2px solid var(--line)}.report-values .money{font:normal 30px var(--serif)}.report-values label{font-weight:700;display:block;font-size:12px;text-transform:capitalize}.notes-list>div{padding:19px 0;border-bottom:1px solid var(--line)}.notes-list b{display:block}.notes-list p{margin:7px 0;font-size:13px;color:#46584e;white-space:pre-wrap}.notes-list small{color:var(--muted)}
+.bottom-message{position:fixed;bottom:22px;right:22px;max-width:min(440px,calc(100vw - 40px));background:#f3f6f0;border:1px solid #b2c9b6;box-shadow:0 6px 28px #20382b16;border-radius:5px;padding:13px 19px;color:#254f36;font-size:12px;z-index:50;display:none}.bottom-message.visible{display:block}.bottom-message.error{border-color:#d8b5b0;background:#fcf3f1;color:#a4473d}.foot{border-top:1px solid var(--line);margin-top:80px;padding:22px 0 0;display:flex;justify-content:space-between;gap:22px;font-size:11px;color:var(--muted)}.mobile-nav{display:none}
+@media(max-width:1050px){.header-inner{padding:0 27px}.header-nav{gap:18px}main{padding:33px 27px}.twocol,.two-panel{gap:35px}.heading{font-size:42px}}
+@media(max-width:790px){.header-inner{min-height:64px}.header-nav{display:none}.mobile-nav{display:flex;overflow:auto;gap:20px;padding:0 20px;border-top:1px solid var(--line)}.mobile-nav .navbutton{height:46px}.private{font-size:10px}.twocol,.two-panel{grid-template-columns:1fr}.welcome{grid-template-columns:1fr}.welcome-side{border-left:0;border-top:1px solid #d5dfd5;padding:20px 0 0}.form-inline{grid-template-columns:1fr 1fr}.form-inline .action{grid-column:1/-1}.heading{font-size:39px}.aside-paper{margin-top:8px}}
+@media(max-width:530px){main{padding:28px 20px 60px}.header-inner{padding:0 20px}.brandname{font-size:16px}.private{max-width:130px;text-align:right}.heading{font-size:34px}.lead{font-size:14px}.welcome{padding:23px}.field-grid,.form-inline{grid-template-columns:1fr}.form-inline .action{grid-column:auto}.line-metrics,.report-values,.ledger-top{grid-template-columns:1fr 1fr;gap:17px}.ledger-top>:first-child{grid-column:1/-1}.quote-top{display:block}.quote-price{margin-top:12px}.sheet{padding:18px}.foot{display:block}.portfolio-table{min-width:530px}.table-scroll{overflow:auto}}
+
+/* V4.6: single-user research workstation — restrained, editorial and task-first. */
+:root{--paper:#f7f8f7;--white:#fff;--ink:#1d2b30;--muted:#687579;--faint:#8d989b;--forest:#17645b;--forest-dark:#12483f;--line:#dce2e0;--accent:#ab7948;--wash:#edf3f1;--negative:#ab514e;--positive:#187051;--serif:Georgia,'Times New Roman',serif;--sans:'Segoe UI',Arial,system-ui,sans-serif}
+body{background:var(--paper);color:var(--ink);font-size:14px}
+.site-header{position:fixed;inset:0 auto 0 0;width:228px;border-bottom:0;border-right:1px solid #d9e1de;background:#fdfefd}
+.header-inner{width:100%;min-height:100%;max-width:none;padding:30px 20px 28px;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:0}
+.brand{padding:4px 9px;gap:10px}.brandmark{width:32px;height:32px;border-radius:8px;background:#1d554d;font:600 19px/1 var(--serif)}.brandname{font-size:18px;letter-spacing:-.055em}
+.header-nav{display:flex;flex-direction:column;align-items:stretch;height:auto;gap:4px;margin-top:48px}
+.navbutton{text-align:left;height:43px;width:100%;border:0;border-left:3px solid transparent;border-radius:0 5px 5px 0;padding:0 15px;color:#596a6d;font-size:13px;font-weight:600}
+.navbutton:hover{background:#f0f4f2;color:#1f514c}.navbutton.active{border-left-color:var(--forest);border-bottom-color:transparent;background:#edf4f0;color:#194e48}
+.private{margin-top:auto;padding:16px 10px 0;border-top:1px solid var(--line);font-size:10px;letter-spacing:.03em;white-space:normal;line-height:1.7}
+main{max-width:1500px;padding:49px 60px 64px;margin:0 0 0 228px;min-height:100vh}
+.page{animation:appear .13s ease}.overline{font-size:10px;font-weight:700;letter-spacing:.125em;color:#52726e;margin-bottom:11px}
+.heading{font:650 39px/1.16 var(--sans);letter-spacing:-.05em;max-width:none;color:#1d3033}
+.heading em{font:inherit;color:inherit}.heading-dot{color:#c08b55}
+.lead{font-size:14px;line-height:1.7;color:#647379;max-width:750px;margin-top:10px}.page-top{margin-bottom:34px}
+.section-title{font:650 20px/1.35 var(--sans);letter-spacing:-.035em}.section-sub{font-size:12px;margin:8px 0 19px}.sectionhead{margin-bottom:15px}
+.desk-top{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:17px}.desk-top .overline{margin:0}.desk-date{font-size:11px;color:#7b898b}.separator{color:#b4bfba;padding:0 7px}
+.portfolio-strip{border:1px solid #d9e2de;border-left:4px solid #357268;background:#fff;border-radius:4px;display:grid;grid-template-columns:1.35fr 1fr auto;align-items:center;gap:30px;padding:24px 30px;margin-bottom:36px}
+.strip-main .metric-label{color:#5d6d6d;font-weight:700}.strip-note{font-weight:400;text-transform:none;letter-spacing:0;color:#8c9896}.strip-value{font:600 34px/1.4 var(--sans);letter-spacing:-.055em;margin-top:1px;color:#223c3a}
+.strip-copy{display:flex;flex-direction:column;gap:6px}.strip-copy b{font-size:12px}.strip-copy span{font-size:11px;line-height:1.6;color:#71807f;max-width:240px}
+.quiet-nav{border:0;background:none;color:var(--forest);white-space:nowrap;font-size:12px;font-weight:700;padding:11px 0}.quiet-nav span{margin-left:5px}
+.home-workspace{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(250px,.85fr);gap:57px}.home-main{min-width:0}.home-main .section-title{font-size:19px}
+.quick-search{display:flex;align-items:center;border:1px solid #d3ddda;background:#fff;border-radius:5px;padding:5px 5px 5px 16px;gap:8px;box-shadow:0 4px 16px #1b37350a}
+.quick-glyph{font:26px/1 var(--serif);color:#64817a}.quick-search input{border:0;background:transparent;outline:none;min-width:0;flex:1;width:auto;height:46px;padding:4px 8px;font-size:15px;font-weight:600}.quick-search input:focus-visible{outline:0}.quick-search:focus-within{outline:2px solid #85ada2;outline-offset:2px}
+.quick-search .action{min-height:41px;font-size:12px;white-space:nowrap}.quick-examples{display:flex;align-items:center;gap:10px;margin:11px 0 0;color:#7d898a;font-size:11px;flex-wrap:wrap}.quick-example{background:none;border:0;border-bottom:1px solid #c7d5d1;color:#35665e;padding:0 0 1px;font-size:11px}
+.desk-rule{border-top:1px solid var(--line);margin:33px 0 29px}.watchlist-area{min-height:64px}.workspace-links{border-top:1px solid var(--line)}
+.workspace-links button{width:100%;display:flex;align-items:center;gap:16px;border:0;border-bottom:1px solid var(--line);background:transparent;text-align:left;padding:15px 0;color:var(--ink)}.workspace-links button:hover{color:var(--forest)}.workspace-links button>span:nth-child(2){flex:1}.workspace-links b{display:block;font-size:13px;font-weight:650}.workspace-links small{display:block;color:#778384;font-size:11px;margin-top:3px}.workspace-index{font-size:11px;color:#96734e;font-weight:700}.right-arrow{font-size:18px;color:var(--forest)}
+.setting-panel{background:#fff;border:1px solid var(--line);padding:24px 25px;border-radius:5px}.settings-heading{display:flex;justify-content:space-between;align-items:center;gap:10px}.settings-heading .section-title{margin:0}.settings-icon{font-size:21px;color:#a6b7b1}
+.setting-panel>p{margin:12px 0 20px}.preferences-details{border-top:1px solid var(--line)}.preferences-details summary{cursor:pointer;list-style:none;padding:15px 0 1px;font-size:12px;font-weight:700;color:var(--forest);display:flex;justify-content:space-between}.preferences-details summary::-webkit-details-marker{display:none}.preferences-details[open] summary span{transform:rotate(180deg)}.settings-content{padding:18px 0 2px}.settings-content .field{margin-bottom:15px}.settings-content .field label{font-size:11px}.settings-content input,.settings-content select{min-height:40px;padding:9px}.aside-notebook{margin-top:27px;border-top:1px solid var(--line);padding:26px 4px}.aside-notebook p{font:italic 18px/1.55 var(--serif);color:#354746;margin:3px 0 17px}.aside-notebook span{font-size:11px;color:#81908d}
+.visually-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+.action{border-radius:4px;background:#1e6257;border-color:#1e6257}.action:hover{background:#154b43}.aside-paper,.sheet{border-radius:5px;box-shadow:none}
+input,select,textarea{border-color:#d6dfdc;border-radius:4px}.question{background:#f0f4f1;border-left:2px solid #71958b}.page-top.personal-page-top{margin-bottom:26px}
+.research-aside{border-left:1px solid var(--line);padding-left:26px}.research-aside h2{font-size:21px}.research-check{padding:16px 0;border-bottom:1px solid var(--line)}.research-check b{font-size:12px}.research-check p{color:var(--muted);font-size:12px;margin:6px 0 0}.formula-drawer{margin-top:24px}.formula-drawer summary{cursor:pointer;color:var(--forest);font-size:12px;font-weight:700}.formula-drawer summary span{float:right}.formula-drawer p{font-size:12px;color:var(--muted);line-height:1.8}
+.foot{margin-top:65px;font-size:10px}.bottom-message{border-radius:5px}
+@media(max-width:1140px){main{padding:42px 35px 65px}.home-workspace{gap:32px}.portfolio-strip{gap:18px;padding:20px 23px}}
+@media(max-width:980px){.site-header{position:sticky;inset:auto;width:100%;border-right:0;border-bottom:1px solid var(--line)}.header-inner{max-width:none;min-height:66px;padding:0 25px;flex-direction:row;align-items:center;justify-content:space-between}.header-nav{flex-direction:row;margin:0;height:66px;align-items:center;gap:8px}.navbutton{height:66px;width:auto;border-left:0;border-bottom:2px solid transparent;border-radius:0;padding:0 8px;font-size:12px}.navbutton.active{border-left-color:transparent;border-bottom-color:var(--forest)}.private{margin:0;padding:0;border:0;font-size:9px}.mobile-nav{display:none}main{margin:0 auto;max-width:1100px}}
+@media(max-width:760px){.header-nav{display:none}.mobile-nav{display:flex;overflow:auto;gap:18px;padding:0 22px;border-top:1px solid var(--line)}.mobile-nav .navbutton{height:46px;flex:0 0 auto}.home-workspace,.twocol,.two-panel{grid-template-columns:1fr}.portfolio-strip{grid-template-columns:1fr auto}.strip-copy{display:none}.quick-search{flex-wrap:wrap}.quick-search input{min-width:120px}.research-aside{border-left:0;border-top:1px solid var(--line);padding:22px 0 0}.desk-top{margin-bottom:11px}}
+@media(max-width:520px){main{padding:30px 19px 50px}.header-inner{padding:0 18px}.heading{font-size:30px}.portfolio-strip{padding:19px;grid-template-columns:1fr;gap:4px}.strip-value{font-size:30px}.quick-search{padding:9px}.quick-search .action{width:100%}.home-workspace{gap:25px}.setting-panel{padding:18px}.desk-date{font-size:10px}.form-inline{grid-template-columns:1fr}.line-metrics,.report-values,.ledger-top{grid-template-columns:1fr 1fr}.foot{display:flex;flex-direction:column;gap:5px}.portfolio-table{min-width:520px}}
+
+
+/* Minimal private workspace: information before decoration. */
+.portfolio-strip{grid-template-columns:1fr auto;gap:18px;padding:18px 24px;margin-bottom:25px}
+.page-top{margin-bottom:23px}.personal-page-top{margin-bottom:18px}
+.desk-rule{margin:25px 0 21px}.sectionhead{margin-bottom:12px}
+.home-workspace{gap:42px}.setting-panel{padding:20px}
+.heading{font-size:32px}.overline{letter-spacing:.08em}
+.question{display:none}
+@media(max-width:760px){.portfolio-strip{grid-template-columns:1fr auto}}
+@media(max-width:520px){.portfolio-strip{grid-template-columns:1fr}}
+
+/* V4.6.2: restrained finish; detail where requested, not on the home screen. */
+:root{--paper:#f7f8f7;--forest:#155b53;--forest-dark:#104c45;--line:#dce5e1;--wash:#edf5f1}
+body{letter-spacing:.002em}
+.site-header{background:#fcfdfc}
+.navbutton{transition:background-color .16s,color .16s}
+.navbutton.active{background:#e9f1ed;border-left-color:#24776c}
+main{background:radial-gradient(ellipse at 96% 0%,rgba(223,238,231,.30),transparent 35%)}
+.brandmark{background:#1d5a50;box-shadow:0 1px 3px #1d3c3520}
+.portfolio-strip{border-left-color:#287f70;border-radius:9px;box-shadow:0 2px 12px #142e2810;background:linear-gradient(110deg,#fff 15%,#f7fbf8 100%)}
+.strip-value{color:#1e4d42;font-variant-numeric:tabular-nums}
+.quick-search{border-radius:8px;box-shadow:0 3px 14px #123e3210}
+.quick-search:focus-within{border-color:#75a99b;box-shadow:0 0 0 3px #237e6613}
+.quick-examples button:hover,.quick-example:hover{color:var(--forest);text-decoration:underline;text-underline-offset:3px}
+.sheet,.aside-paper,.setting-panel{border-radius:9px}
+.sheet{box-shadow:0 2px 12px #102c2510}
+.action{border-radius:6px;transition:background-color .15s,transform .15s}
+.action:active{transform:translateY(1px)}
+.portfolio-table tbody tr:hover{background:#f7faf8}
+.portfolio-table td,.portfolio-table th{font-variant-numeric:tabular-nums}
+.huge,.quote-price,.val,.money{font-variant-numeric:tabular-nums}
+.analysis-drawer{margin:19px 0 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:transparent}
+.analysis-drawer+ .analysis-drawer{margin-top:0;border-top:0}
+.analysis-drawer summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 1px;cursor:pointer;color:#255a51;font-size:12px;font-weight:700}
+.analysis-drawer summary::-webkit-details-marker{display:none}
+.analysis-drawer summary:after{content:'+';font-size:18px;font-weight:400;color:#628278}
+.analysis-drawer[open] summary:after{content:'−'}
+.analysis-drawer summary:hover{color:#0c4037}
+.detail-content{padding:3px 2px 20px;color:#475e59;font-size:12px;line-height:1.6}
+.detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px 21px}
+.detail-pair{display:flex;flex-direction:column;gap:2px}
+.detail-pair .detail-name{color:#788782;font-size:11px}
+.detail-pair b{font-size:13px;font-weight:650;color:#253f37}
+.detail-table{width:100%;border-collapse:collapse;margin:3px 0 8px}
+.detail-table th,.detail-table td{padding:9px 5px;border-bottom:1px solid #e5ebe7;font-size:12px;text-align:left}
+.detail-table th{font-size:10px;color:#72837c;letter-spacing:.03em;font-weight:700}
+.detail-table td:last-child,.detail-table th:last-child{text-align:right}
+.detail-note{font-size:11px;color:#71817d;margin:12px 0 0}
+.detail-content code{font-size:11px;background:#eef4f0;padding:1px 4px;border-radius:3px}
+.risk-number{color:#34685c;font-weight:700}
+@media(max-width:630px){.detail-grid{grid-template-columns:1fr 1fr;gap:12px}.detail-table{display:block;overflow-x:auto}.portfolio-strip{box-shadow:none}}
+
+/* Investment browser: compact, keyboard-friendly, responsive; no third-party assets. */
+.holding-ticker{display:block;font-size:10px;color:var(--muted);font-weight:450;margin-top:2px}
+.directory-toolbar{display:flex;gap:12px;align-items:center;margin:0 0 19px}
+.directory-search{max-width:680px;flex:1;min-width:0;background:#fff;border-radius:6px}
+.directory-search input{font-size:14px;min-height:49px}
+.directory-count{font-size:12px;color:var(--muted);white-space:nowrap}
+.category-filters{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 24px}
+.category-chip{border:1px solid #d7e1dc;background:#fff;border-radius:20px;padding:8px 13px;font-size:12px;color:#37524c;font-weight:550;line-height:1.2}
+.category-chip:hover{background:#eff4f1}.category-chip.active{background:#205b50;border-color:#205b50;color:#fff}
+.directory-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 30px;border-top:1px solid var(--line)}
+.directory-row{border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);padding:15px 3px;width:100%;text-align:left;display:flex;align-items:center;gap:13px;min-width:0}
+.directory-row:hover{background:#eff5f1}.directory-monogram{width:36px;height:36px;border-radius:7px;background:#e5eee8;color:#246554;display:grid;place-items:center;font-weight:750;flex-shrink:0;font-size:12px}
+.directory-name{min-width:0;flex:1}.directory-name b{display:block;line-height:1.35;font-size:13px;font-weight:650;white-space:normal}.directory-name small{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+.directory-symbol{font-size:12px;color:#2d675c;font-weight:740;white-space:nowrap}.directory-arrow{color:#6a8c81;font-size:16px}
+.browse-intro{margin:0 0 16px;color:var(--muted);font-size:12px}.directory-more{margin:25px auto 0;display:block}
+.quick-search,.field.has-suggest{position:relative}.search-suggestions{display:none;position:absolute;top:calc(100% + 6px);left:0;width:min(500px,100%);background:#fff;border:1px solid #d3ded8;box-shadow:0 15px 35px #1a3b321a;border-radius:6px;z-index:45;max-height:350px;overflow:auto}
+.search-suggestions.visible{display:block}.suggest-item{width:100%;padding:11px 13px;display:flex;justify-content:space-between;gap:10px;align-items:center;border:0;border-bottom:1px solid #eef0ed;text-align:left;background:white;color:var(--ink)}.suggest-item:hover,.suggest-item:focus-visible{background:#f0f5f1}.suggest-item b{font-size:12px}.suggest-item small{display:block;font-size:10px;color:var(--muted)}.suggest-symbol{font-size:11px;color:var(--forest);font-weight:740}
+.quote-full-name{font-size:13px;color:#456d60;margin:2px 0 0;max-width:400px}
+@media(max-width:820px){.directory-list{grid-template-columns:1fr}.directory-toolbar{align-items:stretch;flex-direction:column}.directory-count{align-self:flex-start}}
+@media(max-width:520px){.directory-row{padding:13px 2px}.category-filters{gap:6px}.category-chip{font-size:11px;padding:8px 10px}.directory-name b{font-size:12px}.directory-monogram{width:32px;height:32px}}
+
+/* V5: comparison and filings — compact tables, no additional third-party assets. */
+.compare-selects{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 20px;margin-bottom:19px}
+.compare-selects label{display:block;font-size:12px;font-weight:700;margin:0 0 7px}
+.compare-header{display:flex;align-items:end;justify-content:space-between;gap:18px;margin:0 0 21px}
+.compare-header .field{max-width:185px;margin:0}
+.compare-results{overflow:auto;border:1px solid var(--line);background:white;border-radius:8px}
+.compare-table{border-collapse:collapse;width:100%;min-width:680px}
+.compare-table th,.compare-table td{border-bottom:1px solid var(--line);padding:13px 16px;text-align:left;vertical-align:top;font-size:12px}
+.compare-table th{font-weight:700;background:#eef5f1;color:#345b51}
+.compare-table th:first-child{min-width:160px;background:#f9faf7}
+.compare-table td:first-child{font-weight:650;color:#405b53;background:#fafbf8}
+.compare-table tr:last-child td{border-bottom:0}
+.compare-table .short{font-size:10px;color:#78877e;display:block;margin-top:4px;line-height:1.4}
+.compare-caution{font-size:11px;color:var(--muted);line-height:1.6;margin:12px 0}
+.filing-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px 25px;margin:18px 0}
+.filing-metrics .metric{border-bottom:1px solid var(--line);padding:4px 0 14px}
+.filing-metrics .metric span{font-size:11px;color:var(--muted);display:block}
+.filing-metrics .metric b{font-size:16px;font-weight:690;font-variant-numeric:tabular-nums}
+#filingStatus{margin:10px 0;font-size:12px}
+@media(max-width:640px){.compare-selects{grid-template-columns:1fr}.compare-header{align-items:stretch;flex-direction:column}.compare-header .field{max-width:none}.filing-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* V5.1 portfolio tools: quiet tables and compact editable allocation lines. */
+.intel-section{margin-top:31px;padding-top:23px;border-top:1px solid var(--line)}
+.intel-section h2{font:normal 22px/1.3 var(--serif);margin:0 0 8px}
+.intel-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,.75fr);gap:22px}
+.intel-import{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.intel-import label{font-size:11px;font-weight:650;display:block;margin-bottom:4px}
+.intel-import .wide{grid-column:1/-1}
+.intel-import input,.intel-import select{padding:7px 10px;min-height:36px;font-size:12px}
+.intel-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0}
+.intel-tools .action{min-height:34px;padding:6px 12px}
+.intel-status{font-size:12px;color:var(--muted);margin:10px 0}
+.intel-target-row{display:grid;grid-template-columns:1fr 92px 100px;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:12px}
+.intel-target-row input{min-height:33px;height:33px;padding:6px 9px;text-align:right}
+.intel-target-row small{text-align:right;color:var(--muted)}
+.intel-target-row.is-label{font-weight:650;color:var(--muted);font-size:11px}
+.intel-table{width:100%;border-collapse:collapse;margin:8px 0 12px}
+.intel-table th,.intel-table td{font-size:12px;padding:9px 6px;border-bottom:1px solid var(--line);text-align:left}
+.intel-table th:last-child,.intel-table td:last-child{text-align:right}
+.intel-message{font-size:11px;color:#667a71;line-height:1.6;margin-top:9px}
+@media(max-width:760px){.intel-grid{grid-template-columns:1fr}}
+@media(max-width:480px){.intel-target-row{grid-template-columns:1fr 76px 80px;gap:7px}.intel-import{grid-template-columns:1fr}}
+
+/* V5.2: compact analyst inputs and read-only sensitivity tables */
+.model-section{padding:14px 0 25px;border-bottom:1px solid var(--line);margin-bottom:18px}
+.model-selector{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;max-width:1080px;margin:16px 0}
+.model-selector label{display:block;margin-bottom:5px;font-size:11px;font-weight:650;color:var(--muted)}
+.model-selector input,.model-selector select{width:100%;max-width:100%;height:38px;min-height:38px;padding:7px 8px;font-size:12px}
+.model-result{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:16px 0;margin:13px 0}
+.model-result label{font-size:11px;color:var(--muted);display:block;margin-bottom:6px}
+.model-price{font:normal 28px/1.1 var(--serif);font-variant-numeric:tabular-nums}
+.model-sources p{font-size:11px;line-height:1.5;margin:0 0 7px;overflow-wrap:anywhere}
+#dcfSensitivity td,#dcfSensitivity th,#dcfForecast td,#dcfForecast th{font-variant-numeric:tabular-nums;white-space:nowrap;font-size:11px}
+#fundCompareResults table{width:100%}.compare-scroll{overflow-x:auto}
+@media(max-width:780px){.model-selector{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:440px){.model-selector{grid-template-columns:1fr}.model-result{grid-template-columns:1fr 1fr}}
+
+/* V5.3 private quant tools — no third-party chart dependencies. */
+.quant-choice{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 15px;margin:10px 0}
+.quant-choice label{display:flex;align-items:center;gap:8px;padding:8px 4px;font-size:12px;border-bottom:1px solid var(--line)}
+.quant-choice input{width:16px;height:16px;flex-shrink:0;accent-color:#27675a}
+.quant-number{font-size:17px;font-weight:700;color:#24574b;font-variant-numeric:tabular-nums}
+#quantAllocations .compare-table td,#quantCorrelation td,#quantRiskContribution td{font-variant-numeric:tabular-nums}
+#quantCorrelation td,#quantCorrelation th{text-align:right}
+#quantResults .analysis-drawer{margin-top:13px}
+@media(max-width:510px){.quant-choice{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="site-header"><div class="header-inner"><a class="brand" href="#home" data-go="home"><span class="brandmark">Q</span><span class="brandname">quantforge<span style="color:#bb8b67">.</span></span></a>
+<nav class="header-nav" aria-label="Main navigation"><button class="navbutton active" data-go="home">Overview</button><button class="navbutton" data-go="browse">Browse</button><button class="navbutton" data-go="explore">Research</button><button class="navbutton" data-go="compare">Compare</button><button class="navbutton" data-go="portfolio">Portfolio</button><button class="navbutton" data-go="quant">Quant</button><button class="navbutton" data-go="company">Valuation</button><button class="navbutton" data-go="journal">Journal</button></nav><div class="private"><span class="status-dot"></span><span id="modeText">PRIVATE WORKSPACE</span></div></div>
+<nav class="mobile-nav" aria-label="Mobile navigation"><button class="navbutton active" data-go="home">Home</button><button class="navbutton" data-go="browse">Browse</button><button class="navbutton" data-go="explore">Research</button><button class="navbutton" data-go="compare">Compare</button><button class="navbutton" data-go="portfolio">Portfolio</button><button class="navbutton" data-go="quant">Quant</button><button class="navbutton" data-go="company">Valuation</button><button class="navbutton" data-go="journal">Journal</button></nav></header>
+<main>
+<section class="page active" id="home">
+  <div class="desk-top"><span class="overline">Overview</span><span class="desk-date" id="deskDate">Private session</span></div>
+  <div class="page-top personal-page-top">
+    <h1 class="heading">Investment desk</h1>
+    
+  </div>
+  <div class="portfolio-strip">
+    <div class="strip-main"><div class="metric-label">Virtual portfolio</div><div class="strip-value num" id="homeBalance">$10,000.00</div></div>
+    
+    <button class="quiet-nav" data-go="portfolio">Portfolio <span aria-hidden="true">↗</span></button>
+  </div>
+  <div class="home-workspace">
+    <div class="home-main">
+      <div class="sectionhead"><div><h2 class="section-title">Research</h2></div></div>
+      <div class="quick-search"><span class="quick-glyph" aria-hidden="true">⌕</span><label for="quickSymbol" class="visually-hidden">Search investment symbol</label><input id="quickSymbol" value="" autocomplete="off" spellcheck="false" aria-label="Company, fund, crypto or ticker" placeholder="Search Apple, Microsoft, S&P 500..."> <div id="quickSuggestions" class="search-suggestions" role="listbox" aria-label="Matching investments"></div><button class="action" id="quickResearch">Review investment <span aria-hidden="true">↗</span></button></div>
+      <div class="quick-examples"><button class="link-btn" data-go="browse">Browse all companies, ETFs and crypto →</button></div>
+      <div class="desk-rule"></div>
+      <div class="sectionhead" style="margin-bottom:0"><div><h2 class="section-title">Watchlist</h2></div></div>
+      <div id="watchHome" class="watchlist-area quiet small">No saved symbols.</div>
+      <div class="desk-rule"></div>
+      <div class="sectionhead" style="margin-bottom:8px"><div><h2 class="section-title">Tools</h2></div></div>
+      <div class="workspace-links">
+        <button data-go="compare"><span class="workspace-index">01</span><span><b>Compare investments</b><small>Same budget · Risk · Position impact</small></span><span class="right-arrow">↗</span></button>
+        <button data-go="portfolio"><span class="workspace-index">02</span><span><b>Portfolio & risk</b><small>Holdings · Trades · Risk</small></span><span class="right-arrow">↗</span></button>
+        <button data-go="company"><span class="workspace-index">03</span><span><b>Financial valuation</b><small>Microsoft · DCF</small></span><span class="right-arrow">↗</span></button>
+        <button data-go="journal"><span class="workspace-index">04</span><span><b>Decision journal</b><small>Saved investment notes</small></span><span class="right-arrow">↗</span></button>
+      </div>
+    </div>
+    <aside class="home-aside">
+      <div class="setting-panel">
+        <div class="settings-heading"><div><h2 class="section-title">Preferences</h2></div><span class="settings-icon" aria-hidden="true">◎</span></div>
+        
+        <details class="preferences-details" id="preferencesDetails"><summary>Edit <span aria-hidden="true">⌄</span></summary><div class="settings-content">
+          <div class="field"><label for="goal">Goal</label><select id="goal"><option value="explore">Research investments</option><option value="build_wealth">Build wealth over time</option><option value="preserve">Preserve capital</option></select></div>
+          <div class="field"><label for="horizon">Time horizon</label><select id="horizon"><option value="five_plus">5+ years</option><option value="one_to_five">1–5 years</option><option value="under_one">Under 1 year</option></select></div>
+          <div class="field"><label for="comfort">Loss tolerance</label><select id="comfort"><option value="cautious">Low</option><option value="balanced">Medium</option><option value="adventurous">High</option></select></div>
+          <div class="field"><label for="buffer">Cash reserve (%)</label><input id="buffer" type="number" value="20" min="0" max="90" step="1"></div>
+          <button id="saveProfile" class="action">Save preferences</button>
+        </div></details>
+      </div>
+      
+    </aside>
+  </div>
+</section>
+<section class="page" id="browse">
+  <div class="page-top" style="margin-bottom:24px"><h1 class="heading">Browse investments</h1></div>
+  <div class="directory-toolbar"><div class="directory-search"><label for="directorySearch" class="visually-hidden">Search companies, ETFs and crypto</label><input id="directorySearch" type="search" placeholder="Find a company or fund by name or ticker" autocomplete="off"></div><span id="directoryCount" class="directory-count">Loading…</span></div>
+  <div id="directoryCategories" class="category-filters" role="group" aria-label="Filter investments"></div>
+  <div id="directoryList" class="directory-list"><p class="quiet">Loading investments…</p></div>
+  <button id="directoryMore" class="action outline directory-more" style="display:none">Show more</button>
+  <p class="disclosure" style="margin-top:26px">Curated directory, not every listed security. Demo prices are fictional. Select any entry to analyze it.</p>
+</section>
+
+<section class="page" id="compare">
+  <div class="page-top"><h1 class="heading">Compare</h1></div>
+  <div class="compare-header"><div><h2 class="section-title">Investments</h2><p class="small quiet">Compare separate purchases using the same virtual amount.</p></div>
+  <div class="field"><label for="compareBudget">Amount for each scenario ($)</label><input id="compareBudget" type="number" min="1" step="0.01" value="500"></div></div>
+  <div class="compare-selects">
+    <div><label for="compare1">First investment</label><select id="compare1"></select></div>
+    <div><label for="compare2">Second investment</label><select id="compare2"></select></div>
+    <div><label for="compare3">Third investment (optional)</label><select id="compare3"></select></div>
+    <div><label for="compare4">Fourth investment (optional)</label><select id="compare4"></select></div>
+  </div>
+  <div class="actions" style="margin-bottom:23px"><button id="compareRun" class="action">Compare</button><span class="small quiet" id="compareStatus">Select 2–4 investments.</span></div>
+  <div id="compareOutput" style="display:none"><div class="compare-results"><table class="compare-table"><thead id="compareHead"></thead><tbody id="compareBody"></tbody></table></div>
+  <p class="compare-caution" id="compareFoot"></p></div>
+</section>
+<section class="page" id="explore"><div class="page-top"><h1 class="heading">Investment analysis</h1></div>
+
+<div class="form-inline" style="margin-bottom:32px"><div class="field" style="margin:0"><label for="symbol">Company or ticker</label><input id="symbol" value="" autocomplete="off" placeholder="Apple, Microsoft, VOO..."><div id="researchSuggestions" class="search-suggestions" role="listbox" aria-label="Matching investments"></div></div><div class="field" style="margin:0"><label for="budget">Amount ($)</label><input id="budget" type="number" min="1" value="500" step="0.01"></div><button class="action" id="evaluate">Analyze</button></div>
+<div class="two-panel"><div><div id="decision-empty" class="sheet"><h2 class="section-title">Select an investment and amount</h2><p class="quiet">Try <button class="link-btn example" data-symbol="VOO">Vanguard S&P 500</button> · <button class="link-btn example" data-symbol="MSFT">Microsoft</button> · <button class="link-btn example" data-symbol="BTC/USD">Bitcoin</button> · <button class="link-btn" data-go="browse">Browse all</button></p><p class="tiny">Demo: fictional prices. Live: Alpaca IEX quotes with timestamps.</p></div>
+<div id="decision-results" style="display:none"><div class="sheet"><div class="quote-top"><div><div class="overline" id="assetType">INVESTMENT</div><h2 class="quote-name" id="assetSymbol">—</h2><p class="quote-full-name" id="assetFullName"></p><p class="mutedline" id="quoteMeta">—</p></div><div><span class="eyebrow">Last observed price</span><div class="quote-price num" id="quotePrice">—</div></div></div><div class="interpretation" id="assetMeaning">—</div><div class="line-metrics"><div><div class="lbl">Amount</div><div class="val num" id="previewBudget">—</div></div><div><div class="lbl">Position weight</div><div class="val num" id="previewWeight">—</div></div><div><div class="lbl">Cash after purchase</div><div class="val num" id="previewCash">—</div></div></div><div class="scenario"><span class="overline">Downside scenario</span><p class="small quiet" id="scenarioIntro">—</p><div class="large num" id="scenarioLoss">—</div><p class="mutedline" id="scenarioDetail">—</p></div><div><h3 class="strong" style="font-size:14px">Flags</h3><ul id="decisionFlags" class="flags"></ul></div>
+<details class="analysis-drawer" id="positionBreakdown"><summary>Position breakdown</summary><div class="detail-content">
+<div class="detail-grid">
+<div class="detail-pair"><span class="detail-name">Estimated units</span><b class="num" id="detailUnits">—</b></div>
+<div class="detail-pair"><span class="detail-name">Estimated fee</span><b class="num" id="detailFee">—</b></div>
+<div class="detail-pair"><span class="detail-name">Weight before purchase</span><b class="num" id="detailWeightBefore">—</b></div>
+<div class="detail-pair"><span class="detail-name">Weight after purchase</span><b class="num" id="detailWeightAfter">—</b></div>
+<div class="detail-pair"><span class="detail-name">Your position guideline</span><b class="num" id="detailSingleLimit">—</b></div>
+<div class="detail-pair"><span class="detail-name">Your cash reserve setting</span><b class="num" id="detailReserve">—</b></div>
+</div>
+<p class="detail-note">Includes existing units of the same asset. Fees and virtual execution are approximations.</p>
+</div></details>
+<details class="analysis-drawer"><summary>Calculation methods</summary><div class="detail-content">
+<p><b>Position weight</b> = holding value ÷ portfolio value, after estimated fees.</p>
+<p><b>Scenario loss</b> = total units held after purchase × last observed price × assumed price decline.</p>
+<p class="detail-note">A loss scenario is not a forecast or a worst-case bound. Quotes are venue-specific and may be stale.</p>
+</div></details>
+<details class="analysis-drawer" id="secFactsSection"><summary>Company financials (SEC)</summary><div class="detail-content">
+  <div class="actions"><button class="action outline" type="button" id="fetchFinancials">Load latest annual 10-K</button><span id="filingStatus" class="quiet">No SEC request made.</span></div>
+  <div id="filingResults" style="display:none"><p class="small" id="filingPeriod"></p><div class="filing-metrics" id="filingMetrics"></div><p class="detail-note" id="filingLimit"></p><a id="filingLink" target="_blank" rel="noopener noreferrer" href="https://www.sec.gov/">SEC filing records ↗</a></div>
+  <p class="detail-note">Annual filing facts only, not a valuation. U.S. stocks with standard SEC reporting; requires SEC_USER_AGENT.</p>
+</div></details>
+<details class="analysis-drawer" id="mlPeersSection"><summary>Company peers (ML)</summary><div class="detail-content">
+  <div class="intel-import">
+    <div><label for="mlPeerGroup">Companies to compare</label><select id="mlPeerGroup">
+      <option value="Technology">Technology (12 companies)</option>
+      <option value="Consumer">Consumer (12 companies)</option>
+      <option value="Healthcare">Healthcare (12 companies)</option>
+      <option value="Communication">Communication (12 companies)</option>
+      <option value="Finance">Finance (12 companies; accounting differs)</option>
+    </select></div>
+  </div>
+  <div class="intel-tools"><button id="mlCalculate" class="action outline" type="button">Compare company profiles</button><span id="mlStatus" class="small quiet">SEC annual data. May take several seconds.</span></div>
+  <div id="mlResult" style="display:none">
+    <p class="small quiet" id="mlCoverage"></p>
+    <h3 class="section-title" style="font-size:16px">Most similar companies</h3>
+    <div class="compare-scroll"><table id="mlNeighbors" class="intel-table"></table></div>
+    <h3 class="section-title" style="font-size:16px;margin-top:20px">Financial features</h3>
+    <div class="compare-scroll"><table id="mlFeatures" class="intel-table"></table></div>
+    <p id="mlOutlier" class="small"></p>
+    <p id="mlStability" class="small quiet"></p>
+    <details class="analysis-drawer"><summary>Data and methods</summary><div class="detail-content" id="mlMethods"></div></details>
+  </div>
+  <p class="detail-note">Peer similarity is descriptive, not a stock rating or price forecast. Companies use different fiscal year-ends and accounting practices.</p>
+</div></details>
+<p class="disclosure">Hypothetical scenario · 0.05% simulated fee · Not a forecast</p><div class="actions" style="margin-top:22px"><button id="watch" class="action outline">Add to watchlist</button><button id="compareCurrent" class="action outline">Compare</button><button id="buyPreview" class="action">Virtual buy</button></div></div>
+<div class="aside-section"><h3 class="section-title" style="font-size:23px">Notes</h3><textarea id="researchNote" placeholder="Reason for researching; what would change your view"></textarea><div class="actions" style="margin-top:10px"><button class="action outline" id="saveNote">Save note</button></div></div></div></div>
+<aside class="research-aside"><h2 class="section-title">Data checks</h2><div class="research-check"><b>Quote</b><p>Source · Venue · Time</p></div><div class="research-check"><b>Position</b><p>Cash · Weight · Stress loss</p></div><div class="research-check"><b>Limitations</b><p>Scenarios use assumptions; no return forecast.</p></div><details class="formula-drawer"><summary>Formulas <span>＋</span></summary><p>Weight = position value / portfolio value. Stress loss = exposure × assumed decline.</p></details></aside></div></section>
+<section class="page" id="portfolio"><div class="page-top"><h1 class="heading">Portfolio</h1></div><div class="ledger-top"><div><div class="metric-label">Portfolio value</div><div class="huge num" id="equity">—</div><div class="tiny" id="returns">—</div></div><div><div class="metric-label">Cash</div><div class="huge num" id="cash">—</div></div><div><div class="metric-label">Largest holding</div><div class="huge num" id="largest">—</div></div></div>
+<div class="two-panel"><div><div class="sectionhead"><h2 class="section-title">Holdings</h2><button class="action outline" id="refresh">Refresh</button></div><div class="table-scroll"><table class="portfolio-table"><thead><tr><th>Investment</th><th class="right">Units</th><th class="right">Value</th><th class="right">Weight</th></tr></thead><tbody id="holdings"><tr><td colspan="4">No virtual holdings yet.</td></tr></tbody></table></div><div class="aside-section"><h3 class="section-title">Allocation</h3><div class="allocation" id="allocation"></div><div id="allocationLegend" class="allocation-legend"></div></div><div class="aside-section"><h3 class="section-title">Risk scenarios</h3><p class="quiet small">Hypothetical shocks, not predictions.</p><dl class="risk-list"><div><dt>Stocks & ETFs −20%, crypto −40%</dt><dd id="stress1">—</dd></div><div><dt>Largest holding −35%</dt><dd id="stress2">—</dd></div><div><dt>95% VaR (simulated)</dt><dd id="var95">—</dd></div><div><dt>Expected shortfall (simulated)</dt><dd id="es95">—</dd></div><div><dt>Concentration (HHI)</dt><dd id="hhi">—</dd></div></dl><p class="disclosure">Monte Carlo uses assumed volatility; not calibrated to market history.</p>
+<details class="analysis-drawer" id="riskBreakdown"><summary>Risk model details</summary><div class="detail-content">
+<div class="detail-grid">
+<div class="detail-pair"><span class="detail-name">Simulated scenarios</span><b id="riskSimCount">—</b></div>
+<div class="detail-pair"><span class="detail-name">Horizon</span><b id="riskHorizon">—</b></div>
+<div class="detail-pair"><span class="detail-name">Loss frequency in model</span><b id="riskLossFreq">—</b></div>
+<div class="detail-pair"><span class="detail-name">Annual volatility assumptions</span><b id="riskVols">—</b></div>
+</div>
+<p class="detail-note"><b>HHI</b> = sum of squared portfolio weights. <b>95% VaR</b> = the 95th-percentile modeled loss. <b>ES</b> = average modeled loss at or beyond that threshold.</p>
+<p class="detail-note">Simulated outcomes use assumed volatilities and a common market factor. These are not historical loss probabilities or calibrated forecasts.</p>
+</div></details>
+</div></div>
+<aside><div class="aside-paper"><h2 class="section-title">Virtual trades</h2><p>Paper trades only. No broker orders.</p><button data-go="explore" class="action" style="width:100%;margin:12px 0 25px">Buy virtual shares →</button><div class="field"><label for="sellSymbol">Sell symbol</label><input id="sellSymbol" placeholder="e.g., MSFT"></div><div class="field"><label for="sellUnits">Units to sell</label><input type="number" id="sellUnits" value="1" min="0.00000001" step="any"></div><button id="sellPreview" class="action outline" style="width:100%">Sell virtual shares</button><p class="disclosure" style="margin-top:15px">Execution is simulated at an observed price plus assumed fees.</p></div></aside></div>
+<div class="intel-section" id="allocationPlanner">
+ <div class="sectionhead"><h2>Rebalance plan</h2><button class="action outline" id="resetTargets">Reset targets</button></div>
+ <p class="small quiet">Set percentages for existing holdings and cash. This only calculates virtual trades.</p>
+ <div class="intel-grid"><div>
+  <div class="intel-target-row is-label"><span>Holding</span><span>Target %</span><small>Current %</small></div>
+  <div id="rebalanceTargets"></div>
+  <div class="intel-tools"><button class="action" id="calculateRebalance">Calculate plan</button><span class="small quiet" id="targetTotal">Total: —</span></div>
+ </div><div>
+  <div class="small quiet" id="rebalanceStatus">No plan calculated.</div>
+  <div id="rebalanceResults"></div>
+ </div></div>
+</div>
+<div class="intel-section" id="overlapInspector">
+ <div class="sectionhead"><h2>ETF holdings overlap</h2><button class="action outline" id="refreshLookthrough">Refresh</button></div>
+ <p class="small quiet">Import a fund's dated holdings CSV to see which companies you own indirectly.</p>
+ <div class="intel-grid"><div>
+  <div class="intel-import">
+   <div><label for="etfImportSymbol">ETF</label><select id="etfImportSymbol"><option value="">Select ETF</option></select></div>
+   <div><label for="etfImportDate">Holdings date</label><input id="etfImportDate" type="date"></div>
+   <div class="wide"><label for="etfImportSource">Source (issuer and URL or report title)</label><input id="etfImportSource" placeholder="Fund provider holdings CSV"></div>
+   <div class="wide"><label for="etfImportFile">CSV file (Ticker, Weight (%))</label><input id="etfImportFile" type="file" accept=".csv,text/csv"></div>
+  </div><div class="intel-tools"><button class="action outline" id="importEtfHoldings">Import holdings</button><span class="small quiet" id="importStatus"></span></div>
+  <div id="etfImportList" class="small quiet"></div>
+ </div><div>
+  <div class="small quiet" id="lookthroughStatus">No look-through analysis loaded.</div>
+  <div id="lookthroughResults"></div>
+ </div></div>
+ <p class="intel-message">Unknown or missing fund holdings are shown as unknown exposure. Issuer files can be outdated. Results are not derived from Alpaca prices.</p>
+</div>
+</section>
+<section class="page" id="quant">
+ <div class="page-top"><h1 class="heading">Quant analysis</h1></div>
+ <p class="small quiet">Historical price research. No trades or investment recommendations.</p>
+ <div class="intel-section" style="margin-top:12px">
+  <h2 class="section-title">Historical prices</h2>
+  <p class="small quiet" id="quantHistoryStatus">No historical data imported.</p>
+  <details class="analysis-drawer"><summary>Fetch from Alpaca (stocks and ETFs)</summary><div class="detail-content">
+   <p class="small quiet">Historical daily bars, prior sessions only. Use your private Alpaca credentials.</p>
+   <div class="intel-import">
+    <div><label for="quantFetch1">Investment 1</label><select id="quantFetch1"></select></div>
+    <div><label for="quantFetch2">Investment 2</label><select id="quantFetch2"></select></div>
+    <div><label for="quantFetch3">Investment 3 (optional)</label><select id="quantFetch3"></select></div>
+    <div><label for="quantFetchFeed">Historical data feed</label><select id="quantFetchFeed"><option value="iex">IEX (free plan)</option><option value="sip">SIP (historical; if accessible)</option></select></div>
+   </div><div class="intel-tools"><button class="action outline" id="quantFetch">Fetch 400 days</button><span id="quantFetchStatus" class="small quiet"></span></div>
+   <p class="detail-note">SIP availability depends on your Alpaca access; IEX covers only one exchange. Adjustments: splits, dividends and other corporate actions (Alpaca adjustment=all). This dataset replaces the previous import, stays in your local private database, and is not published.</p>
+  </div></details>
+  <details class="analysis-drawer"><summary>Import price CSV</summary><div class="detail-content">
+   <p class="small quiet">Date, symbol, adjusted close. At least 91 prices per asset; 90 shared return dates.</p>
+   <div class="intel-import">
+    <div class="wide"><label for="quantSource">Source (provider or report)</label><input id="quantSource" placeholder="Provider + dataset / exported report"></div>
+    <div class="wide"><label for="quantFile">CSV with date,symbol,close</label><input id="quantFile" type="file" accept=".csv,text/csv"></div>
+   </div><div class="intel-tools"><button id="quantImport" class="action outline">Import prices</button><span id="quantImportStatus" class="small quiet"></span></div>
+   <p class="detail-note">Use adjusted closes where applicable. The import replaces the previous research dataset. It never changes your portfolio.</p>
+  </div></details>
+ </div>
+ <div class="intel-section">
+  <h2 class="section-title">Compare allocations</h2>
+  <div class="intel-grid"><div>
+   <div class="intel-import">
+    <div><label for="quantBudget">Hypothetical budget ($)</label><input id="quantBudget" type="number" min="100" max="10000000" value="10000"></div>
+    <div><label for="quantMaxWeight">Max per asset (%)</label><input id="quantMaxWeight" type="number" min="1" max="100" value="60"></div>
+    <div><label for="quantCryptoMax">Max total crypto (%)</label><input id="quantCryptoMax" type="number" min="0" max="100" value="15"></div>
+   </div>
+   <p class="small quiet">Choose 2–8 investments from your imported data.</p>
+   <div class="quant-choice" id="quantSymbols"></div>
+   <div class="intel-tools"><button class="action" id="quantCalculate">Calculate</button><span class="small quiet" id="quantStatus"></span></div>
+  </div><div>
+    <h3 class="section-title" style="font-size:18px">Summary</h3>
+    <div id="quantSummary" class="small quiet">Import prices to begin.</div>
+  </div></div>
+ </div>
+ <div id="quantResults" style="display:none" class="intel-section">
+  <div class="sectionhead"><h2>Results</h2><span id="quantDates" class="small quiet"></span></div>
+  <div id="quantAllocations" class="compare-scroll"></div>
+  <details class="analysis-drawer"><summary>Correlation matrix</summary><div class="detail-content compare-scroll"><table class="intel-table" id="quantCorrelation"></table></div></details>
+  <details class="analysis-drawer"><summary>Risk contributions</summary><div class="detail-content compare-scroll"><table class="intel-table" id="quantRiskContribution"></table></div></details>
+  <details class="analysis-drawer"><summary>Method and assumptions</summary><div class="detail-content"><p id="quantMethods" class="small quiet"></p></div></details>
+ </div>
+</section>
+<section class="page" id="company"><div class="page-top"><h1 class="heading">Valuation</h1></div>
+<section class="model-section">
+ <h2 class="section-title">Company DCF</h2>
+ <div class="model-selector"><div><label for="dcfSymbol">Company</label><select id="dcfSymbol"><option value="MSFT">Microsoft (MSFT)</option></select></div><div><label for="dcfGrowth">5-year revenue growth %</label><input type="number" id="dcfGrowth" value="5" min="-20" max="30" step="0.5"></div><div><label for="dcfMargin">Operating margin %</label><input type="number" id="dcfMargin" placeholder="Use SEC margin" min="-20" max="75" step="0.5"></div><div><label for="dcfWacc">WACC %</label><input type="number" id="dcfWacc" value="10" min="3" max="30" step="0.5"></div></div>
+ <details class="analysis-drawer"><summary>Additional assumptions</summary><div class="model-selector detail-content"><div><label for="dcfTerminal">Terminal growth %</label><input type="number" id="dcfTerminal" value="2.5" min="-2" max="6" step="0.5"></div><div><label for="dcfTax">Cash tax rate % (assumed)</label><input type="number" id="dcfTax" value="21" min="0" max="45" step="0.5"></div><div><label for="dcfNwc">Change in working capital / new sales %</label><input type="number" id="dcfNwc" value="2" min="-30" max="30" step="0.5"></div><div><label for="dcfDa">D&amp;A / revenue % (manual assumption)</label><input type="number" id="dcfDa" placeholder="Use SEC if available" min="0" max="50" step="0.1"></div></div></details>
+ <div class="intel-tools"><button id="calculateDcf" class="action outline">Calculate DCF</button><span id="dcfStatus" class="small quiet">SEC annual facts required.</span></div>
+ <div id="dcfResult" style="display:none"><div class="model-result"><div><label>Illustrative value per share</label><div class="model-price" id="dcfPrice">—</div></div><div><label>Latest annual fiscal end</label><div id="dcfFiscal">—</div></div><div><label>Terminal share of enterprise value</label><div id="dcfTerminalShare">—</div></div></div>
+ <details class="analysis-drawer"><summary>WACC / terminal-growth sensitivity</summary><div class="detail-content"><table class="intel-table" id="dcfSensitivity"></table></div></details>
+ <details class="analysis-drawer"><summary>Five-year cash-flow forecast</summary><div class="detail-content"><table class="intel-table" id="dcfForecast"></table><p class="detail-note">FCFF = EBIT × (1 − tax rate) + D&amp;A − CapEx − change in working capital. Net debt adjusts enterprise to equity value.</p></div></details>
+ <details class="analysis-drawer"><summary>SEC inputs and filing references</summary><div class="detail-content"><div id="dcfSources" class="model-sources"></div><a id="dcfFiling" target="_blank" rel="noopener noreferrer">SEC filing records</a></div></details>
+ <p id="dcfLimit" class="intel-message"></p></div>
+</section>
+<section class="model-section"><h2 class="section-title">Company financial comparison</h2>
+<div class="model-selector"><div><label for="fundCompare1">Company 1</label><select id="fundCompare1"><option value="MSFT">Microsoft</option></select></div><div><label for="fundCompare2">Company 2</label><select id="fundCompare2"><option value="AAPL">Apple</option></select></div><div><label for="fundCompare3">Company 3 (optional)</label><select id="fundCompare3"><option value="">None</option></select></div></div>
+<div class="intel-tools"><button id="compareFinancials" class="action outline">Compare SEC financials</button><span id="fundCompareStatus" class="small quiet">Annual filings; may have different fiscal years.</span></div>
+<div id="fundCompareResults" class="compare-scroll"></div>
+</section>
+<details class="analysis-drawer" id="legacyDcfSection"><summary>Earlier Microsoft DCF research</summary><div class="detail-content"><div class="twocol"><div><h2 class="section-title">Microsoft DCF</h2><p class="section-sub" id="valuationStatus">Loading SEC data…</p><div id="valuationMetrics" class="report-values"></div>
+<details class="analysis-drawer" id="valuationBreakdown"><summary>DCF breakdown</summary><div class="detail-content">
+<table class="detail-table"><thead><tr><th>Scenario</th><th>WACC</th><th>Terminal growth</th><th>Terminal value / EV</th></tr></thead><tbody id="valuationDetailRows"><tr><td colspan="4">Attach SEC analysis to view calculations.</td></tr></tbody></table>
+<p class="detail-note">DCF sums discounted forecast free cash flows and terminal value. Equity value = enterprise value − net debt. Value per share = equity value ÷ diluted shares.</p>
+<p class="detail-note">Scenario assumptions are illustrative. Reported year-end financials and filing selections require independent cross-checks.</p>
+</div></details>
+<div class="notice" id="valuationLimit">Model estimate; assumptions apply.</div><h3 class="section-title">Key drivers</h3><p class="quiet">Growth · Margins · Capital spending · Discount rate</p></div><aside><div class="aside-paper"><h2 class="section-title">Methods</h2><p>Microsoft FY2026 SEC-based DCF; five-year forecast.</p><div class="subtle-rule"></div><p><b>DCF:</b> Present value of forecast cash flows.</p><p><b>WACC:</b> Discount rate.</p><p><b>Sensitivity:</b> Valuation under changed assumptions.</p><p class="disclosure">Historical filing cross-check still required.</p></div></aside></div></div></details></section>
+<section class="page" id="journal"><div class="page-top"><h1 class="heading">Notes & trades</h1></div><div class="twocol"><div><h2 class="section-title">Research notes</h2><p class="section-sub"></p><div class="notes-list" id="notesList"><p class="quiet">No notes.</p></div></div><aside><h2 class="section-title">Trade history</h2><div class="notes-list" id="trades"><p class="quiet">No virtual trades.</p></div><p class="disclosure">Average-cost paper ledger. Not tax records.</p></aside></div></section>
+<div id="message" class="bottom-message" role="status" aria-live="polite"></div><footer class="foot"><span>QUANTFORGE</span><span>Local portfolio data · Simulated orders only</span></footer>
+</main>
+<script>
+'use strict';
+const $=id=>document.getElementById(id),usd=x=>Number(x).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2}),pcent=x=>Number(x).toFixed(1)+'%',dec=(x,n=6)=>Number(x).toLocaleString('en-US',{maximumFractionDigits:n});
+let profile=null,portfolio=null,idea=null,mode='unknown',messageTimer=null;
+function elem(tag,text,cls){const e=document.createElement(tag);if(text!==undefined&&text!==null)e.textContent=String(text);if(cls)e.className=cls;return e}
+function message(text,error=false){const m=$('message');m.textContent=text;m.className='bottom-message visible'+(error?' error':'');if(messageTimer)clearTimeout(messageTimer);messageTimer=setTimeout(()=>m.classList.remove('visible'),6000)}
+async function api(path,options){let r;try{r=await fetch(path,{cache:'no-store',...options})}catch{throw Error('Local server unavailable. Check the terminal.')};let obj;try{obj=await r.json()}catch{throw Error('Unexpected response format')};if(!r.ok)throw Error(obj.error||'Request failed');return obj}
+async function post(path,data){return api(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})}
+function navigate(page){if(!$(page))return;document.querySelectorAll('.page').forEach(e=>e.classList.toggle('active',e.id===page));document.querySelectorAll('[data-go]').forEach(e=>e.classList.toggle('active',e.dataset.go===page));window.scrollTo(0,0);if(page==='journal')loadNotes();if(page==='portfolio'){refresh().then(()=>{initTargets();refreshLookthrough();loadEtfImports()})};if(page==='browse')renderDirectory();if(page==='quant')loadQuantHistory();}
+for(const item of document.querySelectorAll('[data-go]'))item.addEventListener('click',e=>{e.preventDefault();navigate(item.dataset.go)});
+function renderPortfolio(p){portfolio=p;$('equity').textContent=usd(p.equity);$('homeBalance').textContent=usd(p.equity);$('cash').textContent=usd(p.cash);$('largest').textContent=pcent(p.largest_position_pct);$('returns').textContent=(p.return_since_start_pct>=0?'+':'')+pcent(p.return_since_start_pct)+' since your virtual start';$('returns').className='tiny '+(p.return_since_start_pct>=0?'good':'bad');$('hhi').textContent=dec(p.concentration_hhi,3);const hr=p.hypothetical_risk||{};$('riskSimCount').textContent=hr.simulations?dec(hr.simulations,0):'Not run in preview';$('riskHorizon').textContent=hr.horizon_days?dec(hr.horizon_days,0)+' days':'—';$('riskLossFreq').textContent=Number.isFinite(hr.probability_of_loss)?pcent(100*hr.probability_of_loss):'—';const vols=hr.annual_vol_assumptions||{};$('riskVols').textContent=Object.keys(vols).length?['stock','etf','crypto'].map(k=>k.toUpperCase()+' '+pcent(100*(vols[k]||0))).join(' · '):'Not calculated in preview';$('stress1').textContent=usd(p.stress.stocks_etfs_down_20_crypto_down_40_usd);$('stress2').textContent=usd(p.stress.largest_holding_down_35_usd);$('var95').textContent=usd(p.hypothetical_risk.var_95_usd);$('es95').textContent=usd(p.hypothetical_risk.es_95_usd);
+const body=$('holdings');body.replaceChildren();if(!p.positions.length){const r=elem('tr'),c=elem('td','No holdings.');c.colSpan=4;r.append(c);body.append(r)}for(const item of p.positions){const r=elem('tr');const company=elem('td');company.append(elem('b',directoryName(item.symbol)),elem('small',item.symbol,'holding-ticker'));r.append(company);for(const [v,cls] of [[dec(item.quantity,8),'right num'],[usd(item.value),'right num'],[pcent(100*item.weight),'right num']])r.append(elem('td',v,cls));body.append(r)}const types=[['stock','#668c82','Individual stocks'],['etf','#245948','ETFs'],['crypto','#b48656','Crypto']];const bar=$('allocation'),legend=$('allocationLegend');bar.replaceChildren();legend.replaceChildren();for(const [kind,color,name] of types){const w=p.asset_weights[kind]||0;if(w>0){const s=elem('span');s.style.width=pcent(w*100);s.style.background=color;bar.append(s);const line=elem('div'),left=elem('span');const key=elem('i',undefined,'key');key.style.background=color;left.append(key,document.createTextNode(name));line.append(left,elem('span',pcent(w*100)));legend.append(line)}}const cash=elem('span');cash.style.width=pcent(Math.max(0,100-p.invested_pct));cash.style.background='#dce1d8';bar.append(cash);const cl=elem('div');cl.append(elem('span','Cash'),elem('span',pcent(100-p.invested_pct)));legend.append(cl);
+const activity=$('trades');activity.replaceChildren();if(!p.transactions.length)activity.append(elem('p','No virtual trades.','quiet'));for(const t of p.transactions){const d=elem('div');d.append(elem('b',(t.side==='buy'?'Bought ':'Sold ')+t.symbol),elem('small',t.executed_utc.slice(0,16).replace('T',' ')+' UTC · '+dec(t.quantity,6)+' units · '+usd(t.price)+' per unit'));activity.append(d)} }
+async function refresh(){try{renderPortfolio(await api('/api/portfolio'))}catch(e){message(e.message,true)}}
+function renderWatch(w){const box=$('watchHome');box.replaceChildren();if(!w.length){box.append(elem('p','No saved symbols.','small quiet'));return}for(const a of w){const r=elem('div',undefined,'watch-item'),one=elem('div');one.append(elem('b',directoryName(a.symbol)),elem('small',a.symbol));const b=elem('button','Research →');b.addEventListener('click',()=>{$('symbol').value=a.symbol;navigate('explore');evaluate()});r.append(one,b);box.append(r)}}
+async function loadWatch(){try{renderWatch((await api('/api/watchlist')).watchlist)}catch(e){message(e.message,true)}}
+async function loadProfile(){profile=await api('/api/profile');for(const name of ['goal','horizon','comfort'])$(name).value=profile[name];$('buffer').value=profile.cash_buffer_pct}
+$('saveProfile').addEventListener('click',async()=>{try{profile=await post('/api/profile',{goal:$('goal').value,horizon:$('horizon').value,comfort:$('comfort').value,cash_buffer_pct:Number($('buffer').value)});message('Preferences saved.')}catch(e){message(e.message,true)}});
+async function evaluate(){const symbol=resolveSearch($('symbol').value),budget=$('budget').value;if(!symbol){navigate('browse');$('directorySearch').value=$('symbol').value;renderDirectory();return message('Select a company from the directory.',true)}$('symbol').value=symbol;idea=null;$('decision-results').style.display='none';$('decision-empty').style.display='block';try{const d=await api('/api/decision?symbol='+encodeURIComponent(symbol)+'&budget='+encodeURIComponent(budget));idea=d;$('decision-results').style.display='block';$('decision-empty').style.display='none';$('secFactsSection').style.display=d.asset_class==='stock'?'block':'none';$('mlPeersSection').style.display=d.asset_class==='stock'?'block':'none';const mlAsset=directory.find(x=>x.symbol===d.symbol);if(mlAsset&&mlUniverses[mlAsset.category])$('mlPeerGroup').value=mlAsset.category;$('mlResult').style.display='none';$('mlStatus').textContent='SEC annual data. May take several seconds.';$('filingResults').style.display='none';$('filingStatus').textContent='No SEC request made.';$('assetType').textContent=d.asset_class==='etf'?'Exchange-traded fund':d.asset_class==='crypto'?'Cryptocurrency':'Individual stock';$('assetSymbol').textContent=d.name||directoryName(d.symbol);$('assetFullName').textContent=d.symbol;$('quoteMeta').textContent=d.source+' · '+d.coverage+' · '+new Date(d.quote_timestamp).toLocaleString();$('quotePrice').textContent=usd(d.price);$('assetMeaning').textContent=d.asset_explainer;$('detailUnits').textContent=Number.isFinite(d.shares_preview)?dec(d.shares_preview,8):'—';$('detailFee').textContent=usd(d.approx_fee_usd);$('detailWeightBefore').textContent=Number.isFinite(d.position_weight_before_pct)?pcent(d.position_weight_before_pct):'—';$('detailWeightAfter').textContent=pcent(d.position_weight_after_pct);$('detailSingleLimit').textContent=Number.isFinite(d.position_guideline_pct)?pcent(d.position_guideline_pct):'—';$('detailReserve').textContent=Number.isFinite(d.reserve_percent)?pcent(d.reserve_percent):'—';$('previewBudget').textContent=usd(d.budget_usd);$('previewWeight').textContent=pcent(d.position_weight_after_pct);$('previewCash').textContent=usd(d.post_cash_usd);$('scenarioIntro').textContent='If this holding hypothetically fell '+pcent(d.stress_assumption_pct)+' after your purchase:';$('scenarioLoss').textContent='−'+usd(d.scenario_loss_usd);$('scenarioDetail').textContent=''+pcent(d.scenario_loss_of_portfolio_pct)+' of your whole virtual portfolio, including any units you already own, if your other holdings stayed unchanged. Of this, '+usd(d.scenario_loss_added_usd)+' comes from the new purchase. This is an assumed stress, not a forecast.';const f=$('decisionFlags');f.replaceChildren();if(d.flags.length)for(const x of d.flags)f.append(elem('li',x));else f.append(elem('p','No limit exceeded. Risk remains.','positive-note'));if(!d.fresh_for_paper)$('buyPreview').disabled=true;else $('buyPreview').disabled=false;message('Analysis ready.')}catch(e){message(e.message,true)}}
+$('evaluate').addEventListener('click',evaluate);$('symbol').addEventListener('keydown',e=>{if(e.key==='Enter')evaluate()});for(const b of document.querySelectorAll('.example'))b.addEventListener('click',()=>{$('symbol').value=b.dataset.symbol;evaluate()});
+$('watch').addEventListener('click',async()=>{if(!idea)return;try{await post('/api/watchlist',{symbol:idea.symbol});await loadWatch();message(idea.symbol+' added to watchlist.')}catch(e){message(e.message,true)}});
+$('saveNote').addEventListener('click',async()=>{if(!idea)return message('Explore an idea first.',true);try{await post('/api/notes',{symbol:idea.symbol,note:$('researchNote').value,budget:idea.budget_usd});$('researchNote').value='';message('Note saved.')}catch(e){message(e.message,true)}});
+$('buyPreview').addEventListener('click',async()=>{if(!idea)return;if(!confirm('Record a FICTIONAL purchase of '+idea.symbol+' using '+usd(idea.budget_usd)+' virtual money?\nNo money will leave your account and no real order is sent.'))return;try{const res=await post('/api/paper-order',{side:'buy',symbol:idea.symbol,amount:String(idea.budget_usd),expected_price:idea.price});renderPortfolio(res.portfolio);message('Virtual purchase saved.');navigate('portfolio')}catch(e){message(e.message,true)}});
+$('refresh').addEventListener('click',async()=>{await refresh();message('Portfolio refreshed.')});
+$('sellPreview').addEventListener('click',async()=>{const sym=$('sellSymbol').value.trim().toUpperCase(),amt=$('sellUnits').value;try{const q=await api('/api/quote?symbol='+encodeURIComponent(sym));if(!confirm('Record a FICTIONAL sale of '+amt+' '+sym+' at the last observed price '+usd(q.price)+'?\nNo real order is sent.'))return;const res=await post('/api/paper-order',{side:'sell',symbol:sym,amount:amt,expected_price:q.price});renderPortfolio(res.portfolio);message('Virtual sale saved.')}catch(e){message(e.message,true)}});
+async function loadNotes(){try{const data=await api('/api/notes'),box=$('notesList');box.replaceChildren();if(!data.notes.length)box.append(elem('p','No notes.','quiet'));for(const n of data.notes){const item=elem('div');item.append(elem('b',n.symbol+' · '+n.created_at.slice(0,10)),elem('p',n.note),elem('small','When saved: '+(n.quote_timestamp||'unknown')+' · '+n.quote_source));box.append(item)}}catch(e){message(e.message,true)}}
+async function loadValuation(){try{const v=await api('/api/valuation');if(v.status==='not_attached'){$('valuationStatus').textContent='No verified Microsoft SEC analysis is attached yet. See the README to link your V3 results.';return}$('valuationStatus').textContent='SEC Company Facts · Microsoft FY'+v.fiscal_year+' · valuation assumptions as of '+v.as_of;const out=$('valuationMetrics');out.replaceChildren();const breakdown=$('valuationDetailRows');breakdown.replaceChildren();for(const s of ['bear','base','bull']){const val=v.scenarios.find(x=>x.scenario===s);if(!val)continue;const tr=elem('tr');[s,pcent(100*val.wacc),pcent(100*val.terminal_growth),pcent(val.terminal_share_pct)].forEach(cell=>tr.append(elem('td',cell)));breakdown.append(tr);const box=elem('div');box.append(elem('label',s+' case'),elem('div',usd(val.intrinsic_value_per_share_usd),'money num'),elem('small','WACC '+pcent(100*val.wacc)+' · terminal share '+pcent(val.terminal_share_pct)));out.append(box)}$('valuationLimit').textContent=v.limitation+' Filing audit: '+v.cross_filing_review;}catch(e){$('valuationStatus').textContent='Valuation data unavailable: '+e.message}}
+
+
+
+
+// V5.4: issuer filings only. No stock return prediction or buying recommendation.
+const mlUniverses={
+ Technology:['MSFT','AAPL','NVDA','AVGO','ORCL','CRM','ADBE','AMD','INTC','QCOM','AMAT','IBM'],
+ Consumer:['AMZN','WMT','COST','HD','LOW','TGT','MCD','SBUX','NKE','KO','PEP','PG'],
+ Healthcare:['LLY','JNJ','ABBV','MRK','PFE','AMGN','GILD','REGN','VRTX','TMO','DHR','ABT'],
+ Communication:['GOOGL','META','NFLX','DIS','CMCSA','T','VZ','TMUS','SPOT','PINS','EA','TTWO'],
+ Finance:['JPM','BAC','WFC','C','GS','MS','V','MA','AXP','BLK','SCHW','SPGI']
+};
+$('mlCalculate').addEventListener('click',async()=>{
+ const target=resolveSearch($('symbol').value),group=$('mlPeerGroup').value;
+ if(!target||!mlUniverses[group])return message('Select a company and peer group.',true);
+ $('mlStatus').textContent='Loading SEC annual reports and checking features…';
+ $('mlResult').style.display='none';$('mlCalculate').disabled=true;
+ try{
+  const d=await post('/api/ml-peers',{target,symbols:mlUniverses[group]});
+  $('mlCoverage').textContent=d.target_name+' ('+d.target+') · '+d.sample_size+' analyzed of '+d.requested_count+' · Fiscal years '+d.fiscal_end_range.join(' to ');
+  drawDataTable('mlNeighbors',['Company','Ticker','Standardized distance'],d.peers.map(x=>[x.company_name,x.symbol,x.distance.toFixed(2)]));
+  drawDataTable('mlFeatures',['Metric','Company','Peer median'],d.financial_features.map(x=>[
+   x.name+(x.target_imputed?' (imputed)':''),x.target===null?'n/a':x.target.toFixed(2)+'%',x.peer_median.toFixed(2)+'%']));
+  $('mlOutlier').textContent=d.anomaly.available?'Unusual financial profile: rank '+d.anomaly.unusualness_rank+' of '+d.anomaly.out_of+' (1 = most unusual in this group).':'Unusualness ranking unavailable: '+d.anomaly.reason;
+  const st=d.neighbor_stability;
+  $('mlStability').textContent='Closest peer unchanged in '+st.same_closest_peer+' of '+st.feature_drop_checks+' leave-one-feature-out checks.';
+  const meth=$('mlMethods');meth.replaceChildren();
+  meth.append(elem('p',d.method),elem('p','Source: '+d.source),elem('p','Missing metric cells imputed: '+d.imputed_values),elem('p',d.limitations));
+  if(d.excluded_companies?.length){
+   meth.append(elem('h4','Excluded companies'));
+   for(const x of d.excluded_companies)meth.append(elem('p',x.symbol+': '+x.reason));
+  }
+  const tbl=elem('table',undefined,'intel-table');const head=elem('tr');['Company','Annual fiscal end','10-K filed'].forEach(t=>head.append(elem('th',t)));tbl.append(head);
+  for(const x of d.included_companies){const r=elem('tr');[x.name+' ('+x.symbol+')',x.fiscal_end||'—',x.filing_date||'—'].forEach(t=>r.append(elem('td',t)));tbl.append(r)}
+  meth.append(tbl);
+  $('mlResult').style.display='block';$('mlStatus').textContent='SEC peer analysis complete.';
+ }catch(e){$('mlStatus').textContent=e.message;message(e.message,true)}
+ finally{$('mlCalculate').disabled=false}
+});
+
+// V5.2: valuation uses SEC annual inputs and explicit illustrative assumptions.
+function populateFinancialSelects(){
+ const stocks=[...directory].filter(x=>x.asset_class==='stock').sort((a,b)=>a.name.localeCompare(b.name));
+ for(const [id,fallback] of [['dcfSymbol','MSFT'],['fundCompare1','MSFT'],['fundCompare2','AAPL'],['fundCompare3','']]){
+  const sel=$(id),prev=sel.value||fallback;sel.replaceChildren();if(id==='fundCompare3')sel.add(new Option('None',''));
+  for(const a of stocks)sel.add(new Option(a.name+' ('+a.symbol+')',a.symbol));
+  sel.value=prev;
+ }
+}
+function drawDataTable(tableId,headings,rows){
+ const table=$(tableId);table.replaceChildren();const header=elem('tr');for(const h of headings)header.append(elem('th',h));table.append(header);
+ for(const line of rows){const tr=elem('tr');for(const v of line)tr.append(elem('td',v===null?'—':String(v)));table.append(tr)}
+}
+$('calculateDcf').addEventListener('click',async()=>{
+ $('dcfResult').style.display='none';$('dcfStatus').textContent='Loading SEC filing data…';
+ const args=new URLSearchParams({symbol:$('dcfSymbol').value,growth_pct:$('dcfGrowth').value,
+   wacc_pct:$('dcfWacc').value,terminal_growth_pct:$('dcfTerminal').value,
+   tax_pct:$('dcfTax').value,nwc_pct:$('dcfNwc').value});
+ if($('dcfMargin').value.trim())args.set('margin_pct',$('dcfMargin').value.trim());
+ if($('dcfDa').value.trim())args.set('da_pct',$('dcfDa').value.trim());
+ try{const d=await api('/api/company-dcf?'+args.toString());
+  $('dcfStatus').textContent=d.company_name+' · SEC Company Facts';
+  $('dcfPrice').textContent=usd(d.base.price_usd);$('dcfFiscal').textContent=d.fiscal_end;
+  $('dcfTerminalShare').textContent=d.base.terminal_share_pct===null?'—':pcent(d.base.terminal_share_pct);
+  drawDataTable('dcfSensitivity',['WACC / Terminal',...d.sensitivity[0].values.map(x=>pcent(x.growth_pct))],
+   d.sensitivity.map(x=>[pcent(x.wacc_pct),...x.values.map(v=>v.price_usd===null?'—':usd(v.price_usd))]));
+  drawDataTable('dcfForecast',['Year','Revenue','EBIT','D&A','CapEx','ΔNWC','FCFF'],
+   d.forecast.map(x=>[x.year,...['revenue_usd','ebit_usd','da_usd','capex_usd','change_nwc_usd','fcff_usd'].map(k=>compactDollars(x[k]))]));
+  const sources=$('dcfSources');sources.replaceChildren();
+  sources.append(elem('p','Weighted-average diluted shares: '+dec(d.observed.diluted_weighted_avg_shares,0)+' · Net debt: '+compactDollars(d.observed.net_debt_usd)));
+  sources.append(elem('p','D&A / revenue: '+pcent(d.observed.da_to_sales_pct)+' · '+d.observed.da_source));
+  for(const [k,v] of Object.entries(d.provenance))sources.append(elem('p',k+': '+v.tag+' · filed '+v.filed+' · '+v.accession));
+  $('dcfFiling').href=d.source_url;$('dcfLimit').textContent=d.limitations;
+  $('dcfResult').style.display='block';
+ }catch(e){$('dcfStatus').textContent=e.message;message(e.message,true)}
+});
+$('compareFinancials').addEventListener('click',async()=>{
+ const symbols=['fundCompare1','fundCompare2','fundCompare3'].map(id=>$(id).value).filter(Boolean);
+ $('fundCompareStatus').textContent='Loading SEC annual reports…';
+ try{const d=await api('/api/company-comparables?symbols='+encodeURIComponent(symbols.join(',')));
+  const rows=d.companies.map(x=>x.data||{}),box=$('fundCompareResults');
+  box.replaceChildren();const tbl=elem('table',undefined,'compare-table');
+  const tr=elem('tr');tr.append(elem('th','Metric'));
+  for(const x of d.companies)tr.append(elem('th',x.symbol));tbl.append(tr);
+  const items=[['Company','company_name',x=>x||'—'],['Fiscal end','fiscal_end',x=>x||'—'],
+   ['Revenue','revenue_usd',compactDollars],['Revenue growth','revenue_growth_pct',x=>x==null?'—':pcent(x)],
+   ['Operating margin','operating_margin_pct',x=>x==null?'—':pcent(x)],
+   ['Net margin','net_margin_pct',x=>x==null?'—':pcent(x)],
+   ['Free cash flow','free_cash_flow_usd',compactDollars],['Long-term debt','long_term_debt_usd',compactDollars]];
+  for(const [label,key,fn] of items){const r=elem('tr');r.append(elem('td',label));
+   for(let i=0;i<d.companies.length;i++)r.append(elem('td',d.companies[i].error?(i===0?'Unavailable':'—'):fn(rows[i][key])));
+   tbl.append(r)}box.append(tbl);
+  for(const x of d.companies)if(x.error)box.append(elem('p',x.symbol+': '+x.error,'intel-message'));
+  $('fundCompareStatus').textContent=d.limitations;
+ }catch(e){$('fundCompareStatus').textContent=e.message;message(e.message,true)}
+});
+
+// V5.1: existing-holdings allocation planner. Calculations do not record trades.
+let lastTargetKey='';
+function initTargets(){
+ if(!portfolio)return;
+ const existing=portfolio.positions||[];
+ const input=$('rebalanceTargets'); input.replaceChildren();
+ const raw=[...existing.map(p=>({symbol:p.symbol,weight:p.weight*100})),
+            {symbol:'CASH',weight:100*(portfolio.cash/portfolio.equity)}];
+ const rounded=raw.map(x=>Math.round(x.weight*100)/100);
+ rounded[rounded.length-1]=Math.round((100-rounded.slice(0,-1).reduce((a,b)=>a+b,0))*100)/100;
+ for(let i=0;i<raw.length;i++){
+  const entry=raw[i],line=elem('div',undefined,'intel-target-row');
+  const label=elem('span',entry.symbol==='CASH'?'Cash':directoryName(entry.symbol)+' ('+entry.symbol+')');
+  const field=elem('input');field.type='number';field.min='0';field.max='100';field.step='.01';field.value=rounded[i].toFixed(2);
+  field.dataset.target=entry.symbol;field.setAttribute('aria-label',entry.symbol+' target percentage');
+  field.addEventListener('input',targetTotal);
+  line.append(label,field,elem('small',entry.weight.toFixed(2)+'%'));input.append(line);
+ }
+ $('rebalanceResults').replaceChildren();$('rebalanceStatus').textContent='No plan calculated.';
+ targetTotal();
+}
+function targetTotal(){const items=[...$('rebalanceTargets').querySelectorAll('input[data-target]')];
+const total=items.reduce((n,x)=>n+(Number(x.value)||0),0),valid=items.every(x=>x.value!==''&&Number.isFinite(Number(x.value))&&Number(x.value)>=0&&Number(x.value)<=100);
+$('targetTotal').textContent='Total: '+total.toFixed(2)+'%'+(Math.abs(total-100)>.01?' (must be 100%)':'');
+$('calculateRebalance').disabled=!valid||Math.abs(total-100)>.01;
+}
+$('resetTargets').addEventListener('click',initTargets);
+$('calculateRebalance').addEventListener('click',async()=>{
+ try{const targets={};for(const x of $('rebalanceTargets').querySelectorAll('input[data-target]'))targets[x.dataset.target]=Number(x.value);
+ const plan=await post('/api/rebalance-plan',{targets});const box=$('rebalanceResults');box.replaceChildren();
+ const trades=plan.trades||[];
+ if(!trades.length){box.append(elem('p','No trades needed.','small quiet'))}else{
+  const table=elem('table',undefined,'intel-table'),head=elem('tr');
+  for(const t of ['Trade','Units','Value'])head.append(elem('th',t));table.append(head);
+  for(const t of trades){const tr=elem('tr');tr.append(elem('td',(t.side==='sell'?'Sell ':'Buy ')+t.symbol),
+    elem('td',dec(t.quantity,8)),elem('td',usd(t.value_usd)));table.append(tr)}box.append(table)}
+ box.append(elem('p','Fees '+usd(plan.estimated_fees_usd)+' · Cash after '+usd(plan.cash_after_usd), 'small'));
+ box.append(elem('p','Largest remaining allocation difference: '+plan.largest_target_drift_pct_points.toFixed(2)+' percentage points.','small'));
+ box.append(elem('p',plan.assumptions,'intel-message'));
+ $('rebalanceStatus').textContent='Read-only virtual plan · nothing executed';
+ }catch(e){$('rebalanceStatus').textContent=e.message;message(e.message,true)}
+});
+async function loadEtfImports(){const data=await api('/api/holdings-imports');const box=$('etfImportList');box.replaceChildren();
+ if(!data.funds.length)box.textContent='No ETF holdings imported.';
+ for(const f of data.funds){box.append(elem('p',f.etf+' · '+f.as_of+' · '+f.identified_pct.toFixed(1)+'% identified · '+f.source));}
+}
+function updateETFSelect(){const sel=$('etfImportSymbol'),old=sel.value;sel.replaceChildren();sel.add(new Option('Select ETF',''));
+ const all=(directory||[]).filter(d=>d.asset_class==='etf').sort((a,b)=>a.name.localeCompare(b.name));
+ for(const a of all)sel.add(new Option(a.name+' ('+a.symbol+')',a.symbol));
+ if(old&&[...sel.options].some(o=>o.value===old))sel.value=old;
+}
+async function refreshLookthrough(){try{const d=await api('/api/holdings-lookthrough'),box=$('lookthroughResults');box.replaceChildren();
+ $('lookthroughStatus').textContent='Unidentified ETF value: '+usd(d.unknown_etf_value_usd)+' ('+d.unknown_etf_weight_pct.toFixed(2)+'% of portfolio)';
+ if(d.funds.length){for(const f of d.funds)box.append(elem('p',f.etf+' · '+f.identified_weight_pct.toFixed(1)+'% identified · '+(f.as_of||'no holdings imported'),'small'))}
+ if(d.exposures.length){const tbl=elem('table',undefined,'intel-table'),h=elem('tr');['Underlying company','Value','Weight'].forEach(t=>h.append(elem('th',t)));tbl.append(h);
+  for(const e of d.exposures.slice(0,15)){const r=elem('tr');r.append(elem('td',directoryName(e.ticker)),elem('td',usd(e.value_usd)),elem('td',e.portfolio_weight_pct.toFixed(2)+'%'));tbl.append(r)}box.append(tbl)}
+ if(d.etf_pairs.length){box.append(elem('b','ETF overlap (known constituents)'));for(const p of d.etf_pairs)box.append(elem('p',p.a+' + '+p.b+': at least '+p.known_min_weight_overlap_pct.toFixed(2)+'% common fund weight','small'))}
+ if(!d.funds.length&&!d.exposures.length)box.append(elem('p','Add investments or import ETF holdings.','small quiet'));
+ }catch(e){$('lookthroughStatus').textContent=e.message;message(e.message,true)}}
+$('refreshLookthrough').addEventListener('click',refreshLookthrough);
+$('importEtfHoldings').addEventListener('click',async()=>{
+ const file=$('etfImportFile').files[0];if(!file)return message('Choose a holdings CSV file.',true);
+ if(file.size>1_000_000)return message('CSV is too large (1 MB maximum).',true);
+ try{const res=await post('/api/holdings-imports',{etf:$('etfImportSymbol').value,as_of:$('etfImportDate').value,source:$('etfImportSource').value,csv:await file.text()});
+ $('importStatus').textContent=res.etf+' · '+res.holdings+' holdings imported';await loadEtfImports();await refreshLookthrough();
+ }catch(e){$('importStatus').textContent=e.message;message(e.message,true)}
+});
+
+// Research comparison: every column starts from the same current portfolio.
+function fillComparisonSelects(){if(!directory.length)return;
+ const sorted=[...directory].sort((a,b)=>a.name.localeCompare(b.name));
+ for(let i=1;i<=4;i++){const select=$('compare'+i),current=select.value;select.replaceChildren();
+   if(i>2)select.append(new Option('None',''));
+   const groups=new Map();for(const a of sorted){if(!groups.has(a.category))groups.set(a.category,[]);groups.get(a.category).push(a)}
+   for(const [category,assets] of groups){const group=document.createElement('optgroup');group.label=category;
+     for(const a of assets)group.append(new Option(a.name+' ('+a.symbol+')',a.symbol));select.append(group)}
+   const desired=current||(i===1?'MSFT':i===2?'VOO':'');select.value=desired;
+ }
+}
+function compareFromResearch(){if(!idea)return;const a=idea.symbol,b=$('compare1').value;
+ $('compare1').value=a;$('compare2').value=b&&b!==a?b:(a==='VOO'?'MSFT':'VOO');navigate('compare')}
+$('compareCurrent').addEventListener('click',compareFromResearch);
+$('compareRun').addEventListener('click',async()=>{
+  const symbols=[1,2,3,4].map(i=>$('compare'+i).value).filter(Boolean);
+  $('compareOutput').style.display='none';$('compareStatus').textContent='Loading observations…';
+  try{const result=await api('/api/compare?symbols='+encodeURIComponent(symbols.join(','))+'&budget='+encodeURIComponent($('compareBudget').value));
+  const head=$('compareHead'),body=$('compareBody');head.replaceChildren();body.replaceChildren();
+  const header=elem('tr');header.append(elem('th','Metric'));for(const d of result.rows){const cell=elem('th');cell.append(elem('b',d.name||directoryName(d.symbol)),elem('span',d.symbol+' · '+d.asset_class,'short'));header.append(cell)}head.append(header);
+  const rows=[['Observed price',d=>usd(d.price)],['Position after purchase',d=>pcent(d.position_weight_pct)],
+    ['Approximate units',d=>dec(d.units,8)],['Simulated fee',d=>usd(d.fee_usd)],
+    ['Scenario decline',d=>'−'+pcent(d.scenario_decline_pct)],
+    ['New amount scenario loss',d=>'−'+usd(d.scenario_added_loss_usd)],
+    ['Total holding scenario loss',d=>'−'+usd(d.scenario_total_loss_usd)],
+    ['Personal guidelines',d=>d.flags.length?d.flags.join(' · '):'No guideline exceeded'],
+    ['Last observed',d=>new Date(d.quote_timestamp).toLocaleString()],
+    ['Source',d=>d.synthetic?'Fictional demo':(d.coverage||d.source)]];
+  for(const [label,formatter] of rows){const tr=elem('tr');tr.append(elem('td',label));for(const item of result.rows)tr.append(elem('td',formatter(item)));body.append(tr)}
+  $('compareFoot').textContent=result.method+' '+result.limitations;
+  $('compareStatus').textContent='Comparison ready · '+usd(result.budget_usd)+' per scenario';
+  $('compareOutput').style.display='block';
+  }catch(e){$('compareStatus').textContent=e.message;message(e.message,true)}
+});
+function compactDollars(n){if(n===null||n===undefined||!Number.isFinite(n))return 'Unavailable';
+ const a=Math.abs(n);return (n<0?'−':'')+'$'+(a>=1e12?(a/1e12).toFixed(2)+'T':a>=1e9?(a/1e9).toFixed(2)+'B':a>=1e6?(a/1e6).toFixed(2)+'M':a.toLocaleString('en-US',{maximumFractionDigits:0}))}
+$('fetchFinancials').addEventListener('click',async()=>{
+ if(!idea||idea.asset_class!=='stock')return;
+ const original=idea.symbol;
+ $('filingStatus').textContent='Loading SEC data…';$('filingResults').style.display='none';
+ try{const f=await api('/api/fundamentals?symbol='+encodeURIComponent(original));if(!idea||idea.symbol!==original)return;
+   $('filingStatus').textContent='SEC annual filing';$('filingPeriod').textContent=f.company_name+' · Fiscal year ended '+f.fiscal_end+' · Filed '+f.revenue_filing_date;
+   const fields=[['Revenue',compactDollars(f.revenue_usd)],['Revenue change',f.revenue_growth_pct===null?'Unavailable':pcent(f.revenue_growth_pct)],
+     ['Operating margin',f.operating_margin_pct===null?'Unavailable':pcent(f.operating_margin_pct)],['Net margin',f.net_margin_pct===null?'Unavailable':pcent(f.net_margin_pct)],
+     ['Net income',compactDollars(f.net_income_usd)],['Free cash flow',compactDollars(f.free_cash_flow_usd)],
+     ['Operating cash flow',compactDollars(f.operating_cash_flow_usd)],['Capital expenditure',compactDollars(f.capex_usd)],
+     ['Total assets',compactDollars(f.total_assets_usd)],['Long-term debt',compactDollars(f.long_term_debt_usd)]];
+   const box=$('filingMetrics');box.replaceChildren();for(const [k,v] of fields){const div=elem('div',undefined,'metric');div.append(elem('span',k),elem('b',v));box.append(div)}
+   $('filingLink').href=f.filings_url;$('filingLimit').textContent=f.limitations;
+   $('filingResults').style.display='block';
+ }catch(e){$('filingStatus').textContent=e.message;message(e.message,true)}
+});
+
+// Company directory is metadata only. No quotes are fetched until research is selected.
+let directory=[],directoryCategory='Popular',directoryVisible=48;
+const popularSymbols=new Set(['AAPL','MSFT','NVDA','AMZN','GOOGL','META','TSLA','WMT','COST','DIS','NFLX','JPM','V','MA','BRK.B','LLY','JNJ','XOM','VOO','SPY','VTI','QQQ','SCHD','BND','GLD','BTC/USD','ETH/USD','SOL/USD']);
+function directoryName(symbol){const hit=directory.find(a=>a.symbol===String(symbol).toUpperCase());return hit?hit.name:String(symbol)}
+function matchingDirectory(query){const q=String(query||'').trim().toLowerCase();if(!q)return [];
+const words=q.split(/\s+/);return directory.filter(a=>words.every(w=>(a.name+' '+a.symbol+' '+a.category).toLowerCase().includes(w))).sort((a,b)=>a.name.localeCompare(b.name))}
+function resolveSearch(value){const q=String(value||'').trim();if(!q)return '';
+const exact=directory.find(a=>a.symbol.toLowerCase()===q.toLowerCase()||a.name.toLowerCase()===q.toLowerCase());if(exact)return exact.symbol;
+// Common provider tickers remain usable even if not curated in the directory.
+return /^(?:[a-z][a-z0-9.]{0,9}|(?:btc|eth|sol|ltc|avax|doge|link)\/usd)$/i.test(q)?q.toUpperCase():'';}
+function chooseDirectoryAsset(symbol){$('symbol').value=symbol;$('quickSymbol').value=directoryName(symbol);hideSuggestions();navigate('explore');evaluate()}
+function hideSuggestions(){document.querySelectorAll('.search-suggestions').forEach(x=>x.classList.remove('visible'))}
+function suggestions(input,box){const rows=matchingDirectory(input.value).slice(0,7);box.replaceChildren();if(!rows.length){box.classList.remove('visible');return}
+for(const a of rows){const b=elem('button',undefined,'suggest-item');b.type='button';const left=elem('span');left.append(elem('b',a.name),elem('small',a.category));b.append(left,elem('span',a.symbol,'suggest-symbol'));b.addEventListener('click',()=>chooseDirectoryAsset(a.symbol));box.append(b)}box.classList.add('visible')}
+function drawDirectoryRow(a){const b=elem('button',undefined,'directory-row');b.type='button';b.setAttribute('aria-label','Research '+a.name+' ('+a.symbol+')');const initial=a.asset_class==='etf'?'ETF':a.asset_class==='crypto'?'₿':a.name.substring(0,1).toUpperCase();const name=elem('span',undefined,'directory-name');name.append(elem('b',a.name),elem('small',a.category));b.append(elem('span',initial,'directory-monogram'),name,elem('span',a.symbol,'directory-symbol'),elem('span','↗','directory-arrow'));b.addEventListener('click',()=>chooseDirectoryAsset(a.symbol));return b}
+function visibleDirectory(){const q=$('directorySearch').value.trim().toLowerCase(),words=q.split(/\s+/).filter(Boolean);return directory.filter(a=>{
+if(directoryCategory==='Popular'&&!popularSymbols.has(a.symbol))return false;
+if(directoryCategory!=='All'&&directoryCategory!=='Popular'&&a.category!==directoryCategory)return false;
+return words.every(w=>(a.name+' '+a.symbol+' '+a.category).toLowerCase().includes(w));
+}).sort((a,b)=>a.name.localeCompare(b.name))}
+function renderDirectory(){if(!directory.length)return;const cats=$('directoryCategories');cats.replaceChildren();const opts=['Popular','All',...new Set(directory.map(x=>x.category))];for(const category of opts){const count=category==='All'?directory.length:category==='Popular'?directory.filter(a=>popularSymbols.has(a.symbol)).length:directory.filter(a=>a.category===category).length;const b=elem('button',category+' ('+count+')','category-chip'+(directoryCategory===category?' active':''));b.type='button';b.setAttribute('aria-pressed',String(category===directoryCategory));b.addEventListener('click',()=>{directoryCategory=category;directoryVisible=48;renderDirectory()});cats.append(b)}
+const matches=visibleDirectory(),box=$('directoryList');box.replaceChildren();for(const a of matches.slice(0,directoryVisible))box.append(drawDirectoryRow(a));if(!matches.length)box.append(elem('p','No matching investments. Try a different name or category.','quiet'));
+$('directoryCount').textContent=matches.length+' investments';$('directoryMore').style.display=matches.length>directoryVisible?'block':'none';}
+async function loadDirectory(){const data=await api('/api/directory');directory=data.entries;renderDirectory();fillComparisonSelects();updateETFSelect();populateFinancialSelects();populateQuantFetch();}
+$('directorySearch').addEventListener('input',()=>{directoryVisible=48;renderDirectory()});
+$('directoryMore').addEventListener('click',()=>{directoryVisible+=48;renderDirectory()});
+for(const [id,out] of [['quickSymbol','quickSuggestions'],['symbol','researchSuggestions']]){
+const input=$(id),box=$(out);input.closest('.field')?.classList.add('has-suggest');input.addEventListener('input',()=>suggestions(input,box));input.addEventListener('focus',()=>suggestions(input,box));input.addEventListener('keydown',e=>{if(e.key==='Escape')hideSuggestions()});}
+document.addEventListener('click',e=>{if(!e.target.closest('.quick-search')&&!e.target.closest('.has-suggest'))hideSuggestions()});
+
+// Quick access is personal navigation, not a second investment engine.
+function researchFromHome(value){const symbol=resolveSearch(value);if(!symbol){navigate('browse');$('directorySearch').value=String(value||'');renderDirectory();return message('Select a company from the directory.',true)}$('symbol').value=symbol;navigate('explore');evaluate();}
+$('quickResearch').addEventListener('click',()=>researchFromHome($('quickSymbol').value));
+$('quickSymbol').addEventListener('keydown',e=>{if(e.key==='Enter')researchFromHome(e.currentTarget.value)});
+for(const b of document.querySelectorAll('.quick-example'))b.addEventListener('click',()=>researchFromHome(b.dataset.symbol));
+$('deskDate').textContent=new Date().toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+
+(async()=>{try{const health=await api('/api/health');mode=health.mode;$('modeText').textContent=mode==='synthetic_demo'?'FICTIONAL DEMO':'ALPACA IEX';if(mode==='synthetic_demo')message('Fictional demo prices.');await loadDirectory();await Promise.all([loadProfile(),refresh(),loadWatch(),loadValuation()])}catch(e){message(e.message,true)}})();
+
+// V5.3 — user-imported research prices only. Never infer history from an Alpaca last trade.
+let quantPriceSymbols=[];
+async function loadQuantHistory(){
+ try{const d=await api('/api/quant-history'),status=$('quantHistoryStatus');
+  status.textContent=d.available?(d.symbols.length+' investments · '+d.first_date+' to '+d.last_date+' · '+d.source):'No historical prices imported.';
+  const choices=$('quantSymbols');choices.replaceChildren();
+  const available=d.symbols.map(x=>x.symbol),owned=(portfolio?.positions||[]).map(x=>x.symbol);
+  quantPriceSymbols=available;
+  const initial=available.filter(x=>owned.includes(x));
+  const defaults=initial.length>=2?initial.slice(0,8):available.slice(0,Math.min(5,available.length));
+  for(const item of d.symbols){const label=elem('label'),checkbox=elem('input');checkbox.type='checkbox';checkbox.value=item.symbol;checkbox.checked=defaults.includes(item.symbol);checkbox.setAttribute('aria-label','Analyze '+directoryName(item.symbol));label.append(checkbox,elem('span',directoryName(item.symbol)+' ('+item.symbol+')'));choices.append(label)}
+  if(!d.available){$('quantSummary').textContent='Import a historical price CSV first.';}
+ }catch(e){$('quantHistoryStatus').textContent=e.message;message(e.message,true)}
+}
+$('quantImport').addEventListener('click',async()=>{
+ const file=$('quantFile').files[0];if(!file)return message('Select a CSV file.',true);
+ if(file.size>5_000_000)return message('Maximum price CSV size is 5 MB.',true);
+ $('quantImportStatus').textContent='Checking historical prices…';
+ try{const d=await post('/api/quant-import',{source:$('quantSource').value,csv:await file.text()});
+  $('quantImportStatus').textContent=d.observations+' prices imported';
+  $('quantResults').style.display='none';await loadQuantHistory();
+ }catch(e){$('quantImportStatus').textContent=e.message;message(e.message,true)}
+});
+$('quantCalculate').addEventListener('click',async()=>{
+ const symbols=[...$('quantSymbols').querySelectorAll('input[type=checkbox]:checked')].map(x=>x.value);
+ $('quantStatus').textContent='Calculating…';
+ try{const d=await post('/api/quant-analysis',{symbols,budget:$('quantBudget').value,
+  max_weight_pct:$('quantMaxWeight').value,crypto_cap_pct:$('quantCryptoMax').value});
+  $('quantResults').style.display='block';
+  $('quantStatus').textContent=d.matched_return_dates+' matched daily returns';
+  $('quantDates').textContent=d.aligned_period.join(' – ');
+  const first=d.allocations[0],second=d.allocations[1];
+  const grid=elem('table',undefined,'compare-table');
+  const header=elem('tr');['Metric','Baseline','Constrained'].forEach(t=>header.append(elem('th',t)));grid.append(header);
+  const row=(name,fn)=>{const r=elem('tr');r.append(elem('td',name));for(const a of d.allocations)r.append(elem('td',fn(a)));grid.append(r)};
+  row('Annualized historical volatility',a=>pcent(a.risk.annual_volatility_pct));
+  row('Modeled 21-day VaR 95%',a=>usd(a.monte_carlo.var_95_usd));
+  row('Modeled expected shortfall',a=>usd(a.monte_carlo.es_95_usd));
+  row('Modeled 5th-percentile portfolio value',a=>usd(a.monte_carlo.outcome_5_pct_usd));
+  row('Modeled median portfolio value',a=>usd(a.monte_carlo.outcome_median_usd));
+  row('Modeled 95th-percentile portfolio value',a=>usd(a.monte_carlo.outcome_95_pct_usd));
+  row('Assumed market shock loss',a=>usd(a.stress_loss_usd));
+  for(const sym of d.symbols)row(directoryName(sym)+' ('+sym+')',a=>pcent(a.risk.allocation_pct[sym]));
+  $('quantAllocations').replaceChildren(grid);
+  $('quantSummary').replaceChildren();
+  $('quantSummary').append(elem('p',d.baseline_definition),
+   elem('p','Budget: '+usd(d.hypothetical_budget_usd)+' · Reallocation: '+pcent(d.estimated_one_way_turnover_pct)));
+  if(d.history_is_old)$('quantSummary').append(elem('p','Historical import is '+d.last_observation_age_days+' days old.','intel-message'));
+  const cor=$('quantCorrelation');cor.replaceChildren();const h=elem('tr');h.append(elem('th','Asset'));d.symbols.forEach(x=>h.append(elem('th',x)));cor.append(h);
+  for(let i=0;i<d.symbols.length;i++){const r=elem('tr');r.append(elem('td',d.symbols[i]));
+   for(const value of d.correlations[i]){const cell=elem('td',Number(value).toFixed(2));
+    cell.style.background=value>=0?'rgba(35,112,86,'+(Math.abs(value)*.13).toFixed(2)+')':'rgba(167,91,68,'+(Math.abs(value)*.12).toFixed(2)+')';r.append(cell)}cor.append(r)}
+  const risk=$('quantRiskContribution');risk.replaceChildren();const rh=elem('tr');['Investment','Baseline (pp)','Constrained (pp)'].forEach(t=>rh.append(elem('th',t)));risk.append(rh);
+  for(const sym of d.symbols){const r=elem('tr');r.append(elem('td',directoryName(sym)+' ('+sym+')'));
+   r.append(elem('td',first.risk.risk_contribution_by_symbol_pct_points[sym].toFixed(2)));
+   r.append(elem('td',second.risk.risk_contribution_by_symbol_pct_points[sym].toFixed(2)));risk.append(r)}
+  $('quantMethods').textContent=d.estimator+'. '+d.assumptions+' Source: '+d.source+'. Annualization: '+d.annualization_days+' days.';
+ }catch(e){$('quantStatus').textContent=e.message;message(e.message,true)}
+});
+
+function populateQuantFetch(){
+ const assets=[...directory].filter(x=>x.asset_class==='stock'||x.asset_class==='etf').sort((a,b)=>a.name.localeCompare(b.name));
+ for(let i=1;i<=3;i++){const select=$('quantFetch'+i);select.replaceChildren();if(i===3)select.add(new Option('None',''));
+  for(const a of assets)select.add(new Option(a.name+' ('+a.symbol+')',a.symbol));
+  select.value=i===1?'MSFT':i===2?'VOO':'';
+ }
+}
+$('quantFetch').addEventListener('click',async()=>{
+ if(mode==='synthetic_demo')return message('Start in Alpaca mode to fetch real historical bars.',true);
+ const symbols=['quantFetch1','quantFetch2','quantFetch3'].map(x=>$(x).value).filter(Boolean);
+ $('quantFetchStatus').textContent='Fetching Alpaca historical bars…';
+ try{const result=await post('/api/quant-alpaca-import',{symbols,feed:$('quantFetchFeed').value});
+  $('quantFetchStatus').textContent=result.observations+' prices imported · '+result.feed.toUpperCase();
+  $('quantResults').style.display='none';await loadQuantHistory();
+ }catch(e){$('quantFetchStatus').textContent=e.message;message(e.message,true)}
+});
+</script>
+</body></html>

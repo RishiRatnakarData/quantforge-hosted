@@ -1,0 +1,27 @@
+{
+  "as_of_date": "2026-10-22",
+  "release": "0.2.0",
+  "authoring_environment": "Python 3.13; current authoring environment cannot reach live data providers",
+  "authoring_checks": {
+    "pytest": "61 passed, 1 skipped (duckdb unavailable here)",
+    "syntax_compileall": "passed",
+    "synthetic_end_to_end": "passed, 330 input sessions, 203 forecast evaluation sessions",
+    "offline_tiingo_cli_with_mocked_provider": "passed",
+    "calendar_audit_and_requested_range": "passed on fixed fixtures; duplicate/non-market/missing-session rejection tests",
+    "restricted_holdout_check": "mocked CLI confirms 2019+ data excluded from preliminary metrics",
+    "package_wheel": "built and verified 0.2.0 contains quantforge.data.tiingo and source packages",
+    "duckdb_parquet": "not installed/tested in authoring container",
+    "ruff": "not installed/tested in authoring container",
+    "live_tiingo": "not tested; token absent",
+    "live_fred_sec": "not tested",
+    "github_actions": "not tested"
+  },
+  "user_previous_windows_evidence": {
+    "release": "0.1.1",
+    "pytest": "51 passed, 1 deprecation warning",
+    "ruff": "passed after tests/test_distribution.py import fix",
+    "duckdb_parquet": "simulated demo produced .duckdb and .parquet outputs",
+    "dashboard_html": "generated, visual inspection not provided"
+  },
+  "research_claims": "No empirical ETF risk/performance outcomes verified or published."
+}

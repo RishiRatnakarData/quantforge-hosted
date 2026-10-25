@@ -1,0 +1,7 @@
+company: MSFT
+issuer_name: Microsoft Corporation
+source: SEC EDGAR Company Facts
+fiscal_year_end: '06-30'
+method: five-year-unlevered-DCF
+machine_readable_assumptions: configs/valuation_assumptions.json
+status: scenario assumptions; latest live SEC statement run pending on user's machine

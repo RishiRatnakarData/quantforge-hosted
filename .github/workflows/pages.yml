@@ -1,0 +1,13 @@
+# Archived legacy website workflow.
+# QuantForge V5 is a private local application; GitHub publishes only source/docs.
+name: Legacy Pages deployment (disabled)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  legacy-pages-disabled:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explanation
+        run: echo "Automatic website deployment is disabled for the private QuantForge V5 desk."
