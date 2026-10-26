@@ -2,6 +2,7 @@
 (function(){
 'use strict';
 const M=window.QFModel,$=id=>document.getElementById(id);
+const SEC_DATA=/* QF_SEC_DATA */ null;
 const fmt=n=>Number(n).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2});
 const pct=n=>(100*n).toFixed(1)+'%';
 let state={cash:3500,holdings:{MSFT:5,VOO:8,AAPL:3,'BTC/USD':0.006}};
@@ -11,6 +12,8 @@ const num=id=>Number($(id).value);
 function nav(name){
  document.querySelectorAll('.tabpage').forEach(e=>e.classList.toggle('active',e.id==='page-'+name));
  document.querySelectorAll('.nav-btn').forEach(e=>e.classList.toggle('active',e.dataset.page===name));
+ const badge=document.querySelector('.topbar .badge');
+ if(badge)badge.textContent=name==='sec'?'SEC FILINGS':name==='private'?'PRIVATE WORKSPACE':'FICTIONAL DATA';
  window.scrollTo({top:0,behavior:'instant'});
 }
 function portfolio(){
@@ -74,13 +77,48 @@ function runDCF(){
 function runPeers(){let s=$('ml-company').value;const p=M.peers(s),facts=M.COMPANY_FACTS[s];
  $('ml-result').innerHTML='<div class="pane"><div class="section-title"><h3>Nearest companies to '+M.COMPANY_NAMES[s]+'</h3><span class="mini">Fictional financials</span></div>'+table(['Company','Ticker','Standardized distance'],p.ranking.slice(0,5).map(x=>[x.name,x.symbol,x.distance.toFixed(2)]))+'<p style="margin-top:18px">Sample-relative atypicality rank: <strong>'+p.unusualRank+' of '+p.total+'</strong> (1 = most distant from the feature mean).</p><div class="subtle"><h3>Features used</h3>'+table(['Metric','Fictional value'],['Revenue growth','Operating margin','Net margin','Free cash flow / revenue','Debt / assets'].map((name,i)=>[name,pct(facts.features[i])]))+'</div><p class="tiny" style="margin-top:12px">Z-score feature standardization and Euclidean nearest-neighbors. Atypicality is standardized distance to the sample center, not an Isolation Forest or investment signal.</p></div>';
 }
+
+// SEC comparison uses a static, pre-reviewed companyfacts snapshot. No browser API calls.
+const billions=v=>(typeof v==='number'&&Number.isFinite(v))?'$'+(v/1e9).toFixed(2)+'B':'Not reported';
+const ratio=(a,b)=>(typeof a==='number'&&typeof b==='number'&&b>0)?(a/b*100).toFixed(1)+'%':'Not available';
+function renderSEC(){
+ const out=$('sec-figures'),years=$('sec-years'),peers=$('sec-compare'),scenario=$('sec-scenario');
+ if(!SEC_DATA || !Array.isArray(SEC_DATA.companies) || SEC_DATA.companies.length===0){
+  $('sec-status').textContent='No SEC snapshot published';
+  out.innerHTML='<div class="notice">Real financials have not been published yet. The maintainer must generate and validate the SEC snapshot. No invented issuer data will be substituted.</div>';
+  years.textContent='';peers.textContent='';scenario.textContent='';return;
+ }
+ const company=SEC_DATA.companies.find(c=>c.symbol===$('sec-company').value);
+ if(!company || !company.annual.length)return;
+ const latest=company.annual[0],m=latest.metrics,prior=company.annual[1]?.metrics;
+ const yoy=prior ? ratio(m.revenue_usd-prior.revenue_usd,prior.revenue_usd) : 'Not available';
+ const margin=ratio(m.operating_income_usd,m.revenue_usd);
+ $('sec-status').textContent='SEC filing data as of '+SEC_DATA.as_of;
+ out.innerHTML='<div class="metric"><span class="muted">Revenue · fiscal year ending '+latest.fiscal_end+'</span><strong>'+billions(m.revenue_usd)+'</strong></div>'+
+ '<div class="metric"><span class="muted">Operating margin</span><strong>'+margin+'</strong></div>'+
+ '<div class="metric"><span class="muted">Revenue YoY change</span><strong>'+yoy+'</strong></div>';
+ const rows=company.annual.map(r=>{const f=r.metrics;return [r.fiscal_end,billions(f.revenue_usd),billions(f.operating_income_usd),ratio(f.operating_income_usd,f.revenue_usd),billions(f.free_cash_flow_usd)];});
+ years.innerHTML=table(['FY ended','Revenue','Operating income','Operating margin','FCF proxy'],rows);
+ peers.innerHTML=table(['Company','Sector*','FY ended','Revenue','Operating margin'],SEC_DATA.companies.map(c=>{const f=c.annual[0];return [c.name,c.sector||'Not classified',f.fiscal_end,billions(f.metrics.revenue_usd),ratio(f.metrics.operating_income_usd,f.metrics.revenue_usd)];}));
+ $('sec-source').innerHTML='Source: <a href="'+company.source_url+'" rel="noopener noreferrer" target="_blank">SEC Company Facts, '+company.symbol+'</a>. Each metric is selected from an eligible 10-K filed by '+SEC_DATA.as_of+'. FCF proxy = reported operating cash flow minus cash purchases of property and equipment (not FCFF). Missing values remain blank. *Sector groups are editorial and fiscal periods differ; compare across sectors cautiously. Sources and accession IDs are in the snapshot file.';
+ const shock=Number($('sec-margin-shock').value);
+ if(!Number.isFinite(shock)||shock < -15||shock > 15||typeof m.operating_income_usd!=='number'||typeof m.revenue_usd!=='number'){
+  scenario.textContent='Enter a valid margin shock between -15 and +15 percentage points.';return;
+ }
+ const hypothetical=m.revenue_usd*(m.operating_income_usd/m.revenue_usd+shock/100);
+ scenario.innerHTML='<div class="notice"><strong>Hypothetical margin stress:</strong> '+(shock>=0?'+':'')+shock.toFixed(1)+' pp applied to FY revenue implies '+billions(hypothetical)+' operating income, a '+billions(hypothetical-m.operating_income_usd)+' change from the reported amount. This is a sensitivity, not a forecast.</div>';
+}
+
 function populate(){
+ if(SEC_DATA && Array.isArray(SEC_DATA.companies)){
+  $('sec-company').innerHTML=SEC_DATA.companies.map(c=>'<option value="'+c.symbol+'">'+c.name+' ('+c.symbol+')</option>').join('');
+ }
  const options=M.ASSETS.map(a=>'<option value="'+a.symbol+'">'+a.name+' ('+a.symbol+')</option>').join('');
  $('trade-symbol').innerHTML=options;
  $('assets-list').innerHTML=M.ASSETS.map(a=>'<button class="asset" data-symbol="'+a.symbol+'"><strong>'+a.name+'</strong><span>'+a.symbol+' · '+a.kind+' · '+fmt(a.price)+'</span></button>').join('');
  $('quant-assets').innerHTML=['MSFT','VOO','AAPL','QQQ','BND','BTC/USD','ETH/USD'].map(s=>'<label class="inline-checkbox"><input type="checkbox" name="quant-asset" value="'+s+'" '+(['MSFT','VOO','BND'].includes(s)?'checked':'')+'>'+M.bySymbol[s].name+'</label>').join('');
  $('ml-company').innerHTML=Object.keys(M.COMPANY_FACTS).map(s=>'<option value="'+s+'">'+M.COMPANY_NAMES[s]+'</option>').join('');
- portfolio();runQuant();runDCF();runPeers();
+ portfolio();runQuant();runDCF();runPeers();renderSEC();
 }
 document.addEventListener('click',e=>{
  const btn=e.target.closest('[data-page], [data-go], [data-symbol]');if(!btn)return;
@@ -93,5 +131,7 @@ $('rebalance-submit').addEventListener('click',rebalance);
 $('quant-run').addEventListener('click',runQuant);
 $('dcf-run').addEventListener('click',runDCF);
 $('ml-run').addEventListener('click',runPeers);
+$('sec-company').addEventListener('change',renderSEC);
+$('sec-margin-shock').addEventListener('input',renderSEC);
 populate();
 })();

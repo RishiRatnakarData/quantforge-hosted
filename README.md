@@ -1,10 +1,12 @@
-> **V5.6.1 hosted MFA security upgrade:** See [Windows/deployment guide](docs/MFA_UPGRADE_V5_6_1.md). The public demo is unchanged; the private workspace now requires an authenticator code and Supabase AAL2 RLS. The source archive alone does not deploy these changes.
+> **V5.7 limited public real-data section:** The public website includes a sourced SEC Financials tab for 12 named issuers spanning multiple industries when a validated SEC snapshot has been generated. Other demo calculations remain fictional; private Alpaca/portfolio data are unchanged. See [V5.7 runbook](docs/PUBLIC_SEC_DEMO_V5_7.md).
+
+> **V5.6.1 hosted MFA security upgrade:** See [Windows/deployment guide](docs/MFA_UPGRADE_V5_6_1.md). The V5.6.1 upgrade did not alter the public demo; the private workspace now requires an authenticator code and Supabase AAL2 RLS. The source archive alone does not deploy these changes.
 
 ## Optional hosted website (V5.6 staging)
 
-One Cloudflare Pages website supports a no-login **fictional public demo** and an
+One Cloudflare Pages website supports a no-login **simulated investment demo plus public SEC filing exhibit** and an
 owner-only **My workspace** backed by Render, Supabase Auth and protected read-only
-Alpaca market data. **Not deployed yet.** Hosted quant/valuation/peer calculations
+Alpaca market data. Hosted quant/valuation/peer calculations
 currently use synthetic browser methods; the extensive Python models are in the
 local application and are not claimed to power those hosted panels.
 

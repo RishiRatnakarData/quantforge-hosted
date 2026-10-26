@@ -1,5 +1,6 @@
 import base64
 import hashlib
+import json
 import re
 from pathlib import Path
 
@@ -63,8 +64,26 @@ html=html.replace('Methods are simplified client-side implementations for review
 html=html.replace('.navtop{display:none}', '#private-signed[hidden],#private-login[hidden],#private-mfa[hidden],#private-mfa-qr-wrap[hidden],#private-mfa-setup-actions[hidden]{display:none!important}#private-message{margin-top:8px}.navtop{display:none}')
 html=html.replace('body></html>','body></html>')
 # Ensure all app scripts stay CSP-protected; no external JS libraries.
+snapshot_path=src/'site/sec_snapshot.json'
+snapshot=json.loads(snapshot_path.read_text(encoding="utf-8")) if snapshot_path.exists() else None
+if snapshot is not None:
+ from build_public_sec_snapshot import ISSUERS
+ public_companies = snapshot.get('companies', [])
+ symbols = [c.get('symbol') for c in public_companies if isinstance(c, dict)]
+ if (snapshot.get('dataset') != 'SEC EDGAR Company Facts, annual 10-K US-GAAP'
+     or len(symbols) != len(ISSUERS) or set(symbols) != set(ISSUERS)
+     or any(c.get('cik') != ISSUERS[c['symbol']][0] or
+            c.get('source_url') != f"https://data.sec.gov/api/xbrl/companyfacts/CIK{c['cik']:010d}.json"
+            or not isinstance(c.get('annual'), list) or len(c['annual']) < 2
+            for c in public_companies)):
+  raise ValueError('SEC snapshot validation failed; regenerate the 12-company file from the official source')
+snapshot_js=json.dumps(snapshot, separators=(',',':'), ensure_ascii=True).replace('<', r'\u003c').replace('>', r'\u003e').replace('&', r'\u0026')
 for slot, file in [('/* QF_MODEL */','model.js'),('/* QF_APP */','app.js'),('/* QF_PRIVATE */','private.js')]:
- text=(src/'site'/file).read_text(encoding="utf-8").replace('</script','<\\/script')
+ text=(src/'site'/file).read_text(encoding="utf-8")
+ if file=='app.js':
+  assert text.count('/* QF_SEC_DATA */ null')==1
+  text=text.replace('/* QF_SEC_DATA */ null', snapshot_js)
+ text=text.replace('</script','<\\/script')
  html=html.replace(slot,text)
 (root/'public/index.html').write_text(html, encoding="utf-8")
 scripts=re.findall(r'<script>(.*?)</script>',html,re.DOTALL)

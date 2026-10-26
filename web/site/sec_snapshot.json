@@ -1,0 +1,1409 @@
+{
+  "as_of": "2026-10-25",
+  "companies": [
+    {
+      "annual": [
+        {
+          "fiscal_end": "2026-06-30",
+          "metrics": {
+            "capex_usd": 115948000000,
+            "free_cash_flow_usd": 66987000000,
+            "net_income_usd": 133749000000,
+            "operating_cash_flow_usd": 182935000000,
+            "operating_income_usd": 155237000000,
+            "revenue_usd": 331839000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0001193125-26-323660",
+              "filed": "2026-07-29",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0001193125-26-323660",
+              "filed": "2026-07-29",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0001193125-26-323660",
+              "filed": "2026-07-29",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0001193125-26-323660",
+              "filed": "2026-07-29",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0001193125-26-323660",
+              "filed": "2026-07-29",
+              "tag": "RevenueFromContractWithCustomerExcludingAssessedTax"
+            }
+          }
+        },
+        {
+          "fiscal_end": "2025-06-30",
+          "metrics": {
+            "capex_usd": 64551000000,
+            "free_cash_flow_usd": 71611000000,
+            "net_income_usd": 101832000000,
+            "operating_cash_flow_usd": 136162000000,
+            "operating_income_usd": 128528000000,
+            "revenue_usd": 281724000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0001193125-26-323660",
+              "filed": "2026-07-29",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0001193125-26-323660",
+              "filed": "2026-07-29",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0001193125-26-323660",
+              "filed": "2026-07-29",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0001193125-26-323660",
+              "filed": "2026-07-29",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0001193125-26-323660",
+              "filed": "2026-07-29",
+              "tag": "RevenueFromContractWithCustomerExcludingAssessedTax"
+            }
+          }
+        },
+        {
+          "fiscal_end": "2024-06-30",
+          "metrics": {
+            "capex_usd": 44477000000,
+            "free_cash_flow_usd": 74071000000,
+            "net_income_usd": 88136000000,
+            "operating_cash_flow_usd": 118548000000,
+            "operating_income_usd": 109433000000,
+            "revenue_usd": 245122000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0001193125-26-323660",
+              "filed": "2026-07-29",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0001193125-26-323660",
+              "filed": "2026-07-29",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0001193125-26-323660",
+              "filed": "2026-07-29",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0001193125-26-323660",
+              "filed": "2026-07-29",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0001193125-26-323660",
+              "filed": "2026-07-29",
+              "tag": "RevenueFromContractWithCustomerExcludingAssessedTax"
+            }
+          }
+        }
+      ],
+      "cik": 789019,
+      "name": "Microsoft",
+      "sector": "Technology",
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000789019.json",
+      "symbol": "MSFT"
+    },
+    {
+      "annual": [
+        {
+          "fiscal_end": "2025-09-27",
+          "metrics": {
+            "capex_usd": 12715000000,
+            "free_cash_flow_usd": 98767000000,
+            "net_income_usd": 112010000000,
+            "operating_cash_flow_usd": 111482000000,
+            "operating_income_usd": 133050000000,
+            "revenue_usd": 416161000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0000320193-25-000079",
+              "filed": "2025-10-31",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0000320193-25-000079",
+              "filed": "2025-10-31",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0000320193-25-000079",
+              "filed": "2025-10-31",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0000320193-25-000079",
+              "filed": "2025-10-31",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0000320193-25-000079",
+              "filed": "2025-10-31",
+              "tag": "RevenueFromContractWithCustomerExcludingAssessedTax"
+            }
+          }
+        },
+        {
+          "fiscal_end": "2024-09-28",
+          "metrics": {
+            "capex_usd": 9447000000,
+            "free_cash_flow_usd": 108807000000,
+            "net_income_usd": 93736000000,
+            "operating_cash_flow_usd": 118254000000,
+            "operating_income_usd": 123216000000,
+            "revenue_usd": 391035000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0000320193-25-000079",
+              "filed": "2025-10-31",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0000320193-25-000079",
+              "filed": "2025-10-31",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0000320193-25-000079",
+              "filed": "2025-10-31",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0000320193-25-000079",
+              "filed": "2025-10-31",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0000320193-25-000079",
+              "filed": "2025-10-31",
+              "tag": "RevenueFromContractWithCustomerExcludingAssessedTax"
+            }
+          }
+        },
+        {
+          "fiscal_end": "2023-09-30",
+          "metrics": {
+            "capex_usd": 10959000000,
+            "free_cash_flow_usd": 99584000000,
+            "net_income_usd": 96995000000,
+            "operating_cash_flow_usd": 110543000000,
+            "operating_income_usd": 114301000000,
+            "revenue_usd": 383285000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0000320193-25-000079",
+              "filed": "2025-10-31",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0000320193-25-000079",
+              "filed": "2025-10-31",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0000320193-25-000079",
+              "filed": "2025-10-31",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0000320193-25-000079",
+              "filed": "2025-10-31",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0000320193-25-000079",
+              "filed": "2025-10-31",
+              "tag": "RevenueFromContractWithCustomerExcludingAssessedTax"
+            }
+          }
+        }
+      ],
+      "cik": 320193,
+      "name": "Apple",
+      "sector": "Technology",
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json",
+      "symbol": "AAPL"
+    },
+    {
+      "annual": [
+        {
+          "fiscal_end": "2026-01-25",
+          "metrics": {
+            "capex_usd": null,
+            "free_cash_flow_usd": null,
+            "net_income_usd": 120067000000,
+            "operating_cash_flow_usd": 102718000000,
+            "operating_income_usd": 130387000000,
+            "revenue_usd": 215938000000
+          },
+          "sources": {
+            "net_income_usd": {
+              "accession": "0001045810-26-000021",
+              "filed": "2026-02-25",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0001045810-26-000021",
+              "filed": "2026-02-25",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0001045810-26-000021",
+              "filed": "2026-02-25",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0001045810-26-000021",
+              "filed": "2026-02-25",
+              "tag": "Revenues"
+            }
+          }
+        },
+        {
+          "fiscal_end": "2025-01-26",
+          "metrics": {
+            "capex_usd": null,
+            "free_cash_flow_usd": null,
+            "net_income_usd": 72880000000,
+            "operating_cash_flow_usd": 64089000000,
+            "operating_income_usd": 81453000000,
+            "revenue_usd": 130497000000
+          },
+          "sources": {
+            "net_income_usd": {
+              "accession": "0001045810-26-000021",
+              "filed": "2026-02-25",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0001045810-26-000021",
+              "filed": "2026-02-25",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0001045810-26-000021",
+              "filed": "2026-02-25",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0001045810-26-000021",
+              "filed": "2026-02-25",
+              "tag": "Revenues"
+            }
+          }
+        },
+        {
+          "fiscal_end": "2024-01-28",
+          "metrics": {
+            "capex_usd": null,
+            "free_cash_flow_usd": null,
+            "net_income_usd": 29760000000,
+            "operating_cash_flow_usd": 28090000000,
+            "operating_income_usd": 32972000000,
+            "revenue_usd": 60922000000
+          },
+          "sources": {
+            "net_income_usd": {
+              "accession": "0001045810-26-000021",
+              "filed": "2026-02-25",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0001045810-26-000021",
+              "filed": "2026-02-25",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0001045810-26-000021",
+              "filed": "2026-02-25",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0001045810-26-000021",
+              "filed": "2026-02-25",
+              "tag": "Revenues"
+            }
+          }
+        }
+      ],
+      "cik": 1045810,
+      "name": "NVIDIA",
+      "sector": "Technology",
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001045810.json",
+      "symbol": "NVDA"
+    },
+    {
+      "annual": [
+        {
+          "fiscal_end": "2025-12-31",
+          "metrics": {
+            "capex_usd": 91447000000,
+            "free_cash_flow_usd": 73266000000,
+            "net_income_usd": 132170000000,
+            "operating_cash_flow_usd": 164713000000,
+            "operating_income_usd": 129039000000,
+            "revenue_usd": 402836000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0001652044-26-000018",
+              "filed": "2026-02-05",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0001652044-26-000018",
+              "filed": "2026-02-05",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0001652044-26-000018",
+              "filed": "2026-02-05",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0001652044-26-000018",
+              "filed": "2026-02-05",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0001652044-26-000018",
+              "filed": "2026-02-05",
+              "tag": "Revenues"
+            }
+          }
+        },
+        {
+          "fiscal_end": "2024-12-31",
+          "metrics": {
+            "capex_usd": 52535000000,
+            "free_cash_flow_usd": 72764000000,
+            "net_income_usd": 100118000000,
+            "operating_cash_flow_usd": 125299000000,
+            "operating_income_usd": 112390000000,
+            "revenue_usd": 350018000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0001652044-26-000018",
+              "filed": "2026-02-05",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0001652044-26-000018",
+              "filed": "2026-02-05",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0001652044-26-000018",
+              "filed": "2026-02-05",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0001652044-26-000018",
+              "filed": "2026-02-05",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0001652044-25-000014",
+              "filed": "2025-02-05",
+              "tag": "RevenueFromContractWithCustomerExcludingAssessedTax"
+            }
+          }
+        },
+        {
+          "fiscal_end": "2023-12-31",
+          "metrics": {
+            "capex_usd": 32251000000,
+            "free_cash_flow_usd": 69495000000,
+            "net_income_usd": 73795000000,
+            "operating_cash_flow_usd": 101746000000,
+            "operating_income_usd": 84293000000,
+            "revenue_usd": 307394000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0001652044-26-000018",
+              "filed": "2026-02-05",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0001652044-26-000018",
+              "filed": "2026-02-05",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0001652044-26-000018",
+              "filed": "2026-02-05",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0001652044-26-000018",
+              "filed": "2026-02-05",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0001652044-25-000014",
+              "filed": "2025-02-05",
+              "tag": "RevenueFromContractWithCustomerExcludingAssessedTax"
+            }
+          }
+        }
+      ],
+      "cik": 1652044,
+      "name": "Alphabet",
+      "sector": "Communication",
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001652044.json",
+      "symbol": "GOOGL"
+    },
+    {
+      "annual": [
+        {
+          "fiscal_end": "2025-12-31",
+          "metrics": {
+            "capex_usd": null,
+            "free_cash_flow_usd": null,
+            "net_income_usd": 77670000000,
+            "operating_cash_flow_usd": 139514000000,
+            "operating_income_usd": 79975000000,
+            "revenue_usd": 716924000000
+          },
+          "sources": {
+            "net_income_usd": {
+              "accession": "0001018724-26-000004",
+              "filed": "2026-02-06",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0001018724-26-000004",
+              "filed": "2026-02-06",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0001018724-26-000004",
+              "filed": "2026-02-06",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0001018724-26-000004",
+              "filed": "2026-02-06",
+              "tag": "RevenueFromContractWithCustomerExcludingAssessedTax"
+            }
+          }
+        },
+        {
+          "fiscal_end": "2024-12-31",
+          "metrics": {
+            "capex_usd": null,
+            "free_cash_flow_usd": null,
+            "net_income_usd": 59248000000,
+            "operating_cash_flow_usd": 115877000000,
+            "operating_income_usd": 68593000000,
+            "revenue_usd": 637959000000
+          },
+          "sources": {
+            "net_income_usd": {
+              "accession": "0001018724-26-000004",
+              "filed": "2026-02-06",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0001018724-26-000004",
+              "filed": "2026-02-06",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0001018724-26-000004",
+              "filed": "2026-02-06",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0001018724-26-000004",
+              "filed": "2026-02-06",
+              "tag": "RevenueFromContractWithCustomerExcludingAssessedTax"
+            }
+          }
+        },
+        {
+          "fiscal_end": "2023-12-31",
+          "metrics": {
+            "capex_usd": null,
+            "free_cash_flow_usd": null,
+            "net_income_usd": 30425000000,
+            "operating_cash_flow_usd": 84946000000,
+            "operating_income_usd": 36852000000,
+            "revenue_usd": 574785000000
+          },
+          "sources": {
+            "net_income_usd": {
+              "accession": "0001018724-26-000004",
+              "filed": "2026-02-06",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0001018724-26-000004",
+              "filed": "2026-02-06",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0001018724-26-000004",
+              "filed": "2026-02-06",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0001018724-26-000004",
+              "filed": "2026-02-06",
+              "tag": "RevenueFromContractWithCustomerExcludingAssessedTax"
+            }
+          }
+        }
+      ],
+      "cik": 1018724,
+      "name": "Amazon",
+      "sector": "Consumer discretionary",
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001018724.json",
+      "symbol": "AMZN"
+    },
+    {
+      "annual": [
+        {
+          "fiscal_end": "2025-12-31",
+          "metrics": {
+            "capex_usd": 69691000000,
+            "free_cash_flow_usd": 46109000000,
+            "net_income_usd": 60458000000,
+            "operating_cash_flow_usd": 115800000000,
+            "operating_income_usd": 83276000000,
+            "revenue_usd": 200966000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0001628280-26-003942",
+              "filed": "2026-01-29",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0001628280-26-003942",
+              "filed": "2026-01-29",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0001628280-26-003942",
+              "filed": "2026-01-29",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0001628280-26-003942",
+              "filed": "2026-01-29",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0001628280-26-003942",
+              "filed": "2026-01-29",
+              "tag": "RevenueFromContractWithCustomerExcludingAssessedTax"
+            }
+          }
+        },
+        {
+          "fiscal_end": "2024-12-31",
+          "metrics": {
+            "capex_usd": 37256000000,
+            "free_cash_flow_usd": 54072000000,
+            "net_income_usd": 62360000000,
+            "operating_cash_flow_usd": 91328000000,
+            "operating_income_usd": 69380000000,
+            "revenue_usd": 164501000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0001628280-26-003942",
+              "filed": "2026-01-29",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0001628280-26-003942",
+              "filed": "2026-01-29",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0001628280-26-003942",
+              "filed": "2026-01-29",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0001628280-26-003942",
+              "filed": "2026-01-29",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0001628280-26-003942",
+              "filed": "2026-01-29",
+              "tag": "RevenueFromContractWithCustomerExcludingAssessedTax"
+            }
+          }
+        },
+        {
+          "fiscal_end": "2023-12-31",
+          "metrics": {
+            "capex_usd": 27045000000,
+            "free_cash_flow_usd": 44068000000,
+            "net_income_usd": 39098000000,
+            "operating_cash_flow_usd": 71113000000,
+            "operating_income_usd": 46751000000,
+            "revenue_usd": 134902000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0001628280-26-003942",
+              "filed": "2026-01-29",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0001628280-26-003942",
+              "filed": "2026-01-29",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0001628280-26-003942",
+              "filed": "2026-01-29",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0001628280-26-003942",
+              "filed": "2026-01-29",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0001628280-26-003942",
+              "filed": "2026-01-29",
+              "tag": "RevenueFromContractWithCustomerExcludingAssessedTax"
+            }
+          }
+        }
+      ],
+      "cik": 1326801,
+      "name": "Meta Platforms",
+      "sector": "Communication",
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001326801.json",
+      "symbol": "META"
+    },
+    {
+      "annual": [
+        {
+          "fiscal_end": "2026-08-30",
+          "metrics": {
+            "capex_usd": 6435000000,
+            "free_cash_flow_usd": 9382000000,
+            "net_income_usd": 9226000000,
+            "operating_cash_flow_usd": 15817000000,
+            "operating_income_usd": 11685000000,
+            "revenue_usd": 303154000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0000909832-26-000093",
+              "filed": "2026-10-07",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0000909832-26-000093",
+              "filed": "2026-10-07",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0000909832-26-000093",
+              "filed": "2026-10-07",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0000909832-26-000093",
+              "filed": "2026-10-07",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0000909832-26-000093",
+              "filed": "2026-10-07",
+              "tag": "RevenueFromContractWithCustomerExcludingAssessedTax"
+            }
+          }
+        },
+        {
+          "fiscal_end": "2025-08-31",
+          "metrics": {
+            "capex_usd": 5498000000,
+            "free_cash_flow_usd": 7837000000,
+            "net_income_usd": 8099000000,
+            "operating_cash_flow_usd": 13335000000,
+            "operating_income_usd": 10383000000,
+            "revenue_usd": 275235000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0000909832-26-000093",
+              "filed": "2026-10-07",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0000909832-26-000093",
+              "filed": "2026-10-07",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0000909832-26-000093",
+              "filed": "2026-10-07",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0000909832-26-000093",
+              "filed": "2026-10-07",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0000909832-26-000093",
+              "filed": "2026-10-07",
+              "tag": "RevenueFromContractWithCustomerExcludingAssessedTax"
+            }
+          }
+        },
+        {
+          "fiscal_end": "2024-09-01",
+          "metrics": {
+            "capex_usd": 4710000000,
+            "free_cash_flow_usd": 6629000000,
+            "net_income_usd": 7367000000,
+            "operating_cash_flow_usd": 11339000000,
+            "operating_income_usd": 9285000000,
+            "revenue_usd": 254453000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0000909832-26-000093",
+              "filed": "2026-10-07",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0000909832-26-000093",
+              "filed": "2026-10-07",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0000909832-26-000093",
+              "filed": "2026-10-07",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0000909832-26-000093",
+              "filed": "2026-10-07",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0000909832-26-000093",
+              "filed": "2026-10-07",
+              "tag": "RevenueFromContractWithCustomerExcludingAssessedTax"
+            }
+          }
+        }
+      ],
+      "cik": 909832,
+      "name": "Costco Wholesale",
+      "sector": "Consumer staples",
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000909832.json",
+      "symbol": "COST"
+    },
+    {
+      "annual": [
+        {
+          "fiscal_end": "2026-01-31",
+          "metrics": {
+            "capex_usd": 26642000000,
+            "free_cash_flow_usd": 14923000000,
+            "net_income_usd": 21893000000,
+            "operating_cash_flow_usd": 41565000000,
+            "operating_income_usd": 29825000000,
+            "revenue_usd": 706413000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0000104169-26-000055",
+              "filed": "2026-03-13",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0000104169-26-000055",
+              "filed": "2026-03-13",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0000104169-26-000055",
+              "filed": "2026-03-13",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0000104169-26-000055",
+              "filed": "2026-03-13",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0000104169-26-000055",
+              "filed": "2026-03-13",
+              "tag": "RevenueFromContractWithCustomerExcludingAssessedTax"
+            }
+          }
+        },
+        {
+          "fiscal_end": "2025-01-31",
+          "metrics": {
+            "capex_usd": 23783000000,
+            "free_cash_flow_usd": 12660000000,
+            "net_income_usd": 19436000000,
+            "operating_cash_flow_usd": 36443000000,
+            "operating_income_usd": 29348000000,
+            "revenue_usd": 674538000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0000104169-26-000055",
+              "filed": "2026-03-13",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0000104169-26-000055",
+              "filed": "2026-03-13",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0000104169-26-000055",
+              "filed": "2026-03-13",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0000104169-26-000055",
+              "filed": "2026-03-13",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0000104169-26-000055",
+              "filed": "2026-03-13",
+              "tag": "RevenueFromContractWithCustomerExcludingAssessedTax"
+            }
+          }
+        },
+        {
+          "fiscal_end": "2024-01-31",
+          "metrics": {
+            "capex_usd": 20606000000,
+            "free_cash_flow_usd": 15120000000,
+            "net_income_usd": 15511000000,
+            "operating_cash_flow_usd": 35726000000,
+            "operating_income_usd": 27012000000,
+            "revenue_usd": 642637000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0000104169-26-000055",
+              "filed": "2026-03-13",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0000104169-26-000055",
+              "filed": "2026-03-13",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0000104169-26-000055",
+              "filed": "2026-03-13",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0000104169-26-000055",
+              "filed": "2026-03-13",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0000104169-26-000055",
+              "filed": "2026-03-13",
+              "tag": "RevenueFromContractWithCustomerExcludingAssessedTax"
+            }
+          }
+        }
+      ],
+      "cik": 104169,
+      "name": "Walmart",
+      "sector": "Consumer staples",
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000104169.json",
+      "symbol": "WMT"
+    },
+    {
+      "annual": [
+        {
+          "fiscal_end": "2025-12-31",
+          "metrics": {
+            "capex_usd": 2112000000,
+            "free_cash_flow_usd": 5296000000,
+            "net_income_usd": 13107000000,
+            "operating_cash_flow_usd": 7408000000,
+            "operating_income_usd": 13762000000,
+            "revenue_usd": 47941000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0001628280-26-010047",
+              "filed": "2026-02-20",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0001628280-26-010047",
+              "filed": "2026-02-20",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0001628280-26-010047",
+              "filed": "2026-02-20",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0001628280-26-010047",
+              "filed": "2026-02-20",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0001628280-26-010047",
+              "filed": "2026-02-20",
+              "tag": "Revenues"
+            }
+          }
+        },
+        {
+          "fiscal_end": "2024-12-31",
+          "metrics": {
+            "capex_usd": 2064000000,
+            "free_cash_flow_usd": 4741000000,
+            "net_income_usd": 10631000000,
+            "operating_cash_flow_usd": 6805000000,
+            "operating_income_usd": 9992000000,
+            "revenue_usd": 47061000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0001628280-26-010047",
+              "filed": "2026-02-20",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0001628280-26-010047",
+              "filed": "2026-02-20",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0001628280-26-010047",
+              "filed": "2026-02-20",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0001628280-26-010047",
+              "filed": "2026-02-20",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0001628280-26-010047",
+              "filed": "2026-02-20",
+              "tag": "Revenues"
+            }
+          }
+        },
+        {
+          "fiscal_end": "2023-12-31",
+          "metrics": {
+            "capex_usd": 1852000000,
+            "free_cash_flow_usd": 9747000000,
+            "net_income_usd": 10714000000,
+            "operating_cash_flow_usd": 11599000000,
+            "operating_income_usd": 11311000000,
+            "revenue_usd": 45754000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0001628280-26-010047",
+              "filed": "2026-02-20",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0001628280-26-010047",
+              "filed": "2026-02-20",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0001628280-26-010047",
+              "filed": "2026-02-20",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0001628280-26-010047",
+              "filed": "2026-02-20",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0001628280-26-010047",
+              "filed": "2026-02-20",
+              "tag": "Revenues"
+            }
+          }
+        }
+      ],
+      "cik": 21344,
+      "name": "Coca-Cola",
+      "sector": "Consumer staples",
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000021344.json",
+      "symbol": "KO"
+    },
+    {
+      "annual": [
+        {
+          "fiscal_end": "2025-12-28",
+          "metrics": {
+            "capex_usd": 4832000000,
+            "free_cash_flow_usd": 19698000000,
+            "net_income_usd": 26804000000,
+            "operating_cash_flow_usd": 24530000000,
+            "operating_income_usd": null,
+            "revenue_usd": 94193000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0000200406-26-000016",
+              "filed": "2026-02-11",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0000200406-26-000016",
+              "filed": "2026-02-11",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0000200406-26-000016",
+              "filed": "2026-02-11",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "revenue_usd": {
+              "accession": "0000200406-26-000016",
+              "filed": "2026-02-11",
+              "tag": "RevenueFromContractWithCustomerExcludingAssessedTax"
+            }
+          }
+        },
+        {
+          "fiscal_end": "2024-12-29",
+          "metrics": {
+            "capex_usd": 4424000000,
+            "free_cash_flow_usd": 19842000000,
+            "net_income_usd": 14066000000,
+            "operating_cash_flow_usd": 24266000000,
+            "operating_income_usd": null,
+            "revenue_usd": 88821000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0000200406-26-000016",
+              "filed": "2026-02-11",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0000200406-26-000016",
+              "filed": "2026-02-11",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0000200406-26-000016",
+              "filed": "2026-02-11",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "revenue_usd": {
+              "accession": "0000200406-26-000016",
+              "filed": "2026-02-11",
+              "tag": "RevenueFromContractWithCustomerExcludingAssessedTax"
+            }
+          }
+        },
+        {
+          "fiscal_end": "2023-12-31",
+          "metrics": {
+            "capex_usd": 4543000000,
+            "free_cash_flow_usd": 18248000000,
+            "net_income_usd": 35153000000,
+            "operating_cash_flow_usd": 22791000000,
+            "operating_income_usd": null,
+            "revenue_usd": 85159000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0000200406-26-000016",
+              "filed": "2026-02-11",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0000200406-26-000016",
+              "filed": "2026-02-11",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0000200406-26-000016",
+              "filed": "2026-02-11",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "revenue_usd": {
+              "accession": "0000200406-26-000016",
+              "filed": "2026-02-11",
+              "tag": "RevenueFromContractWithCustomerExcludingAssessedTax"
+            }
+          }
+        }
+      ],
+      "cik": 200406,
+      "name": "Johnson & Johnson",
+      "sector": "Healthcare",
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000200406.json",
+      "symbol": "JNJ"
+    },
+    {
+      "annual": [
+        {
+          "fiscal_end": "2025-12-31",
+          "metrics": {
+            "capex_usd": 28358000000,
+            "free_cash_flow_usd": 23612000000,
+            "net_income_usd": 28844000000,
+            "operating_cash_flow_usd": 51970000000,
+            "operating_income_usd": null,
+            "revenue_usd": 332238000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0000034088-26-000045",
+              "filed": "2026-02-18",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0000034088-26-000045",
+              "filed": "2026-02-18",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0000034088-26-000045",
+              "filed": "2026-02-18",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "revenue_usd": {
+              "accession": "0000034088-26-000045",
+              "filed": "2026-02-18",
+              "tag": "Revenues"
+            }
+          }
+        },
+        {
+          "fiscal_end": "2024-12-31",
+          "metrics": {
+            "capex_usd": 24306000000,
+            "free_cash_flow_usd": 30716000000,
+            "net_income_usd": 33680000000,
+            "operating_cash_flow_usd": 55022000000,
+            "operating_income_usd": null,
+            "revenue_usd": 349585000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0000034088-26-000045",
+              "filed": "2026-02-18",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0000034088-26-000045",
+              "filed": "2026-02-18",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0000034088-26-000045",
+              "filed": "2026-02-18",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "revenue_usd": {
+              "accession": "0000034088-26-000045",
+              "filed": "2026-02-18",
+              "tag": "Revenues"
+            }
+          }
+        },
+        {
+          "fiscal_end": "2023-12-31",
+          "metrics": {
+            "capex_usd": 21919000000,
+            "free_cash_flow_usd": 33450000000,
+            "net_income_usd": 36010000000,
+            "operating_cash_flow_usd": 55369000000,
+            "operating_income_usd": null,
+            "revenue_usd": 344582000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0000034088-26-000045",
+              "filed": "2026-02-18",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "net_income_usd": {
+              "accession": "0000034088-26-000045",
+              "filed": "2026-02-18",
+              "tag": "NetIncomeLoss"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0000034088-26-000045",
+              "filed": "2026-02-18",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "revenue_usd": {
+              "accession": "0000034088-26-000045",
+              "filed": "2026-02-18",
+              "tag": "Revenues"
+            }
+          }
+        }
+      ],
+      "cik": 34088,
+      "name": "Exxon Mobil",
+      "sector": "Energy",
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000034088.json",
+      "symbol": "XOM"
+    },
+    {
+      "annual": [
+        {
+          "fiscal_end": "2025-12-31",
+          "metrics": {
+            "capex_usd": 2821000000,
+            "free_cash_flow_usd": 8918000000,
+            "net_income_usd": null,
+            "operating_cash_flow_usd": 11739000000,
+            "operating_income_usd": 11151000000,
+            "revenue_usd": 67589000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0000018230-26-000008",
+              "filed": "2026-02-13",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0000018230-26-000008",
+              "filed": "2026-02-13",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0000018230-26-000008",
+              "filed": "2026-02-13",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0000018230-26-000008",
+              "filed": "2026-02-13",
+              "tag": "Revenues"
+            }
+          }
+        },
+        {
+          "fiscal_end": "2024-12-31",
+          "metrics": {
+            "capex_usd": 1988000000,
+            "free_cash_flow_usd": 10047000000,
+            "net_income_usd": null,
+            "operating_cash_flow_usd": 12035000000,
+            "operating_income_usd": 13072000000,
+            "revenue_usd": 64809000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0000018230-26-000008",
+              "filed": "2026-02-13",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0000018230-26-000008",
+              "filed": "2026-02-13",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0000018230-26-000008",
+              "filed": "2026-02-13",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0000018230-26-000008",
+              "filed": "2026-02-13",
+              "tag": "Revenues"
+            }
+          }
+        },
+        {
+          "fiscal_end": "2023-12-31",
+          "metrics": {
+            "capex_usd": 1597000000,
+            "free_cash_flow_usd": 11288000000,
+            "net_income_usd": null,
+            "operating_cash_flow_usd": 12885000000,
+            "operating_income_usd": 12966000000,
+            "revenue_usd": 67060000000
+          },
+          "sources": {
+            "capex_usd": {
+              "accession": "0000018230-26-000008",
+              "filed": "2026-02-13",
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment"
+            },
+            "operating_cash_flow_usd": {
+              "accession": "0000018230-26-000008",
+              "filed": "2026-02-13",
+              "tag": "NetCashProvidedByUsedInOperatingActivities"
+            },
+            "operating_income_usd": {
+              "accession": "0000018230-26-000008",
+              "filed": "2026-02-13",
+              "tag": "OperatingIncomeLoss"
+            },
+            "revenue_usd": {
+              "accession": "0000018230-26-000008",
+              "filed": "2026-02-13",
+              "tag": "Revenues"
+            }
+          }
+        }
+      ],
+      "cik": 18230,
+      "name": "Caterpillar",
+      "sector": "Industrials",
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000018230.json",
+      "symbol": "CAT"
+    }
+  ],
+  "dataset": "SEC EDGAR Company Facts, annual 10-K US-GAAP",
+  "methodology": "Annual period 330-380 days; 10-K/10-K/A; filing date <= as_of; latest eligible filing per period. Null means no comparable eligible fact. Free cash flow proxy = operating cash flow - cash capex. Editorial sector groups and non-synchronized fiscal years must not be interpreted as strict peers.",
+  "source": "https://www.sec.gov/search-filings/edgar-application-programming-interfaces"
+}
