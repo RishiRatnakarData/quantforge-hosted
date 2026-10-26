@@ -46,6 +46,10 @@
 .private-chart svg{width:100%;height:auto}.private-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:15px 0}
 .private-metrics>div{border:1px solid var(--line);border-radius:9px;padding:14px}.private-metrics strong{display:block;font-size:20px}
 @media(max-width:650px){.private-metrics{grid-template-columns:1fr}.private-nav{gap:2px}.private-nav button{padding:7px 8px}}
+/* Notes are individually removable without deleting the private portfolio. */
+.saved-note{display:flex;align-items:start;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:13px 0}
+.saved-note-body{min-width:0;overflow-wrap:anywhere}.saved-note-body p{margin:0 0 5px;white-space:pre-wrap}
+.saved-note button{flex-shrink:0}
 /* Private directory browser appears only after MFA owner login. */
 .selected-asset,.chosen-assets{border:1px solid var(--line);border-radius:8px;padding:11px 12px;background:#f8fbf9;font-size:13px;margin:7px 0 10px;min-height:42px}
 .chosen-assets{display:flex;gap:6px;flex-wrap:wrap;align-items:center}

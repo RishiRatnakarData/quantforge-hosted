@@ -65,12 +65,12 @@ block='''<section class="tabpage" id="page-private">
     </section>
     <section class="private-view" data-private-view="valuation" hidden>
       <div class="pane"><h3>Financial valuation scenarios</h3><p class="tiny">Historical company financials from SEC filings, with editable forecast assumptions. Alpaca supplies market prices, not audited accounting statements.</p>
-      <div class="formgrid" style="margin-top:14px"><div class="field"><label for="private-valuation-company">Company</label><select id="private-valuation-company"></select></div>
+      <div class="formgrid" style="margin-top:14px"><div class="field"><label for="private-valuation-company">Company</label><input id="private-valuation-company" type="hidden"><div class="selected-asset" id="private-valuation-selected">No company selected</div><button class="btn sm" id="private-browse-valuation" type="button">Browse companies</button></div>
       <div class="field"><label for="private-valuation-growth">Annual FCF growth (%)</label><input id="private-valuation-growth" type="number" min="-30" max="40" value="4"></div>
       <div class="field"><label for="private-valuation-wacc">Discount rate (%)</label><input id="private-valuation-wacc" type="number" min="2" max="30" value="10"></div>
       <div class="field"><label for="private-valuation-terminal">Terminal growth (%)</label><input id="private-valuation-terminal" type="number" min="-5" max="8" value="2"></div></div>
       <div class="controls"><button class="btn primary" id="private-valuation-run">Run scenario</button></div><div id="private-valuation-output" style="margin-top:15px"></div></div>
-      <div class="pane"><h3>Company comparison</h3><div id="private-peers"></div></div>
+      <div class="pane"><h3>Selected company comparison</h3><div id="private-peers"></div></div>
     </section>
     <section class="private-view" data-private-view="settings" hidden>
       <div class="pane"><h3>Virtual account balance</h3><p class="tiny">Change your simulation budget without any bank transfer or brokerage order. Deposits and withdrawals affect only uninvested cash. Reset clears virtual positions and trades but preserves notes.</p>

@@ -27,7 +27,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from qrcode.image.svg import SvgPathImage
 
-from cloud import asset_directory
+from cloud import asset_directory, sec_fundamentals
 from quantforge.desk.engine import FEE_RATE, QTY, DeskError, cents, money, valid_quote
 from quantforge.desk.market import AlpacaDeskMarket
 from quantforge.live.provider import AlpacaClient, MarketDataError
@@ -417,6 +417,16 @@ def private_assets(request: Request, response: Response,
     try:
         return asset_directory.browse(category=category, letter=letter, query=query, page=page)
     except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+
+
+@app.get("/api/private/sec/company")
+def private_sec_company(request: Request, response: Response, symbol: str):
+    """Private on-demand SEC annual figures, never a brokerage fundamentals proxy."""
+    owner(request, response)
+    try:
+        return sec_fundamentals.get_company(symbol)
+    except sec_fundamentals.SECFundamentalsError as exc:
         raise HTTPException(422, str(exc)) from exc
 
 
