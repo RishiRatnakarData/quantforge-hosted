@@ -118,6 +118,8 @@ async function logout(){
   clearMFA();showStep('login');privateState=null;quoted={};historySeries=null;closeAssetBrowser();researchSelection=[];$('private-symbol').value='';$('private-selected-asset').textContent='No investment selected';renderResearchSelection();
   optimizerResult=null;$('private-opt-export').disabled=true;$('private-opt-output').textContent='Load market history to begin.';$('private-opt-risk').textContent='';
   $('private-history-chart').textContent='Load a historical series to begin.';$('private-risk-results').textContent='';$('private-backtest-output').textContent='';$('private-valuation-output').textContent='';$('private-peers').textContent='';$('private-concentration').textContent='';$('private-positions').textContent='';
+  $('private-wf-output').textContent='Load historical investments in Market research to begin.';$('private-wf-export').disabled=true;walkforwardResult=null;
+  $('private-fc-output').textContent='Load SEC statements for a selected company first.';
   $('private-total').textContent='—';$('private-invested').textContent='—';
   $('private-cash').textContent='—';$('private-notes').textContent='';valuationCompanies={};$('private-valuation-company').value='';$('private-valuation-selected').textContent='No company selected';message('Signed out.');privateTab('home');
 }
@@ -241,6 +243,7 @@ function chooseAsset(symbol,name,kind){
   $('private-valuation-company').value=symbol;
   $('private-valuation-selected').textContent=name+' ('+symbol+')';
   $('private-valuation-output').textContent='Select Run scenario to load available SEC filings.';
+  $('private-fc-output').textContent='Load SEC statements for the newly selected company first.';
   message('Selected '+name+'. SEC statements will be checked when you run the scenario.');
  }else if(browserState.mode==='trade'){
   $('private-symbol').value=symbol;
@@ -253,7 +256,8 @@ function chooseAsset(symbol,name,kind){
    researchSelection.push(symbol);
   }
   renderResearchSelection();historySeries=null;optimizerResult=null;$('private-opt-export').disabled=true;$('private-opt-output').textContent='Selection changed. Load the updated historical series first.';$('private-opt-risk').textContent='';
-  $('private-history-chart').textContent='Load market history for the selected investments.';
+  $('private-wf-output').textContent='Selection changed. Load new historical data.';$('private-wf-export').disabled=true;walkforwardResult=null;
+ $('private-history-chart').textContent='Load market history for the selected investments.';
   $('private-backtest-output').textContent='';
   message('Added '+name+' to your historical research selection.');
  }
@@ -283,6 +287,7 @@ $('private-history-selection').addEventListener('click',e=>{
  if(!b)return;
  researchSelection=researchSelection.filter(s=>s!==b.dataset.researchRemove);
  renderResearchSelection();historySeries=null;optimizerResult=null;$('private-opt-export').disabled=true;$('private-opt-output').textContent='Selection changed. Load the updated historical series first.';$('private-opt-risk').textContent='';
+ $('private-wf-output').textContent='Selection changed. Load new historical data.';$('private-wf-export').disabled=true;walkforwardResult=null;
  $('private-history-chart').textContent='Load market history for the selected investments.';
  $('private-backtest-output').textContent='';
 });
@@ -356,12 +361,12 @@ async function loadHistory(){
   optimizerResult=null;$('private-opt-export').disabled=true;
   $('private-opt-output').textContent='History loaded. Open Optimization to calculate allocations.';
   $('private-opt-risk').textContent='Risk diagnostics appear after an allocation is calculated.';
-  historySeries=d;
+  historySeries=d;walkforwardResult=null;$('private-wf-export').disabled=true;$('private-wf-output').textContent='History loaded. Run walk-forward evaluation when ready.';
   $('private-history-chart').innerHTML=svgIndexChart(d);
   $('private-history-source').textContent=d.source+' · through '+d.as_of+' · '+d.calendar;
   $('private-risk-results').innerHTML=privateRisk(d)+privateCrossAsset(d);
   message('Historical market research loaded.');
- }catch(e){optimizerResult=null;$('private-opt-export').disabled=true;historySeries=null;message(e.message);$('private-history-chart').textContent='Market history unavailable.';$('private-risk-results').textContent='';$('private-backtest-output').textContent='';}
+ }catch(e){optimizerResult=null;$('private-opt-export').disabled=true;historySeries=null;walkforwardResult=null;$('private-wf-export').disabled=true;$('private-wf-output').textContent='Load history again to continue.';message(e.message);$('private-history-chart').textContent='Market history unavailable.';$('private-risk-results').textContent='';$('private-backtest-output').textContent='';}
 }
 function wealthStats(values){let out=values.at(-1)/values[0]-1;return [percent(out),percent(maxDD(values))];}
 function privateBacktest(){
@@ -436,6 +441,7 @@ async function privateValuation(){
  // Do not allow late fetches from a prior selection to replace the current issuer.
  if($('private-valuation-company').value!==symbol)return;
  $('private-valuation-output').innerHTML=output;
+ $('private-fc-output').textContent='Statements loaded. Set projection assumptions and run a forecast.';
  privatePeers();message('SEC filings loaded for '+companyName+'.');
 }
 function privatePeers(){
@@ -566,6 +572,96 @@ function exportOptimization(){
 $('private-opt-run').addEventListener('click',runOptimization);
 $('private-opt-export').addEventListener('click',exportOptimization);
 for(const id of ['private-opt-objective','private-opt-cap'])$(id).addEventListener('change',()=>{optimizerResult=null;$('private-opt-export').disabled=true;$('private-opt-output').textContent='Settings changed. Calculate allocations to update the results.';$('private-opt-risk').textContent='';});
+
+
+/* V6.5: SEC scenario projections and past-only walk-forward evaluations. */
+let walkforwardResult=null;
+const fcMoney=x=>finite(x)?usd(x):'Unavailable';
+function runFinancialForecast(){
+ if(!privateState){message('Sign in first.');return;}
+ const symbol=$('private-valuation-company').value,company=valuationCompanies[symbol];
+ if(!company){message('Load SEC annual statements for a selected company first.');return;}
+ try{
+  const d=window.QFPrivateForecast.run(company,{
+   years:Number($('private-fc-years').value),growth:Number($('private-fc-growth').value)/100,
+   fcfMargin:Number($('private-fc-margin').value)/100,
+   discount:Number($('private-fc-discount').value)/100,
+   terminal:Number($('private-fc-terminal').value)/100});
+  const hist=displayTable(['Reported fiscal end','SEC revenue','SEC FCF proxy','Revenue change'],d.historic.map(x=>[
+   x.date,fcMoney(x.revenue),fcMoney(x.fcf),x.revenueGrowth===null?'—':percent(x.revenueGrowth)]));
+  const projected=displayTable(['Scenario','Forward year','Modeled revenue','Modeled FCF proxy'],d.scenarios.flatMap(s=>s.projection.map(x=>[
+   s.name,'Year '+x.year,fcMoney(x.revenue),fcMoney(x.fcf)])));
+  const valuation=displayTable(['Assumption','Conservative','Base case','Optimistic'],[
+   ['Revenue growth',...d.scenarios.map(s=>percent(s.growth))],
+   ['FCF/revenue',...d.scenarios.map(s=>percent(s.margin))],
+   ['Discounted FCF-plus-terminal proxy',...d.scenarios.map(s=>fcMoney(s.proxy))]]);
+  $('private-fc-output').innerHTML='<p class="tiny">'+safe(d.name)+' ('+safe(d.symbol)+') · last SEC fiscal period '+safe(d.fiscalEnd)+' · '+safe(d.source)+' · as-of '+safe(d.asOf)+'</p>'+hist+
+   '<h3 style="margin:16px 0 8px">Hypothetical projections</h3>'+projected+
+   '<h3 style="margin:16px 0 8px">Scenario sensitivity</h3>'+valuation+
+   '<p class="tiny">Forecasts are assumptions, not observed SEC values. Revenue is compounded from the latest reported year. FCF is projected using an assumed FCF-to-revenue margin. '+
+   (d.baseMargin===null?'Reported FCF margin unavailable; FCF valuation is suppressed.':'Latest reported FCF proxy/revenue: '+percent(d.baseMargin)+'.')+
+   ' The discounted total is a simplified cash-flow proxy, NOT company equity value, enterprise value, price target, or per-share valuation. Cash, debt and other capital adjustments are not modeled; historical data may be restated.</p>';
+  message('Financial scenarios calculated. No trades placed.');
+ }catch(e){$('private-fc-output').textContent=e.message;message(e.message);}
+}
+function wfChart(d){
+ const a=d.optimized.wealth,b=d.benchmark.wealth,len=a.length;
+ const all=[...a,...b],min=Math.min(...all),max=Math.max(...all),span=Math.max(max-min,1),lo=min-span*.08,hi=max+span*.08;
+ function path(values){return values.map((v,i)=>(i?'L':'M')+(26+560*i/(len-1)).toFixed(1)+' '+(201-170*(v-lo)/(hi-lo)).toFixed(1)).join(' ');}
+ return '<svg viewBox="0 0 620 245" width="100%" role="img" aria-label="Out-of-sample virtual wealth for optimized and equal-weight portfolios">'+
+  '<path d="'+path(a)+'" stroke="#0c7660" stroke-width="2" fill="none"/>'+
+  '<path d="'+path(b)+'" stroke="#c58b31" stroke-width="2" fill="none"/>'+
+  '<text x="26" y="232" font-size="11" fill="#526a60">'+safe(d.start)+'</text><text x="493" y="232" font-size="11" fill="#526a60">'+safe(d.end)+'</text></svg>'+
+  '<p class="tiny">Green: rolling fitted allocation. Orange: equal-weight benchmark. Trading costs included; prices observed historically.</p>';
+}
+function runWalkforward(){
+ if(!privateState){message('Sign in first.');return;}
+ if(!historySeries){message('Load investments in Market research first.');privateTab('research');return;}
+ try{
+  const d=window.QFPrivateWalkforward.run(historySeries,{
+   train:Number($('private-wf-train').value),step:Number($('private-wf-step').value),
+   objective:$('private-wf-mode').value,cap:Number($('private-wf-cap').value),
+   feeBps:Number($('private-wf-fee').value),capital:Number($('private-wf-capital').value)});
+  walkforwardResult=d;$('private-wf-export').disabled=false;
+  const om=d.optimized.metrics,bm=d.benchmark.metrics;
+  const comparison=displayTable(['Metric','Rolling allocation','Equal-weight benchmark'],[
+   ['Out-of-sample compounded return',percent(om.change),percent(bm.change)],
+   ['Annualized historical volatility',percent(om.annualVol),percent(bm.annualVol)],
+   ['Maximum drawdown',percent(om.maxDrawdown),percent(bm.maxDrawdown)],
+   ['Daily 95% historical VaR',percent(om.var95),percent(bm.var95)],
+   ['Daily 95% historical expected shortfall',percent(om.expectedShortfall),percent(bm.expectedShortfall)],
+   ['Modeled transaction fees',usd(d.optimized.fees),usd(d.benchmark.fees)],
+   ['Final hypothetical wealth',usd(d.optimized.wealth.at(-1)),usd(d.benchmark.wealth.at(-1))]]);
+  const windows=displayTable(['Fitted through','Unseen evaluation dates','Rolling weights'],d.windows.map(w=>[
+   w.trainingEnd,w.testStart+' to '+w.testEnd,
+   w.weights.map((p,i)=>d.symbols[i]+': '+percent(p)).join(' · ')]));
+  $('private-wf-output').innerHTML='<p class="tiny">'+d.windows.length+' non-overlapping test windows · '+safe(d.start)+' to '+safe(d.end)+' · '+
+   d.train+' prior training observations per fit · '+d.step+' test observations · '+d.annual+' annualization observations/year · '+safe(d.source)+'</p>'+wfChart(d)+comparison+
+   '<h3 style="margin:16px 0 8px">Training and evaluation boundaries</h3>'+windows+
+   '<p class="tiny">Each allocation is fitted only through the training-end date shown and held until its next scheduled rebalance. Rebalance fees are charged to both strategies on absolute traded notional, including initial deployment. Trades are assumed at the observed rebalance-date closing price, without bid–ask spreads or slippage. This is a retrospective simulation, not a live or guaranteed out-of-sample trading record. Symbol selection, date selection and model choice can introduce selection bias.</p>';
+  message('Walk-forward historical evaluation completed. No trades placed.');
+ }catch(e){walkforwardResult=null;$('private-wf-export').disabled=true;$('private-wf-output').textContent=e.message;message(e.message);}
+}
+function exportWalkforward(){
+ if(!privateState||!walkforwardResult)return;
+ const d=walkforwardResult,cell=v=>{let s=String(v).replace(/"/g,'""');if(/^[=+@-]/.test(s))s="'"+s;return '"'+s+'"';};
+ const rows=[['training_start','training_end','test_start','test_end','symbol','fitted_weight','period_source'].map(cell).join(',')];
+ for(const w of d.windows)for(let i=0;i<d.symbols.length;i++)rows.push([
+  w.trainingStart,w.trainingEnd,w.testStart,w.testEnd,d.symbols[i],w.weights[i],d.source].map(cell).join(','));
+ const blob=new Blob([rows.join('\r\n')+'\r\n'],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
+ link.href=url;link.download='quantforge-walkforward-historical-windows.csv';document.body.appendChild(link);link.click();link.remove();URL.revokeObjectURL(url);
+ message('Historical walk-forward windows exported locally.');
+}
+$('private-fc-run').addEventListener('click',runFinancialForecast);
+$('private-wf-run').addEventListener('click',runWalkforward);
+$('private-wf-export').addEventListener('click',exportWalkforward);
+for(const id of ['private-wf-train','private-wf-step','private-wf-mode','private-wf-cap','private-wf-fee','private-wf-capital']){
+ $(id).addEventListener('change',()=>{walkforwardResult=null;$('private-wf-export').disabled=true;
+  $('private-wf-output').textContent='Settings changed. Re-run walk-forward evaluation.';});
+}
+for(const id of ['private-fc-years','private-fc-growth','private-fc-margin','private-fc-discount','private-fc-terminal']){
+ $(id).addEventListener('change',()=>{$('private-fc-output').textContent='Assumptions changed. Re-run company forecast.';});
+}
 
 document.querySelectorAll('[data-private-tab]').forEach(b=>b.addEventListener('click',()=>privateTab(b.dataset.privateTab)));
 $('private-history-load').addEventListener('click',loadHistory);

@@ -36,7 +36,7 @@ block='''<section class="tabpage" id="page-private">
   </div>
   <div id="private-signed" hidden>
     <div class="controls"><span class="mini">Personal research · authenticated</span><button class="btn sm" id="private-logout">Sign out</button></div>
-    <nav class="private-nav" aria-label="Private workspace sections"><button class="active" data-private-tab="home">Portfolio</button><button data-private-tab="trade">Virtual trading</button><button data-private-tab="research">Market research</button><button data-private-tab="optimization">Optimization</button><button data-private-tab="backtest">Backtesting</button><button data-private-tab="valuation">Valuation &amp; peers</button><button data-private-tab="settings">Settings &amp; notes</button></nav>
+    <nav class="private-nav" aria-label="Private workspace sections"><button class="active" data-private-tab="home">Portfolio</button><button data-private-tab="trade">Virtual trading</button><button data-private-tab="research">Market research</button><button data-private-tab="optimization">Optimization</button><button data-private-tab="backtest">Backtesting</button><button data-private-tab="walkforward">Walk-forward</button><button data-private-tab="valuation">Valuation &amp; peers</button><button data-private-tab="settings">Settings &amp; notes</button></nav>
     <section class="private-view" data-private-view="home">
       <div class="pane"><div class="three"><div class="metric"><span class="muted">Virtual total</span><strong id="private-total">—</strong></div><div class="metric"><span class="muted">Available cash</span><strong id="private-cash">—</strong></div><div class="metric"><span class="muted">Invested value</span><strong id="private-invested">—</strong></div></div><div class="section-title"><h3>Holdings</h3><button class="btn sm" data-private-tab="trade">Trade</button></div><div id="private-positions"></div></div>
       <div class="pane"><h3>Portfolio concentration</h3><div id="private-concentration" class="tiny" style="margin-top:12px">Add virtual holdings to see allocation.</div></div>
@@ -75,6 +75,22 @@ block='''<section class="tabpage" id="page-private">
       <div class="controls"><button class="btn primary" id="private-backtest-run">Run backtest</button></div>
       <div id="private-backtest-output" style="margin-top:15px"></div></div>
     </section>
+    <section class="private-view" data-private-view="walkforward" hidden>
+      <div class="pane"><h3>Walk-forward strategy validation</h3>
+        <p class="tiny">Fit portfolio weights using previous historical observations, then evaluate the allocation on later dates. Refit at every test-window boundary. Compare against equal-weight rebalancing using the same transaction-fee assumptions. No brokerage orders.</p>
+        <div class="formgrid" style="margin-top:14px">
+          <div class="field"><label for="private-wf-train">Training window</label><select id="private-wf-train"><option value="63">63 observations</option><option selected value="126">126 observations</option><option value="252">252 observations</option></select></div>
+          <div class="field"><label for="private-wf-step">Out-of-sample test window</label><select id="private-wf-step"><option selected value="21">21 observations</option><option value="42">42 observations</option></select></div>
+          <div class="field"><label for="private-wf-mode">Allocation rule</label><select id="private-wf-mode"><option value="minimum">Minimum historical volatility</option><option value="inverse">Inverse volatility</option><option value="tilt">Historical-return tilt</option></select></div>
+          <div class="field"><label for="private-wf-cap">Maximum position weight</label><select id="private-wf-cap"><option value="0.35">35%</option><option value="0.40">40%</option><option value="0.50">50%</option><option selected value="0.60">60%</option><option value="0.75">75%</option><option value="1.00">100%</option></select></div>
+          <div class="field"><label for="private-wf-fee">Fee per turnover (bps)</label><input id="private-wf-fee" type="number" min="0" max="100" value="5" step="1"></div>
+          <div class="field"><label for="private-wf-capital">Research capital ($)</label><input id="private-wf-capital" type="number" min="100" max="1000000" value="10000"></div>
+        </div>
+        <div class="controls"><button class="btn primary" type="button" id="private-wf-run">Run walk-forward test</button><button class="btn" id="private-wf-export" type="button" disabled>Export test windows CSV</button></div>
+        <div id="private-wf-output" style="margin-top:15px" aria-live="polite">Load historical investments in Market research to begin.</div>
+        <p class="tiny">Model uses price-only historical returns; no dividends, borrow costs, slippage, taxes, or corporate-action simulations. Backtests remain subject to selection bias and do not establish future performance.</p>
+      </div>
+    </section>
     <section class="private-view" data-private-view="valuation" hidden>
       <div class="pane"><h3>Financial valuation scenarios</h3><p class="tiny">Historical company financials from SEC filings, with editable forecast assumptions. Alpaca supplies market prices, not audited accounting statements.</p>
       <div class="formgrid" style="margin-top:14px"><div class="field"><label for="private-valuation-company">Company</label><input id="private-valuation-company" type="hidden"><div class="selected-asset" id="private-valuation-selected">No company selected</div><button class="btn sm" id="private-browse-valuation" type="button">Browse companies</button></div>
@@ -82,6 +98,18 @@ block='''<section class="tabpage" id="page-private">
       <div class="field"><label for="private-valuation-wacc">Discount rate (%)</label><input id="private-valuation-wacc" type="number" min="2" max="30" value="10"></div>
       <div class="field"><label for="private-valuation-terminal">Terminal growth (%)</label><input id="private-valuation-terminal" type="number" min="-5" max="8" value="2"></div></div>
       <div class="controls"><button class="btn primary" id="private-valuation-run">Run scenario</button></div><div id="private-valuation-output" style="margin-top:15px"></div></div>
+      <div class="pane"><h3>Multi-year SEC financial projections</h3>
+        <p class="tiny">Choose a company above and load its SEC annual disclosures first. Enter hypothetical annual revenue growth and free-cash-flow margin; projections never overwrite reported financials. Scenarios differ by ±4 percentage points of growth and ±3 points of FCF margin.</p>
+        <div class="formgrid" style="margin-top:14px">
+          <div class="field"><label for="private-fc-years">Projection horizon</label><select id="private-fc-years"><option value="3">3 years</option><option selected value="5">5 years</option><option value="7">7 years</option></select></div>
+          <div class="field"><label for="private-fc-growth">Base annual revenue growth (%)</label><input id="private-fc-growth" type="number" min="-30" max="40" value="6" step="0.5"></div>
+          <div class="field"><label for="private-fc-margin">Base FCF proxy / revenue (%)</label><input id="private-fc-margin" type="number" min="-25" max="60" value="12" step="0.5"></div>
+          <div class="field"><label for="private-fc-discount">Discount rate (%)</label><input id="private-fc-discount" type="number" min="2" max="30" value="10" step="0.5"></div>
+          <div class="field"><label for="private-fc-terminal">Terminal growth (%)</label><input id="private-fc-terminal" type="number" min="-5" max="8" value="2" step="0.5"></div>
+        </div>
+        <div class="controls"><button class="btn primary" id="private-fc-run" type="button">Forecast selected company</button></div>
+        <div id="private-fc-output" style="margin-top:15px" aria-live="polite">Load SEC statements for a selected company first.</div>
+      </div>
       <div class="pane"><h3>Selected company comparison</h3><div id="private-peers"></div></div>
     </section>
     <section class="private-view" data-private-view="settings" hidden>
@@ -130,7 +158,7 @@ for slot, file in [('/* QF_MODEL */','model.js'),('/* QF_APP */','app.js'),('/* 
  text=(src/'site'/file).read_text(encoding="utf-8")
  if file=='private.js':
   # Bundled alongside the existing private script: still only three CSP-protected scripts.
-  text=(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_multimarket.js').read_text(encoding='utf-8')+'\n'+text
+  text=(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_multimarket.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_forecast_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_walkforward_v65.js').read_text(encoding='utf-8')+'\n'+text
  if file=='app.js':
   assert text.count('/* QF_SEC_DATA */ null')==1
   # Bundle pure SEC analytics in the existing public app script. CSP remains 3 hashes.
