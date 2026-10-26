@@ -1,7 +1,7 @@
 /* Public demo: prebuilt real SEC filing facts plus browser-only simulated model examples. */
 (function(){
 'use strict';
-const M=window.QFModel,$=id=>document.getElementById(id);
+const M=window.QFModel,$=id=>document.getElementById(id),SEC=window.QFSecAnalytics;
 const SEC_DATA=/* QF_SEC_DATA */ null;
 const fmt=n=>Number(n).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2});
 const pct=n=>(100*n).toFixed(1)+'%';
@@ -86,12 +86,54 @@ function runPeers(){let s=$('ml-company').value;const p=M.peers(s),facts=M.COMPA
 // SEC comparison uses a static, pre-reviewed companyfacts snapshot. No browser API calls.
 const billions=v=>(typeof v==='number'&&Number.isFinite(v))?'$'+(v/1e9).toFixed(2)+'B':'Not reported';
 const ratio=(a,b)=>(typeof a==='number'&&typeof b==='number'&&b>0)?(a/b*100).toFixed(1)+'%':'Not available';
+const safeText=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const secMetricLabel=(value,key)=>value===null?'Not reported':(SEC.METRICS[key].unit==='usd'?billions(value):value.toFixed(1)+'%');
+function renderSECTrend(company){
+ const container=$('sec-trend'),series=SEC.revenueSeries(company);
+ if(series.length<2){container.textContent='Insufficient comparable annual revenue observations for a trend.';return;}
+ const max=Math.max(...series.map(item=>item.revenue_usd));
+ if(max<=0){container.textContent='Revenue trend unavailable.';return;}
+ const xSlots=series.map((item,i)=>100+i*185),bottom=187,height=151;
+ const bars=series.map((item,i)=>{
+  const h=item.revenue_usd/max*height,x=xSlots[i],y=bottom-h;
+  return `<rect x="${x}" y="${y.toFixed(2)}" width="91" height="${h.toFixed(2)}" rx="5" fill="#1d665a"/>`+
+   `<text x="${x+45.5}" y="${Math.max(17,y-10).toFixed(2)}" text-anchor="middle" fill="#183c33" font-size="13" font-weight="700">${safeText(billions(item.revenue_usd))}</text>`+
+   `<text x="${x+45.5}" y="216" text-anchor="middle" fill="#536f66" font-size="12">FY ${safeText(item.fiscal_end.slice(0,4))}</text>`;
+ });
+ container.innerHTML=`<svg viewBox="0 0 650 237" role="img" aria-label="${safeText(company.name)} SEC-reported annual revenue, oldest to newest fiscal period"><title>${safeText(company.name)} annual SEC revenue</title><desc>Up to three fiscal reporting periods. Exact values are repeated in the accessible table below.</desc><line x1="56" y1="187" x2="614" y2="187" stroke="#c8dcd3" stroke-width="2"/>${bars.join('')}</svg>`+
+  '<p class="trend-caption">Revenue in USD billions · chronological issuer fiscal years. Values are historical filing data, not share-price performance.</p>';
+}
+function renderSECRanking(){
+ const key=$('sec-rank-metric').value, rows=SEC.ranking(SEC_DATA,key);
+ let rank=0;
+ $('sec-compare').innerHTML=table(['Rank','Company','Sector*','FY ended',SEC.METRICS[key].label],rows.map(row=>{
+  const hasValue=row.value!==null;if(hasValue)rank++;
+  return [hasValue?'<span class="sec-rank-highlight">'+rank+'</span>':'—',safeText(row.name)+' <span class="tiny">('+safeText(row.symbol)+')</span>',safeText(row.sector),safeText(row.fiscal_end),secMetricLabel(row.value,key)];
+ }));
+}
+function renderSECProvenance(company){
+ const latest=company.annual[0],fields=[['Revenue','revenue_usd'],['Operating income','operating_income_usd'],['Net income','net_income_usd'],['Operating cash flow','operating_cash_flow_usd'],['Cash PP&E purchases','capex_usd']];
+ $('sec-provenance').innerHTML=table(['Metric','US-GAAP tag','Filed','Accession'],fields.map(([label,key])=>{
+  const source=latest.sources?.[key];
+  return [label,source?safeText(source.tag):'Not reported',source?safeText(source.filed):'—',source?safeText(source.accession):'—'];
+ }))+'<p class="tiny" style="margin-top:9px">Fiscal year ending '+safeText(latest.fiscal_end)+'. Free cash flow is a derived proxy, not a separately reported SEC line item. Source facts and filing details are preserved in the downloadable CSV.</p>';
+}
+function downloadSECCsv(){
+ if(!SEC_DATA||!Array.isArray(SEC_DATA.companies))return;
+ const content=SEC.snapshotCsv(SEC_DATA);
+ const file=new Blob(['\ufeff'+content],{type:'text/csv;charset=utf-8'});
+ const url=URL.createObjectURL(file),link=document.createElement('a');
+ link.href=url;link.download='quantforge-sec-annual-'+SEC_DATA.as_of+'.csv';
+ document.body.appendChild(link);link.click();link.remove();
+ URL.revokeObjectURL(url);
+}
+
 function renderSEC(){
  const out=$('sec-figures'),years=$('sec-years'),peers=$('sec-compare'),scenario=$('sec-scenario');
  if(!SEC_DATA || !Array.isArray(SEC_DATA.companies) || SEC_DATA.companies.length===0){
   $('sec-status').textContent='No SEC snapshot published';
   out.innerHTML='<div class="notice">Real financials have not been published yet. The maintainer must generate and validate the SEC snapshot. No invented issuer data will be substituted.</div>';
-  years.textContent='';peers.textContent='';scenario.textContent='';return;
+  years.textContent='';peers.textContent='';scenario.textContent='';$('sec-trend').textContent='';$('sec-provenance').textContent='';return;
  }
  const company=SEC_DATA.companies.find(c=>c.symbol===$('sec-company').value);
  if(!company || !company.annual.length)return;
@@ -104,10 +146,13 @@ function renderSEC(){
  '<div class="metric"><span class="muted">Revenue YoY change</span><strong>'+yoy+'</strong></div>';
  const rows=company.annual.map(r=>{const f=r.metrics;return [r.fiscal_end,billions(f.revenue_usd),billions(f.operating_income_usd),ratio(f.operating_income_usd,f.revenue_usd),billions(f.free_cash_flow_usd)];});
  years.innerHTML=table(['FY ended','Revenue','Operating income','Operating margin','FCF proxy'],rows);
- peers.innerHTML=table(['Company','Sector*','FY ended','Revenue','Operating margin'],SEC_DATA.companies.map(c=>{const f=c.annual[0];return [c.name,c.sector||'Not classified',f.fiscal_end,billions(f.metrics.revenue_usd),ratio(f.metrics.operating_income_usd,f.metrics.revenue_usd)];}));
+ renderSECTrend(company);renderSECRanking();renderSECProvenance(company);
  $('sec-source').innerHTML='Source: <a href="'+company.source_url+'" rel="noopener noreferrer" target="_blank">SEC Company Facts, '+company.symbol+'</a>. Each metric is selected from an eligible 10-K filed by '+SEC_DATA.as_of+'. FCF proxy = reported operating cash flow minus cash purchases of property and equipment (not FCFF). Missing values remain blank. *Sector groups are editorial and fiscal periods differ; compare across sectors cautiously. Sources and accession IDs are in the snapshot file.';
  const shock=Number($('sec-margin-shock').value);
- if(!Number.isFinite(shock)||shock < -15||shock > 15||typeof m.operating_income_usd!=='number'||typeof m.revenue_usd!=='number'){
+ if(typeof m.operating_income_usd!=='number'||typeof m.revenue_usd!=='number'){
+  scenario.textContent='Margin stress is unavailable because this issuer lacks a comparable reported operating-income or revenue figure for the selected fiscal year.';return;
+ }
+ if(!Number.isFinite(shock)||shock < -15||shock > 15){
   scenario.textContent='Enter a valid margin shock between -15 and +15 percentage points.';return;
  }
  const hypothetical=m.revenue_usd*(m.operating_income_usd/m.revenue_usd+shock/100);
@@ -158,6 +203,8 @@ $('dcf-run').addEventListener('click',runDCF);
 $('ml-run').addEventListener('click',runPeers);
 $('sec-company').addEventListener('change',renderSEC);
 $('sec-margin-shock').addEventListener('input',renderSEC);
+$('sec-rank-metric').addEventListener('change',renderSECRanking);
+$('sec-export').addEventListener('click',downloadSECCsv);
 window.addEventListener('hashchange',()=>{const target=window.location.hash.slice(1);if(PUBLIC_PAGES.has(target))nav(target,false);});
 populate();
 const initial=window.location.hash.slice(1);if(PUBLIC_PAGES.has(initial))nav(initial,false);

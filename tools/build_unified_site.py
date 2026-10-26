@@ -82,7 +82,9 @@ for slot, file in [('/* QF_MODEL */','model.js'),('/* QF_APP */','app.js'),('/* 
  text=(src/'site'/file).read_text(encoding="utf-8")
  if file=='app.js':
   assert text.count('/* QF_SEC_DATA */ null')==1
-  text=text.replace('/* QF_SEC_DATA */ null', snapshot_js)
+  # Bundle pure SEC analytics in the existing public app script. CSP remains 3 hashes.
+  analytics=(src/'site/sec_analytics.js').read_text(encoding='utf-8')
+  text=analytics+'\n'+text.replace('/* QF_SEC_DATA */ null', snapshot_js)
  text=text.replace('</script','<\\/script')
  html=html.replace(slot,text)
 (root/'public/index.html').write_text(html, encoding="utf-8")
