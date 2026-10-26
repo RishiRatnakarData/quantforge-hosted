@@ -10,19 +10,22 @@ import base64
 import binascii
 import datetime as dt
 import hmac
+import io
 import json
 import os
 import re
 import secrets
 from decimal import ROUND_DOWN
 from typing import Any
-from urllib.parse import unquote
+from urllib.parse import parse_qs, unquote, urlsplit
 from xml.etree import ElementTree as ET
 
+import qrcode
 import requests
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
+from qrcode.image.svg import SvgPathImage
 
 from quantforge.desk.engine import FEE_RATE, QTY, DeskError, cents, money, valid_quote
 from quantforge.desk.market import AlpacaDeskMarket
@@ -247,6 +250,45 @@ def normalize_totp_qr_svg(raw: Any) -> str:
     return candidate
 
 
+def generate_totp_qr_svg(totp: Any) -> str:
+    """Render our own QR image from the private Supabase TOTP enrollment URI.
+
+    Provider SVG format is not trusted and may vary. The URI/secret is never
+    logged, persisted, or returned as plaintext. Only an enrolled owner can
+    request this SVG; it is a sensitive one-time enrollment credential.
+    """
+    if not isinstance(totp, dict):
+        raise HTTPException(503, "Authenticator enrollment response was incomplete.")
+    uri = totp.get("uri")
+    if isinstance(uri, str) and uri:
+        if len(uri) > 4096 or any(ord(char) < 32 for char in uri):
+            raise HTTPException(503, "Authenticator enrollment URI was invalid.")
+        parsed = urlsplit(uri)
+        if (parsed.scheme != "otpauth" or parsed.netloc != "totp"
+                or not parsed.path.strip("/") or parsed.fragment):
+            raise HTTPException(503, "Authenticator enrollment URI was invalid.")
+        secrets = parse_qs(parsed.query).get("secret", [])
+        if len(secrets) != 1 or not re.fullmatch(r"[A-Za-z2-7]{16,128}={0,6}", secrets[0]):
+            raise HTTPException(503, "Authenticator enrollment URI was invalid.")
+    else:
+        # Some provider releases omit 'uri' but still return the Base32 secret.
+        # Never place that secret into an error message or log.
+        secret = totp.get("secret", "")
+        if isinstance(secret, str) and re.fullmatch(r"[A-Za-z2-7]{16,128}={0,6}", secret):
+            uri = "otpauth://totp/QuantForge%3AOwner?secret=" + secret + "&issuer=QuantForge"
+        else:
+            # Compatibility with minimal mocked providers used in earlier tests.
+            # This fails closed on malformed provider-controlled SVG.
+            return normalize_totp_qr_svg(totp.get("qr_code", ""))
+    qr = qrcode.make(uri, image_factory=SvgPathImage, box_size=6, border=4)
+    sink = io.BytesIO()
+    qr.save(sink)
+    svg = sink.getvalue().decode("utf-8")
+    if len(svg) > 200_000:
+        raise HTTPException(503, "Authenticator QR image was too large.")
+    return svg
+
+
 @app.post("/api/auth/mfa/enroll")
 def mfa_enroll(request: Request, response: Response):
     _uid, token, user = authenticated_owner(request, response)
@@ -262,7 +304,7 @@ def mfa_enroll(request: Request, response: Response):
     factor_id = str(factor.get("id", ""))
     if not FACTOR_RE.fullmatch(factor_id):
         raise HTTPException(503, "Authenticator enrollment returned an invalid factor ID.")
-    qr = normalize_totp_qr_svg(totp.get("qr_code", ""))
+    qr = generate_totp_qr_svg(totp)
     # This QR is sensitive. Return only to authenticated owner over no-store,
     # never save or log it. Do not send the underlying key to static site code.
     return {"factor_id": factor_id, "qr_svg": qr}
