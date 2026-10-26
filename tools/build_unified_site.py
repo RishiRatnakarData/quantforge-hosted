@@ -5,7 +5,7 @@ from pathlib import Path
 
 root=Path(__file__).resolve().parents[1]
 src=root/'web'
-html=(src/'site/site.template.html').read_text()
+html=(src/'site/site.template.html').read_text(encoding="utf-8")
 nav='<button class="nav-btn" data-page="private">My workspace</button>'
 html=html.replace('</nav>',nav+'</nav>',1)
 block='''<section class="tabpage" id="page-private">
@@ -64,12 +64,12 @@ html=html.replace('.navtop{display:none}', '#private-signed[hidden],#private-log
 html=html.replace('body></html>','body></html>')
 # Ensure all app scripts stay CSP-protected; no external JS libraries.
 for slot, file in [('/* QF_MODEL */','model.js'),('/* QF_APP */','app.js'),('/* QF_PRIVATE */','private.js')]:
- text=(src/'site'/file).read_text().replace('</script','<\\/script')
+ text=(src/'site'/file).read_text(encoding="utf-8").replace('</script','<\\/script')
  html=html.replace(slot,text)
-(root/'public/index.html').write_text(html)
+(root/'public/index.html').write_text(html, encoding="utf-8")
 scripts=re.findall(r'<script>(.*?)</script>',html,re.DOTALL)
 assert len(scripts)==3
 hashes=["'sha256-"+base64.b64encode(hashlib.sha256(s.encode()).digest()).decode()+"'" for s in scripts]
 csp="default-src 'none'; script-src "+' '.join(hashes)+"; style-src 'unsafe-inline'; connect-src 'self'; img-src data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"
-(root/'public/_headers').write_text("/*\n  Content-Security-Policy: "+csp+"\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: no-referrer\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n")
+(root/'public/_headers').write_text("/*\n  Content-Security-Policy: "+csp+"\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: no-referrer\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n", encoding="utf-8")
 print('Built',root/'public/index.html',len(html),'bytes',len(scripts),'protected scripts')

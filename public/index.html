@@ -17,7 +17,7 @@
 <section class="tabpage" id="page-valuation"><div class="pagehead"><h1>Valuation</h1><p>Illustrative discounted cash flow. All company financial statements below are invented.</p></div><div class="pane"><h3>Company DCF</h3><div class="formgrid" style="margin-top:15px"><div class="field"><label for="dcf-company">Company</label><select id="dcf-company"><option value="MSFT">Microsoft</option><option value="AAPL">Apple</option><option value="NVDA">NVIDIA</option><option value="AMZN">Amazon</option><option value="ADBE">Adobe</option></select></div><div class="field"><label for="dcf-growth">Revenue growth (%)</label><input id="dcf-growth" type="number" min="-40" max="80" value="5"></div><div class="field"><label for="dcf-wacc">WACC (%)</label><input id="dcf-wacc" type="number" min="1" max="80" value="10"></div><div class="field"><label for="dcf-term">Terminal growth (%)</label><input id="dcf-term" type="number" min="0" max="20" value="2.5" step="0.5"></div><div class="field"><label for="dcf-margin">Operating margin (%)</label><input id="dcf-margin" type="number" min="0" max="90" placeholder="Use fictional base"></div></div><div class="controls"><button class="btn primary" id="dcf-run">Calculate DCF</button></div><p id="dcf-error" class="error" style="margin-top:8px"></p></div><div id="dcf-result"></div></section>
 <section class="tabpage" id="page-ml"><div class="pagehead"><h1>Company peers</h1><p>Unsupervised nearest-neighbor analysis using standardized fictional company fundamentals.</p></div><div class="pane"><div class="formgrid"><div class="field"><label for="ml-company">Company</label><select id="ml-company"></select></div></div><div class="controls"><button class="btn primary" id="ml-run">Compare financial profiles</button></div><div class="tiny" style="margin-top:9px">Five features: revenue growth, operating margin, net margin, free-cash-flow margin and debt/assets.</div></div><div id="ml-result"></div></section>
 <section class="tabpage" id="page-private">
-  <div class="pagehead"><h1>My workspace</h1><p id="private-status">Private · Sign in required</p></div>
+  <div class="pagehead"><h1>My workspace</h1><p id="private-status">Private Â· Sign in required</p></div>
   <div class="pane" id="private-login"><h3>Sign in</h3>
     <div class="formgrid" style="margin-top:14px">
       <div class="field"><label for="private-email">Email</label><input id="private-email" type="email" autocomplete="username" placeholder="Your private account"></div>
@@ -42,11 +42,11 @@
       <button class="btn" id="private-mfa-logout">Sign out</button></div>
   </div>
   <div id="private-signed" hidden>
-    <div class="controls"><span class="mini">Alpaca observations · Supabase private portfolio</span><button class="btn sm" id="private-logout">Sign out</button></div>
+    <div class="controls"><span class="mini">Alpaca observations Â· Supabase private portfolio</span><button class="btn sm" id="private-logout">Sign out</button></div>
     <div class="pane"><div class="three">
-      <div class="metric"><span class="muted">Virtual total</span><strong id="private-total">—</strong></div>
-      <div class="metric"><span class="muted">Available cash</span><strong id="private-cash">—</strong></div>
-      <div class="metric"><span class="muted">Invested value</span><strong id="private-invested">—</strong></div>
+      <div class="metric"><span class="muted">Virtual total</span><strong id="private-total">â€”</strong></div>
+      <div class="metric"><span class="muted">Available cash</span><strong id="private-cash">â€”</strong></div>
+      <div class="metric"><span class="muted">Invested value</span><strong id="private-invested">â€”</strong></div>
     </div><div class="section-title"><h3>Positions</h3></div><div id="private-positions"></div></div>
     <div class="pane"><h3>Market observation and virtual trade</h3>
       <div class="formgrid" style="margin-top:12px"><div class="field"><label for="private-symbol">Investment</label><select id="private-symbol"></select></div>

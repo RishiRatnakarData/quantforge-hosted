@@ -253,8 +253,8 @@ def test_demo_has_no_secrets_or_backend_calls_on_startup():
     from pathlib import Path
 
     root = Path(__file__).resolve().parents[1]
-    html = (root / "public/index.html").read_text()
-    script = (root / "web/site/private.js").read_text()
+    html = (root / "public/index.html").read_text(encoding="utf-8")
+    script = (root / "web/site/private.js").read_text(encoding="utf-8")
     assert "My workspace" in html and "FICTIONAL DATA" in html
     assert "ALPACA_API_SECRET_KEY" not in html and "SUPABASE_" not in html
     assert "checkSession();\n})();" not in script
@@ -263,7 +263,7 @@ def test_demo_has_no_secrets_or_backend_calls_on_startup():
 def test_supabase_schema_requires_auth_user_rls():
     from pathlib import Path
 
-    text = (Path(__file__).resolve().parents[1] / "cloud/supabase.sql").read_text()
+    text = (Path(__file__).resolve().parents[1] / "cloud/supabase.sql").read_text(encoding="utf-8")
     assert "enable row level security" in text
     assert text.count("(select auth.uid()) = user_id") >= 3
     assert "grant select, insert, update" in text
@@ -407,10 +407,10 @@ def test_mfa_sql_rls_and_browser_controls():
     from pathlib import Path
 
     root = Path(__file__).resolve().parents[1]
-    sql = (root / "cloud/supabase.sql").read_text()
+    sql = (root / "cloud/supabase.sql").read_text(encoding="utf-8")
     assert sql.count("(select auth.jwt()->>'aal') = 'aal2'") >= 3
-    ui = (root / "public/index.html").read_text()
-    script = (root / "web/site/private.js").read_text()
+    ui = (root / "public/index.html").read_text(encoding="utf-8")
+    script = (root / "web/site/private.js").read_text(encoding="utf-8")
     for selector in (
         "private-mfa-code",
         "private-mfa-qr",
