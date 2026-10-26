@@ -35,25 +35,50 @@ block='''<section class="tabpage" id="page-private">
       <button class="btn" id="private-mfa-logout">Sign out</button></div>
   </div>
   <div id="private-signed" hidden>
-    <div class="controls"><span class="mini">Alpaca observations · Supabase private portfolio</span><button class="btn sm" id="private-logout">Sign out</button></div>
-    <div class="pane"><div class="three">
-      <div class="metric"><span class="muted">Virtual total</span><strong id="private-total">—</strong></div>
-      <div class="metric"><span class="muted">Available cash</span><strong id="private-cash">—</strong></div>
-      <div class="metric"><span class="muted">Invested value</span><strong id="private-invested">—</strong></div>
-    </div><div class="section-title"><h3>Positions</h3></div><div id="private-positions"></div></div>
-    <div class="pane"><h3>Market observation and virtual trade</h3>
-      <div class="formgrid" style="margin-top:12px"><div class="field"><label for="private-symbol">Investment</label><select id="private-symbol"></select></div>
+    <div class="controls"><span class="mini">Personal research · authenticated</span><button class="btn sm" id="private-logout">Sign out</button></div>
+    <nav class="private-nav" aria-label="Private workspace sections"><button class="active" data-private-tab="home">Portfolio</button><button data-private-tab="trade">Virtual trading</button><button data-private-tab="research">Market research</button><button data-private-tab="backtest">Backtesting</button><button data-private-tab="valuation">Valuation &amp; peers</button><button data-private-tab="settings">Settings &amp; notes</button></nav>
+    <section class="private-view" data-private-view="home">
+      <div class="pane"><div class="three"><div class="metric"><span class="muted">Virtual total</span><strong id="private-total">—</strong></div><div class="metric"><span class="muted">Available cash</span><strong id="private-cash">—</strong></div><div class="metric"><span class="muted">Invested value</span><strong id="private-invested">—</strong></div></div><div class="section-title"><h3>Holdings</h3><button class="btn sm" data-private-tab="trade">Trade</button></div><div id="private-positions"></div></div>
+      <div class="pane"><h3>Portfolio concentration</h3><div id="private-concentration" class="tiny" style="margin-top:12px">Add virtual holdings to see allocation.</div></div>
+    </section>
+    <section class="private-view" data-private-view="trade" hidden>
+      <div class="pane"><h3>Market observation &amp; virtual trade</h3><p class="tiny">Stocks, ETFs, and supported crypto pairs. Market observations are private and read-only; no brokerage orders are placed.</p>
+      <div class="formgrid" style="margin-top:12px"><div class="field"><label for="private-symbol">Symbol</label><input id="private-symbol" list="private-symbol-list" value="MSFT" maxlength="12" autocomplete="off" placeholder="MSFT or BTC/USD"><datalist id="private-symbol-list"></datalist></div>
       <div class="field"><label for="private-side">Action</label><select id="private-side"><option value="buy">Buy with USD budget</option><option value="sell">Sell units</option></select></div>
       <div class="field"><label for="private-amount">USD budget / units</label><input type="number" min="0.00000001" step="any" id="private-amount" value="100"></div></div>
-      <div class="controls"><button class="btn" id="private-quote-submit">Get market price</button><button class="btn primary" id="private-trade-submit">Record virtual trade</button></div>
-      <div class="tiny" id="private-quote" style="margin-top:10px">No quote loaded</div>
-      <p class="tiny">IEX stock/ETF trades or Alpaca crypto venue observations. Transactions require a fresh timestamp. No brokerage order is placed.</p>
-    </div>
-    <div class="pane"><h3>Research notes</h3><div class="field" style="margin-top:12px"><label for="private-note">Private note</label><textarea id="private-note" maxlength="2000" rows="3" placeholder="Why are you considering this investment?"></textarea></div>
-      <div class="controls"><button class="btn" id="private-note-submit">Save note</button></div><div id="private-notes"></div>
-      <p class="tiny">Watchlist: <span id="private-watchlist">None</span></p>
-    </div>
-    <div class="pane"><h3>Quant / valuation / ML</h3><p class="tiny">The other tabs currently run the public fictional demonstration models. They do not use your private market observations. Full server-backed analysis is a separate integration milestone.</p></div>
+      <div class="controls"><button class="btn" id="private-quote-submit">Get market price</button><button class="btn primary" id="private-trade-submit">Record virtual trade</button></div><p id="private-quote" class="tiny" style="margin-top:12px">No quote loaded.</p></div>
+    </section>
+    <section class="private-view" data-private-view="research" hidden>
+      <div class="pane"><h3>Historical market research</h3><p class="tiny">Private Alpaca daily stock/ETF history. Split-adjusted close prices; dividend returns are excluded.</p>
+      <div class="formgrid" style="margin-top:14px"><div class="field"><label for="private-history-symbols">Stock/ETF symbols (2–5)</label><input id="private-history-symbols" value="MSFT,AAPL,VOO" maxlength="55" spellcheck="false"></div>
+      <div class="field"><label for="private-history-days">Period</label><select id="private-history-days"><option value="90">3 months</option><option value="180">6 months</option><option selected value="365">1 year</option><option value="730">2 years</option></select></div></div>
+      <div class="controls"><button class="btn primary" id="private-history-load">Load market history</button><span class="tiny" id="private-history-source"></span></div>
+      <div id="private-history-chart" class="private-chart" style="margin-top:15px">Load a historical series to begin.</div><div id="private-risk-results"></div>
+      </div>
+    </section>
+    <section class="private-view" data-private-view="backtest" hidden>
+      <div class="pane"><h3>Historical strategy simulator</h3><p class="tiny">Equal-weight buy-and-hold versus monthly rebalancing, using the symbols and daily history selected in Market research. Includes hypothetical transaction fees; no forward-looking optimization.</p>
+      <div class="formgrid" style="margin-top:14px"><div class="field"><label for="private-test-capital">Starting virtual capital ($)</label><input id="private-test-capital" type="number" min="100" max="1000000" step="100" value="10000"></div>
+      <div class="field"><label for="private-test-fee">Fee per rebalance (basis points)</label><input id="private-test-fee" type="number" min="0" max="100" step="1" value="5"></div></div>
+      <div class="controls"><button class="btn primary" id="private-backtest-run">Run backtest</button></div>
+      <div id="private-backtest-output" style="margin-top:15px"></div></div>
+    </section>
+    <section class="private-view" data-private-view="valuation" hidden>
+      <div class="pane"><h3>Financial valuation scenarios</h3><p class="tiny">Historical company financials from SEC filings, with editable forecast assumptions. Alpaca supplies market prices, not audited accounting statements.</p>
+      <div class="formgrid" style="margin-top:14px"><div class="field"><label for="private-valuation-company">Company</label><select id="private-valuation-company"></select></div>
+      <div class="field"><label for="private-valuation-growth">Annual FCF growth (%)</label><input id="private-valuation-growth" type="number" min="-30" max="40" value="4"></div>
+      <div class="field"><label for="private-valuation-wacc">Discount rate (%)</label><input id="private-valuation-wacc" type="number" min="2" max="30" value="10"></div>
+      <div class="field"><label for="private-valuation-terminal">Terminal growth (%)</label><input id="private-valuation-terminal" type="number" min="-5" max="8" value="2"></div></div>
+      <div class="controls"><button class="btn primary" id="private-valuation-run">Run scenario</button></div><div id="private-valuation-output" style="margin-top:15px"></div></div>
+      <div class="pane"><h3>Company comparison</h3><div id="private-peers"></div></div>
+    </section>
+    <section class="private-view" data-private-view="settings" hidden>
+      <div class="pane"><h3>Virtual account balance</h3><p class="tiny">Change your simulation budget without any bank transfer or brokerage order. Deposits and withdrawals affect only uninvested cash. Reset clears virtual positions and trades but preserves notes.</p>
+      <div class="formgrid" style="margin-top:14px"><div class="field"><label for="private-capital-action">Change</label><select id="private-capital-action"><option value="deposit">Add virtual cash</option><option value="withdraw">Withdraw virtual cash</option><option value="reset">Start a new virtual portfolio</option></select></div><div class="field"><label for="private-capital-amount">Amount ($)</label><input id="private-capital-amount" type="number" min="1" max="1000000" step="1" value="10000"></div></div>
+      <div class="controls"><button class="btn" id="private-capital-submit">Update virtual balance</button></div></div>
+      <div class="pane"><h3>Research notes</h3><div class="field" style="margin-top:12px"><label for="private-note">Private note</label><textarea id="private-note" maxlength="2000" rows="3" placeholder="Write a research note..."></textarea></div>
+      <div class="controls"><button class="btn" id="private-note-submit">Save note</button></div><div id="private-notes"></div><p class="tiny">Watchlist: <span id="private-watchlist">None</span></p></div>
+    </section>
   </div>
   <p id="private-message" class="tiny" role="status" aria-live="polite"></p>
 </section>'''

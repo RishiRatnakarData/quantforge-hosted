@@ -3,6 +3,7 @@
 'use strict';
 const M=window.QFModel,$=id=>document.getElementById(id),SEC=window.QFSecAnalytics;
 const SEC_DATA=/* QF_SEC_DATA */ null;
+window.QFPublishedSEC=SEC_DATA;
 const fmt=n=>Number(n).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2});
 const pct=n=>(100*n).toFixed(1)+'%';
 let state={cash:3500,holdings:{MSFT:5,VOO:8,AAPL:3,'BTC/USD':0.006}};
@@ -14,9 +15,9 @@ function nav(name,updateHash=true){
  if(name!=='private' && !PUBLIC_PAGES.has(name))return;
  document.querySelectorAll('.tabpage').forEach(e=>e.classList.toggle('active',e.id==='page-'+name));
  document.querySelectorAll('.nav-btn').forEach(e=>{const active=e.dataset.page===name;e.classList.toggle('active',active);if(active)e.setAttribute('aria-current','page');else e.removeAttribute('aria-current');});
- const labels={overview:'REAL SEC DATA + SIMULATIONS',sec:'REPORTED SEC FINANCIALS',portfolio:'SIMULATED PORTFOLIO',quant:'SIMULATED RETURNS',valuation:'ILLUSTRATIVE DCF',ml:'SIMULATED PEER INPUTS',methods:'METHODOLOGY & SOURCES',private:'PRIVATE WORKSPACE'};
+ const labels={overview:'RESEARCH / DEMO',sec:'REPORTED SEC FINANCIALS',portfolio:'SIMULATED PORTFOLIO',quant:'SIMULATED RETURNS',valuation:'ILLUSTRATIVE DCF',ml:'SIMULATED PEER INPUTS',methods:'METHODOLOGY & SOURCES',private:'PRIVATE WORKSPACE'};
  const badge=document.querySelector('.topbar .badge');if(badge)badge.textContent=labels[name];
- const eyebrow=document.querySelector('.topbar .eyebrow');if(eyebrow)eyebrow.textContent=name==='private'?'Your portfolio · Personal use':'QuantForge · Limited public research demo';
+ const eyebrow=document.querySelector('.topbar .eyebrow');if(eyebrow)eyebrow.textContent=name==='private'?'Your portfolio · Personal use':'Financial research · models and data';
  if(updateHash && PUBLIC_PAGES.has(name))history.replaceState(null,'','#'+name);
  window.scrollTo({top:0,behavior:'instant'});
 }

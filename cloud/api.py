@@ -29,6 +29,7 @@ from qrcode.image.svg import SvgPathImage
 
 from quantforge.desk.engine import FEE_RATE, QTY, DeskError, cents, money, valid_quote
 from quantforge.desk.market import AlpacaDeskMarket
+from quantforge.live.provider import AlpacaClient, MarketDataError
 
 app = FastAPI(title="QuantForge private API", docs_url=None, redoc_url=None, openapi_url=None)
 SESSION = requests.Session()
@@ -497,3 +498,80 @@ def notes(data: PersonalData, request: Request, response: Response):
     current["notes"] = cleaned
     save_state(uid, token, current, version)
     return {"portfolio": current, "version": version + 1}
+
+
+# Read-only, single-owner historical market research. Historical stock bars are
+# split-adjusted but price-only; dividend return is not included.
+@app.get("/api/private/history")
+def private_history(request: Request, response: Response, symbols: str, days: int = 365):
+    owner(request, response)
+    parsed = list(dict.fromkeys(x.strip().upper() for x in symbols.split(",")))
+    if not 2 <= len(parsed) <= 5 or any(not re.fullmatch(r"[A-Z][A-Z0-9.]{0,9}", x) for x in parsed):
+        raise HTTPException(422, "Choose 2-5 US stock or ETF symbols.")
+    if days not in (90, 180, 365, 730):
+        raise HTTPException(422, "Choose a supported historical period.")
+    # Exclude the current, potentially incomplete trading day.
+    end = dt.datetime.now(dt.UTC).date() - dt.timedelta(days=1)
+    start = end - dt.timedelta(days=days)
+    try:
+        client = AlpacaClient.from_environment()
+        observations = {s: client.history(s, start.isoformat(), end.isoformat()) for s in parsed}
+    except MarketDataError as exc:
+        raise HTTPException(422, str(exc)) from exc
+    # Use only common market dates so covariances/backtests never mix unmatched closes.
+    common = set.intersection(*(set(x["date"] for x in obs) for obs in observations.values()))
+    dates = sorted(common)
+    if len(dates) < 15:
+        raise HTTPException(422, "Not enough overlapping history for these symbols.")
+    closes = {symbol: {x["date"]: x["close"] for x in obs} for symbol, obs in observations.items()}
+    return {"symbols": parsed, "dates": dates,
+            "closes": {symbol: [closes[symbol][d] for d in dates] for symbol in parsed},
+            "source": "Alpaca historical daily bars (SIP, split-adjusted)",
+            "coverage": "Price-only; excludes dividends, taxes and currency conversion. Latest session excluded.",
+            "as_of": end.isoformat(), "licensed_private": True}
+
+
+class CapitalRequest(BaseModel):
+    action: str
+    amount: str
+    expected_version: int = Field(ge=0)
+    confirmation: str = ""
+
+
+@app.post("/api/private/capital")
+def private_capital(data: CapitalRequest, request: Request, response: Response):
+    uid, token = owner(request, response)
+    current, version = read_state(uid, token)
+    if version != data.expected_version:
+        raise HTTPException(409, "Portfolio changed. Reload and try again.")
+    if data.action not in ("deposit", "withdraw", "reset"):
+        raise HTTPException(422, "Select deposit, withdraw or reset.")
+    amount = cents(money(data.amount, "virtual capital"))
+    if amount < 1 or amount > 1_000_000:
+        raise HTTPException(422, "Enter $1 to $1,000,000 in virtual funds.")
+    balance = money(current.get("cash", 0), "cash")
+    initial = money(current.get("initial_cash", 10000), "initial cash")
+    if data.action == "reset":
+        if data.confirmation != "RESET":
+            raise HTTPException(422, "Type RESET to clear the virtual ledger.")
+        # Leave independent private research notes and watchlist intact.
+        preserved = {k: current.get(k, []) for k in ("watchlist", "notes")}
+        current = default_state()
+        current.update(preserved)
+        current["cash"] = float(amount)
+        current["initial_cash"] = float(amount)
+        current["capital_events"] = [{"action": "reset", "amount": float(amount),
+                                      "at": dt.datetime.now(dt.UTC).isoformat()}]
+    else:
+        if data.action == "withdraw" and amount > balance:
+            raise HTTPException(422, "Withdrawal exceeds available virtual cash.")
+        delta = amount if data.action == "deposit" else -amount
+        if initial + delta < 0 or initial + delta > 10_000_000:
+            raise HTTPException(422, "Virtual capital would exceed the allowed range.")
+        current["cash"] = float(cents(balance + delta))
+        current["initial_cash"] = float(cents(initial + delta))
+        events = current.get("capital_events", [])
+        current["capital_events"] = ([{"action": data.action, "amount": float(amount),
+                                      "at": dt.datetime.now(dt.UTC).isoformat()}] + events)[:100]
+    save_state(uid, token, current, version)
+    return {"portfolio": current, "version": version + 1, "paper_only": True}
