@@ -1,4 +1,4 @@
-/* Browser-only fictional QuantForge demo. No fetch(), no local persistence. */
+/* Public demo: prebuilt real SEC filing facts plus browser-only simulated model examples. */
 (function(){
 'use strict';
 const M=window.QFModel,$=id=>document.getElementById(id);
@@ -13,7 +13,7 @@ function nav(name){
  document.querySelectorAll('.tabpage').forEach(e=>e.classList.toggle('active',e.id==='page-'+name));
  document.querySelectorAll('.nav-btn').forEach(e=>e.classList.toggle('active',e.dataset.page===name));
  const badge=document.querySelector('.topbar .badge');
- if(badge)badge.textContent=name==='sec'?'SEC FILINGS':name==='private'?'PRIVATE WORKSPACE':'FICTIONAL DATA';
+ if(badge){const labels={overview:'REAL SEC DATA + SIMULATIONS',sec:'REPORTED SEC FINANCIALS',portfolio:'SIMULATED PORTFOLIO',quant:'SIMULATED RETURNS',valuation:'ILLUSTRATIVE DCF',ml:'SIMULATED PEER INPUTS',private:'PRIVATE WORKSPACE'};badge.textContent=labels[name]||'PUBLIC DEMO';}
  window.scrollTo({top:0,behavior:'instant'});
 }
 function portfolio(){
@@ -33,7 +33,7 @@ function transact(){
  if(!(amount>0&&Number.isFinite(amount))){$('trade-message').textContent='Enter a positive amount.';return;}
  const units=amount/M.bySymbol[s].price;
  if(action==='buy'){
-  if(amount+fee>state.cash+1e-7){$('trade-message').textContent='Not enough fictional cash, including the fee.';return;}
+  if(amount+fee>state.cash+1e-7){$('trade-message').textContent='Not enough sample cash, including the fee.';return;}
   state.cash-=amount+fee;state.holdings[s]=(state.holdings[s]||0)+units;
  }else{
   if((state.holdings[s]||0)+1e-8<units){$('trade-message').textContent='Not enough units to sell.';return;}
@@ -71,11 +71,11 @@ function runDCF(){
  try{
   const r=M.dcf(s,opts);
   let sens=[];for(const dw of [-0.01,0,0.01])for(const dg of [-0.005,0,0.005]){const w=opts.wacc+dw,g=opts.terminal+dg;let v='—';if(w>g){v=fmt(M.dcf(s,{...opts,wacc:w,terminal:g}).value);}sens.push([(w*100).toFixed(1)+'%',(g*100).toFixed(2)+'%',v]);}
-  $('dcf-result').innerHTML='<div class="pane"><div class="three"><div class="metric"><span class="muted">Illustrative value per share</span><strong>'+fmt(r.value)+'</strong></div><div class="metric"><span class="muted">Terminal share of EV</span><strong>'+pct(r.terminalFraction)+'</strong></div><div class="metric"><span class="muted">Enterprise value</span><strong>'+fmt(r.enterprise)+'B</strong></div></div><h3 class="section-title">WACC / terminal-growth sensitivity</h3>'+table(['WACC','Terminal growth','Per share'],sens)+'<details class="subtle"><summary>Five-year forecast</summary>'+table(['Year','Revenue ($B)','FCF ($B)'],r.forecast.map(x=>[x.year,fmt(x.revenue),fmt(x.fcf)]))+'</details><p class="tiny" style="margin-top:13px">Fictional revenue, reinvestment ratios, net debt and shares. 5-year unlevered FCF discounted by WACC; perpetuity terminal value. This is not a real-company valuation.</p></div>';
+  $('dcf-result').innerHTML='<div class="pane"><div class="three"><div class="metric"><span class="muted">Illustrative value per share</span><strong>'+fmt(r.value)+'</strong></div><div class="metric"><span class="muted">Terminal share of EV</span><strong>'+pct(r.terminalFraction)+'</strong></div><div class="metric"><span class="muted">Enterprise value</span><strong>'+fmt(r.enterprise)+'B</strong></div></div><h3 class="section-title">WACC / terminal-growth sensitivity</h3>'+table(['WACC','Terminal growth','Per share'],sens)+'<details class="subtle"><summary>Five-year forecast</summary>'+table(['Year','Revenue ($B)','FCF ($B)'],r.forecast.map(x=>[x.year,fmt(x.revenue),fmt(x.fcf)]))+'</details><p class="tiny" style="margin-top:13px">Illustrative revenue, reinvestment ratios, net debt and shares. 5-year unlevered FCF discounted by WACC; perpetuity terminal value. This is not a real-company valuation.</p></div>';
  }catch(e){error('dcf-error',e.message);$('dcf-result').innerHTML='';}
 }
 function runPeers(){let s=$('ml-company').value;const p=M.peers(s),facts=M.COMPANY_FACTS[s];
- $('ml-result').innerHTML='<div class="pane"><div class="section-title"><h3>Nearest companies to '+M.COMPANY_NAMES[s]+'</h3><span class="mini">Fictional financials</span></div>'+table(['Company','Ticker','Standardized distance'],p.ranking.slice(0,5).map(x=>[x.name,x.symbol,x.distance.toFixed(2)]))+'<p style="margin-top:18px">Sample-relative atypicality rank: <strong>'+p.unusualRank+' of '+p.total+'</strong> (1 = most distant from the feature mean).</p><div class="subtle"><h3>Features used</h3>'+table(['Metric','Fictional value'],['Revenue growth','Operating margin','Net margin','Free cash flow / revenue','Debt / assets'].map((name,i)=>[name,pct(facts.features[i])]))+'</div><p class="tiny" style="margin-top:12px">Z-score feature standardization and Euclidean nearest-neighbors. Atypicality is standardized distance to the sample center, not an Isolation Forest or investment signal.</p></div>';
+ $('ml-result').innerHTML='<div class="pane"><div class="section-title"><h3>Nearest companies to '+M.COMPANY_NAMES[s]+'</h3><span class="mini">Simulated inputs</span></div>'+table(['Company','Ticker','Standardized distance'],p.ranking.slice(0,5).map(x=>[x.name,x.symbol,x.distance.toFixed(2)]))+'<p style="margin-top:18px">Sample-relative atypicality rank: <strong>'+p.unusualRank+' of '+p.total+'</strong> (1 = most distant from the feature mean).</p><div class="subtle"><h3>Features used</h3>'+table(['Metric','Illustrative value'],['Revenue growth','Operating margin','Net margin','Free cash flow / revenue','Debt / assets'].map((name,i)=>[name,pct(facts.features[i])]))+'</div><p class="tiny" style="margin-top:12px">Z-score feature standardization and Euclidean nearest-neighbors. Atypicality is standardized distance to the sample center, not an Isolation Forest or investment signal.</p></div>';
 }
 
 // SEC comparison uses a static, pre-reviewed companyfacts snapshot. No browser API calls.
@@ -109,6 +109,22 @@ function renderSEC(){
  scenario.innerHTML='<div class="notice"><strong>Hypothetical margin stress:</strong> '+(shock>=0?'+':'')+shock.toFixed(1)+' pp applied to FY revenue implies '+billions(hypothetical)+' operating income, a '+billions(hypothetical-m.operating_income_usd)+' change from the reported amount. This is a sensitivity, not a forecast.</div>';
 }
 
+function renderSECHighlights(){
+ const out=$('home-sec-highlights'),status=$('home-sec-updated');
+ if(!out || !status)return;
+ if(!SEC_DATA || !Array.isArray(SEC_DATA.companies) || !SEC_DATA.companies.length){
+  out.textContent='SEC filing snapshot unavailable in this build. Sample simulations remain accessible.';
+  status.textContent='No reported financial figures have been substituted.';
+  return;
+ }
+ const highlights=['MSFT','AAPL','NVDA'].map(symbol=>SEC_DATA.companies.find(c=>c.symbol===symbol)).filter(Boolean);
+ out.innerHTML=highlights.map(c=>{
+  const annual=c.annual[0];
+  return '<div class="metric"><span class="muted">'+c.name+' ('+c.symbol+') · FY '+annual.fiscal_end+'</span><strong>'+billions(annual.metrics.revenue_usd)+'</strong><span class="tiny">Reported annual revenue · SEC filing</span></div>';
+ }).join('');
+ status.textContent='Filed by '+SEC_DATA.as_of+' · historical annual data, not live prices';
+}
+
 function populate(){
  if(SEC_DATA && Array.isArray(SEC_DATA.companies)){
   $('sec-company').innerHTML=SEC_DATA.companies.map(c=>'<option value="'+c.symbol+'">'+c.name+' ('+c.symbol+')</option>').join('');
@@ -118,7 +134,7 @@ function populate(){
  $('assets-list').innerHTML=M.ASSETS.map(a=>'<button class="asset" data-symbol="'+a.symbol+'"><strong>'+a.name+'</strong><span>'+a.symbol+' · '+a.kind+' · '+fmt(a.price)+'</span></button>').join('');
  $('quant-assets').innerHTML=['MSFT','VOO','AAPL','QQQ','BND','BTC/USD','ETH/USD'].map(s=>'<label class="inline-checkbox"><input type="checkbox" name="quant-asset" value="'+s+'" '+(['MSFT','VOO','BND'].includes(s)?'checked':'')+'>'+M.bySymbol[s].name+'</label>').join('');
  $('ml-company').innerHTML=Object.keys(M.COMPANY_FACTS).map(s=>'<option value="'+s+'">'+M.COMPANY_NAMES[s]+'</option>').join('');
- portfolio();runQuant();runDCF();runPeers();renderSEC();
+ portfolio();runQuant();runDCF();runPeers();renderSEC();renderSECHighlights();
 }
 document.addEventListener('click',e=>{
  const btn=e.target.closest('[data-page], [data-go], [data-symbol]');if(!btn)return;

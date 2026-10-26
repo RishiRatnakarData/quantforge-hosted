@@ -69,7 +69,8 @@ def test_public_site_and_builder_have_distinct_data_origin():
     assert 'id="sec-company"' in template
     assert "/* QF_SEC_DATA */" in (ROOT / "web/site/app.js").read_text(encoding="utf-8")
     assert 'sec_snapshot.json' in builder
-    assert 'FICTIONAL DATA' in template
+    assert 'REAL SEC DATA + SIMULATIONS' in template
+    assert 'Simulated holdings and prices' in template
 
 
 def test_public_universe_is_twelve_named_distinct_issuers():
