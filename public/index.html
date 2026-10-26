@@ -1260,12 +1260,47 @@ async function changeCapital(){
 
 /* V6.3: purely historical owner-only optimization; never invokes /trade or /capital. */
 function optPct(x){return typeof x==='number'&&Number.isFinite(x)?(100*x).toFixed(2)+'%':'Unavailable';}
-function optSvgFrontier(points){
- const xs=points.map(p=>p.risk),ys=points.map(p=>p.historicalMean);
+function optSvgFrontier(points, equal, optimized){
+ // A tight or degenerate volatility range is common when position caps bind.
+ // Never divide by an arbitrary fallback denominator that pins the plot to the left.
+ const candidates=[...points.map(p=>({risk:p.risk,mean:p.historicalMean,kind:'candidate'}))];
+ if(equal)candidates.push({risk:equal.annualVolatility,mean:equal.annualHistoricalMean,kind:'equal'});
+ if(optimized)candidates.push({risk:optimized.annualVolatility,mean:optimized.annualHistoricalMean,kind:'optimized'});
+ if(!candidates.length||candidates.some(p=>!Number.isFinite(p.risk)||!Number.isFinite(p.mean))){
+  return '<p class="tiny">Historical portfolio comparison is unavailable for these observations.</p>';
+ }
+ const xs=candidates.map(p=>p.risk),ys=candidates.map(p=>p.mean);
  const xmin=Math.min(...xs),xmax=Math.max(...xs),ymin=Math.min(...ys),ymax=Math.max(...ys);
- const xscale=x=>30+540*(x-xmin)/(xmax-xmin||1),yscale=y=>200-175*(y-ymin)/(ymax-ymin||1);
- const plot=points.map(p=>xscale(p.risk).toFixed(2)+','+yscale(p.historicalMean).toFixed(2)).join(' ');
- return '<svg viewBox="0 0 600 245" role="img" aria-label="In-sample portfolio risk-return trade-off"><line x1="30" y1="202" x2="575" y2="202" stroke="#cad9d2"/><polyline points="'+plot+'" fill="none" stroke="#196c58" stroke-width="2"/>'+points.map(p=>'<circle cx="'+xscale(p.risk).toFixed(2)+'" cy="'+yscale(p.historicalMean).toFixed(2)+'" r="4" fill="#196c58"/>').join('')+'<text x="30" y="236" font-size="11" fill="#526a60">Annualized historical volatility →</text><text x="30" y="13" font-size="11" fill="#526a60">Historical mean (not a forecast)</text></svg>';
+ const spanX=xmax-xmin,spanY=ymax-ymin;
+ const dx=Math.max(spanX*1.18,0.006),dy=Math.max(spanY*1.18,0.015);
+ const mx=(xmin+xmax)/2,my=(ymin+ymax)/2;
+ const domainX=[mx-dx/2,mx+dx/2],domainY=[my-dy/2,my+dy/2];
+ const left=80,right=565,top=27,bottom=219;
+ const xscale=x=>left+(right-left)*(x-domainX[0])/dx;
+ const yscale=y=>bottom-(bottom-top)*(y-domainY[0])/dy;
+ const percent=x=>(100*x).toFixed(2)+'%';
+ const xTicks=[domainX[0],mx,domainX[1]].map(t=>
+  '<line x1="'+xscale(t).toFixed(2)+'" y1="'+top+'" x2="'+xscale(t).toFixed(2)+'" y2="'+bottom+'" stroke="#e5ece8"/>'+
+  '<text x="'+xscale(t).toFixed(2)+'" y="240" text-anchor="middle" font-size="11" fill="#526a60">'+percent(t)+'</text>').join('');
+ const yTicks=[domainY[0],my,domainY[1]].map(t=>
+  '<line x1="'+left+'" y1="'+yscale(t).toFixed(2)+'" x2="'+right+'" y2="'+yscale(t).toFixed(2)+'" stroke="#e5ece8"/>'+
+  '<text x="73" y="'+(yscale(t)+4).toFixed(2)+'" text-anchor="end" font-size="11" fill="#526a60">'+percent(t)+'</text>').join('');
+ // Duplicate parameter settings may generate the same constrained weights.
+ const distinct=[];
+ for(const p of candidates.filter(p=>p.kind==='candidate')){
+  if(!distinct.some(q=>Math.abs(p.risk-q.risk)<1e-9&&Math.abs(p.mean-q.mean)<1e-9))distinct.push(p);
+ }
+ const circles=distinct.map(p=>'<circle cx="'+xscale(p.risk).toFixed(2)+'" cy="'+yscale(p.mean).toFixed(2)+'" r="4" fill="#196c58"><title>Scenario · volatility '+percent(p.risk)+' · historical mean '+percent(p.mean)+'</title></circle>').join('');
+ const special=candidates.filter(p=>p.kind!=='candidate').map(p=>
+  '<circle cx="'+xscale(p.risk).toFixed(2)+'" cy="'+yscale(p.mean).toFixed(2)+'" r="6" fill="'+(p.kind==='equal'?'#d48b31':'#ffffff')+'" stroke="'+(p.kind==='equal'?'#b67628':'#135c4b')+'" stroke-width="2"><title>'+(p.kind==='equal'?'Equal-weight':'Selected optimized')+' · volatility '+percent(p.risk)+' · historical mean '+percent(p.mean)+'</title></circle>').join('');
+ const near=spanX<0.0005;
+ const note=near?'Candidate portfolios have almost identical volatility with these assets and weight constraints. The points may overlap.':
+  'Dots represent in-sample portfolio candidates, not a predictive efficient frontier.';
+ return '<div class="opt-frontier-chart"><svg viewBox="0 0 640 280" width="100%" role="img" aria-label="Annualized historical mean versus volatility for portfolio candidates">'+
+  xTicks+yTicks+'<path d="M'+left+' '+top+' V'+bottom+' H'+right+'" fill="none" stroke="#849f92" stroke-width="1.5"/>'+
+  circles+special+'<text x="322" y="265" text-anchor="middle" font-size="12" fill="#526a60">Annualized historical volatility</text>'+
+  '<text x="80" y="15" font-size="12" fill="#526a60">Historical annual mean (not a forecast)</text></svg>'+
+  '<p class="tiny">'+note+' Orange: equal-weight. Outlined: selected allocation.</p></div>';
 }
 function optimizationTable(res){
  const risks=res.optimized.riskContributions;
@@ -1288,7 +1323,7 @@ function optimizerDiagnostics(res){
  const matrix=displayTable(['Investment',...res.symbols],res.symbols.map((sym,i)=>[
   sym,...res.correlation[i].map(x=>x===null?'Unavailable':x.toFixed(3))]));
  return '<h3>Equal-weight versus optimized</h3>'+comparison+'<h3 style="margin:20px 0 8px">Historical correlation matrix</h3>'+matrix+
-  '<h3 style="margin:20px 0 8px">In-sample risk–return trade-off</h3>'+optSvgFrontier(res.frontier)+
+  '<h3 style="margin:20px 0 8px">In-sample risk–return trade-off</h3>'+optSvgFrontier(res.frontier, res.equal, res.optimized)+
   '<p class="tiny">All statistics use the same observed period. A portfolio selected using these data is in-sample; the displayed historical result is not an out-of-sample backtest. Daily rebalancing is assumed when compounding weighted returns. No dividends, borrow costs, slippage, or brokerage orders are included. Variance contributions may be negative for hedging assets.</p>';
 }
 function runOptimization(){
