@@ -69,7 +69,7 @@ def test_historical_research_does_not_expose_keys_and_aligns_dates(client, monke
     "symbols,days",
     [
         ("MSFT", 365),
-        ("BTC/USD,AAPL", 365),
+        ("BTC/EUR,AAPL", 365),
         ("MSFT,AAPL", 999),
         ("MSFT,MSFT", 365),
         ("MSFT,AAPL,VOO,QQQ,NVDA,CAT", 365),

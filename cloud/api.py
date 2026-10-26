@@ -27,7 +27,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from qrcode.image.svg import SvgPathImage
 
-from cloud import asset_directory, sec_fundamentals
+from cloud import asset_directory, crypto_history, sec_fundamentals
 from quantforge.desk.engine import FEE_RATE, QTY, DeskError, cents, money, valid_quote
 from quantforge.desk.market import AlpacaDeskMarket
 from quantforge.live.provider import AlpacaClient, MarketDataError
@@ -528,28 +528,52 @@ def notes(data: PersonalData, request: Request, response: Response):
 def private_history(request: Request, response: Response, symbols: str, days: int = 365):
     owner(request, response)
     parsed = list(dict.fromkeys(x.strip().upper() for x in symbols.split(",")))
-    if not 2 <= len(parsed) <= 5 or any(not re.fullmatch(r"[A-Z][A-Z0-9.]{0,9}", x) for x in parsed):
-        raise HTTPException(422, "Choose 2-5 US stock or ETF symbols.")
+    if not 2 <= len(parsed) <= 5 or len(parsed) != len(symbols.split(",")):
+        raise HTTPException(422, "Choose 2-5 distinct investments.")
+    if any(not SYMBOL_RE.fullmatch(s) for s in parsed):
+        raise HTTPException(422, "Select supported stocks, ETFs or USD crypto pairs.")
     if days not in (90, 180, 365, 730):
         raise HTTPException(422, "Choose a supported historical period.")
-    # Exclude the current, potentially incomplete trading day.
+    # The prior UTC date is complete for 24/7 crypto; equity bars exclude
+    # incomplete exchange sessions. No broker orders or database writes.
     end = dt.datetime.now(dt.UTC).date() - dt.timedelta(days=1)
     start = end - dt.timedelta(days=days)
+    crypto = [s for s in parsed if s in crypto_history.SUPPORTED]
+    equities = [s for s in parsed if s not in crypto_history.SUPPORTED]
     try:
-        client = AlpacaClient.from_environment()
-        observations = {s: client.history(s, start.isoformat(), end.isoformat()) for s in parsed}
-    except MarketDataError as exc:
+        client = AlpacaClient.from_environment() if equities else None
+        observations = {}
+        for symbol in parsed:
+            if symbol in crypto:
+                observations[symbol] = crypto_history.history(symbol, start.isoformat(), end.isoformat())
+            else:
+                observations[symbol] = client.history(symbol, start.isoformat(), end.isoformat())
+    except (MarketDataError, crypto_history.CryptoHistoryError) as exc:
         raise HTTPException(422, str(exc)) from exc
-    # Use only common market dates so covariances/backtests never mix unmatched closes.
+    # Mix only actually observed shared dates. Crypto trades on weekends but
+    # no synthetic equity weekend closes are fabricated to force alignment.
     common = set.intersection(*(set(x["date"] for x in obs) for obs in observations.values()))
     dates = sorted(common)
     if len(dates) < 15:
-        raise HTTPException(422, "Not enough overlapping history for these symbols.")
+        raise HTTPException(422, "Not enough overlapping daily observations for these investments.")
     closes = {symbol: {x["date"]: x["close"] for x in obs} for symbol, obs in observations.items()}
+    annual = 365 if not equities else 252
+    source = (
+        "Alpaca US crypto daily bars (UTC calendar days)" if not equities else
+        "Alpaca stocks SIP split-adjusted daily bars" if not crypto else
+        "Alpaca stocks SIP and US crypto daily bars (shared equity sessions)"
+    )
+    coverage = (
+        "Crypto venue daily closes; market open 24/7. No fees, spread or funding included." if not equities else
+        "Stock prices are split-adjusted and exclude dividends. Crypto uses UTC daily bars; only shared stock sessions are compared. No synthetic weekend stock returns."
+        if crypto else "Stock prices are split-adjusted and exclude dividends. Latest incomplete session excluded."
+    )
     return {"symbols": parsed, "dates": dates,
             "closes": {symbol: [closes[symbol][d] for d in dates] for symbol in parsed},
-            "source": "Alpaca historical daily bars (SIP, split-adjusted)",
-            "coverage": "Price-only; excludes dividends, taxes and currency conversion. Latest session excluded.",
+            "asset_classes": {symbol: "crypto" if symbol in crypto else "us_equity" for symbol in parsed},
+            "sessions_per_year": annual,
+            "calendar": "UTC calendar days" if not equities else "shared US stock sessions",
+            "source": source, "coverage": coverage,
             "as_of": end.isoformat(), "licensed_private": True}
 
 

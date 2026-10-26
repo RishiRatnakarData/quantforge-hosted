@@ -14,7 +14,6 @@
   const dot = (a, b) => sum(a.map((x, i) => x * b[i]));
   const average = a => sum(a) / a.length;
   const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
-  const annual = 252;
 
   function prepare(data) {
     if (!data || !Array.isArray(data.symbols) || !Array.isArray(data.dates) ||
@@ -23,8 +22,9 @@
         data.dates.length > 900 || data.dates.some((d, i) =>
           typeof d !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(d) ||
           (i > 0 && d <= data.dates[i - 1]))) {
-      throw Error('Load at least 31 aligned daily prices for 2–5 distinct stocks or ETFs.');
+      throw Error('Load at least 31 aligned daily prices for 2–5 distinct investments.');
     }
+    const annual = data.sessions_per_year === 365 ? 365 : 252;
     const prices = data.symbols.map(s => {
       const arr = data.closes[s];
       if (!Array.isArray(arr) || arr.length !== data.dates.length ||
@@ -45,7 +45,7 @@
     const covariance = raw.map((row, i) => row.map((c, j) =>
       c * (i === j ? 1 : 0.80))); // fixed 20% diagonal shrinkage, off-diagonal only
     return {symbols: [...data.symbols], dates: [...data.dates], count, assetReturns,
-      means: means.map(x => x * annual), rawCovariance: raw, covariance, prices};
+      means: means.map(x => x * annual), rawCovariance: raw, covariance, prices, annual};
   }
 
   function project(values, maxWeight) {
@@ -78,7 +78,7 @@
 
   function solve(data, maxWeight, mode, tiltStrength = 0.02) {
     const n = data.symbols.length;
-    const c = data.covariance.map(row => row.map(x => x * annual));
+    const c = data.covariance.map(row => row.map(x => x * data.annual));
     const initial = project(Array(n).fill(1 / n), maxWeight);
     if (mode === 'inverse') {
       const sigmas = data.covariance.map((row, i) => Math.sqrt(Math.max(row[i], 1e-12)));
@@ -110,7 +110,7 @@
       dot(weights, data.assetReturns.map(row => row[t])));
     const avg = average(daily);
     const sampleVar = sum(daily.map(x => (x - avg) ** 2)) / (daily.length - 1);
-    const vol = Math.sqrt(Math.max(0, variance(weights, data.covariance) * annual));
+    const vol = Math.sqrt(Math.max(0, variance(weights, data.covariance) * data.annual));
     const wealth = [1];
     for (const r of daily) wealth.push(wealth.at(-1) * (1 + r));
     let high = 1, drawdown = 0;
@@ -132,8 +132,8 @@
       }
       return worst;
     }
-    return {annualHistoricalMean: avg * annual, annualVolatility: vol,
-      realizedVolatility: Math.sqrt(sampleVar * annual), compoundChange: wealth.at(-1) - 1,
+    return {annualHistoricalMean: avg * data.annual, annualVolatility: vol,
+      realizedVolatility: Math.sqrt(sampleVar * data.annual), compoundChange: wealth.at(-1) - 1,
       maxDrawdown: drawdown, dailyVaR, dailyES, effectiveHoldings: 1 / sum(weights.map(w => w * w)),
       riskContributions: contributions, worst5: worstWindow(5), worst20: worstWindow(20)};
   }
@@ -157,7 +157,7 @@
       return {risk: stats.annualVolatility, historicalMean: stats.annualHistoricalMean};
     });
     return {symbols: data.symbols, periodStart: data.dates[0], periodEnd: data.dates.at(-1),
-      observations: data.count, objective, maxWeight: cap, chosen,
+      observations: data.count, annualSessions: data.annual, objective, maxWeight: cap, chosen,
       optimized: weightsStats(data, chosen), equalWeights: baseline,
       equal: weightsStats(data, baseline), correlation: correlation(data), frontier,
       source: history.source || 'Alpaca historical close observations'};

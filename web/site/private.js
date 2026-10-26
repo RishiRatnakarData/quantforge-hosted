@@ -248,7 +248,6 @@ function chooseAsset(symbol,name,kind){
   $('private-quote').textContent='Get market price to inspect the current observation.';
   message('Selected '+name+'. No trade has been placed.');
  }else{
-  if(kind==='crypto'){message('Historical research currently uses U.S. stocks and ETFs.');return;}
   if(!researchSelection.includes(symbol)){
    if(researchSelection.length>=5){message('You can compare up to five investments. Remove one first.');return;}
    researchSelection.push(symbol);
@@ -329,14 +328,26 @@ function privateRisk(series){
  const ret=equalReturns(series),wealth=[100];for(const r of ret)wealth.push(wealth.at(-1)*(1+r));
  const sorted=[...ret].sort((a,b)=>a-b),bottom=Math.max(1,Math.ceil(.05*sorted.length));
  const var95=Math.max(0,-sorted[bottom-1]),es=Math.max(0,-mean(sorted.slice(0,bottom)));
- const sdev=sampleStdev(ret)*Math.sqrt(252),total=wealth.at(-1)/wealth[0]-1;
- const rows=[['Aligned sessions',String(ret.length)],['Equal-weight daily average return',percent(mean(ret))],['Annualized historical volatility',percent(sdev)],['5% historical daily VaR',percent(var95)],['5% historical daily expected shortfall',percent(es)],['Worst historical drawdown',percent(maxDD(wealth))],['Compounded indexed change',percent(total)]];
- return '<h3 style="margin:18px 0 10px">Historical return statistics</h3>'+displayTable(['Measure','Result'],rows)+'<p class="tiny">Equal-weight daily return series with simple arithmetic returns. VaR/ES are empirical one-day historical statistics, not forward forecasts. Prices exclude dividends.</p>';
+ const annual=series.sessions_per_year===365?365:252;
+ const sdev=sampleStdev(ret)*Math.sqrt(annual),total=wealth.at(-1)/wealth[0]-1;
+ const rows=[['Aligned observed days',String(ret.length)],['Annualization convention',annual+' observations/year'],['Equal-weight daily average return',percent(mean(ret))],['Annualized historical volatility',percent(sdev)],['5% historical daily VaR',percent(var95)],['5% historical daily expected shortfall',percent(es)],['Worst historical drawdown',percent(maxDD(wealth))],['Compounded indexed change',percent(total)]];
+ return '<h3 style="margin:18px 0 10px">Historical return statistics</h3>'+displayTable(['Measure','Result'],rows)+'<p class="tiny">Equal-weight daily return series with simple arithmetic returns. VaR/ES are empirical one-day historical statistics, not forward forecasts. Equity prices exclude dividends; mixed portfolios use common observed equity-session dates without filling crypto weekends.</p>';
+}
+function privateCrossAsset(series){
+ const report=window.QFPrivateMultiMarket.analyze(series);
+ const diagnostics=displayTable(['Investment','Asset class','Period change','Annualized volatility','Max drawdown','Worst aligned day'],report.assets.map(a=>[
+  (assetNames[a.symbol]||a.symbol)+' ('+a.symbol+')',a.kind==='crypto'?'Cryptocurrency':'Stock / ETF',
+  percent(a.observedChange),percent(a.annualVolatility),percent(a.maxDrawdown),percent(a.worstDay)
+ ]));
+ const stress=displayTable(['Hypothetical one-day event','Equal-weight impact'],report.stress.map(row=>[row.name,percent(row.change)]));
+ return '<h3 style="margin:20px 0 8px">Multi-asset comparison</h3>'+diagnostics+
+  '<h3 style="margin:20px 0 8px">What-if stress scenarios</h3>'+stress+
+  '<p class="tiny">Stress events are user-independent fixed assumptions, not historical observations or likelihood estimates: broad shock = stocks −10%, crypto −20%; crypto selloff = crypto −35%; equity selloff = stocks −20%. Equal-weight one-day impact only, with no rebalancing, fees or volatility forecast. '+safe(report.calendar)+' · '+report.annual+' observations/year annualization.</p>';
 }
 async function loadHistory(){
  const raw=researchSelection.join(',');
  const syms=researchSelection;
- if(syms.length<2||syms.length>5){message('Select 2–5 different stocks or ETFs using Browse investments.');return;}
+ if(syms.length<2||syms.length>5){message('Select 2–5 investments by name using Browse investments.');return;}
  message('Retrieving private market history…');$('private-history-source').textContent='';
  try{
   const d=await api('private/history?symbols='+encodeURIComponent(raw)+'&days='+encodeURIComponent($('private-history-days').value));
@@ -347,8 +358,8 @@ async function loadHistory(){
   $('private-opt-risk').textContent='Risk diagnostics appear after an allocation is calculated.';
   historySeries=d;
   $('private-history-chart').innerHTML=svgIndexChart(d);
-  $('private-history-source').textContent=d.source+' · through '+d.as_of;
-  $('private-risk-results').innerHTML=privateRisk(d);
+  $('private-history-source').textContent=d.source+' · through '+d.as_of+' · '+d.calendar;
+  $('private-risk-results').innerHTML=privateRisk(d)+privateCrossAsset(d);
   message('Historical market research loaded.');
  }catch(e){optimizerResult=null;$('private-opt-export').disabled=true;historySeries=null;message(e.message);$('private-history-chart').textContent='Market history unavailable.';$('private-risk-results').textContent='';$('private-backtest-output').textContent='';}
 }
