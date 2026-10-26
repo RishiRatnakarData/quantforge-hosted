@@ -151,7 +151,7 @@
   </div>
   <div id="private-signed" hidden>
     <div class="controls"><span class="mini">Personal research · authenticated</span><button class="btn sm" id="private-logout">Sign out</button></div>
-    <nav class="private-nav" aria-label="Private workspace sections"><button class="active" data-private-tab="home">Portfolio</button><button data-private-tab="trade">Virtual trading</button><button data-private-tab="research">Market research</button><button data-private-tab="backtest">Backtesting</button><button data-private-tab="valuation">Valuation &amp; peers</button><button data-private-tab="settings">Settings &amp; notes</button></nav>
+    <nav class="private-nav" aria-label="Private workspace sections"><button class="active" data-private-tab="home">Portfolio</button><button data-private-tab="trade">Virtual trading</button><button data-private-tab="research">Market research</button><button data-private-tab="optimization">Optimization</button><button data-private-tab="backtest">Backtesting</button><button data-private-tab="valuation">Valuation &amp; peers</button><button data-private-tab="settings">Settings &amp; notes</button></nav>
     <section class="private-view" data-private-view="home">
       <div class="pane"><div class="three"><div class="metric"><span class="muted">Virtual total</span><strong id="private-total">—</strong></div><div class="metric"><span class="muted">Available cash</span><strong id="private-cash">—</strong></div><div class="metric"><span class="muted">Invested value</span><strong id="private-invested">—</strong></div></div><div class="section-title"><h3>Holdings</h3><button class="btn sm" data-private-tab="trade">Trade</button></div><div id="private-positions"></div></div>
       <div class="pane"><h3>Portfolio concentration</h3><div id="private-concentration" class="tiny" style="margin-top:12px">Add virtual holdings to see allocation.</div></div>
@@ -170,6 +170,18 @@
       <div class="controls"><button class="btn primary" id="private-history-load">Load market history</button><span class="tiny" id="private-history-source"></span></div>
       <div id="private-history-chart" class="private-chart" style="margin-top:15px">Load a historical series to begin.</div><div id="private-risk-results"></div>
       </div>
+    </section>
+    <section class="private-view" data-private-view="optimization" hidden>
+      <div class="pane"><h3>Portfolio optimization</h3>
+        <p class="tiny">Use the historical prices selected in Market research to explore constrained, long-only allocations. The research calculation stays separate from your virtual positions. Nothing is traded or saved to your portfolio.</p>
+        <div class="formgrid" style="margin-top:15px">
+          <div class="field"><label for="private-opt-objective">Allocation method</label><select id="private-opt-objective"><option value="minimum">Minimum historical volatility</option><option value="inverse">Inverse-volatility allocation</option><option value="tilt">Historical return tilt</option></select></div>
+          <div class="field"><label for="private-opt-cap">Maximum weight per investment</label><select id="private-opt-cap"><option value="0.35">35%</option><option value="0.40">40%</option><option value="0.50">50%</option><option selected value="0.60">60%</option><option value="0.75">75%</option><option value="1.00">100%</option></select></div>
+        </div>
+        <div class="controls"><button class="btn primary" id="private-opt-run" type="button">Calculate allocations</button><button class="btn" id="private-opt-export" type="button" disabled>Export allocations CSV</button></div>
+        <div id="private-opt-output" style="margin-top:16px" aria-live="polite">Select 2–5 investments in Market research, load their history, then calculate an allocation.</div>
+      </div>
+      <div class="pane"><h3>Risk diagnostics</h3><p class="tiny">Empirical covariance uses 20% diagonal shrinkage. Historical correlations, contribution to variance, drawdowns, and tail losses are descriptive, not forecasts.</p><div id="private-opt-risk" style="margin-top:15px">Risk diagnostics appear after an allocation is calculated.</div></div>
     </section>
     <section class="private-view" data-private-view="backtest" hidden>
       <div class="pane"><h3>Historical strategy simulator</h3><p class="tiny">Equal-weight buy-and-hold versus monthly rebalancing, using the symbols and daily history selected in Market research. Includes hypothetical transaction fees; no forward-looking optimization.</p>
@@ -621,7 +633,175 @@ const methodsAsOf=$('methods-asof');if(methodsAsOf && SEC_DATA && SEC_DATA.as_of
 
 })();
 </script>
-<script>/* Hosted private mode, same Cloudflare website. No credentials or provider keys in source. */
+<script>/* QuantForge private research: pure in-sample portfolio analytics.
+ * No external requests, synthetic data, brokerage orders, or portfolio mutations.
+ * The public demo model is deliberately not imported here.
+ */
+(function (root, factory) {
+  'use strict';
+  const api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.QFPrivateOptimizer = api;
+})(typeof window !== 'undefined' ? window : this, function () {
+  'use strict';
+  const finite = x => typeof x === 'number' && Number.isFinite(x);
+  const sum = x => x.reduce((a, b) => a + b, 0);
+  const dot = (a, b) => sum(a.map((x, i) => x * b[i]));
+  const average = a => sum(a) / a.length;
+  const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
+  const annual = 252;
+
+  function prepare(data) {
+    if (!data || !Array.isArray(data.symbols) || !Array.isArray(data.dates) ||
+        !data.closes || data.symbols.length < 2 || data.symbols.length > 5 ||
+        new Set(data.symbols).size !== data.symbols.length || data.dates.length < 31 ||
+        data.dates.length > 900 || data.dates.some((d, i) =>
+          typeof d !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(d) ||
+          (i > 0 && d <= data.dates[i - 1]))) {
+      throw Error('Load at least 31 aligned daily prices for 2–5 distinct stocks or ETFs.');
+    }
+    const prices = data.symbols.map(s => {
+      const arr = data.closes[s];
+      if (!Array.isArray(arr) || arr.length !== data.dates.length ||
+          arr.some(p => !finite(p) || p <= 0)) throw Error('Incomplete or invalid price history.');
+      return arr;
+    });
+    const assetReturns = prices.map(p => p.slice(1).map((x, i) => x / p[i] - 1));
+    if (assetReturns.some(a => a.some(r => !finite(r) || r <= -1 || r > 10))) {
+      throw Error('Unsupported or discontinuous daily price history.');
+    }
+    const count = assetReturns[0].length;
+    const means = assetReturns.map(average);
+    const raw = assetReturns.map((a, i) => assetReturns.map((b, j) => {
+      let v = 0;
+      for (let t = 0; t < count; t++) v += (a[t] - means[i]) * (b[t] - means[j]);
+      return v / (count - 1);
+    }));
+    const covariance = raw.map((row, i) => row.map((c, j) =>
+      c * (i === j ? 1 : 0.80))); // fixed 20% diagonal shrinkage, off-diagonal only
+    return {symbols: [...data.symbols], dates: [...data.dates], count, assetReturns,
+      means: means.map(x => x * annual), rawCovariance: raw, covariance, prices};
+  }
+
+  function project(values, maxWeight) {
+    const n = values.length;
+    if (!finite(maxWeight) || maxWeight <= 0 || maxWeight > 1 ||
+        n * maxWeight < 1 - 1e-10) throw Error('Maximum position weight is too low for the selected investments.');
+    if (values.some(x => !finite(x))) throw Error('Invalid allocation calculation.');
+    let low = Math.min(...values) - maxWeight;
+    let high = Math.max(...values);
+    for (let k = 0; k < 100; k++) {
+      const mid = (low + high) / 2;
+      const s = sum(values.map(x => clamp(x - mid, 0, maxWeight)));
+      if (s > 1) low = mid; else high = mid;
+    }
+    const out = values.map(x => clamp(x - (low + high) / 2, 0, maxWeight));
+    let residual = 1 - sum(out);
+    for (let k = 0; k < out.length && Math.abs(residual) > 1e-11; k++) {
+      const change = residual > 0 ? Math.min(residual, maxWeight - out[k]) :
+        Math.max(residual, -out[k]);
+      out[k] += change;
+      residual -= change;
+    }
+    if (Math.abs(sum(out) - 1) > 1e-8) throw Error('Cannot satisfy allocation constraints.');
+    return out;
+  }
+
+  function variance(weights, covariance) {
+    return dot(weights, covariance.map(row => dot(row, weights)));
+  }
+
+  function solve(data, maxWeight, mode, tiltStrength = 0.02) {
+    const n = data.symbols.length;
+    const c = data.covariance.map(row => row.map(x => x * annual));
+    const initial = project(Array(n).fill(1 / n), maxWeight);
+    if (mode === 'inverse') {
+      const sigmas = data.covariance.map((row, i) => Math.sqrt(Math.max(row[i], 1e-12)));
+      return project(sigmas.map(x => 1 / x / sum(sigmas.map(y => 1 / y))), maxWeight);
+    }
+    if (mode !== 'minimum' && mode !== 'tilt') throw Error('Unknown optimization objective.');
+    // Center and shrink highly unstable historical annualized return estimates.
+    // This score is descriptive, not an expected-return forecast.
+    const common = average(data.means);
+    const scores = data.means.map(x => clamp((x - common) * 0.25, -0.20, 0.20));
+    const maxRow = Math.max(...c.map(row => sum(row.map(Math.abs))), 1e-7);
+    const learningRate = 0.75 / (2 * maxRow);
+    let weights = initial;
+    for (let k = 0; k < 1800; k++) {
+      const gradient = weights.map((_, i) =>
+        2 * dot(c[i], weights) - (mode === 'tilt' ? tiltStrength * scores[i] : 0));
+      const next = project(weights.map((w, i) => w - learningRate * gradient[i]), maxWeight);
+      const delta = Math.max(...weights.map((w, i) => Math.abs(w - next[i])));
+      weights = next;
+      if (delta < 1e-11) break;
+    }
+    return weights;
+  }
+
+  function weightsStats(data, weights) {
+    if (weights.length !== data.symbols.length || weights.some(x => !finite(x) || x < -1e-9) ||
+        Math.abs(sum(weights) - 1) > 1e-6) throw Error('Invalid portfolio weights.');
+    const daily = data.assetReturns[0].map((_, t) =>
+      dot(weights, data.assetReturns.map(row => row[t])));
+    const avg = average(daily);
+    const sampleVar = sum(daily.map(x => (x - avg) ** 2)) / (daily.length - 1);
+    const vol = Math.sqrt(Math.max(0, variance(weights, data.covariance) * annual));
+    const wealth = [1];
+    for (const r of daily) wealth.push(wealth.at(-1) * (1 + r));
+    let high = 1, drawdown = 0;
+    for (const v of wealth) {high = Math.max(high, v); drawdown = Math.min(drawdown, v / high - 1);}
+    const ordered = [...daily].sort((a, b) => a - b);
+    const tail = Math.max(1, Math.ceil(ordered.length * 0.05));
+    const dailyVaR = Math.max(0, -ordered[tail - 1]);
+    const dailyES = Math.max(0, -average(ordered.slice(0, tail)));
+    const sigma = Math.sqrt(Math.max(0, variance(weights, data.covariance)));
+    const contributions = weights.map((w, i) =>
+      sigma <= 1e-12 ? 0 : w * dot(data.covariance[i], weights) / (sigma * sigma));
+    function worstWindow(days) {
+      if (daily.length < days) return null;
+      let worst = Infinity;
+      for (let k = 0; k + days <= daily.length; k++) {
+        let p = 1;
+        for (let t = k; t < k + days; t++) p *= 1 + daily[t];
+        worst = Math.min(worst, p - 1);
+      }
+      return worst;
+    }
+    return {annualHistoricalMean: avg * annual, annualVolatility: vol,
+      realizedVolatility: Math.sqrt(sampleVar * annual), compoundChange: wealth.at(-1) - 1,
+      maxDrawdown: drawdown, dailyVaR, dailyES, effectiveHoldings: 1 / sum(weights.map(w => w * w)),
+      riskContributions: contributions, worst5: worstWindow(5), worst20: worstWindow(20)};
+  }
+
+  function correlation(data) {
+    return data.rawCovariance.map((row, i) => row.map((v, j) => {
+      const a = data.rawCovariance[i][i], b = data.rawCovariance[j][j];
+      return a > 1e-15 && b > 1e-15 ? clamp(v / Math.sqrt(a * b), -1, 1) : null;
+    }));
+  }
+
+  function run(history, opts = {}) {
+    const data = prepare(history);
+    const cap = Number(opts.maxWeight ?? 0.6);
+    const objective = opts.objective || 'minimum';
+    const baseline = project(Array(data.symbols.length).fill(1 / data.symbols.length), cap);
+    const chosen = solve(data, cap, objective);
+    const frontier = [0, 0.005, 0.01, 0.02, 0.035, 0.05, 0.08].map(s => {
+      const w = solve(data, cap, s === 0 ? 'minimum' : 'tilt', s);
+      const stats = weightsStats(data, w);
+      return {risk: stats.annualVolatility, historicalMean: stats.annualHistoricalMean};
+    });
+    return {symbols: data.symbols, periodStart: data.dates[0], periodEnd: data.dates.at(-1),
+      observations: data.count, objective, maxWeight: cap, chosen,
+      optimized: weightsStats(data, chosen), equalWeights: baseline,
+      equal: weightsStats(data, baseline), correlation: correlation(data), frontier,
+      source: history.source || 'Alpaca historical close observations'};
+  }
+
+  return {prepare, project, solve, weightsStats, correlation, run};
+});
+
+/* Hosted private mode, same Cloudflare website. No credentials or provider keys in source. */
 (function () {
 'use strict';
 const $=id=>document.getElementById(id);
@@ -739,6 +919,7 @@ async function verifyMFA(){
 async function logout(){
   try{await api('auth/logout',{});}catch(_){ /* Clear visible private content regardless */ }
   clearMFA();showStep('login');privateState=null;quoted={};historySeries=null;closeAssetBrowser();researchSelection=[];$('private-symbol').value='';$('private-selected-asset').textContent='No investment selected';renderResearchSelection();
+  optimizerResult=null;$('private-opt-export').disabled=true;$('private-opt-output').textContent='Load market history to begin.';$('private-opt-risk').textContent='';
   $('private-history-chart').textContent='Load a historical series to begin.';$('private-risk-results').textContent='';$('private-backtest-output').textContent='';$('private-valuation-output').textContent='';$('private-peers').textContent='';$('private-concentration').textContent='';$('private-positions').textContent='';
   $('private-total').textContent='—';$('private-invested').textContent='—';
   $('private-cash').textContent='—';$('private-notes').textContent='';valuationCompanies={};$('private-valuation-company').value='';$('private-valuation-selected').textContent='No company selected';message('Signed out.');privateTab('home');
@@ -875,7 +1056,7 @@ function chooseAsset(symbol,name,kind){
    if(researchSelection.length>=5){message('You can compare up to five investments. Remove one first.');return;}
    researchSelection.push(symbol);
   }
-  renderResearchSelection();historySeries=null;
+  renderResearchSelection();historySeries=null;optimizerResult=null;$('private-opt-export').disabled=true;$('private-opt-output').textContent='Selection changed. Load the updated historical series first.';$('private-opt-risk').textContent='';
   $('private-history-chart').textContent='Load market history for the selected investments.';
   $('private-backtest-output').textContent='';
   message('Added '+name+' to your historical research selection.');
@@ -905,7 +1086,7 @@ $('private-history-selection').addEventListener('click',e=>{
  const b=e.target.closest('[data-research-remove]');
  if(!b)return;
  researchSelection=researchSelection.filter(s=>s!==b.dataset.researchRemove);
- renderResearchSelection();historySeries=null;
+ renderResearchSelection();historySeries=null;optimizerResult=null;$('private-opt-export').disabled=true;$('private-opt-output').textContent='Selection changed. Load the updated historical series first.';$('private-opt-risk').textContent='';
  $('private-history-chart').textContent='Load market history for the selected investments.';
  $('private-backtest-output').textContent='';
 });
@@ -913,6 +1094,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('private-asset-b
 renderResearchSelection();
 
 /* V6: authenticated research tools. No Alpaca credentials or private data in public code. */
+let optimizerResult=null;
 let historySeries=null;
 const finite=n=>typeof n==='number'&&Number.isFinite(n);
 const percent=n=>finite(n)?(n*100).toFixed(2)+'%':'Unavailable';
@@ -961,12 +1143,17 @@ async function loadHistory(){
  message('Retrieving private market history…');$('private-history-source').textContent='';
  try{
   const d=await api('private/history?symbols='+encodeURIComponent(raw)+'&days='+encodeURIComponent($('private-history-days').value));
+  // A pending fetch may finish after sign-out or a changed investment selection.
+  if(!privateState || researchSelection.join(',')!==raw)return;
+  optimizerResult=null;$('private-opt-export').disabled=true;
+  $('private-opt-output').textContent='History loaded. Open Optimization to calculate allocations.';
+  $('private-opt-risk').textContent='Risk diagnostics appear after an allocation is calculated.';
   historySeries=d;
   $('private-history-chart').innerHTML=svgIndexChart(d);
   $('private-history-source').textContent=d.source+' · through '+d.as_of;
   $('private-risk-results').innerHTML=privateRisk(d);
   message('Historical market research loaded.');
- }catch(e){historySeries=null;message(e.message);$('private-history-chart').textContent='Market history unavailable.';$('private-risk-results').textContent='';$('private-backtest-output').textContent='';}
+ }catch(e){optimizerResult=null;$('private-opt-export').disabled=true;historySeries=null;message(e.message);$('private-history-chart').textContent='Market history unavailable.';$('private-risk-results').textContent='';$('private-backtest-output').textContent='';}
 }
 function wealthStats(values){let out=values.at(-1)/values[0]-1;return [percent(out),percent(maxDD(values))];}
 function privateBacktest(){
@@ -1070,6 +1257,73 @@ async function changeCapital(){
   message('Virtual account updated. No real funds were moved.');privateTab('home');
  }catch(e){message(e.message);}
 }
+
+/* V6.3: purely historical owner-only optimization; never invokes /trade or /capital. */
+function optPct(x){return typeof x==='number'&&Number.isFinite(x)?(100*x).toFixed(2)+'%':'Unavailable';}
+function optSvgFrontier(points){
+ const xs=points.map(p=>p.risk),ys=points.map(p=>p.historicalMean);
+ const xmin=Math.min(...xs),xmax=Math.max(...xs),ymin=Math.min(...ys),ymax=Math.max(...ys);
+ const xscale=x=>30+540*(x-xmin)/(xmax-xmin||1),yscale=y=>200-175*(y-ymin)/(ymax-ymin||1);
+ const plot=points.map(p=>xscale(p.risk).toFixed(2)+','+yscale(p.historicalMean).toFixed(2)).join(' ');
+ return '<svg viewBox="0 0 600 245" role="img" aria-label="In-sample portfolio risk-return trade-off"><line x1="30" y1="202" x2="575" y2="202" stroke="#cad9d2"/><polyline points="'+plot+'" fill="none" stroke="#196c58" stroke-width="2"/>'+points.map(p=>'<circle cx="'+xscale(p.risk).toFixed(2)+'" cy="'+yscale(p.historicalMean).toFixed(2)+'" r="4" fill="#196c58"/>').join('')+'<text x="30" y="236" font-size="11" fill="#526a60">Annualized historical volatility →</text><text x="30" y="13" font-size="11" fill="#526a60">Historical mean (not a forecast)</text></svg>';
+}
+function optimizationTable(res){
+ const risks=res.optimized.riskContributions;
+ return displayTable(['Investment','Equal weight','Optimized','Variance contribution'],res.symbols.map((sym,i)=>[
+  (assetNames[sym]||sym)+' ('+sym+')',optPct(res.equalWeights[i]),optPct(res.chosen[i]),optPct(risks[i])]));
+}
+function optimizerDiagnostics(res){
+ const eq=res.equal,op=res.optimized;
+ const comparison=displayTable(['Measure','Equal-weight','Optimized'],[
+  ['Annualized historical volatility',optPct(eq.annualVolatility),optPct(op.annualVolatility)],
+  ['Historical arithmetic annual mean',optPct(eq.annualHistoricalMean),optPct(op.annualHistoricalMean)],
+  ['Historical compounded change',optPct(eq.compoundChange),optPct(op.compoundChange)],
+  ['Maximum drawdown',optPct(eq.maxDrawdown),optPct(op.maxDrawdown)],
+  ['One-day 95% historical VaR',optPct(eq.dailyVaR),optPct(op.dailyVaR)],
+  ['One-day 95% historical expected shortfall',optPct(eq.dailyES),optPct(op.dailyES)],
+  ['Worst rolling five-session change',optPct(eq.worst5),optPct(op.worst5)],
+  ['Worst rolling 20-session change',optPct(eq.worst20),optPct(op.worst20)],
+  ['Effective number of holdings',eq.effectiveHoldings.toFixed(2),op.effectiveHoldings.toFixed(2)]
+ ]);
+ const matrix=displayTable(['Investment',...res.symbols],res.symbols.map((sym,i)=>[
+  sym,...res.correlation[i].map(x=>x===null?'Unavailable':x.toFixed(3))]));
+ return '<h3>Equal-weight versus optimized</h3>'+comparison+'<h3 style="margin:20px 0 8px">Historical correlation matrix</h3>'+matrix+
+  '<h3 style="margin:20px 0 8px">In-sample risk–return trade-off</h3>'+optSvgFrontier(res.frontier)+
+  '<p class="tiny">All statistics use the same observed period. A portfolio selected using these data is in-sample; the displayed historical result is not an out-of-sample backtest. Daily rebalancing is assumed when compounding weighted returns. No dividends, borrow costs, slippage, or brokerage orders are included. Variance contributions may be negative for hedging assets.</p>';
+}
+function runOptimization(){
+ if(!privateState){message('Sign in to run private portfolio research.');return;}
+ if(!historySeries){message('Go to Market research and load 2–5 investments first.');privateTab('research');return;}
+ $('private-opt-output').textContent='Calculating historical allocation…';
+ try{
+  const result=window.QFPrivateOptimizer.run(historySeries,{
+   objective:$('private-opt-objective').value,maxWeight:Number($('private-opt-cap').value)});
+  optimizerResult=result;
+  $('private-opt-export').disabled=false;
+  $('private-opt-output').innerHTML='<p class="tiny">'+safe(result.periodStart)+' to '+safe(result.periodEnd)+' · '+result.observations+' aligned return sessions · '+safe(result.source)+'</p>'+optimizationTable(result)+
+   '<p class="tiny">Allocation constraints: no shorts or leverage, each position limited to '+optPct(result.maxWeight)+'. Weights sum to 100%. Calculations do not alter your virtual holdings.</p>';
+  $('private-opt-risk').innerHTML=optimizerDiagnostics(result);
+  message('Historical portfolio optimization completed; no transactions were placed.');
+ }catch(e){optimizerResult=null;$('private-opt-export').disabled=true;$('private-opt-output').textContent=e.message;$('private-opt-risk').textContent='';message(e.message);}
+}
+function exportOptimization(){
+ if(!privateState||!optimizerResult)return;
+ const result=optimizerResult;
+ const clean=s=>{let v=String(s).replace(/"/g,'""');if(/^[=+@\-]/.test(v))v="'"+v;return '"'+v+'"';};
+ const head=['symbol','company','equal_weight','optimized_weight','variance_contribution','period_start','period_end','objective','price_source'];
+ const lines=[head.join(',')];
+ for(let i=0;i<result.symbols.length;i++){
+  const sym=result.symbols[i];lines.push([sym,assetNames[sym]||sym,result.equalWeights[i],result.chosen[i],result.optimized.riskContributions[i],result.periodStart,result.periodEnd,result.objective,result.source].map(clean).join(','));
+ }
+ const blob=new Blob([lines.join('\r\n')+'\r\n'],{type:'text/csv;charset=utf-8'});
+ const url=URL.createObjectURL(blob),link=document.createElement('a');
+ link.href=url;link.download='quantforge-private-optimized-allocations.csv';document.body.appendChild(link);link.click();link.remove();URL.revokeObjectURL(url);
+ message('Historical allocation CSV exported locally. No data was uploaded.');
+}
+$('private-opt-run').addEventListener('click',runOptimization);
+$('private-opt-export').addEventListener('click',exportOptimization);
+for(const id of ['private-opt-objective','private-opt-cap'])$(id).addEventListener('change',()=>{optimizerResult=null;$('private-opt-export').disabled=true;$('private-opt-output').textContent='Settings changed. Calculate allocations to update the results.';$('private-opt-risk').textContent='';});
+
 document.querySelectorAll('[data-private-tab]').forEach(b=>b.addEventListener('click',()=>privateTab(b.dataset.privateTab)));
 $('private-history-load').addEventListener('click',loadHistory);
 $('private-backtest-run').addEventListener('click',privateBacktest);

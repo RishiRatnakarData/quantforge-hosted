@@ -36,7 +36,7 @@ block='''<section class="tabpage" id="page-private">
   </div>
   <div id="private-signed" hidden>
     <div class="controls"><span class="mini">Personal research · authenticated</span><button class="btn sm" id="private-logout">Sign out</button></div>
-    <nav class="private-nav" aria-label="Private workspace sections"><button class="active" data-private-tab="home">Portfolio</button><button data-private-tab="trade">Virtual trading</button><button data-private-tab="research">Market research</button><button data-private-tab="backtest">Backtesting</button><button data-private-tab="valuation">Valuation &amp; peers</button><button data-private-tab="settings">Settings &amp; notes</button></nav>
+    <nav class="private-nav" aria-label="Private workspace sections"><button class="active" data-private-tab="home">Portfolio</button><button data-private-tab="trade">Virtual trading</button><button data-private-tab="research">Market research</button><button data-private-tab="optimization">Optimization</button><button data-private-tab="backtest">Backtesting</button><button data-private-tab="valuation">Valuation &amp; peers</button><button data-private-tab="settings">Settings &amp; notes</button></nav>
     <section class="private-view" data-private-view="home">
       <div class="pane"><div class="three"><div class="metric"><span class="muted">Virtual total</span><strong id="private-total">—</strong></div><div class="metric"><span class="muted">Available cash</span><strong id="private-cash">—</strong></div><div class="metric"><span class="muted">Invested value</span><strong id="private-invested">—</strong></div></div><div class="section-title"><h3>Holdings</h3><button class="btn sm" data-private-tab="trade">Trade</button></div><div id="private-positions"></div></div>
       <div class="pane"><h3>Portfolio concentration</h3><div id="private-concentration" class="tiny" style="margin-top:12px">Add virtual holdings to see allocation.</div></div>
@@ -55,6 +55,18 @@ block='''<section class="tabpage" id="page-private">
       <div class="controls"><button class="btn primary" id="private-history-load">Load market history</button><span class="tiny" id="private-history-source"></span></div>
       <div id="private-history-chart" class="private-chart" style="margin-top:15px">Load a historical series to begin.</div><div id="private-risk-results"></div>
       </div>
+    </section>
+    <section class="private-view" data-private-view="optimization" hidden>
+      <div class="pane"><h3>Portfolio optimization</h3>
+        <p class="tiny">Use the historical prices selected in Market research to explore constrained, long-only allocations. The research calculation stays separate from your virtual positions. Nothing is traded or saved to your portfolio.</p>
+        <div class="formgrid" style="margin-top:15px">
+          <div class="field"><label for="private-opt-objective">Allocation method</label><select id="private-opt-objective"><option value="minimum">Minimum historical volatility</option><option value="inverse">Inverse-volatility allocation</option><option value="tilt">Historical return tilt</option></select></div>
+          <div class="field"><label for="private-opt-cap">Maximum weight per investment</label><select id="private-opt-cap"><option value="0.35">35%</option><option value="0.40">40%</option><option value="0.50">50%</option><option selected value="0.60">60%</option><option value="0.75">75%</option><option value="1.00">100%</option></select></div>
+        </div>
+        <div class="controls"><button class="btn primary" id="private-opt-run" type="button">Calculate allocations</button><button class="btn" id="private-opt-export" type="button" disabled>Export allocations CSV</button></div>
+        <div id="private-opt-output" style="margin-top:16px" aria-live="polite">Select 2–5 investments in Market research, load their history, then calculate an allocation.</div>
+      </div>
+      <div class="pane"><h3>Risk diagnostics</h3><p class="tiny">Empirical covariance uses 20% diagonal shrinkage. Historical correlations, contribution to variance, drawdowns, and tail losses are descriptive, not forecasts.</p><div id="private-opt-risk" style="margin-top:15px">Risk diagnostics appear after an allocation is calculated.</div></div>
     </section>
     <section class="private-view" data-private-view="backtest" hidden>
       <div class="pane"><h3>Historical strategy simulator</h3><p class="tiny">Equal-weight buy-and-hold versus monthly rebalancing, using the symbols and daily history selected in Market research. Includes hypothetical transaction fees; no forward-looking optimization.</p>
@@ -116,6 +128,9 @@ if snapshot is not None:
 snapshot_js=json.dumps(snapshot, separators=(',',':'), ensure_ascii=True).replace('<', r'\u003c').replace('>', r'\u003e').replace('&', r'\u0026')
 for slot, file in [('/* QF_MODEL */','model.js'),('/* QF_APP */','app.js'),('/* QF_PRIVATE */','private.js')]:
  text=(src/'site'/file).read_text(encoding="utf-8")
+ if file=='private.js':
+  # Bundled alongside the existing private script: still only three CSP-protected scripts.
+  text=(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+text
  if file=='app.js':
   assert text.count('/* QF_SEC_DATA */ null')==1
   # Bundle pure SEC analytics in the existing public app script. CSP remains 3 hashes.
