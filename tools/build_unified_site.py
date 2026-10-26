@@ -43,14 +43,14 @@ block='''<section class="tabpage" id="page-private">
     </section>
     <section class="private-view" data-private-view="trade" hidden>
       <div class="pane"><h3>Market observation &amp; virtual trade</h3><p class="tiny">Stocks, ETFs, and supported crypto pairs. Market observations are private and read-only; no brokerage orders are placed.</p>
-      <div class="formgrid" style="margin-top:12px"><div class="field"><label for="private-symbol">Symbol</label><input id="private-symbol" list="private-symbol-list" value="MSFT" maxlength="12" autocomplete="off" placeholder="MSFT or BTC/USD"><datalist id="private-symbol-list"></datalist></div>
+      <div class="formgrid" style="margin-top:12px"><div class="field"><label for="private-selected-asset">Investment</label><input type="hidden" id="private-symbol" value=""><div class="selected-asset" id="private-selected-asset">No investment selected</div><button class="btn sm" type="button" id="private-browse-trade">Browse investments</button></div>
       <div class="field"><label for="private-side">Action</label><select id="private-side"><option value="buy">Buy with USD budget</option><option value="sell">Sell units</option></select></div>
       <div class="field"><label for="private-amount">USD budget / units</label><input type="number" min="0.00000001" step="any" id="private-amount" value="100"></div></div>
       <div class="controls"><button class="btn" id="private-quote-submit">Get market price</button><button class="btn primary" id="private-trade-submit">Record virtual trade</button></div><p id="private-quote" class="tiny" style="margin-top:12px">No quote loaded.</p></div>
     </section>
     <section class="private-view" data-private-view="research" hidden>
       <div class="pane"><h3>Historical market research</h3><p class="tiny">Private Alpaca daily stock/ETF history. Split-adjusted close prices; dividend returns are excluded.</p>
-      <div class="formgrid" style="margin-top:14px"><div class="field"><label for="private-history-symbols">Stock/ETF symbols (2–5)</label><input id="private-history-symbols" value="MSFT,AAPL,VOO" maxlength="55" spellcheck="false"></div>
+      <div class="formgrid" style="margin-top:14px"><div class="field"><label for="private-history-selection">Selected stocks &amp; ETFs (2–5)</label><input type="hidden" id="private-history-symbols" value=""><div id="private-history-selection" class="chosen-assets">Choose investments to compare.</div><button class="btn sm" type="button" id="private-browse-research">Browse investments</button></div>
       <div class="field"><label for="private-history-days">Period</label><select id="private-history-days"><option value="90">3 months</option><option value="180">6 months</option><option selected value="365">1 year</option><option value="730">2 years</option></select></div></div>
       <div class="controls"><button class="btn primary" id="private-history-load">Load market history</button><span class="tiny" id="private-history-source"></span></div>
       <div id="private-history-chart" class="private-chart" style="margin-top:15px">Load a historical series to begin.</div><div id="private-risk-results"></div>
@@ -79,6 +79,17 @@ block='''<section class="tabpage" id="page-private">
       <div class="pane"><h3>Research notes</h3><div class="field" style="margin-top:12px"><label for="private-note">Private note</label><textarea id="private-note" maxlength="2000" rows="3" placeholder="Write a research note..."></textarea></div>
       <div class="controls"><button class="btn" id="private-note-submit">Save note</button></div><div id="private-notes"></div><p class="tiny">Watchlist: <span id="private-watchlist">None</span></p></div>
     </section>
+  </div>
+  <div id="private-asset-browser" class="private-picker" hidden role="dialog" aria-modal="true" aria-labelledby="asset-browser-title">
+    <div class="picker-shell">
+      <div class="picker-header"><div><h2 id="asset-browser-title">Choose an investment</h2><p class="tiny">Browse by name. No ticker knowledge required.</p></div><button class="btn sm" id="asset-browser-close" type="button" aria-label="Close investment browser">Close</button></div>
+      <div class="controls picker-controls"><button class="btn sm" data-asset-category="popular" type="button">Popular</button><button class="btn sm" data-asset-category="all" type="button">All stocks &amp; ETFs</button><button class="btn sm" data-asset-category="crypto" type="button">Supported crypto</button></div>
+      <div class="field"><label for="asset-browser-search">Filter by company name (optional)</label><input id="asset-browser-search" maxlength="60" autocomplete="off" placeholder="Optional name search"></div>
+      <div class="picker-letters" id="asset-browser-letters" aria-label="Browse by first letter"></div>
+      <div id="asset-browser-status" class="tiny" role="status" aria-live="polite">Select a category.</div>
+      <div id="asset-browser-results" class="picker-results"></div>
+      <div class="controls"><button class="btn sm" type="button" id="asset-browser-prev">Previous</button><span class="tiny" id="asset-browser-page"></span><button class="btn sm" type="button" id="asset-browser-next">Next</button></div>
+    </div>
   </div>
   <p id="private-message" class="tiny" role="status" aria-live="polite"></p>
 </section>'''

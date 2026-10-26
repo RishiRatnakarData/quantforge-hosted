@@ -27,6 +27,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from qrcode.image.svg import SvgPathImage
 
+from cloud import asset_directory
 from quantforge.desk.engine import FEE_RATE, QTY, DeskError, cents, money, valid_quote
 from quantforge.desk.market import AlpacaDeskMarket
 from quantforge.live.provider import AlpacaClient, MarketDataError
@@ -34,7 +35,7 @@ from quantforge.live.provider import AlpacaClient, MarketDataError
 app = FastAPI(title="QuantForge private API", docs_url=None, redoc_url=None, openapi_url=None)
 SESSION = requests.Session()
 MAX_BYTES = 350_000
-SYMBOL_RE = re.compile(r"^(?:[A-Z][A-Z0-9.]{0,9}|(?:BTC|ETH|SOL)/USD)$")
+SYMBOL_RE = re.compile(r"^(?:[A-Z][A-Z0-9.]{0,9}|(?:BTC|ETH|SOL|LTC|AVAX|DOGE|LINK)/USD)$")
 FACTOR_RE = re.compile(r"^[0-9a-fA-F-]{36}$")
 TOTP_RE = re.compile(r"^[0-9]{6}$")
 
@@ -405,6 +406,17 @@ def quote(symbol: str) -> dict:
     try:
         return AlpacaDeskMarket().quote(symbol)
     except (DeskError, ValueError) as exc:
+        raise HTTPException(422, str(exc)) from exc
+
+
+@app.get("/api/private/assets")
+def private_assets(request: Request, response: Response,
+                   category: str = "popular", letter: str = "", query: str = "", page: int = 0):
+    """Browse Alpaca names without exposing credentials, quotes or private holdings."""
+    owner(request, response)
+    try:
+        return asset_directory.browse(category=category, letter=letter, query=query, page=page)
+    except ValueError as exc:
         raise HTTPException(422, str(exc)) from exc
 
 

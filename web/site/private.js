@@ -4,6 +4,11 @@
 const $=id=>document.getElementById(id);
 const M=window.QFModel;
 let privateState=null, version=0, quoted={}, mfaFactorId=null;
+let researchSelection=[];
+let assetNames={};
+const browserState={mode:'trade',category:'popular',letter:'',query:'',page:0,pages:1};
+let browserRequest=0, browserDebounce;
+
 const usd=n=>Number(n).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2});
 const safe=s=>String(s).replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
 function message(msg){$('private-message').textContent=msg;}
@@ -109,7 +114,7 @@ async function verifyMFA(){
 }
 async function logout(){
   try{await api('auth/logout',{});}catch(_){ /* Clear visible private content regardless */ }
-  clearMFA();showStep('login');privateState=null;quoted={};historySeries=null;
+  clearMFA();showStep('login');privateState=null;quoted={};historySeries=null;closeAssetBrowser();researchSelection=[];$('private-symbol').value='';$('private-selected-asset').textContent='No investment selected';renderResearchSelection();
   $('private-history-chart').textContent='Load a historical series to begin.';$('private-risk-results').textContent='';$('private-backtest-output').textContent='';$('private-valuation-output').textContent='';$('private-peers').textContent='';$('private-concentration').textContent='';$('private-positions').textContent='';
   $('private-total').textContent='—';$('private-invested').textContent='—';
   $('private-cash').textContent='—';$('private-notes').textContent='';message('Signed out.');privateTab('home');
@@ -117,6 +122,7 @@ async function logout(){
 async function currentQuote(){
   message('Retrieving private market observation…');
   const symbol=$('private-symbol').value.trim().toUpperCase();
+  if(!symbol){message('Choose an investment with Browse investments first.');return;}
   try{
     const r=await api('private/quotes?symbols='+encodeURIComponent(symbol));
     const q=r.quotes[0];quoted[symbol]=q;
@@ -126,6 +132,7 @@ async function currentQuote(){
 }
 async function trade(){
   if(!privateState){message('Sign in first.');return;}
+  if(!$('private-symbol').value){message('Choose an investment before trading.');return;}
   message('Validating virtual trade…');
   try{
     const r=await api('private/trade',{symbol:$('private-symbol').value.trim().toUpperCase(),side:$('private-side').value,
@@ -165,8 +172,100 @@ $('private-quote-submit').addEventListener('click',currentQuote);
 $('private-trade-submit').addEventListener('click',trade);
 $('private-note-submit').addEventListener('click',addNote);
 document.addEventListener('click',e=>{const b=e.target.closest('[data-page],[data-go]');if(b){queueMicrotask(updateMode);if(b.dataset.page==='private')checkSession();}});
-$('private-symbol-list').innerHTML=M.ASSETS.map(a=>'<option value="'+safe(a.symbol)+'">'+safe(a.name)+'</option>').join('');
+// Investment names come from private Alpaca asset discovery after MFA.
 // Do not contact the private API from the public-only pages.
+/* Private asset directory: click-to-select. Name search is optional. */
+function renderResearchSelection(){
+ const target=$('private-history-selection');
+ $('private-history-symbols').value=researchSelection.join(',');
+ if(!researchSelection.length){target.textContent='Choose investments to compare.';return;}
+ target.innerHTML=researchSelection.map(symbol=>'<button type="button" class="asset-chip" data-research-remove="'+safe(symbol)+'" aria-label="Remove '+safe(symbol)+'">'+safe(assetNames[symbol]||symbol)+' ('+safe(symbol)+') ×</button>').join('');
+}
+function closeAssetBrowser(){
+ browserRequest++;
+ const dialog=$('private-asset-browser');
+ if(dialog)dialog.hidden=true;
+}
+async function openAssetBrowser(mode){
+ if(!privateState){message('Sign in and verify your authenticator first.');return;}
+ browserState.mode=mode;
+ browserState.category='popular';browserState.letter='';browserState.query='';browserState.page=0;
+ $('asset-browser-search').value='';
+ $('private-asset-browser').hidden=false;
+ $('asset-browser-letters').innerHTML=['All',...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'].map(letter=>'<button type="button" data-asset-letter="'+(letter==='All'?'':letter)+'">'+letter+'</button>').join('');
+ await loadBrowserPage();
+ $('asset-browser-close').focus();
+}
+function browserParams(){
+ return 'private/assets?'+new URLSearchParams({category:browserState.category,letter:browserState.letter,query:browserState.query,page:String(browserState.page)});
+}
+async function loadBrowserPage(){
+ const id=++browserRequest;
+ $('asset-browser-status').textContent='Loading investments…';
+ $('asset-browser-results').textContent='';
+ try{
+  const data=await api(browserParams());
+  if(id!==browserRequest||$('private-asset-browser').hidden||!privateState)return;
+  browserState.pages=data.pages;
+  $('asset-browser-status').textContent=data.total+' available investments · '+data.source;
+  $('asset-browser-results').innerHTML=data.items.length?data.items.map(a=>'<button class="picker-item" type="button" data-asset-select="'+safe(a.symbol)+'" data-asset-kind="'+safe(a.asset_class)+'" data-asset-name="'+safe(a.name)+'"><strong>'+safe(a.name)+'</strong><span>'+safe(a.symbol)+' · '+safe(a.exchange||a.asset_class)+'</span></button>').join(''):'<p>No investments found for this filter. Choose another letter or category.</p>';
+  $('asset-browser-page').textContent='Page '+(data.page+1)+' of '+data.pages;
+  $('asset-browser-prev').disabled=!data.has_previous;
+  $('asset-browser-next').disabled=!data.has_next;
+  document.querySelectorAll('[data-asset-category]').forEach(b=>b.classList.toggle('active',b.dataset.assetCategory===browserState.category));
+  document.querySelectorAll('[data-asset-letter]').forEach(b=>b.classList.toggle('active',b.dataset.assetLetter===browserState.letter));
+ }catch(e){if(id===browserRequest)$('asset-browser-status').textContent=e.message;}
+}
+function chooseAsset(symbol,name,kind){
+ if(!privateState)return;
+ assetNames[symbol]=name;
+ if(browserState.mode==='trade'){
+  $('private-symbol').value=symbol;
+  $('private-selected-asset').textContent=name+' ('+symbol+')';
+  $('private-quote').textContent='Get market price to inspect the current observation.';
+  message('Selected '+name+'. No trade has been placed.');
+ }else{
+  if(kind==='crypto'){message('Historical research currently uses U.S. stocks and ETFs.');return;}
+  if(!researchSelection.includes(symbol)){
+   if(researchSelection.length>=5){message('You can compare up to five investments. Remove one first.');return;}
+   researchSelection.push(symbol);
+  }
+  renderResearchSelection();historySeries=null;
+  $('private-history-chart').textContent='Load market history for the selected investments.';
+  $('private-backtest-output').textContent='';
+  message('Added '+name+' to your historical research selection.');
+ }
+ closeAssetBrowser();
+}
+$('private-browse-trade').addEventListener('click',()=>openAssetBrowser('trade'));
+$('private-browse-research').addEventListener('click',()=>openAssetBrowser('research'));
+$('asset-browser-close').addEventListener('click',closeAssetBrowser);
+$('asset-browser-prev').addEventListener('click',()=>{if(browserState.page>0){browserState.page--;loadBrowserPage();}});
+$('asset-browser-next').addEventListener('click',()=>{if(browserState.page+1<browserState.pages){browserState.page++;loadBrowserPage();}});
+$('asset-browser-search').addEventListener('input',()=>{
+ clearTimeout(browserDebounce);
+ browserDebounce=setTimeout(()=>{browserState.query=$('asset-browser-search').value;browserState.page=0;loadBrowserPage();},220);
+});
+$('private-asset-browser').addEventListener('click',e=>{
+ if(e.target.id==='private-asset-browser'){closeAssetBrowser();return;}
+ const cat=e.target.closest('[data-asset-category]');
+ if(cat){browserState.category=cat.dataset.assetCategory;browserState.letter='';browserState.page=0;loadBrowserPage();return;}
+ const letter=e.target.closest('[data-asset-letter]');
+ if(letter){browserState.letter=letter.dataset.assetLetter;browserState.page=0;loadBrowserPage();return;}
+ const asset=e.target.closest('[data-asset-select]');
+ if(asset){chooseAsset(asset.dataset.assetSelect,asset.dataset.assetName,asset.dataset.assetKind);}
+});
+$('private-history-selection').addEventListener('click',e=>{
+ const b=e.target.closest('[data-research-remove]');
+ if(!b)return;
+ researchSelection=researchSelection.filter(s=>s!==b.dataset.researchRemove);
+ renderResearchSelection();historySeries=null;
+ $('private-history-chart').textContent='Load market history for the selected investments.';
+ $('private-backtest-output').textContent='';
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('private-asset-browser').hidden)closeAssetBrowser();});
+renderResearchSelection();
+
 /* V6: authenticated research tools. No Alpaca credentials or private data in public code. */
 let historySeries=null;
 const finite=n=>typeof n==='number'&&Number.isFinite(n);
@@ -210,9 +309,9 @@ function privateRisk(series){
  return '<h3 style="margin:18px 0 10px">Historical return statistics</h3>'+displayTable(['Measure','Result'],rows)+'<p class="tiny">Equal-weight daily return series with simple arithmetic returns. VaR/ES are empirical one-day historical statistics, not forward forecasts. Prices exclude dividends.</p>';
 }
 async function loadHistory(){
- const raw=$('private-history-symbols').value.toUpperCase().replace(/\s+/g,'');
- const syms=raw.split(',');
- if(syms.length<2||syms.length>5||new Set(syms).size!==syms.length||syms.some(x=>!/^\w[A-Z0-9.]{0,9}$/.test(x))) {message('Enter 2–5 distinct stock or ETF tickers.');return;}
+ const raw=researchSelection.join(',');
+ const syms=researchSelection;
+ if(syms.length<2||syms.length>5){message('Select 2–5 different stocks or ETFs using Browse investments.');return;}
  message('Retrieving private market history…');$('private-history-source').textContent='';
  try{
   const d=await api('private/history?symbols='+encodeURIComponent(raw)+'&days='+encodeURIComponent($('private-history-days').value));
