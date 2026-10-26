@@ -3,7 +3,7 @@
 'use strict';
 const $=id=>document.getElementById(id);
 const M=window.QFModel;
-let privateState=null, version=0, quoted={};
+let privateState=null, version=0, quoted={}, mfaFactorId=null;
 const usd=n=>Number(n).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2});
 const safe=s=>String(s).replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
 function message(msg){$('private-message').textContent=msg;}
@@ -15,8 +15,37 @@ async function api(path, body){
   if(!r.ok)throw Error(data.detail || data.error || ('HTTP '+r.status));
   return data;
 }
-function showSignedIn(ok){$('private-login').hidden=ok;$('private-signed').hidden=!ok;
-  $('private-status').textContent=ok?'Private · Signed in':'Private · Sign in required';
+function showStep(step){
+  $('private-login').hidden=step!=='login';
+  $('private-mfa').hidden=step!=='mfa';
+  $('private-signed').hidden=step!=='ready';
+  $('private-status').textContent=step==='ready'?'Private · Authenticator verified':
+    step==='mfa'?'Private · Authenticator required':'Private · Sign in required';
+}
+function clearMFA(){
+  mfaFactorId=null;
+  $('private-mfa-code').value='';
+  $('private-mfa-qr').removeAttribute('src');
+  $('private-mfa-qr-wrap').hidden=true;
+  $('private-mfa-setup-actions').hidden=true;
+}
+async function handleAuthState(state){
+  if(state.signed_in){clearMFA();showStep('ready');await loadState();return;}
+  if(!state.mfa_required){clearMFA();showStep('login');return;}
+  showStep('mfa');
+  if(state.mfa_setup){
+    $('private-mfa-title').textContent='Set up your authenticator';
+    $('private-mfa-instructions').textContent='Scan this private QR code in an authenticator app, then enter its six-digit code.';
+    if(!mfaFactorId){$('private-mfa-setup-actions').hidden=false;}
+    // Enrollment is a user action, never a GET/session side effect. Keep any
+    // existing QR visible during an in-progress enrollment in this tab.
+  }else{
+    clearMFA();
+    const factors=await api('auth/mfa/factors');
+    mfaFactorId=factors.factor_id;
+    $('private-mfa-title').textContent='Verify your authenticator';
+    $('private-mfa-instructions').textContent='Enter the current code from your enrolled authenticator app.';
+  }
 }
 async function loadState(){
   const d=await api('private/state');privateState=d.portfolio;version=d.version;
@@ -50,13 +79,35 @@ function render(){
 async function login(){
   message('Signing in…');
   try{
-    await api('auth/login',{email:$('private-email').value.trim(),password:$('private-password').value});
-    $('private-password').value='';showSignedIn(true);await loadState();message('Signed in.');
-  }catch(e){showSignedIn(false);message(e.message);}
+    const state=await api('auth/login',{email:$('private-email').value.trim(),password:$('private-password').value});
+    $('private-password').value='';await handleAuthState(state);
+    message(state.signed_in?'Signed in.':'Password accepted. Authenticator verification required.');
+  }catch(e){message(e.message);}
+}
+async function startMFASetup(){
+  message('Starting authenticator setup…');
+  try{
+    const enroll=await api('auth/mfa/enroll',{});
+    mfaFactorId=enroll.factor_id;
+    $('private-mfa-setup-actions').hidden=true;
+    // Supabase provides SVG markup. Show it as an image, never inject HTML.
+    $('private-mfa-qr').src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(enroll.qr_svg);
+    $('private-mfa-qr-wrap').hidden=false;
+    message('Scan the QR, then verify the current code. Keep this page open until setup is complete.');
+  }catch(e){message(e.message);}
+}
+async function verifyMFA(){
+  const code=$('private-mfa-code').value.trim();
+  if(!/^[0-9]{6}$/.test(code)){message('Enter the six-digit code.');return;}
+  message('Verifying authenticator…');
+  try{
+    const data=await api('auth/mfa/verify',{factor_id:mfaFactorId||undefined,code});
+    await handleAuthState(data);message('Authenticator verified. Your private workspace is unlocked.');
+  }catch(e){message(e.message);}
 }
 async function logout(){
   try{await api('auth/logout',{});}catch(_){ /* Clear visible private content regardless */ }
-  showSignedIn(false);privateState=null;quoted={};$('private-positions').textContent='';
+  clearMFA();showStep('login');privateState=null;quoted={};$('private-positions').textContent='';
   $('private-total').textContent='—';$('private-invested').textContent='—';
   $('private-cash').textContent='—';$('private-notes').textContent='';message('Signed out.');
 }
@@ -90,9 +141,8 @@ async function addNote(){
   }catch(e){message(e.message);}
 }
 async function checkSession(){
-  try{const s=await api('auth/session');if(s.signed_in){showSignedIn(true);await loadState();}
-    else showSignedIn(false);
-  }catch(e){showSignedIn(false);message('Private service is unavailable. The public demo still works.');}
+  try{const s=await api('auth/session');await handleAuthState(s);}
+  catch(e){message('Private authentication needs attention: '+e.message);}
 }
 function updateMode(){
  const active=document.querySelector('.tabpage.active')?.id==='page-private';
@@ -102,6 +152,9 @@ function updateMode(){
  if(eyebrow)eyebrow.textContent=active?'Your portfolio · Personal use':'Investment research · Public demonstration';
 }
 $('private-login-submit').addEventListener('click',login);
+$('private-mfa-submit').addEventListener('click',verifyMFA);
+$('private-mfa-start').addEventListener('click',startMFASetup);
+$('private-mfa-logout').addEventListener('click',logout);
 $('private-logout').addEventListener('click',logout);
 $('private-quote-submit').addEventListener('click',currentQuote);
 $('private-trade-submit').addEventListener('click',trade);

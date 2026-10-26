@@ -12,16 +12,20 @@ grant select, insert, update on public.quantforge_private_state to authenticated
 
 drop policy if exists "owner_select" on public.quantforge_private_state;
 create policy "owner_select" on public.quantforge_private_state
-for select to authenticated using ((select auth.uid()) = user_id);
+for select to authenticated using ((select auth.uid()) = user_id and (select auth.jwt()->>'aal') = 'aal2');
 
 drop policy if exists "owner_insert" on public.quantforge_private_state;
 create policy "owner_insert" on public.quantforge_private_state
-for insert to authenticated with check ((select auth.uid()) = user_id);
+for insert to authenticated with check ((select auth.uid()) = user_id and (select auth.jwt()->>'aal') = 'aal2');
 
 drop policy if exists "owner_update" on public.quantforge_private_state;
 create policy "owner_update" on public.quantforge_private_state
-for update to authenticated using ((select auth.uid()) = user_id)
-with check ((select auth.uid()) = user_id);
+for update to authenticated using ((select auth.uid()) = user_id and (select auth.jwt()->>'aal') = 'aal2')
+with check ((select auth.uid()) = user_id and (select auth.jwt()->>'aal') = 'aal2');
 
 -- Disable self-registration in Supabase Auth > Providers > Email.
 -- Create your one authorized user in Auth > Users, then use their UUID as OWNER_USER_ID.
+
+-- Critical: the SQL editor executes as admin. After running, ensure the
+-- authenticated role cannot read or write at AAL1; review policies in UI.
+-- This preserves existing portfolio rows while upgrading authorization.

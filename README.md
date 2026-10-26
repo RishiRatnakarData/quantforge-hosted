@@ -1,3 +1,5 @@
+> **V5.6.1 hosted MFA security upgrade:** See [Windows/deployment guide](docs/MFA_UPGRADE_V5_6_1.md). The public demo is unchanged; the private workspace now requires an authenticator code and Supabase AAL2 RLS. The source archive alone does not deploy these changes.
+
 ## Optional hosted website (V5.6 staging)
 
 One Cloudflare Pages website supports a no-login **fictional public demo** and an

@@ -6,10 +6,14 @@ Never forward this API directly to the public without the documented proxy.
 """
 from __future__ import annotations
 
+import base64
+import binascii
 import datetime as dt
 import hmac
+import json
 import os
 import re
+import secrets
 from decimal import ROUND_DOWN
 from typing import Any
 
@@ -25,6 +29,8 @@ app = FastAPI(title="QuantForge private API", docs_url=None, redoc_url=None, ope
 SESSION = requests.Session()
 MAX_BYTES = 350_000
 SYMBOL_RE = re.compile(r"^(?:[A-Z][A-Z0-9.]{0,9}|(?:BTC|ETH|SOL)/USD)$")
+FACTOR_RE = re.compile(r"^[0-9a-fA-F-]{36}$")
+TOTP_RE = re.compile(r"^[0-9]{6}$")
 
 
 def config(name: str) -> str:
@@ -111,12 +117,51 @@ def login(data: Credentials, response: Response):
     user = auth.get("user") or {}
     if str(user.get("id", "")) != config("OWNER_USER_ID") or not user.get("email_confirmed_at"):
         raise HTTPException(403, "Account not authorized or email unconfirmed.")
+    checked = sb_request("GET", "/auth/v1/user", token=auth["access_token"])
+    if checked.status_code != 200 or str(checked.json().get("id", "")) != str(user["id"]):
+        raise HTTPException(401, "Sign-in session could not be validated.")
     cookie(response, auth["access_token"], auth["refresh_token"])
-    return {"signed_in": True, "mode": "private"}
+    # Password authentication alone never opens the private workspace.
+    return auth_state(checked.json(), auth["access_token"])
 
 
-def owner(request: Request, response: Response) -> tuple[str, str]:
-    """Validate JWT with Supabase Auth, not client claims or unsigned JWT decoding."""
+def verified_totp(user: dict) -> list[str]:
+    """Only verified authenticator factors may be used for step-up sign-in."""
+    factors = user.get("factors") or []
+    return [str(f["id"]) for f in factors
+            if f.get("status") == "verified"
+            and f.get("factor_type", f.get("type")) == "totp"
+            and FACTOR_RE.fullmatch(str(f.get("id", "")))]
+
+
+def trusted_aal(token: str, uid: str) -> str:
+    """Inspect claims ONLY after /auth/v1/user has verified this exact token.
+
+    This is not generic JWT verification. The Supabase Auth server is our
+    verifier; unvalidated, browser-provided claims must never call this.
+    """
+    try:
+        payload = token.split(".")[1]
+        raw = base64.urlsafe_b64decode(payload + "=" * (-len(payload) % 4))
+        claims = json.loads(raw)
+    except (IndexError, ValueError, TypeError, UnicodeDecodeError, binascii.Error) as exc:
+        raise HTTPException(401, "Invalid authenticated session token.") from exc
+    if claims.get("sub") != uid or claims.get("role") != "authenticated":
+        raise HTTPException(401, "Session identity mismatch.")
+    return claims.get("aal", "aal1")
+
+
+def auth_state(user: dict, token: str) -> dict:
+    uid = str(user.get("id", ""))
+    aal = trusted_aal(token, uid)
+    if aal == "aal2" and verified_totp(user):
+        return {"signed_in": True, "mode": "private", "mfa_required": False}
+    return {"signed_in": False, "mfa_required": True,
+            "mfa_setup": not bool(verified_totp(user))}
+
+
+def authenticated_owner(request: Request, response: Response) -> tuple[str, str, dict]:
+    """Validate the exact access token via Supabase, refreshing only when needed."""
     token = request.cookies.get("qf_access", "")
     if not token and not request.cookies.get("qf_refresh"):
         raise HTTPException(401, "Sign in first.")
@@ -132,24 +177,96 @@ def owner(request: Request, response: Response) -> tuple[str, str]:
         r = sb_request("GET", "/auth/v1/user", token=token)
         if r.status_code == 200:
             cookie(response, token, new["refresh_token"])
-    if r.status_code != 200:
+    if r is None or r.status_code != 200:
         raise HTTPException(401, "Sign in again.")
     user = r.json()
     uid = str(user.get("id", ""))
     if uid != config("OWNER_USER_ID") or not user.get("email_confirmed_at"):
         raise HTTPException(403, "Not authorized.")
+    return uid, token, user
+
+
+def owner(request: Request, response: Response) -> tuple[str, str]:
+    uid, token, user = authenticated_owner(request, response)
+    if not auth_state(user, token)["signed_in"]:
+        raise HTTPException(403, "Authenticator verification required to access private data.")
     return uid, token
 
 
 @app.get("/api/auth/session")
 def session(request: Request, response: Response):
     try:
-        owner(request, response)
+        _uid, token, user = authenticated_owner(request, response)
     except HTTPException as e:
         if e.status_code in (401, 403):
-            return {"signed_in": False}
+            return {"signed_in": False, "mfa_required": False}
         raise
-    return {"signed_in": True, "mode": "private"}
+    return auth_state(user, token)
+
+
+@app.get("/api/auth/mfa/factors")
+def mfa_factors(request: Request, response: Response):
+    _uid, _token, user = authenticated_owner(request, response)
+    factors = verified_totp(user)
+    if not factors:
+        raise HTTPException(409, "Authenticator setup required first.")
+    return {"factor_id": factors[0]}
+
+
+@app.post("/api/auth/mfa/enroll")
+def mfa_enroll(request: Request, response: Response):
+    _uid, token, user = authenticated_owner(request, response)
+    if verified_totp(user):
+        raise HTTPException(409, "An authenticator is already enrolled. Enter its code.")
+    r = sb_request("POST", "/auth/v1/factors", token=token,
+                   payload={"factor_type": "totp",
+                            "friendly_name": "QuantForge " + secrets.token_hex(4)})
+    if r.status_code not in (200, 201):
+        raise HTTPException(409, "Unable to start authenticator setup. Try signing in again.")
+    factor = r.json()
+    totp = factor.get("totp") or {}
+    factor_id = str(factor.get("id", ""))
+    qr = totp.get("qr_code", "")
+    if not FACTOR_RE.fullmatch(factor_id) or not isinstance(qr, str) or not qr.lstrip().startswith("<svg") or len(qr) > 100_000:
+        raise HTTPException(503, "Invalid authenticator enrollment response.")
+    # This QR is sensitive. Return only to authenticated owner over no-store,
+    # never save or log it. Do not send the underlying key to static site code.
+    return {"factor_id": factor_id, "qr_svg": qr}
+
+
+class MFAVerification(BaseModel):
+    factor_id: str = Field(min_length=36, max_length=36)
+    code: str = Field(min_length=6, max_length=6)
+
+
+@app.post("/api/auth/mfa/verify")
+def mfa_verify(data: MFAVerification, request: Request, response: Response):
+    uid, token, user = authenticated_owner(request, response)
+    if not FACTOR_RE.fullmatch(data.factor_id) or not TOTP_RE.fullmatch(data.code):
+        raise HTTPException(422, "Enter the six-digit authenticator code.")
+    factors = verified_totp(user)
+    if factors and data.factor_id not in factors:
+        raise HTTPException(403, "Unknown authenticator factor.")
+    challenge = sb_request("POST", f"/auth/v1/factors/{data.factor_id}/challenge",
+                           token=token, payload={})
+    if challenge.status_code not in (200, 201) or not challenge.json().get("id"):
+        raise HTTPException(401, "Could not begin authenticator verification.")
+    result = sb_request("POST", f"/auth/v1/factors/{data.factor_id}/verify", token=token,
+                        payload={"challenge_id": challenge.json()["id"], "code": data.code})
+    if result.status_code != 200:
+        raise HTTPException(401, "Invalid or expired authenticator code.")
+    tokens = result.json()
+    upgraded = tokens.get("access_token", "")
+    refresh = tokens.get("refresh_token", "")
+    if not upgraded or not refresh:
+        raise HTTPException(503, "Supabase did not return the verified session.")
+    checked = sb_request("GET", "/auth/v1/user", token=upgraded)
+    if checked.status_code != 200 or str(checked.json().get("id", "")) != uid:
+        raise HTTPException(401, "Authenticator session could not be validated.")
+    if not auth_state(checked.json(), upgraded)["signed_in"]:
+        raise HTTPException(403, "Authenticator verification did not reach MFA assurance level.")
+    cookie(response, upgraded, refresh)
+    return {"signed_in": True, "mode": "private", "mfa_required": False}
 
 
 @app.post("/api/auth/logout")

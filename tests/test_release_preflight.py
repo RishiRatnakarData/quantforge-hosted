@@ -5,7 +5,6 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("prepublish_check", ROOT / "tools" / "prepublish_check.py")
 preflight = importlib.util.module_from_spec(spec)

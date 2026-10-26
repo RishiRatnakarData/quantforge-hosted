@@ -1,3 +1,5 @@
+> **V5.6.1 MFA source update (not yet deployed):** 221 Python tests passed, 1 optional DuckDB skip in batch runs; authenticator MFA and AAL2 policy migration prepared. Requires Cloudflare/Render/Supabase deployment and live validation. [Guide](MFA_UPGRADE_V5_6_1.md).
+
 ## V5.6 hosted deployment status (October 2026)
 
 Cloudflare Pages + Render + Supabase source prepared; **not deployed or live-integrated**. Public synthetic calculators and hosted single-owner virtual portfolio/notes have automated and mocked browser/API tests. Remote authentication, HTTP-only cookies, RLS and live provider integration require independent verification on deployed accounts. The hosted Quant/DCF/ML tabs still use synthetic JavaScript methods; the full Python algorithms remain in the local app. See [hosting instructions](HOSTED_WEBSITE_V5_6.md).
