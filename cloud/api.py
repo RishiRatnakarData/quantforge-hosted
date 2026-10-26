@@ -16,6 +16,8 @@ import re
 import secrets
 from decimal import ROUND_DOWN
 from typing import Any
+from urllib.parse import unquote
+from xml.etree import ElementTree as ET
 
 import requests
 from fastapi import FastAPI, HTTPException, Request, Response
@@ -213,6 +215,38 @@ def mfa_factors(request: Request, response: Response):
     return {"factor_id": factors[0]}
 
 
+def normalize_totp_qr_svg(raw: Any) -> str:
+    """Validate the SVG image returned by Supabase Auth without revealing its secret.
+
+    GoTrue's REST API normally returns raw SVG. The same valid SVG can include
+    an XML declaration, or be supplied with the data-URL prefix used by some
+    Supabase client SDKs. Never log the QR or TOTP secret.
+    """
+    if not isinstance(raw, str) or not raw or len(raw) > 100_000:
+        raise HTTPException(503, "Authenticator enrollment returned an invalid QR image.")
+    candidate = raw.strip()
+    if candidate.lower().startswith("data:"):
+        prefix, separator, payload = candidate.partition(",")
+        if not separator or prefix.lower() not in {
+            "data:image/svg+xml;utf-8",
+            "data:image/svg+xml;charset=utf-8",
+        }:
+            raise HTTPException(503, "Authenticator enrollment returned an unsupported QR image.")
+        candidate = unquote(payload).strip()
+    if len(candidate) > 100_000 or any(
+        item in candidate.lower()
+        for item in ("<!doctype", "<!entity", "<script", "<foreignobject")
+    ):
+        raise HTTPException(503, "Authenticator enrollment returned an invalid QR image.")
+    try:
+        node = ET.fromstring(candidate)
+    except ET.ParseError as exc:
+        raise HTTPException(503, "Authenticator enrollment returned malformed QR SVG.") from exc
+    if node.tag not in ("svg", "{http://www.w3.org/2000/svg}svg"):
+        raise HTTPException(503, "Authenticator enrollment returned a non-SVG QR image.")
+    return candidate
+
+
 @app.post("/api/auth/mfa/enroll")
 def mfa_enroll(request: Request, response: Response):
     _uid, token, user = authenticated_owner(request, response)
@@ -226,9 +260,9 @@ def mfa_enroll(request: Request, response: Response):
     factor = r.json()
     totp = factor.get("totp") or {}
     factor_id = str(factor.get("id", ""))
-    qr = totp.get("qr_code", "")
-    if not FACTOR_RE.fullmatch(factor_id) or not isinstance(qr, str) or not qr.lstrip().startswith("<svg") or len(qr) > 100_000:
-        raise HTTPException(503, "Invalid authenticator enrollment response.")
+    if not FACTOR_RE.fullmatch(factor_id):
+        raise HTTPException(503, "Authenticator enrollment returned an invalid factor ID.")
+    qr = normalize_totp_qr_svg(totp.get("qr_code", ""))
     # This QR is sensitive. Return only to authenticated owner over no-store,
     # never save or log it. Do not send the underlying key to static site code.
     return {"factor_id": factor_id, "qr_svg": qr}
