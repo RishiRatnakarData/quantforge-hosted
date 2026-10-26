@@ -9,13 +9,18 @@ let state={cash:3500,holdings:{MSFT:5,VOO:8,AAPL:3,'BTC/USD':0.006}};
 const table=(heads,rows)=>'<div class="table-wrap"><table><thead><tr>'+heads.map(h=>'<th>'+h+'</th>').join('')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+row.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
 const error=(id,msg)=>{$(id).textContent=msg||'';};
 const num=id=>Number($(id).value);
-function nav(name){
+const PUBLIC_PAGES=new Set(['overview','sec','portfolio','quant','valuation','ml','methods']);
+function nav(name,updateHash=true){
+ if(name!=='private' && !PUBLIC_PAGES.has(name))return;
  document.querySelectorAll('.tabpage').forEach(e=>e.classList.toggle('active',e.id==='page-'+name));
- document.querySelectorAll('.nav-btn').forEach(e=>e.classList.toggle('active',e.dataset.page===name));
- const badge=document.querySelector('.topbar .badge');
- if(badge){const labels={overview:'REAL SEC DATA + SIMULATIONS',sec:'REPORTED SEC FINANCIALS',portfolio:'SIMULATED PORTFOLIO',quant:'SIMULATED RETURNS',valuation:'ILLUSTRATIVE DCF',ml:'SIMULATED PEER INPUTS',private:'PRIVATE WORKSPACE'};badge.textContent=labels[name]||'PUBLIC DEMO';}
+ document.querySelectorAll('.nav-btn').forEach(e=>{const active=e.dataset.page===name;e.classList.toggle('active',active);if(active)e.setAttribute('aria-current','page');else e.removeAttribute('aria-current');});
+ const labels={overview:'REAL SEC DATA + SIMULATIONS',sec:'REPORTED SEC FINANCIALS',portfolio:'SIMULATED PORTFOLIO',quant:'SIMULATED RETURNS',valuation:'ILLUSTRATIVE DCF',ml:'SIMULATED PEER INPUTS',methods:'METHODOLOGY & SOURCES',private:'PRIVATE WORKSPACE'};
+ const badge=document.querySelector('.topbar .badge');if(badge)badge.textContent=labels[name];
+ const eyebrow=document.querySelector('.topbar .eyebrow');if(eyebrow)eyebrow.textContent=name==='private'?'Your portfolio · Personal use':'QuantForge · Limited public research demo';
+ if(updateHash && PUBLIC_PAGES.has(name))history.replaceState(null,'','#'+name);
  window.scrollTo({top:0,behavior:'instant'});
 }
+
 function portfolio(){
  const holds=M.exposure(state.holdings),total=holds.total+state.cash;
  $('home-value').textContent=$('portfolio-total').textContent=fmt(total);
@@ -137,9 +142,13 @@ function populate(){
  portfolio();runQuant();runDCF();runPeers();renderSEC();renderSECHighlights();
 }
 document.addEventListener('click',e=>{
- const btn=e.target.closest('[data-page], [data-go], [data-symbol]');if(!btn)return;
+ const btn=e.target.closest('[data-page], [data-go], [data-symbol], [data-sec-symbol]');if(!btn)return;
  if(btn.dataset.page)nav(btn.dataset.page);
  else if(btn.dataset.go)nav(btn.dataset.go);
+ else if(btn.dataset.secSymbol){
+  const symbol=btn.dataset.secSymbol;
+  if(SEC_DATA && SEC_DATA.companies.some(c=>c.symbol===symbol)){$('sec-company').value=symbol;renderSEC();nav('sec');}
+ }
  else if(btn.dataset.symbol){$('trade-symbol').value=btn.dataset.symbol;nav('portfolio');}
 });
 $('trade-submit').addEventListener('click',transact);
@@ -149,5 +158,9 @@ $('dcf-run').addEventListener('click',runDCF);
 $('ml-run').addEventListener('click',runPeers);
 $('sec-company').addEventListener('change',renderSEC);
 $('sec-margin-shock').addEventListener('input',renderSEC);
+window.addEventListener('hashchange',()=>{const target=window.location.hash.slice(1);if(PUBLIC_PAGES.has(target))nav(target,false);});
 populate();
+const initial=window.location.hash.slice(1);if(PUBLIC_PAGES.has(initial))nav(initial,false);
+const methodsAsOf=$('methods-asof');if(methodsAsOf && SEC_DATA && SEC_DATA.as_of)methodsAsOf.textContent='SEC filing cutoff · '+SEC_DATA.as_of;
+
 })();

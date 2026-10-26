@@ -145,11 +145,13 @@ async function checkSession(){
   catch(e){message('Private authentication needs attention: '+e.message);}
 }
 function updateMode(){
+ // Public page labels belong to app.js navigation; never overwrite them.
  const active=document.querySelector('.tabpage.active')?.id==='page-private';
+ if(!active)return;
  const badge=document.querySelector('.topbar .badge');
- if(badge)badge.textContent=active?'PRIVATE WORKSPACE':'FICTIONAL DATA';
+ if(badge)badge.textContent='PRIVATE WORKSPACE';
  const eyebrow=document.querySelector('.topbar .eyebrow');
- if(eyebrow)eyebrow.textContent=active?'Your portfolio · Personal use':'Investment research · Public demonstration';
+ if(eyebrow)eyebrow.textContent='Your portfolio · Personal use';
 }
 $('private-login-submit').addEventListener('click',login);
 $('private-mfa-submit').addEventListener('click',verifyMFA);
