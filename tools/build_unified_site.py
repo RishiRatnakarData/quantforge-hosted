@@ -98,6 +98,9 @@ block='''<section class="tabpage" id="page-private">
         </div>
         <div class="controls"><button class="btn primary" type="button" id="private-wf-run">Run walk-forward test</button><button class="btn" id="private-wf-export" type="button" disabled>Export test windows CSV</button></div>
         <div id="private-wf-output" style="margin-top:15px" aria-live="polite">Load historical investments in Market research to begin.</div>
+        <div id="private-wf-diagnostics" class="pane" hidden style="margin-top:14px"><h3>Evaluation diagnostics</h3><div id="private-wf-diagnostics-content"></div>
+          <div class="controls"><button class="btn" type="button" id="private-wf-robustness" disabled>Check transaction-cost sensitivity</button><button class="btn" type="button" id="private-wf-report" disabled>Download research report (JSON)</button></div>
+          <div id="private-wf-robustness-output" aria-live="polite"></div></div>
         <p class="tiny">Model uses price-only historical returns; no dividends, borrow costs, slippage, taxes, or corporate-action simulations. Backtests remain subject to selection bias and do not establish future performance.</p>
       </div>
     </section>
@@ -119,6 +122,8 @@ block='''<section class="tabpage" id="page-private">
         </div>
         <div class="controls"><button class="btn primary" id="private-fc-run" type="button">Forecast selected company</button></div>
         <div id="private-fc-output" style="margin-top:15px" aria-live="polite">Load SEC statements for a selected company first.</div>
+        <div id="private-fc-diagnostics" class="pane" hidden style="margin-top:14px"><h3>Forecast assumption sensitivity</h3><div id="private-fc-diagnostics-content"></div>
+          <div class="controls"><button class="btn" type="button" id="private-fc-report" disabled>Download financial research report (JSON)</button></div></div>
       </div>
       <div class="pane"><h3>Selected company comparison</h3><div id="private-peers"></div></div>
     </section>
@@ -168,7 +173,7 @@ for slot, file in [('/* QF_MODEL */','model.js'),('/* QF_APP */','app.js'),('/* 
  text=(src/'site'/file).read_text(encoding="utf-8")
  if file=='private.js':
   # Bundled alongside the existing private script: still only three CSP-protected scripts.
-  text=(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_multimarket.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_forecast_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_walkforward_v65.js').read_text(encoding='utf-8')+'\n'+text
+  text=(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_multimarket.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_forecast_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_walkforward_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_diagnostics_v66.js').read_text(encoding='utf-8')+'\n'+text
  if file=='app.js':
   assert text.count('/* QF_SEC_DATA */ null')==1
   # Bundle pure SEC analytics in the existing public app script. CSP remains 3 hashes.

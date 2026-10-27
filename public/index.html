@@ -213,6 +213,9 @@
         </div>
         <div class="controls"><button class="btn primary" type="button" id="private-wf-run">Run walk-forward test</button><button class="btn" id="private-wf-export" type="button" disabled>Export test windows CSV</button></div>
         <div id="private-wf-output" style="margin-top:15px" aria-live="polite">Load historical investments in Market research to begin.</div>
+        <div id="private-wf-diagnostics" class="pane" hidden style="margin-top:14px"><h3>Evaluation diagnostics</h3><div id="private-wf-diagnostics-content"></div>
+          <div class="controls"><button class="btn" type="button" id="private-wf-robustness" disabled>Check transaction-cost sensitivity</button><button class="btn" type="button" id="private-wf-report" disabled>Download research report (JSON)</button></div>
+          <div id="private-wf-robustness-output" aria-live="polite"></div></div>
         <p class="tiny">Model uses price-only historical returns; no dividends, borrow costs, slippage, taxes, or corporate-action simulations. Backtests remain subject to selection bias and do not establish future performance.</p>
       </div>
     </section>
@@ -234,6 +237,8 @@
         </div>
         <div class="controls"><button class="btn primary" id="private-fc-run" type="button">Forecast selected company</button></div>
         <div id="private-fc-output" style="margin-top:15px" aria-live="polite">Load SEC statements for a selected company first.</div>
+        <div id="private-fc-diagnostics" class="pane" hidden style="margin-top:14px"><h3>Forecast assumption sensitivity</h3><div id="private-fc-diagnostics-content"></div>
+          <div class="controls"><button class="btn" type="button" id="private-fc-report" disabled>Download financial research report (JSON)</button></div></div>
       </div>
       <div class="pane"><h3>Selected company comparison</h3><div id="private-peers"></div></div>
     </section>
@@ -982,6 +987,7 @@ const methodsAsOf=$('methods-asof');if(methodsAsOf && SEC_DATA && SEC_DATA.as_of
    const fitted=optimizer.run(training,{objective,maxWeight:cap});
    const strategies=[fitted.chosen,Array(N).fill(1/N)];
    const next=Math.min(at+step,T-1);
+   const feesBefore=[...fees],turnoversBefore=[...turnovers];
    for(let k=0;k<2;k++){
     const current=shares[k].map((n,i)=>n*prices[i][at]);
     const total=cash[k]+sum(current),target=strategies[k].map(w=>total*w);
@@ -994,7 +1000,9 @@ const methodsAsOf=$('methods-asof');if(methodsAsOf && SEC_DATA && SEC_DATA.as_of
    }
    windows.push({trainingStart:history.dates[at-train+1],trainingEnd:history.dates[at],
     testStart:history.dates[at+1],testEnd:history.dates[next],
-    weights:[...fitted.chosen],benchmarkWeights:[...strategies[1]]});
+    weights:[...fitted.chosen],benchmarkWeights:[...strategies[1]],
+    rebalanceFees:[fees[0]-feesBefore[0],fees[1]-feesBefore[1]],
+    rebalanceTurnover:[turnovers[0]-turnoversBefore[0],turnovers[1]-turnoversBefore[1]]});
    for(let t=at+1;t<=next;t++){
     const values=shares.map(x=>sum(x.map((n,i)=>n*prices[i][t])));
     if(values.some(x=>!finite(x)||x<=0))throw Error('Invalid out-of-sample wealth.');
@@ -1009,6 +1017,169 @@ const methodsAsOf=$('methods-asof');if(methodsAsOf && SEC_DATA && SEC_DATA.as_of
    source:history.source||'Historical price observations',description:'Historical rolling-origin test, not live/predictive performance'};
  }
  return {run,metrics};
+});
+
+/* QuantForge V6.6: research-quality diagnostics over previously loaded private results.
+   Pure computations; no external requests, credentials, trades, or storage side effects. */
+(function(root, factory) {
+  'use strict';
+  const value = factory(
+    root.QFPrivateForecast || (typeof require === 'function' ? require('./private_forecast_v65.js') : null),
+    root.QFPrivateWalkforward || (typeof require === 'function' ? require('./private_walkforward_v65.js') : null)
+  );
+  if (typeof module === 'object' && module.exports) module.exports = value;
+  else root.QFPrivateDiagnostics = value;
+})(typeof window !== 'undefined' ? window : this, function(forecast, walkforward) {
+  'use strict';
+  const finite = x => typeof x === 'number' && Number.isFinite(x);
+  const sum = values => values.reduce((acc, v) => acc + v, 0);
+  const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+  const round = n => Math.round(n * 1e10) / 1e10;
+
+  function summarizeWalkforward(result) {
+    if (!result || !Array.isArray(result.windows) || !result.windows.length ||
+        !Array.isArray(result.symbols) || result.symbols.length < 2 ||
+        !Array.isArray(result.dates) || !result.dates.length ||
+        !Array.isArray(result.optimized?.wealth) || !Array.isArray(result.benchmark?.wealth) ||
+        result.optimized.wealth.length !== result.dates.length ||
+        result.benchmark.wealth.length !== result.dates.length) {
+      throw Error('Valid walk-forward results are required for diagnostics.');
+    }
+    const dateIndices = new Map(result.dates.map((d, i) => [d, i]));
+    if (dateIndices.size !== result.dates.length || result.dates.some(d => !datePattern.test(d))) {
+      throw Error('Evaluation dates must be distinct, chronological ISO dates.');
+    }
+    let endBefore = 0;
+    const rows = result.windows.map((window, index) => {
+      const start = dateIndices.get(window.testStart);
+      const end = dateIndices.get(window.testEnd);
+      if (!Number.isInteger(start) || !Number.isInteger(end) || start !== endBefore + 1 || end < start ||
+          !datePattern.test(window.trainingEnd) || window.trainingEnd >= window.testStart ||
+          !Array.isArray(window.weights) || window.weights.length !== result.symbols.length ||
+          window.weights.some(w => !finite(w) || w < -1e-8 || w > 1 + 1e-8) ||
+          Math.abs(sum(window.weights) - 1) > 1e-6) {
+        throw Error('Walk-forward evaluation boundaries or weights are inconsistent.');
+      }
+      const a = result.optimized.wealth, b = result.benchmark.wealth;
+      const values = [a[start - 1], a[end], b[start - 1], b[end]];
+      if (values.some(x => !finite(x) || x <= 0)) throw Error('Invalid portfolio wealth observations.');
+      const opt = a[end] / a[start - 1] - 1;
+      const bench = b[end] / b[start - 1] - 1;
+      const fees = window.rebalanceFees;
+      const turnover = window.rebalanceTurnover;
+      if (!Array.isArray(fees) || fees.length !== 2 || fees.some(x => !finite(x) || x < 0) ||
+          !Array.isArray(turnover) || turnover.length !== 2 || turnover.some(x => !finite(x) || x < 0)) {
+        throw Error('Per-window fee and turnover bookkeeping is missing. Re-run the test.');
+      }
+      endBefore = end;
+      return {index: index + 1, trainingEnd: window.trainingEnd,
+        testStart: window.testStart, testEnd: window.testEnd, sessions: end - start + 1,
+        optimizedReturn: opt, benchmarkReturn: bench, activeReturn: opt - bench,
+        optimizedFees: fees[0], benchmarkFees: fees[1],
+        optimizedTurnover: turnover[0], benchmarkTurnover: turnover[1],
+        weights: [...window.weights]};
+    });
+    if (endBefore !== result.dates.length - 1) throw Error('Some evaluation dates are not covered by windows.');
+    const reportedFees = [result.optimized.fees, result.benchmark.fees];
+    const totals = [sum(rows.map(x => x.optimizedFees)), sum(rows.map(x => x.benchmarkFees))];
+    if (reportedFees.some((v, i) => !finite(v) || Math.abs(v - totals[i]) > Math.max(1e-5, Math.abs(v) * 1e-7))) {
+      throw Error('Per-window fees do not reconcile with total costs.');
+    }
+    const changes = rows.slice(1).map((w, i) =>
+      sum(w.weights.map((weight, j) => Math.abs(weight - rows[i].weights[j]))) / 2);
+    const allReturns = rows.map(r => r.activeReturn);
+    const capBinding = rows.filter(w => w.weights.some(weight => Math.abs(weight - result.cap) < 1e-4)).length;
+    return {symbols: [...result.symbols], source: result.source, train: result.train,
+      step: result.step, feeBps: result.feeBps, capital: result.capital,
+      annualization: result.annual, start: result.start, end: result.end,
+      rows, windowsCount: rows.length, positiveActiveWindows: allReturns.filter(x => x > 0).length,
+      negativeActiveWindows: allReturns.filter(x => x < 0).length,
+      meanWeightChange: changes.length ? sum(changes) / changes.length : 0,
+      maxWeightChange: changes.length ? Math.max(...changes) : 0,
+      capBindingWindows: capBinding,
+      totalFees: totals,
+      optimizedReturn: result.optimized.metrics.change,
+      benchmarkReturn: result.benchmark.metrics.change,
+      activeCompoundedReturn: result.optimized.metrics.change - result.benchmark.metrics.change};
+  }
+
+  function costSensitivity(history, baseline) {
+    if (!walkforward || !baseline) throw Error('Loaded walk-forward results required.');
+    const baselineParams = {train: baseline.train, step: baseline.step,
+      objective: baseline.objective, cap: baseline.cap, capital: baseline.capital};
+    const scenarios = [0, baseline.feeBps, Math.min(100, baseline.feeBps + 15)];
+    const distinct = [...new Set(scenarios)];
+    return distinct.map(feeBps => {
+      // Every fee scenario re-fits using exactly the same past-only training schedule.
+      const run = walkforward.run(history, {...baselineParams, feeBps});
+      if (run.start !== baseline.start || run.end !== baseline.end ||
+          run.windows.length !== baseline.windows.length ||
+          run.symbols.join('|') !== baseline.symbols.join('|')) {
+        throw Error('Transaction-cost scenarios do not share the same observation window.');
+      }
+      return {feeBps, optimizedChange: run.optimized.metrics.change,
+        benchmarkChange: run.benchmark.metrics.change,
+        activeChange: run.optimized.metrics.change - run.benchmark.metrics.change,
+        optimizedFees: run.optimized.fees, benchmarkFees: run.benchmark.fees};
+    });
+  }
+
+  function forecastSensitivity(company, opts) {
+    if (!forecast) throw Error('Forecast engine unavailable.');
+    const base = forecast.run(company, opts);
+    const growth = Number(opts.growth), discount = Number(opts.discount);
+    const offsets = [-0.04, -0.02, 0, 0.02, 0.04];
+    const growthRates = offsets.map(x => round(growth + x));
+    const discountRates = offsets.map(x => round(discount + x));
+    const cells = discountRates.map(rate => growthRates.map(g => {
+      if (g < -0.30 || g > 0.40 || rate < 0.02 || rate > 0.30 || rate <= Number(opts.terminal)) return null;
+      try {
+        // Hold forecast horizon, cash-flow margin and terminal growth fixed.
+        const calc = forecast.run(company, {...opts, growth: g, discount: rate});
+        return calc.scenarios.find(s => s.name === 'Base case')?.proxy ?? null;
+      } catch (_) { return null; }
+    }));
+    const historicalGrowth = base.historic.map(x => x.revenueGrowth).filter(finite);
+    return {symbol: base.symbol, company: base.name, source: base.source, asOf: base.asOf,
+      fiscalEnd: base.fiscalEnd, growthRates, discountRates, cells,
+      fcfAvailable: base.fcfAvailable,
+      historicalPeriods: base.historic.length,
+      observedGrowthMin: historicalGrowth.length ? Math.min(...historicalGrowth) : null,
+      observedGrowthMax: historicalGrowth.length ? Math.max(...historicalGrowth) : null,
+      observedGrowthAverage: historicalGrowth.length ? sum(historicalGrowth) / historicalGrowth.length : null,
+      baseCaseProxy: base.scenarios.find(s => s.name === 'Base case')?.proxy ?? null,
+      assumptions: {years: base.years, growth, fcfMargin: Number(opts.fcfMargin), discount,
+        terminal: Number(opts.terminal)}};
+  }
+
+  function report(type, result, diagnostics) {
+    if (!['walkforward', 'forecast'].includes(type) || !diagnostics) throw Error('Research report unavailable.');
+    // Deliberately exclude provider tokens, raw Alpaca price feeds, private holdings, and note contents.
+    if (type === 'walkforward') return {
+      schema: 'quantforge.research.v1', type, historicalOnly: true,
+      attribution: 'Alpaca historical market observations', createdFor: 'Local research export',
+      investments: [...result.symbols], priceSource: result.source,
+      methodology: 'Rolling past-only fitting and subsequent non-overlapping evaluation; same fee rule for both strategies.',
+      limitations: ['Retrospective simulation, not live trading', 'Selection and optimization bias are possible',
+        'No dividends, spread, slippage, taxes or borrow costs', 'IEX is not consolidated SIP coverage when fallback occurs'],
+      parameters: {train: result.train, step: result.step, objective: result.objective,
+        cap: result.cap, feeBps: result.feeBps, capital: result.capital, annualization: result.annual},
+      period: {start: result.start, end: result.end},
+      optimized: {metrics: result.optimized.metrics, totalFees: result.optimized.fees},
+      benchmark: {metrics: result.benchmark.metrics, totalFees: result.benchmark.fees},
+      diagnosticSummary: diagnostics};
+    return {schema: 'quantforge.research.v1', type, hypothetical: true,
+      company: diagnostics.company, symbol: diagnostics.symbol, source: diagnostics.source,
+      asOf: diagnostics.asOf, fiscalEnd: diagnostics.fiscalEnd,
+      methodology: 'Annual revenue compounding, assumed FCF/revenue margin, discounted FCF-plus-terminal proxy.',
+      limitations: ['Not company enterprise value, equity value or per-share price target',
+        'Not a predictive model or audited forecast', 'No capital-structure adjustments',
+        'Few observed SEC years; scenarios depend heavily on assumptions'],
+      observedSECAnnual: result.historic,
+      modeledScenarios: result.scenarios,
+      sensitivity: diagnostics};
+  }
+  return {summarizeWalkforward, costSensitivity, forecastSensitivity, report};
 });
 
 /* Hosted private mode, same Cloudflare website. No credentials or provider keys in source. */
@@ -1131,7 +1302,7 @@ async function logout(){
   clearMFA();showStep('login');privateState=null;quoted={};historyLoadSequence++;historySeries=null;closeAssetBrowser();researchSelection=[];$('private-symbol').value='';$('private-selected-asset').textContent='No investment selected';renderResearchSelection();
   optimizerResult=null;$('private-opt-export').disabled=true;$('private-opt-output').textContent='Load market history to begin.';$('private-opt-risk').textContent='';
   $('private-history-chart').textContent='Load a historical series to begin.';$('private-risk-results').textContent='';$('private-backtest-output').textContent='';$('private-valuation-output').textContent='';$('private-peers').textContent='';$('private-concentration').textContent='';$('private-positions').textContent='';
-  $('private-wf-output').textContent='Load historical investments in Market research to begin.';$('private-wf-export').disabled=true;walkforwardResult=null;
+  $('private-wf-output').textContent='Load historical investments in Market research to begin.';$('private-wf-export').disabled=true;walkforwardResult=null;clearV66Walkforward();clearV66Forecast();
   $('private-fc-output').textContent='Load SEC statements for a selected company first.';
   $('private-total').textContent='—';$('private-invested').textContent='—';
   $('private-cash').textContent='—';$('private-notes').textContent='';valuationCompanies={};$('private-valuation-company').value='';$('private-valuation-selected').textContent='No company selected';message('Signed out.');privateTab('home');
@@ -1256,7 +1427,7 @@ function chooseAsset(symbol,name,kind){
   $('private-valuation-company').value=symbol;
   $('private-valuation-selected').textContent=name+' ('+symbol+')';
   $('private-valuation-output').textContent='Select Run scenario to load available SEC filings.';
-  $('private-fc-output').textContent='Load SEC statements for the newly selected company first.';
+  $('private-fc-output').textContent='Load SEC statements for the newly selected company first.';clearV66Forecast();
   message('Selected '+name+'. SEC statements will be checked when you run the scenario.');
  }else if(browserState.mode==='trade'){
   $('private-symbol').value=symbol;
@@ -1322,7 +1493,7 @@ function refreshResearchContext(){
 }
 function invalidateResearchHistory(reason){
  historyLoadSequence++;
- historySeries=null;optimizerResult=null;walkforwardResult=null;
+ historySeries=null;optimizerResult=null;walkforwardResult=null;clearV66Walkforward();
  $('private-opt-export').disabled=true;$('private-wf-export').disabled=true;
  $('private-history-source').textContent='';
  $('private-history-chart').textContent='Load market history for the selected investments.';
@@ -1480,7 +1651,7 @@ async function privateValuation(){
  // Do not allow late fetches from a prior selection to replace the current issuer.
  if($('private-valuation-company').value!==symbol)return;
  $('private-valuation-output').innerHTML=output;
- $('private-fc-output').textContent='Statements loaded. Set projection assumptions and run a forecast.';
+ $('private-fc-output').textContent='Statements loaded. Set projection assumptions and run a forecast.';clearV66Forecast();
  privatePeers();message('SEC filings loaded for '+companyName+'.');
 }
 function privatePeers(){
@@ -1615,6 +1786,69 @@ for(const id of ['private-opt-objective','private-opt-cap'])$(id).addEventListen
 
 /* V6.5: SEC scenario projections and past-only walk-forward evaluations. */
 let walkforwardResult=null;
+/* V6.6: derived reports are ephemeral, not stored with virtual positions. */
+let forecastResultV66=null,forecastDiagnosticsV66=null,walkforwardDiagnosticsV66=null;
+function clearV66Walkforward(){
+ walkforwardDiagnosticsV66=null;
+ $('private-wf-diagnostics').hidden=true;
+ $('private-wf-diagnostics-content').textContent='';
+ $('private-wf-robustness-output').textContent='';
+ $('private-wf-report').disabled=true;
+ $('private-wf-robustness').disabled=true;
+}
+function clearV66Forecast(){
+ forecastResultV66=null;forecastDiagnosticsV66=null;
+ $('private-fc-diagnostics').hidden=true;
+ $('private-fc-diagnostics-content').textContent='';
+ $('private-fc-report').disabled=true;
+}
+function downloadResearchJSON(filename,data){
+ if(!privateState)throw Error('Sign in to export a private research report.');
+ const blob=new Blob([JSON.stringify(data,null,2)+'\n'],{type:'application/json;charset=utf-8'});
+ const url=URL.createObjectURL(blob),link=document.createElement('a');
+ link.href=url;link.download=filename;document.body.appendChild(link);link.click();link.remove();
+ URL.revokeObjectURL(url);
+}
+function showV66ForecastDiagnostics(d,company,opts){
+ const grid=window.QFPrivateDiagnostics.forecastSensitivity(company,opts);
+ forecastResultV66=d;forecastDiagnosticsV66=grid;
+ const header=['Discount / revenue growth',...grid.growthRates.map(percent)];
+ const rows=grid.discountRates.map((rate,i)=>[percent(rate),...grid.cells[i].map(v=>v==null?'Unavailable':usd(v))]);
+ $('private-fc-diagnostics-content').innerHTML='<p class="tiny">Sensitivity of the <strong>hypothetical discounted FCF proxy</strong> to annual revenue growth (columns) and discount rate (rows). FCF margin, horizon, and terminal growth remain unchanged. Not a share price or market forecast.</p>'+displayTable(header,rows)+
+  '<p class="tiny">'+grid.historicalPeriods+' SEC annual periods · observed annual revenue growth range: '+
+  (grid.observedGrowthMin==null?'Unavailable':percent(grid.observedGrowthMin)+' to '+percent(grid.observedGrowthMax))+'. Past growth is not a forecast or an estimate of predictive accuracy. Unavailable cells fail the modeling limits.</p>';
+ $('private-fc-diagnostics').hidden=false;$('private-fc-report').disabled=false;
+}
+function showV66WalkforwardDiagnostics(d){
+ const result=window.QFPrivateDiagnostics.summarizeWalkforward(d);
+ walkforwardDiagnosticsV66=result;
+ const rows=result.rows.map(w=>[String(w.index),w.testStart+' to '+w.testEnd,
+  percent(w.optimizedReturn),percent(w.benchmarkReturn),percent(w.activeReturn),
+  usd(w.optimizedFees),usd(w.benchmarkFees)]);
+ $('private-wf-diagnostics-content').innerHTML='<p class="tiny">Each row compares <strong>two portfolios containing all '+d.symbols.length+' selected investments</strong>. Returns are compounded within each non-overlapping evaluation window, including modeled rebalance fees.</p>'+
+  displayTable(['Window','Unseen test dates','Optimized return','Equal-weight return','Difference (pp)','Optimized fees','Benchmark fees'],rows)+
+  displayTable(['Stability and accounting','Result'],[
+   ['Windows outperforming equal-weight',result.positiveActiveWindows+' / '+result.windowsCount],
+   ['Mean allocation change between fits',percent(result.meanWeightChange)],
+   ['Maximum allocation change between fits',percent(result.maxWeightChange)],
+   ['Windows where maximum weight cap binds',result.capBindingWindows+' / '+result.windowsCount],
+   ['Optimized total fee reconciliation',usd(result.totalFees[0])],
+   ['Equal-weight total fee reconciliation',usd(result.totalFees[1])]])+
+  '<p class="tiny">Allocation change = half the absolute difference between consecutive fitted weight vectors; it is <strong>not</strong> transaction-dollar turnover. Positive window differences do not imply statistical significance. This is a historical simulation with selected assets and assumptions.</p>';
+ $('private-wf-diagnostics').hidden=false;$('private-wf-report').disabled=false;$('private-wf-robustness').disabled=false;
+ $('private-wf-robustness-output').textContent='';
+}
+function runV66CostSensitivity(){
+ if(!privateState||!walkforwardResult||!historySeries){message('Run Walk-forward with loaded historical investments first.');return;}
+ try{
+  const rows=window.QFPrivateDiagnostics.costSensitivity(historySeries,walkforwardResult);
+  $('private-wf-robustness-output').innerHTML='<h4 style="margin:14px 0 8px">Transaction-cost sensitivity</h4>'+displayTable(
+   ['Fee (bps)','Optimized net change','Equal-weight net change','Difference (pp)','Optimized fees'],
+   rows.map(r=>[String(r.feeBps),percent(r.optimizedChange),percent(r.benchmarkChange),percent(r.activeChange),usd(r.optimizedFees)]))+
+   '<p class="tiny">The same assets, training boundaries, objective and cap are used in every scenario. Only the fee assumption changes. These are historical counterfactuals, not execution-quality estimates.</p>';
+ }catch(e){$('private-wf-robustness-output').textContent=e.message;message(e.message);}
+}
+
 const fcMoney=x=>finite(x)?usd(x):'Unavailable';
 function runFinancialForecast(){
  if(!privateState){message('Sign in first.');return;}
@@ -1640,8 +1874,9 @@ function runFinancialForecast(){
    '<p class="tiny">Forecasts are assumptions, not observed SEC values. Revenue is compounded from the latest reported year. FCF is projected using an assumed FCF-to-revenue margin. '+
    (d.baseMargin===null?'Reported FCF margin unavailable; FCF valuation is suppressed.':'Latest reported FCF proxy/revenue: '+percent(d.baseMargin)+'.')+
    ' The discounted total is a simplified cash-flow proxy, NOT company equity value, enterprise value, price target, or per-share valuation. Cash, debt and other capital adjustments are not modeled; historical data may be restated.</p>';
+  showV66ForecastDiagnostics(d,company,{years:d.years,growth:Number($('private-fc-growth').value)/100,fcfMargin:Number($('private-fc-margin').value)/100,discount:d.discount,terminal:d.terminal});
   message('Financial scenarios calculated. No trades placed.');
- }catch(e){$('private-fc-output').textContent=e.message;message(e.message);}
+ }catch(e){clearV66Forecast();$('private-fc-output').textContent=e.message;message(e.message);}
 }
 function wfChart(d){
  const a=d.optimized.wealth,b=d.benchmark.wealth,len=a.length;
@@ -1679,8 +1914,9 @@ function runWalkforward(){
    d.train+' prior training observations per fit · '+d.step+' test observations · '+d.annual+' annualization observations/year · '+safe(d.source)+'</p>'+wfChart(d)+comparison+
    '<h3 style="margin:16px 0 8px">Training and evaluation boundaries</h3>'+windows+
    '<p class="tiny">Each allocation is fitted only through the training-end date shown and held until its next scheduled rebalance. Rebalance fees are charged to both strategies on absolute traded notional, including initial deployment. Trades are assumed at the observed rebalance-date closing price, without bid–ask spreads or slippage. This is a retrospective simulation, not a live or guaranteed out-of-sample trading record. Symbol selection, date selection and model choice can introduce selection bias.</p>';
+  showV66WalkforwardDiagnostics(d);
   message('Walk-forward historical evaluation completed. No trades placed.');
- }catch(e){walkforwardResult=null;$('private-wf-export').disabled=true;$('private-wf-output').textContent=e.message;message(e.message);}
+ }catch(e){walkforwardResult=null;clearV66Walkforward();$('private-wf-export').disabled=true;$('private-wf-output').textContent=e.message;message(e.message);}
 }
 function exportWalkforward(){
  if(!privateState||!walkforwardResult)return;
@@ -1695,12 +1931,21 @@ function exportWalkforward(){
 $('private-fc-run').addEventListener('click',runFinancialForecast);
 $('private-wf-run').addEventListener('click',runWalkforward);
 $('private-wf-export').addEventListener('click',exportWalkforward);
+$('private-wf-robustness').addEventListener('click',runV66CostSensitivity);
+$('private-wf-report').addEventListener('click',()=>{
+ if(!privateState||!walkforwardResult||!walkforwardDiagnosticsV66)return;
+ downloadResearchJSON('quantforge-walkforward-research.json',window.QFPrivateDiagnostics.report('walkforward',walkforwardResult,walkforwardDiagnosticsV66));
+});
+$('private-fc-report').addEventListener('click',()=>{
+ if(!privateState||!forecastResultV66||!forecastDiagnosticsV66)return;
+ downloadResearchJSON('quantforge-sec-forecast-research.json',window.QFPrivateDiagnostics.report('forecast',forecastResultV66,forecastDiagnosticsV66));
+});
 for(const id of ['private-wf-train','private-wf-step','private-wf-mode','private-wf-cap','private-wf-fee','private-wf-capital']){
- $(id).addEventListener('change',()=>{walkforwardResult=null;$('private-wf-export').disabled=true;
+ $(id).addEventListener('change',()=>{walkforwardResult=null;clearV66Walkforward();$('private-wf-export').disabled=true;
   $('private-wf-output').textContent='Settings changed. Re-run walk-forward evaluation.';});
 }
 for(const id of ['private-fc-years','private-fc-growth','private-fc-margin','private-fc-discount','private-fc-terminal']){
- $(id).addEventListener('change',()=>{$('private-fc-output').textContent='Assumptions changed. Re-run company forecast.';});
+ $(id).addEventListener('change',()=>{clearV66Forecast();$('private-fc-output').textContent='Assumptions changed. Re-run company forecast.';});
 }
 
 document.querySelectorAll('[data-private-tab]').forEach(b=>b.addEventListener('click',()=>privateTab(b.dataset.privateTab)));

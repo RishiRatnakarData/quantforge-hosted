@@ -41,6 +41,7 @@
    const fitted=optimizer.run(training,{objective,maxWeight:cap});
    const strategies=[fitted.chosen,Array(N).fill(1/N)];
    const next=Math.min(at+step,T-1);
+   const feesBefore=[...fees],turnoversBefore=[...turnovers];
    for(let k=0;k<2;k++){
     const current=shares[k].map((n,i)=>n*prices[i][at]);
     const total=cash[k]+sum(current),target=strategies[k].map(w=>total*w);
@@ -53,7 +54,9 @@
    }
    windows.push({trainingStart:history.dates[at-train+1],trainingEnd:history.dates[at],
     testStart:history.dates[at+1],testEnd:history.dates[next],
-    weights:[...fitted.chosen],benchmarkWeights:[...strategies[1]]});
+    weights:[...fitted.chosen],benchmarkWeights:[...strategies[1]],
+    rebalanceFees:[fees[0]-feesBefore[0],fees[1]-feesBefore[1]],
+    rebalanceTurnover:[turnovers[0]-turnoversBefore[0],turnovers[1]-turnoversBefore[1]]});
    for(let t=at+1;t<=next;t++){
     const values=shares.map(x=>sum(x.map((n,i)=>n*prices[i][t])));
     if(values.some(x=>!finite(x)||x<=0))throw Error('Invalid out-of-sample wealth.');
