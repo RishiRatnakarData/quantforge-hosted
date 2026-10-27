@@ -25,6 +25,7 @@ function showStep(step){
   $('private-login').hidden=step!=='login';
   $('private-mfa').hidden=step!=='mfa';
   $('private-signed').hidden=step!=='ready';
+  if(step!=='ready')clearAllocationV74();else allocationChoicesV74();
   if(step!=='ready'){valueBridgeRequestV73++;const bridge=$('private-value-output-v73');if(bridge)bridge.textContent='';}
   $('private-status').textContent=step==='ready'?'Private · Authenticator verified':
     step==='mfa'?'Private · Authenticator required':'Private · Sign in required';
@@ -55,6 +56,7 @@ async function handleAuthState(state){
   }
 }
 async function loadState(){
+  clearAllocationV74();
   const d=await api('private/state');privateState=d.portfolio;version=d.version;
   quoted={}; // Never carry fictional quotes across a private session.
   const symbols=Object.keys(privateState.holdings || {});
@@ -1053,6 +1055,92 @@ async function loadValueBridgeV73(){
  }
 }
 $('private-value-run-v73').addEventListener('click',loadValueBridgeV73);
+
+/* V7.4 owner-only virtual allocation what-if: read-only; no write API calls. */
+let allocationTokenV74=0,allocationResultV74=null,allocationRiskV74=null;
+function clearAllocationV74(){
+ allocationTokenV74++;allocationResultV74=null;allocationRiskV74=null;
+ const out=$('private-allocation-results-v74');if(out)out.textContent='';
+ const exp=$('private-allocation-export-v74');if(exp)exp.disabled=true;
+ const go=$('private-allocation-run-v74');if(go)go.disabled=false;
+}
+function allocationChoicesV74(){
+ const picker=$('private-allocation-symbol-v74');if(!picker)return;
+ const previous=picker.value;
+ const holdings=Object.keys(privateState?.holdings||{});
+ const suggested=typeof ideaUniverse!=='undefined'&&Array.isArray(ideaUniverse)?ideaUniverse:[];
+ const all=[...new Set([...suggested,...holdings])].filter(s=>/^[A-Z0-9][A-Z0-9.\/-]{0,19}$/.test(s)).sort();
+ picker.innerHTML='<option value="">Choose an investment</option>'+all.map(s=>'<option value="'+safe(s)+'">'+safe(assetNames[s]||s)+' ('+safe(s)+')</option>').join('');
+ if(all.includes(previous))picker.value=previous;
+ $('private-allocation-selection-v74').textContent=all.length?'Choose among your Investment ideas shortlist and held positions. Add more by name in Investment ideas first.':'Open Investment ideas to select companies by name, then return here.';
+}
+function renderAllocationV74(plan,risk){
+ const pct=n=>typeof n==='number'&&Number.isFinite(n)?(n*100).toFixed(2)+'%':'Unavailable';
+ const rows=[...new Set([...plan.before.positions.map(p=>p.symbol),...plan.after.positions.map(p=>p.symbol)])].sort();
+ const weights=rows.map(s=>{const a=plan.before.positions.find(p=>p.symbol===s)?.weight||0;
+  const b=plan.after.positions.find(p=>p.symbol===s)?.weight||0;
+  return [safe(assetNames[s]||s)+' ('+safe(s)+')',pct(a),pct(b),pct(b-a)];});
+ weights.push(['Virtual cash',pct(plan.before.cashWeight),pct(plan.after.cashWeight),pct(plan.after.cashWeight-plan.before.cashWeight)]);
+ const lines=[
+  ['Observed purchase price',usd(plan.observedPrice)],
+  ['Quote provenance',safe(plan.source)+' / '+safe(plan.priceTime)],
+  ['Proposed virtual spending',usd(plan.proposedBudget)],
+  ['Hypothetical units added',plan.unitsBought.toFixed(6)],
+  ['Cash before / after',usd(plan.cashBefore)+' / '+usd(plan.cashAfter)],
+  ['Total virtual portfolio value (unchanged)',usd(plan.totalAfter)],
+  ['Largest position before / after',pct(plan.before.largest?.weight||0)+' / '+pct(plan.after.largest?.weight||0)],
+  ['Concentration HHI including cash (before / after)',plan.before.hhi.toFixed(4)+' / '+plan.after.hhi.toFixed(4)]
+ ];
+ const riskView=risk?.available?
+  '<h4>Aligned-history volatility sensitivity</h4>'+displayTable(['Measure','Before','After'],[
+   ['Annualized historical volatility',pct(risk.annualizedVolBefore),pct(risk.annualizedVolAfter)],
+   ['Aligned observations',String(risk.sessions),String(risk.sessions)]])+
+   '<p class="tiny">'+safe(risk.firstDate)+' to '+safe(risk.lastDate)+' · '+safe(risk.note)+'</p>':
+   '<p class="notice">Historical volatility comparison unavailable: '+safe(risk?.reason||'Historical data not loaded.')+' The cash and concentration comparison remains available.</p>';
+ $('private-allocation-results-v74').innerHTML='<p class="tiny"><strong>Hypothetical only: no portfolio balances or holdings were changed.</strong> All amounts use observed historical/last-trade quotes, not executable prices.</p>'+
+   displayTable(['Metric','What-if result'],lines)+'<h4>Before vs. after allocations</h4>'+displayTable(['Investment','Before','After','Change'],weights)+riskView+
+   '<h4>Assumptions and cautions</h4><ul class="tiny">'+plan.warnings.map(w=>'<li>'+safe(w)+'</li>').join('')+'</ul>';
+ $('private-allocation-export-v74').disabled=false;
+}
+async function runAllocationV74(){
+ clearAllocationV74();
+ if(!privateState){message('Sign in and load your virtual portfolio first.');return;}
+ const symbol=$('private-allocation-symbol-v74').value;
+ const budget=Number($('private-allocation-budget-v74').value);
+ const target=$('private-allocation-results-v74');
+ if(!symbol){target.textContent='Choose an investment from your shortlist first.';return;}
+ const state=privateState,token=allocationTokenV74;
+ $('private-allocation-run-v74').disabled=true;
+ target.textContent='Fetching fresh private market observations for all current positions…';
+ try{
+  const symbols=[...new Set([...Object.entries(state.holdings||{}).filter(([s,n])=>Number(n)>0).map(([s])=>s),symbol])];
+  if(symbols.length>60)throw Error('Too many virtual positions to compare.');
+  const quotes={};
+  for(let i=0;i<symbols.length;i+=8){
+   const data=await api('private/quotes?symbols='+encodeURIComponent(symbols.slice(i,i+8).join(',')));
+   for(const q of data.quotes||[])if(symbols.includes(q.symbol))quotes[q.symbol]=q;
+   if(token!==allocationTokenV74||privateState!==state)return;
+  }
+  const plan=window.QFPrivateAllocationV74.scenario({holdings:state.holdings,cash:state.cash,quotes,symbol,budget,nowISO:new Date().toISOString()});
+  const aligned=Array.isArray(ideaData)?ideaData:[];
+  const risk=window.QFPrivateAllocationV74.matchedRisk(plan,aligned,252);
+  if(token!==allocationTokenV74||privateState!==state)return;
+  allocationResultV74=plan;allocationRiskV74=risk;
+  renderAllocationV74(plan,risk);
+  message('Hypothetical allocation analyzed. No trades were placed.');
+ }catch(e){if(token===allocationTokenV74&&privateState===state){target.textContent='Unable to calculate: '+e.message;message(e.message);}}
+ finally{if(token===allocationTokenV74)$('private-allocation-run-v74').disabled=false;}
+}
+$('private-allocation-choices-v74').addEventListener('click',()=>{clearAllocationV74();allocationChoicesV74();});
+$('private-allocation-symbol-v74').addEventListener('change',clearAllocationV74);
+$('private-allocation-budget-v74').addEventListener('input',clearAllocationV74);
+$('private-allocation-run-v74').addEventListener('click',runAllocationV74);
+$('private-allocation-export-v74').addEventListener('click',()=>{
+ if(!privateState||!allocationResultV74){message('Calculate the scenario before exporting.');return;}
+ const report=window.QFPrivateAllocationV74.exportResearch(allocationResultV74,allocationRiskV74,{source:ideaSource,period:$('ideas-period').value});
+ downloadResearchJSON('quantforge-allocation-research.json',report);
+ message('Allocation research exported without private account balances, positions, purchase amounts or raw prices.');
+});
 
 $('private-valuation-run').addEventListener('click',privateValuation);
 $('private-valuation-run').addEventListener('click',()=>{valueBridgeRequestV73++;$('private-value-output-v73').textContent='';});

@@ -52,6 +52,17 @@ block='''<section class="tabpage" id="page-private">
     <section class="private-view" data-private-view="home">
       <div class="pane"><div class="three"><div class="metric"><span class="muted">Virtual total</span><strong id="private-total">—</strong></div><div class="metric"><span class="muted">Available cash</span><strong id="private-cash">—</strong></div><div class="metric"><span class="muted">Invested value</span><strong id="private-invested">—</strong></div></div><div class="section-title"><h3>Holdings</h3><button class="btn sm" data-private-tab="trade">Trade</button></div><div id="private-positions"></div></div>
       <div class="pane"><h3>Portfolio concentration</h3><div id="private-concentration" class="tiny" style="margin-top:12px">Add virtual holdings to see allocation.</div></div>
+      <div class="pane" id="private-allocation-card-v74">
+        <h3>Portfolio allocation what-if</h3>
+        <p class="tiny">Explore a proposed purchase using your current virtual cash and observed prices. Nothing is submitted to the virtual trading ledger or real brokerage.</p>
+        <div class="formgrid" style="margin-top:14px">
+          <div class="field"><label for="private-allocation-symbol-v74">Investment</label><select id="private-allocation-symbol-v74"><option value="">Choose an investment</option></select></div>
+          <div class="field"><label for="private-allocation-budget-v74">Hypothetical spending in USD</label><input id="private-allocation-budget-v74" type="number" min="1" step="1" value="250"></div>
+        </div>
+        <p id="private-allocation-selection-v74" class="tiny">Use Investment ideas to choose companies by name first, then refresh your list.</p>
+        <div class="controls"><button class="btn" type="button" id="private-allocation-choices-v74">Refresh investment list</button><button class="btn primary" type="button" id="private-allocation-run-v74">Analyze proposed purchase</button><button class="btn" type="button" id="private-allocation-export-v74" disabled>Export research JSON</button></div>
+        <div id="private-allocation-results-v74" aria-live="polite" style="margin-top:15px"></div>
+      </div>
     </section>
     <section class="private-view" data-private-view="trade" hidden>
       <div class="pane"><h3>Market observation &amp; virtual trade</h3><p class="tiny">Stocks, ETFs, and supported crypto pairs. Market observations are private and read-only; no brokerage orders are placed.</p>
@@ -204,7 +215,7 @@ for slot, file in [('/* QF_MODEL */','model.js'),('/* QF_APP */','app.js'),('/* 
  text=(src/'site'/file).read_text(encoding="utf-8")
  if file=='private.js':
   # Bundled alongside the existing private script: still only three CSP-protected scripts.
-  text=(src/'site/private_ideas_v70.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_value_v73.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_v72.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_multimarket.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_forecast_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_walkforward_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_diagnostics_v66.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_integrity_v67.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_robustness_v68.js').read_text(encoding='utf-8')+'\n'+text
+  text=(src/'site/private_ideas_v70.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_allocation_v74.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_value_v73.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_v72.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_multimarket.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_forecast_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_walkforward_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_diagnostics_v66.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_integrity_v67.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_robustness_v68.js').read_text(encoding='utf-8')+'\n'+text
  if file=='app.js':
   assert text.count('/* QF_SEC_DATA */ null')==1
   # Bundle pure SEC analytics in the existing public app script. CSP remains 3 hashes.
