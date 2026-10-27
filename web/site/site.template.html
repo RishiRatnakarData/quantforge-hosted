@@ -142,11 +142,103 @@ body{font-size:15px;line-height:1.62}main{width:min(1280px,100%)}.app{grid-templ
 @media(max-width:1050px){.lab-skill-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:750px){.lab-skill-grid,.lab-metrics,.lab-fields,.lab-settings{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.lab-skill-grid,.lab-metrics,.lab-fields,.lab-settings{grid-template-columns:1fr}.lab-weight-head,.lab-weight-row{grid-template-columns:minmax(90px,1.3fr) minmax(95px,1.5fr) 58px;gap:5px}.lab-weight-row{font-size:11px}}
+
+/* V8.0: layout and reading-order refinement; additive, no API or model changes. */
+:root{--qf-content:1140px;--qf-radius:12px;--qf-gap:18px}
+html{scroll-behavior:smooth}
+body{overflow-x:hidden}
+.app{grid-template-columns:232px minmax(0,1fr)}
+.app>*,main,.pane,.tabpage,.private-view,.formgrid>*,.two>*,.three>*{min-width:0}
+main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
+.tabpage>*,.private-view>*{max-width:100%}
+.tabpage .pagehead{margin-bottom:24px}
+.tabpage .pagehead p,.intro-simple p,.lab-lead p{max-width:78ch;line-height:1.7}
+.pane{padding:clamp(19px,2.5vw,26px);border-radius:var(--qf-radius);margin-bottom:var(--qf-gap)}
+.section-title,.row,.lab-section-heading,.tech-head{min-width:0;flex-wrap:wrap;row-gap:9px}
+.section-title>*{min-width:0}
+.section-title h3,.pane>h3{line-height:1.4}
+.controls{align-items:center;column-gap:11px;row-gap:10px}
+.controls>.tiny{flex:1 1 210px;max-width:65ch}
+.btn,.private-nav button,.nav-btn{min-height:40px;display:inline-flex;align-items:center;justify-content:center;line-height:1.3;text-align:center;white-space:normal}
+.btn.primary{box-shadow:0 1px 3px rgba(8,57,45,.12)}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.text-link{display:inline-flex;align-items:center;min-height:32px;text-align:left}
+.field{min-width:0}.field label{line-height:1.4}.formgrid{align-items:start;gap:16px}
+.formgrid input,.formgrid select,textarea{max-width:100%}
+.table-wrap,.evidence-data{max-width:100%;overflow-x:auto;scrollbar-width:thin}
+.table-wrap table{min-width:520px}.table-wrap th,.table-wrap td{vertical-align:middle}
+.lab-chart,.tech-visual,.evidence-graph{min-width:0;max-width:100%}
+.lab-chart svg,.tech-visual svg,.evidence-graph svg,.private-view svg{max-width:100%;height:auto}
+.lab-skill-grid,.tech-overview,.method-grid,.two,.three,.listcards{align-items:stretch}
+.lab-skill,.tech-tile,.method-card,.asset{min-width:0}
+.lab-skill small,.tech-tile p,.method-card p{overflow-wrap:anywhere}
+#private-message{padding:0 4px;max-width:85ch}
+#private-signed> .controls{margin-bottom:14px;justify-content:space-between}
+/* Public sidebar groups: top tasks first, supporting demos available on demand. */
+.side{gap:24px;padding:25px 14px 15px}
+.side nav{gap:4px;align-content:start}
+.side .nav-btn{justify-content:flex-start;text-align:left;width:100%;min-height:40px;padding:10px 13px}
+.qf-nav-fold{border-top:1px solid var(--line);padding-top:7px;margin-top:7px;min-width:0}
+.qf-nav-fold>summary{list-style:none;cursor:pointer;font-size:12px;font-weight:750;color:#365e51;padding:11px 13px;border-radius:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:41px}
+.qf-nav-fold>summary::-webkit-details-marker{display:none}
+.qf-nav-fold>summary::after{content:'+';font-size:19px;line-height:1;color:#567b6b}
+.qf-nav-fold[open]>summary::after{content:'−'}
+.qf-nav-fold>summary:hover{background:#eef6f1}
+.qf-nav-fold .nav-btn{padding-left:20px;font-size:13px}
+.qf-nav-fold>summary:focus-visible,.private-nav summary:focus-visible{outline:3px solid #90cab7;outline-offset:2px}
+/* Reading flow: company evidence before illustrative models; keep secondary details skimmable. */
+.qf-home-roadmap{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0 20px}
+.qf-roadmap-card{display:flex;flex-direction:column;gap:6px;border:1px solid #d4e4db;border-radius:12px;background:#fff;padding:16px;text-align:left;min-height:140px}
+.qf-roadmap-card:hover{border-color:#88b9a4;background:#f7fcf8}
+.qf-roadmap-card strong{font-size:14px;line-height:1.4}
+.qf-roadmap-card small{font-size:12px;color:#5f736a;line-height:1.55}
+.qf-roadmap-card span{color:#226954;font-size:10px;font-weight:800;letter-spacing:.08em}
+.qf-secondary-details{border:1px solid var(--line);border-radius:12px;padding:0 15px 15px;margin:0 0 18px;background:#fff}
+.qf-secondary-details>summary{cursor:pointer;font-weight:700;color:#195944;padding:17px 3px;line-height:1.5}
+.qf-secondary-details>.pane{margin-top:10px;box-shadow:none}
+.qf-secondary-details .listcards{margin-bottom:0}
+#page-overview .project-story{margin-top:0}
+#page-overview .intro-simple{margin-bottom:20px}
+/* Private pages: narrower content rhythm and grouped navigational sections. */
+.private-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:start;gap:12px;margin:14px 0 22px}
+.private-nav-group{flex:none;min-width:0;padding:10px 11px;display:block;background:#fbfdfb}
+.private-nav-title{list-style:none;display:flex;justify-content:space-between;align-items:center;cursor:pointer;margin:0;padding:7px 4px 10px;font-size:11px;letter-spacing:.065em}
+.private-nav-title::-webkit-details-marker{display:none}
+.private-nav-title::after{content:'+';font-size:17px;letter-spacing:0;font-weight:650}
+.private-nav-group[open] .private-nav-title::after{content:'−'}
+.private-nav-actions{display:grid;grid-template-columns:1fr;gap:4px}
+.private-nav .private-nav-group button{display:flex;justify-content:flex-start;min-height:36px;border-radius:7px;padding:7px 11px;text-align:left}
+.private-nav .private-nav-group button.active{background:#dbeee5;color:#125643;box-shadow:inset 3px 0 #256c57}
+#private-research-dataset .formgrid{grid-template-columns:minmax(0,2fr) minmax(160px,1fr)}
+#private-guide-card-v79{background:linear-gradient(120deg,#fbfefc,#f5faf7)}
+#private-guide-card-v79 .formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+#private-guide-result-v79{overflow-wrap:anywhere;line-height:1.7}
+#private-guide-result-v79 h4{font-size:14px;margin:17px 0 7px}
+#private-guide-result-v79 ol,#private-guide-result-v79 ul{padding-left:22px}
+#private-guide-result-v79 li{margin-bottom:8px}
+.private-view .pane>.formgrid{margin-top:14px}
+.private-view .pane>h3{margin-bottom:9px}
+.private-view .pane>.tiny{max-width:80ch}
+/* Mobile and narrow content: no off-screen controls or clipped headings. */
+@media(max-width:1060px){.qf-home-roadmap{grid-template-columns:1fr}.qf-roadmap-card{min-height:0}}
+@media(max-width:900px){.private-nav{grid-template-columns:repeat(2,minmax(0,1fr))}.lab-skill-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:800px){.app{display:block}.side{position:relative;height:auto;overflow:visible;padding:12px 16px 15px}.side nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px;padding:0}.side .nav-caption,.side .sidenote{display:none}.side .nav-btn{white-space:normal;text-align:center;justify-content:center;border:1px solid var(--line);background:#fff;font-size:12px}.qf-nav-fold{margin:0;padding:0;border:0}.qf-nav-fold>summary{border:1px solid var(--line);font-size:12px;background:#fff;height:100%}.qf-nav-fold[open]{grid-column:1/-1;border:1px solid var(--line);border-radius:10px;padding:8px}.qf-nav-fold[open]>summary{border:0;background:#f3faf5;height:auto}.qf-nav-fold[open] .nav-btn{width:100%;margin-top:4px}.side .brand{padding:0}main{padding:24px 18px 65px}.private-nav{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.private-nav{grid-template-columns:1fr}.lab-fields,.lab-settings,.formgrid,#private-research-dataset .formgrid,#private-guide-card-v79 .formgrid{grid-template-columns:1fr}.three,.two{grid-template-columns:1fr}.controls .btn{max-width:100%}.lab-weight-head,.lab-weight-row{overflow-wrap:anywhere}.sec-toolbar .btn{flex:1 1 140px}}
+@media(max-width:450px){.side nav{grid-template-columns:repeat(2,minmax(0,1fr))}.pane{padding:17px 15px}.topbar{align-items:flex-start;flex-wrap:wrap}.topbar .eyebrow{max-width:90%}.research-hero{grid-template-columns:1fr}.hero-facts{border-left:0;border-top:1px solid #d1e3dc;padding:15px 0 0}.section-title{align-items:flex-start}.private-nav .private-nav-group button{width:100%}.lab-section-heading strong{font-size:16px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.journey-card:hover{transform:none}}
+
 </style></head><body>
-<div class="app"><aside class="side"><div class="brand"><div class="mark">Q</div>quantforge</div><nav id="navigation" aria-label="Main navigation"><span class="nav-caption">Financial analysis</span><button class="nav-btn active" data-page="overview" aria-current="page">Overview</button><button class="nav-btn" data-page="sec">SEC company data</button><button class="nav-btn" data-page="lab">Analysis dashboard</button><span class="nav-caption">Illustrative models</span><button class="nav-btn" data-page="portfolio">Portfolio simulator</button><button class="nav-btn" data-page="quant">Risk &amp; allocation</button><button class="nav-btn" data-page="valuation">DCF scenarios</button><button class="nav-btn" data-page="ml">Peer comparison</button><span class="nav-caption">Methods and source</span><button class="nav-btn" data-page="systems">Research methods</button><button class="nav-btn" data-page="methods">Data &amp; engineering</button><span class="nav-caption">Personal</span></nav><div class="sidenote">Historical SEC data · reproducible models<br>Personal investment research requires sign-in</div></aside>
+<div class="app"><aside class="side"><div class="brand"><div class="mark">Q</div>quantforge</div><nav id="navigation" aria-label="Main navigation"><span class="nav-caption">Financial analysis</span><button class="nav-btn active" data-page="overview" aria-current="page">Overview</button><button class="nav-btn" data-page="sec">SEC company data</button><button class="nav-btn" data-page="lab">Analysis dashboard</button><details class="qf-nav-fold"><summary>Simulated model examples</summary><div class="qf-nav-content"><button class="nav-btn" data-page="portfolio">Portfolio simulator</button><button class="nav-btn" data-page="quant">Risk &amp; allocation</button><button class="nav-btn" data-page="valuation">DCF scenarios</button><button class="nav-btn" data-page="ml">Peer comparison</button></div></details><details class="qf-nav-fold"><summary>Methods &amp; code</summary><div class="qf-nav-content"><button class="nav-btn" data-page="systems">Research methods</button><button class="nav-btn" data-page="methods">Data &amp; engineering</button></div></details><span class="nav-caption">Personal</span></nav><div class="sidenote">Historical SEC data · reproducible models<br>Personal investment research requires sign-in</div></aside>
 <a class="skip-link" href="#main-content">Skip to content</a><main id="main-content"><div class="topbar"><span class="eyebrow">SEC filings · portfolio models · research methods</span><span class="badge">PUBLIC OVERVIEW</span></div>
 <section class="tabpage active" id="page-overview">
-<div class="intro-simple"><span class="eyebrow">FINANCIAL DATA &amp; QUANTITATIVE ANALYSIS</span><h1>Company financials, portfolio risk, and strategy testing.</h1><p>QuantForge analyzes historical SEC company filings and provides working portfolio, risk, and valuation models. Explore reported financial trends, change model assumptions, and examine how strategies are evaluated. Public investment examples use simulated returns; a separate MFA-protected workspace uses available historical market data for personal research.</p><div class="controls"><button class="btn primary" data-go="sec">Explore SEC financials</button><button class="btn" data-go="lab">View analysis dashboard</button><button class="btn" data-go="methods">Review data &amp; code</button></div></div>
+<div class="intro-simple"><span class="eyebrow">FINANCIAL DATA &amp; QUANTITATIVE ANALYSIS</span><h1>Company financials, portfolio risk, and strategy testing.</h1><p>QuantForge analyzes historical SEC company filings and provides working portfolio, risk, and valuation models. Explore reported financial trends, change model assumptions, and examine how strategies are evaluated. Public investment examples use simulated returns; a separate MFA-protected workspace uses available historical market data for personal research.</p></div>
+<nav class="qf-home-roadmap" aria-label="Choose an analysis">
+ <button type="button" class="qf-roadmap-card" data-go="sec"><span>01 · REPORTED DATA</span><strong>Explore company financials</strong><small>Start with real SEC revenue, income, and cash-flow disclosures.</small></button>
+ <button type="button" class="qf-roadmap-card" data-go="lab"><span>02 · CALCULATED MODELS</span><strong>Compare risk and strategies</strong><small>Adjust simulated assumptions and inspect what changes.</small></button>
+ <button type="button" class="qf-roadmap-card" data-go="private"><span>03 · PERSONAL RESEARCH</span><strong>Open your private workspace</strong><small>Analyze selected investments and explain the available findings after MFA sign-in.</small></button>
+</nav>
+<div class="pane"><div class="section-title"><h3>Company financials from SEC filings</h3><span class="mini">Historical company filings</span></div><div class="three" id="home-sec-highlights"></div><div class="controls"><button class="btn primary" data-go="sec">Explore SEC Financials</button><span class="tiny" id="home-sec-updated">Historical filings · not live stock prices</span></div></div>
+<details class="qf-secondary-details"><summary>How the research platform works</summary>
 <div class="project-story pane"><div class="section-title"><h3>What the project covers</h3><span class="mini">From filings to model evaluation</span></div><div class="story-grid">
 <div><span class="eyebrow">01 · DATA ENGINEERING</span><h3>SEC financial data</h3><p>Annual company facts with filing dates, fiscal-year selection, reported values, calculated margins, and missing-data checks.</p><button class="text-link" data-go="sec">Explore financials →</button></div>
 <div><span class="eyebrow">02 · QUANTITATIVE ANALYTICS</span><h3>Portfolio risk</h3><p>Estimate covariance, apply position limits, compare allocations, and inspect volatility and downside assumptions.</p><button class="text-link" data-go="quant">Quantitative model →</button></div>
@@ -165,9 +257,11 @@ body{font-size:15px;line-height:1.62}main{width:min(1280px,100%)}.app{grid-templ
  </div>
  <div class="controls" style="margin-top:0"><button class="btn primary" data-go="lab">Explore the analysis</button><button class="btn" data-go="systems">Research methods</button><button class="btn" data-go="methods">Data &amp; engineering</button></div>
 </div>
-<div class="pane"><div class="section-title"><h3>Company financials from SEC filings</h3><span class="mini">Historical company filings</span></div><div class="three" id="home-sec-highlights"></div><div class="controls"><button class="btn primary" data-go="sec">Explore SEC Financials</button><span class="tiny" id="home-sec-updated">Historical filings · not live stock prices</span></div></div>
+</details>
+<details class="qf-secondary-details"><summary>Additional simulated portfolio and model examples</summary>
 <div class="pane"><div class="section-title"><h3>Sample portfolio</h3><span class="mini">Simulated holdings and prices</span></div><div class="three"><div class="metric"><span class="muted">Sample portfolio value</span><strong id="home-value">—</strong></div><div class="metric"><span class="muted">Cash available</span><strong id="home-cash">—</strong></div><div class="metric"><span class="muted">Invested</span><strong id="home-invested">—</strong></div></div><div class="section-title"><h3>Sample allocation</h3><button class="btn sm" data-go="portfolio">Portfolio model</button></div><div id="home-allocation"></div></div>
-<div class="pane"><div class="section-title"><h3>Example investments</h3><span class="muted tiny">Illustrative prices · not live quotes</span></div><div class="listcards" id="assets-list"></div></div><div class="pane"><div class="section-title"><h3>Additional model examples</h3><span class="muted tiny">Illustrative calculations · simulated financial inputs</span></div><div class="listcards"><button class="asset" data-go="quant"><strong>Portfolio optimization</strong><span>Covariance, volatility and modeled downside</span></button><button class="asset" data-go="valuation"><strong>DCF valuation</strong><span>Five-year cash flows and sensitivity</span></button><button class="asset" data-go="ml"><strong>Company similarity</strong><span>Standardized financial features</span></button></div></div></section>
+<div class="pane"><div class="section-title"><h3>Example investments</h3><span class="muted tiny">Illustrative prices · not live quotes</span></div><div class="listcards" id="assets-list"></div></div><div class="pane"><div class="section-title"><h3>Additional model examples</h3><span class="muted tiny">Illustrative calculations · simulated financial inputs</span></div><div class="listcards"><button class="asset" data-go="quant"><strong>Portfolio optimization</strong><span>Covariance, volatility and modeled downside</span></button><button class="asset" data-go="valuation"><strong>DCF valuation</strong><span>Five-year cash flows and sensitivity</span></button><button class="asset" data-go="ml"><strong>Company similarity</strong><span>Standardized financial features</span></button></div></div>
+</details></section>
 <section class="tabpage" id="page-sec">
   <div class="pagehead"><h1>SEC company financials</h1><p>Explore reported annual revenue, operating income, growth, and cash flow from the reviewed SEC Company Facts snapshot. Filing dates and fiscal periods are shown alongside the figures.</p></div>
   <div class="sec-toolbar"><span class="tiny">Quick company examples:</span><button class="btn sm" data-sec-symbol="MSFT">Microsoft · Technology</button><button class="btn sm" data-sec-symbol="WMT">Walmart · Retail</button><button class="btn sm" data-sec-symbol="XOM">Exxon Mobil · Energy</button><button class="btn sm" data-go="methods">Data &amp; methods</button></div>

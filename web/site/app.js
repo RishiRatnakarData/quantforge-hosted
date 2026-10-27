@@ -15,6 +15,7 @@ function nav(name,updateHash=true){
  if(name!=='private' && !PUBLIC_PAGES.has(name))return;
  document.querySelectorAll('.tabpage').forEach(e=>e.classList.toggle('active',e.id==='page-'+name));
  document.querySelectorAll('.nav-btn').forEach(e=>{const active=e.dataset.page===name;e.classList.toggle('active',active);if(active)e.setAttribute('aria-current','page');else e.removeAttribute('aria-current');});
+ const activeButton=document.querySelector('.nav-btn.active');const group=activeButton?.closest('details.qf-nav-fold');if(group)group.open=true;
  const labels={overview:'PUBLIC OVERVIEW',sec:'HISTORICAL SEC DATA',portfolio:'SIMULATED PORTFOLIO',quant:'SIMULATED RISK MODEL',valuation:'DCF ASSUMPTIONS',ml:'SIMULATED PEER MODEL',methods:'DATA & ENGINEERING',systems:'RESEARCH METHODS',lab:'INTERACTIVE ANALYSIS',private:'PRIVATE WORKSPACE'};
  const badge=document.querySelector('.topbar .badge');if(badge)badge.textContent=labels[name];
  const eyebrow=document.querySelector('.topbar .eyebrow');if(eyebrow)eyebrow.textContent=name==='private'?'Your portfolio · Personal use':'Financial research · models and data';

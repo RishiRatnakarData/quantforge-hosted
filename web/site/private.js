@@ -497,6 +497,7 @@ function privateTab(tab){
  refreshResearchContext();
  document.querySelectorAll('[data-private-view]').forEach(p=>p.hidden=p.dataset.privateView!==tab);
  document.querySelectorAll('.private-nav [data-private-tab]').forEach(b=>b.classList.toggle('active',b.dataset.privateTab===tab));
+ const activeButton=document.querySelector('.private-nav [data-private-tab].active');const group=typeof activeButton?.closest==='function'?activeButton?.closest('details.private-nav-group'):null;if(group)group.open=true;
 }
 function normalizedSeries(series){
  const rows=series.symbols.map(s=>series.closes[s]);
