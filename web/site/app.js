@@ -10,12 +10,12 @@ let state={cash:3500,holdings:{MSFT:5,VOO:8,AAPL:3,'BTC/USD':0.006}};
 const table=(heads,rows)=>'<div class="table-wrap"><table><thead><tr>'+heads.map(h=>'<th>'+h+'</th>').join('')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+row.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
 const error=(id,msg)=>{$(id).textContent=msg||'';};
 const num=id=>Number($(id).value);
-const PUBLIC_PAGES=new Set(['overview','sec','portfolio','quant','valuation','ml','methods']);
+const PUBLIC_PAGES=new Set(['overview','sec','portfolio','quant','valuation','ml','methods','systems']);
 function nav(name,updateHash=true){
  if(name!=='private' && !PUBLIC_PAGES.has(name))return;
  document.querySelectorAll('.tabpage').forEach(e=>e.classList.toggle('active',e.id==='page-'+name));
  document.querySelectorAll('.nav-btn').forEach(e=>{const active=e.dataset.page===name;e.classList.toggle('active',active);if(active)e.setAttribute('aria-current','page');else e.removeAttribute('aria-current');});
- const labels={overview:'RESEARCH / DEMO',sec:'REPORTED SEC FINANCIALS',portfolio:'SIMULATED PORTFOLIO',quant:'SIMULATED RETURNS',valuation:'ILLUSTRATIVE DCF',ml:'SIMULATED PEER INPUTS',methods:'METHODOLOGY & SOURCES',private:'PRIVATE WORKSPACE'};
+ const labels={overview:'RESEARCH / DEMO',sec:'REPORTED SEC FINANCIALS',portfolio:'SIMULATED PORTFOLIO',quant:'SIMULATED RETURNS',valuation:'ILLUSTRATIVE DCF',ml:'SIMULATED PEER INPUTS',methods:'METHODOLOGY & SOURCES',systems:'RESEARCH SYSTEMS',private:'PRIVATE WORKSPACE'};
  const badge=document.querySelector('.topbar .badge');if(badge)badge.textContent=labels[name];
  const eyebrow=document.querySelector('.topbar .eyebrow');if(eyebrow)eyebrow.textContent=name==='private'?'Your portfolio · Personal use':'Financial research · models and data';
  if(updateHash && PUBLIC_PAGES.has(name))history.replaceState(null,'','#'+name);
