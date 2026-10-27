@@ -2,6 +2,36 @@
 (function () {
 'use strict';
 const $=id=>document.getElementById(id);
+let guideReportV79=null;
+function clearGuideV79(){
+ guideReportV79=null;
+ const out=$('private-guide-result-v79'),btn=$('private-guide-export-v79');
+ if(out)out.textContent='Research changed. Generate a new summary to use the latest results.';
+ if(btn)btn.disabled=true;
+}
+function runGuideV79(){
+ if(!privateState){message('Sign in and complete authenticator verification first.');return;}
+ const symbol=$('private-valuation-company').value;
+ const report=window.QFPrivateGuideV79.analyze({
+  cash:privateState.cash,holdings:privateState.holdings,quotes:quoted,
+  selected:researchSelection,history:historySeries,optimizer:optimizerResult,
+  walkforward:walkforwardResult,company:valuationCompanies[symbol]||null,
+  screening:ideaDecisionBrief,purchaseImpact:allocationResultV74,
+  robustness:robustnessResultV68,forecast:forecastResultV66,
+  horizon:$('private-guide-horizon-v79').value,comfort:$('private-guide-comfort-v79').value,
+  now:new Date().toISOString()
+ });
+ guideReportV79=report;
+ const ul=items=>'<ul class="tiny">'+items.map(item=>'<li>'+safe(item)+'</li>').join('')+'</ul>';
+ const actions=report.actions.map(a=>'<li>'+safe(a.text)+' <button class="text-link" type="button" data-guide-go-v79="'+safe(a.id)+'">Open '+safe(({trade:'Virtual trades',ideas:'Investment screening',research:'Market data',optimization:'Optimization',walkforward:'Walk-forward',valuation:'Valuation',home:'Overview'})[a.id]||'Overview')+'</button></li>').join('');
+ $('private-guide-result-v79').innerHTML='<h4>What the available evidence says</h4>'+ul(report.facts.length?report.facts:['No completed research calculations are available yet.'])+
+  '<h4>Important risks and limits</h4>'+ul(report.warnings.length?report.warnings:['No numerical risk conclusion can be drawn without verified market observations.'])+
+  '<h4>What to check next</h4><ol class="tiny">'+actions+'</ol><h4>How to use this report</h4>'+ul(report.notes)+
+  '<p class="tiny">Generated on request; results are not automatically updated. No real trades or data transfers took place.</p>';
+ $('private-guide-export-v79').disabled=false;
+ message('Research summary generated locally. No trades or external AI calls.');
+}
+
 const M=window.QFModel;
 let privateState=null, version=0, quoted={}, mfaFactorId=null;
 let researchSelection=[];
@@ -57,6 +87,7 @@ async function handleAuthState(state){
 }
 async function loadState(){
   clearAllocationV74();
+  clearGuideV79();
   const d=await api('private/state');privateState=d.portfolio;version=d.version;
   quoted={}; // Never carry fictional quotes across a private session.
   const symbols=Object.keys(privateState.holdings || {});
@@ -119,7 +150,7 @@ async function verifyMFA(){
 async function logout(){
   try{await api('auth/logout',{});}catch(_){ /* Clear visible private content regardless */ }
   ideasRunSequence++;ideaData=[];ideaFundamentals={};$('ideas-results').textContent='';$('ideas-run').disabled=false;clearDecisionBrief();
-  clearMFA();showStep('login');privateState=null;quoted={};historyLoadSequence++;historySeries=null;closeAssetBrowser();researchSelection=[];$('private-symbol').value='';$('private-selected-asset').textContent='No investment selected';renderResearchSelection();
+  clearGuideV79();clearMFA();showStep('login');privateState=null;quoted={};historyLoadSequence++;historySeries=null;closeAssetBrowser();researchSelection=[];$('private-symbol').value='';$('private-selected-asset').textContent='No investment selected';renderResearchSelection();
   optimizerResult=null;$('private-opt-export').disabled=true;$('private-opt-output').textContent='Load market history to begin.';$('private-opt-risk').textContent='';
   $('private-history-chart').textContent='Load a historical series to begin.';$('private-risk-results').textContent='';$('private-backtest-output').textContent='';$('private-valuation-output').textContent='';$('private-peers').textContent='';$('private-concentration').textContent='';$('private-positions').textContent='';
   $('private-wf-output').textContent='Load price history in Market data to begin.';$('private-wf-export').disabled=true;walkforwardResult=null;clearV66Walkforward();clearV66Forecast();
@@ -444,6 +475,7 @@ function refreshResearchContext(){
  }
 }
 function invalidateResearchHistory(reason){
+ clearGuideV79();
  historyLoadSequence++;
  historySeries=null;optimizerResult=null;walkforwardResult=null;clearV66Walkforward();
  $('private-opt-export').disabled=true;$('private-wf-export').disabled=true;
@@ -560,6 +592,7 @@ function privateBacktest(){
  message('Backtest comparison calculated.');
 }
 async function privateValuation(){
+ clearGuideV79();
  const symbol=$('private-valuation-company').value;
  if(!symbol){message('Choose a company with Browse companies first.');return;}
  $('private-valuation-output').textContent='Loading available SEC annual filings…';
@@ -703,6 +736,7 @@ function optimizerDiagnostics(res){
   '<p class="tiny">All statistics use the same observed period. A portfolio selected using these data is in-sample; the displayed historical result is not an out-of-sample backtest. Daily rebalancing is assumed when compounding weighted returns. No dividends, borrow costs, slippage, or brokerage orders are included. Variance contributions may be negative for hedging assets.</p>';
 }
 function runOptimization(){
+ clearGuideV79();
  if(!privateState){message('Sign in to run private portfolio research.');return;}
  if(!historySeries){message('Go to Market data and load 2–5 investments first.');privateTab('research');return;}
  $('private-opt-output').textContent='Calculating historical allocation…';
@@ -891,6 +925,7 @@ $('private-wf-v68-export').addEventListener('click',exportV68Robustness);
 
 const fcMoney=x=>finite(x)?usd(x):'Unavailable';
 function runFinancialForecast(){
+ clearGuideV79();
  if(!privateState){message('Sign in first.');return;}
  const symbol=$('private-valuation-company').value,company=valuationCompanies[symbol];
  if(!company){message('Load SEC annual statements for a selected company first.');return;}
@@ -930,6 +965,7 @@ function wfChart(d){
   '<p class="tiny">Green: optimized portfolio (all selected investments). Orange: equal-weight benchmark (the same investments). These are two strategies, not one line per company. To view prices for each investment, open Market data. Trading costs included; prices observed historically.</p>';
 }
 function runWalkforward(){
+ clearGuideV79();
  if(!privateState){message('Sign in first.');return;}
  if(!historySeries){message('Load investment history in Market data first.');privateTab('research');return;}
  try{
@@ -997,6 +1033,18 @@ for(const id of ['private-fc-years','private-fc-growth','private-fc-margin','pri
 }
 
 document.querySelectorAll('[data-private-tab]').forEach(b=>b.addEventListener('click',()=>privateTab(b.dataset.privateTab)));
+$('private-guide-run-v79').addEventListener('click',runGuideV79);
+$('private-guide-export-v79').addEventListener('click',()=>{
+ if(!privateState||!guideReportV79)return;
+ downloadResearchJSON('quantforge-private-research-explanation.json',guideReportV79);
+});
+$('private-guide-result-v79').addEventListener('click',e=>{
+ const b=e.target.closest('[data-guide-go-v79]');
+ if(!b||!privateState)return;
+ const id=b.dataset.guideGoV79;
+ if(['home','trade','ideas','research','optimization','backtest','walkforward','valuation','settings'].includes(id))privateTab(id);
+});
+
 $('private-history-load').addEventListener('click',loadHistory);
 $('private-history-days').addEventListener('change',()=>invalidateResearchHistory('Historical period changed. Load the new date range first.'));
 $('private-backtest-run').addEventListener('click',privateBacktest);

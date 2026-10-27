@@ -85,7 +85,13 @@ def test_public_sec_selector_generated_from_dataset():
     assert "$('sec-company').innerHTML=SEC_DATA.companies.map" in js
     assert "SEC_DATA.companies.map(c=>" in js
     builder = (ROOT / "tools/build_unified_site.py").read_text(encoding="utf-8")
-    assert "set(symbols) != set(ISSUERS)" in builder
+    # Duplicates and missing original issuers must still be rejected.
+    assert "len(symbols) != len(set(symbols))" in builder
+    assert "not set(ISSUERS).issubset(symbols)" in builder
+    # Additional issuers are allowed, but core CIK and SEC lineage must be checked.
+    assert "c['symbol'] in ISSUERS and c['cik'] != ISSUERS[c['symbol']][0]" in builder
+    assert "source_url" in builder
+    assert "len(c['annual']) < 2" in builder
 
 
 def test_sector_is_explicitly_editorial_not_gaap():

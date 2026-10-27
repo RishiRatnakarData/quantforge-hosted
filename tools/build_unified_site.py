@@ -54,6 +54,18 @@ block='''<section class="tabpage" id="page-private">
       <p class="tiny" id="private-research-state" role="status" aria-live="polite">No market history loaded for the current selection.</p>
     </div>
     <section class="private-view" data-private-view="home">
+      <div class="pane" id="private-guide-card-v79">
+        <div class="section-title"><h3>Your research, explained</h3><span class="mini">Private · educational decision support</span></div>
+        <p class="tiny">New to investing? Generate a plain-language review of your virtual portfolio, loaded market data, portfolio model, walk-forward results, and SEC company research. The guide uses only analyses currently available in this signed-in session. It never places trades or sends your information to an external AI provider.</p>
+        <div class="formgrid" style="margin-top:12px">
+          <div class="field"><label for="private-guide-horizon-v79">When could you need this money?</label><select id="private-guide-horizon-v79"><option value="unknown">Not sure yet</option><option value="short">Within 3 years</option><option value="medium">3–10 years</option><option value="long">More than 10 years</option></select></div>
+          <div class="field"><label for="private-guide-comfort-v79">How would a large temporary loss affect you?</label><select id="private-guide-comfort-v79"><option value="unknown">Not sure yet</option><option value="low">I could not comfortably absorb it</option><option value="medium">I could tolerate some loss</option><option value="high">I understand substantial losses are possible</option></select></div>
+        </div>
+        <div class="controls"><button class="btn primary" id="private-guide-run-v79" type="button">Explain my current research</button><button class="btn" id="private-guide-export-v79" type="button" disabled>Export private report (JSON)</button></div>
+        <div id="private-guide-result-v79" aria-live="polite" style="margin-top:14px"><p class="tiny">Click Explain my current research when signed in. Results stay in this browser session until cleared.</p></div>
+        <details class="lab-details"><summary>New to investing? Plain-English terms</summary><div class="tiny" style="padding-top:10px"><p><strong>Volatility:</strong> how much prices moved up and down in the observed period.</p><p><strong>Drawdown:</strong> how far a portfolio fell from a prior high.</p><p><strong>Backtest:</strong> a calculation using past prices, not proof of future success.</p><p><strong>Walk-forward:</strong> a backtest that repeatedly fits on earlier data and checks later observations.</p><p><strong>Cash flow:</strong> money reported moving through a company; this is not the same as stock-price return.</p><p><strong>Concentration:</strong> how dependent your portfolio value is on one holding.</p></div></details>
+        <p class="tiny">This is a rule-based research explanation, not a generative AI chatbot, investment recommendation, or personalized suitability determination. Nothing is sent to an AI service.</p>
+      </div>
       <div class="pane"><div class="three"><div class="metric"><span class="muted">Virtual portfolio value</span><strong id="private-total">—</strong></div><div class="metric"><span class="muted">Available cash</span><strong id="private-cash">—</strong></div><div class="metric"><span class="muted">Invested value</span><strong id="private-invested">—</strong></div></div><div class="section-title"><h3>Holdings</h3><button class="btn sm" data-private-tab="trade">Trade</button></div><div id="private-positions"></div></div>
       <div class="pane"><h3>Holdings by weight</h3><div id="private-concentration" class="tiny" style="margin-top:12px">Add virtual holdings to see allocation.</div></div>
       <div class="pane" id="private-allocation-card-v74">
@@ -206,18 +218,22 @@ if snapshot is not None:
  public_companies = snapshot.get('companies', [])
  symbols = [c.get('symbol') for c in public_companies if isinstance(c, dict)]
  if (snapshot.get('dataset') != 'SEC EDGAR Company Facts, annual 10-K US-GAAP'
-     or len(symbols) != len(ISSUERS) or set(symbols) != set(ISSUERS)
-     or any(c.get('cik') != ISSUERS[c['symbol']][0] or
-            c.get('source_url') != f"https://data.sec.gov/api/xbrl/companyfacts/CIK{c['cik']:010d}.json"
+     or len(symbols) != len(set(symbols)) or not set(ISSUERS).issubset(symbols)
+     or any(not isinstance(c, dict) or not re.fullmatch(r'[A-Z0-9.\-]{1,15}', str(c.get('symbol', '')))
+            or not isinstance(c.get('cik'), int) or c['cik'] <= 0
+            or (c['symbol'] in ISSUERS and c['cik'] != ISSUERS[c['symbol']][0])
+            or c.get('source_url') != f"https://data.sec.gov/api/xbrl/companyfacts/CIK{c['cik']:010d}.json"
             or not isinstance(c.get('annual'), list) or len(c['annual']) < 2
+            or not all(isinstance(y,dict) and isinstance(y.get('fiscal_end'),str)
+                       and isinstance(y.get('metrics'),dict) for y in c['annual'])
             for c in public_companies)):
-  raise ValueError('SEC snapshot validation failed; regenerate the 12-company file from the official source')
+  raise ValueError('SEC snapshot validation failed; core issuers and any additional company records must be validated')
 snapshot_js=json.dumps(snapshot, separators=(',',':'), ensure_ascii=True).replace('<', r'\u003c').replace('>', r'\u003e').replace('&', r'\u0026')
 for slot, file in [('/* QF_MODEL */','model.js'),('/* QF_APP */','app.js'),('/* QF_PRIVATE */','private.js')]:
  text=(src/'site'/file).read_text(encoding="utf-8")
  if file=='private.js':
   # Bundled alongside the existing private script: still only three CSP-protected scripts.
-  text=(src/'site/private_ideas_v70.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_allocation_v74.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_value_v73.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_v72.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_multimarket.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_forecast_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_walkforward_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_diagnostics_v66.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_integrity_v67.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_robustness_v68.js').read_text(encoding='utf-8')+'\n'+text
+  text=(src/'site/private_ideas_v70.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_allocation_v74.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_value_v73.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_v72.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_guide_v79.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_multimarket.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_forecast_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_walkforward_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_diagnostics_v66.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_integrity_v67.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_robustness_v68.js').read_text(encoding='utf-8')+'\n'+text
  if file=='app.js':
   assert text.count('/* QF_SEC_DATA */ null')==1
   # Bundle pure SEC analytics in the existing public app script. CSP remains 3 hashes.

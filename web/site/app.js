@@ -105,7 +105,7 @@ function renderSECTrend(company){
   '<p class="trend-caption">Revenue in USD billions · chronological issuer fiscal years. Values are historical filing data, not share-price performance.</p>';
 }
 function renderSECRanking(){
- const key=$('sec-rank-metric').value, rows=SEC.ranking(SEC_DATA,key);
+ const key=$('sec-rank-metric').value, rows=SEC.ranking(SEC_DATA,key).slice(0,30);
  let rank=0;
  $('sec-compare').innerHTML=table(['Rank','Company','Sector*','FY ended',SEC.METRICS[key].label],rows.map(row=>{
   const hasValue=row.value!==null;if(hasValue)rank++;
@@ -141,14 +141,14 @@ function renderSEC(){
  const latest=company.annual[0],m=latest.metrics,prior=company.annual[1]?.metrics;
  const yoy=prior ? ratio(m.revenue_usd-prior.revenue_usd,prior.revenue_usd) : 'Not available';
  const margin=ratio(m.operating_income_usd,m.revenue_usd);
- $('sec-status').textContent='SEC filing data as of '+SEC_DATA.as_of;
+ $('sec-status').textContent='SEC filing data cutoff: '+(company.as_of||SEC_DATA.as_of);
  out.innerHTML='<div class="metric"><span class="muted">Revenue · fiscal year ending '+latest.fiscal_end+'</span><strong>'+billions(m.revenue_usd)+'</strong></div>'+
  '<div class="metric"><span class="muted">Operating margin</span><strong>'+margin+'</strong></div>'+
  '<div class="metric"><span class="muted">Revenue YoY change</span><strong>'+yoy+'</strong></div>';
  const rows=company.annual.map(r=>{const f=r.metrics;return [r.fiscal_end,billions(f.revenue_usd),billions(f.operating_income_usd),ratio(f.operating_income_usd,f.revenue_usd),billions(f.free_cash_flow_usd)];});
  years.innerHTML=table(['FY ended','Revenue','Operating income','Operating margin','FCF proxy'],rows);
  renderSECTrend(company);renderSECRanking();renderSECProvenance(company);
- $('sec-source').innerHTML='Source: <a href="'+company.source_url+'" rel="noopener noreferrer" target="_blank">SEC Company Facts, '+company.symbol+'</a>. Each metric is selected from an eligible 10-K filed by '+SEC_DATA.as_of+'. FCF proxy = reported operating cash flow minus cash purchases of property and equipment (not FCFF). Missing values remain blank. *Sector groups are editorial and fiscal periods differ; compare across sectors cautiously. Sources and accession IDs are in the snapshot file.';
+ $('sec-source').innerHTML='Source: <a href="'+company.source_url+'" rel="noopener noreferrer" target="_blank">SEC Company Facts, '+company.symbol+'</a>. Each metric is selected from an eligible 10-K filed by '+(company.as_of||SEC_DATA.as_of)+'. FCF proxy = reported operating cash flow minus cash purchases of property and equipment (not FCFF). Missing values remain blank. *Sector groups are editorial and fiscal periods differ; compare across sectors cautiously. Sources and accession IDs are in the snapshot file.';
  const shock=Number($('sec-margin-shock').value);
  if(typeof m.operating_income_usd!=='number'||typeof m.revenue_usd!=='number'){
   scenario.textContent='Margin stress is unavailable because this issuer lacks a comparable reported operating-income or revenue figure for the selected fiscal year.';return;
@@ -176,9 +176,25 @@ function renderSECHighlights(){
  status.textContent='Filed by '+SEC_DATA.as_of+' · historical annual data, not live prices';
 }
 
+function filterSECCompaniesV79(){
+ if(!SEC_DATA||!Array.isArray(SEC_DATA.companies))return;
+ const q=$('sec-company-search-v79').value.trim().toLowerCase();
+ const visible=SEC_DATA.companies.filter(c=>!q||c.name.toLowerCase().includes(q)||c.symbol.toLowerCase().includes(q));
+ const select=$('sec-company'),previous=select.value;
+ const option=c=>'<option value="'+safeText(c.symbol)+'">'+safeText(c.name)+' ('+safeText(c.symbol)+')</option>';
+ if(!q) $('sec-company').innerHTML=SEC_DATA.companies.map(c=>'<option value="'+safeText(c.symbol)+'">'+safeText(c.name)+' ('+safeText(c.symbol)+')</option>').join('');
+ else select.innerHTML=visible.map(option).join('');
+ if(visible.some(c=>c.symbol===previous))select.value=previous;
+ $('sec-company-count-v79').textContent=visible.length+' of '+SEC_DATA.companies.length+' published SEC companies';
+ if(visible.length)renderSEC();
+ else{
+  $('sec-figures').textContent='No published company matches this search.';
+  for(const id of ['sec-years','sec-trend','sec-compare','sec-provenance','sec-scenario','sec-source'])$(id).textContent='';
+ }
+}
 function populate(){
  if(SEC_DATA && Array.isArray(SEC_DATA.companies)){
-  $('sec-company').innerHTML=SEC_DATA.companies.map(c=>'<option value="'+c.symbol+'">'+c.name+' ('+c.symbol+')</option>').join('');
+  filterSECCompaniesV79();
  }
  const options=M.ASSETS.map(a=>'<option value="'+a.symbol+'">'+a.name+' ('+a.symbol+')</option>').join('');
  $('trade-symbol').innerHTML=options;
@@ -204,6 +220,7 @@ $('rebalance-submit').addEventListener('click',rebalance);
 $('quant-run').addEventListener('click',runQuant);
 $('dcf-run').addEventListener('click',runDCF);
 $('ml-run').addEventListener('click',runPeers);
+$('sec-company-search-v79').addEventListener('input',filterSECCompaniesV79);
 $('sec-company').addEventListener('change',renderSEC);
 $('sec-margin-shock').addEventListener('input',renderSEC);
 $('sec-rank-metric').addEventListener('change',renderSECRanking);

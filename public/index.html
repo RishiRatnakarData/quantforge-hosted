@@ -173,7 +173,7 @@ body{font-size:15px;line-height:1.62}main{width:min(1280px,100%)}.app{grid-templ
   <div class="sec-toolbar"><span class="tiny">Quick company examples:</span><button class="btn sm" data-sec-symbol="MSFT">Microsoft · Technology</button><button class="btn sm" data-sec-symbol="WMT">Walmart · Retail</button><button class="btn sm" data-sec-symbol="XOM">Exxon Mobil · Energy</button><button class="btn sm" data-go="methods">Data &amp; methods</button></div>
   <div class="pane"><div class="row"><h3>Financial performance by company</h3><span class="mini" id="sec-status">SEC annual filings</span></div>
   <div class="formgrid" style="margin-top:14px">
-    <div class="field"><label for="sec-company">Company</label><select id="sec-company"><option value="MSFT">Microsoft (MSFT)</option></select></div>
+    <div class="field"><label for="sec-company-search-v79">Find a company by name or ticker</label><input id="sec-company-search-v79" type="search" placeholder="Search published SEC companies" autocomplete="off" maxlength="90"><span class="tiny" id="sec-company-count-v79" role="status">Showing the published company snapshot</span></div><div class="field"><label for="sec-company">Company</label><select id="sec-company"><option value="MSFT">Microsoft (MSFT)</option></select></div>
     <div class="field"><label for="sec-margin-shock">Hypothetical margin change (percentage points)</label><input id="sec-margin-shock" type="number" min="-15" max="15" step="1" value="-3" /></div>
   </div>
   <div class="three" id="sec-figures" style="margin-top:16px"></div>
@@ -450,6 +450,18 @@ body{font-size:15px;line-height:1.62}main{width:min(1280px,100%)}.app{grid-templ
       <p class="tiny" id="private-research-state" role="status" aria-live="polite">No market history loaded for the current selection.</p>
     </div>
     <section class="private-view" data-private-view="home">
+      <div class="pane" id="private-guide-card-v79">
+        <div class="section-title"><h3>Your research, explained</h3><span class="mini">Private · educational decision support</span></div>
+        <p class="tiny">New to investing? Generate a plain-language review of your virtual portfolio, loaded market data, portfolio model, walk-forward results, and SEC company research. The guide uses only analyses currently available in this signed-in session. It never places trades or sends your information to an external AI provider.</p>
+        <div class="formgrid" style="margin-top:12px">
+          <div class="field"><label for="private-guide-horizon-v79">When could you need this money?</label><select id="private-guide-horizon-v79"><option value="unknown">Not sure yet</option><option value="short">Within 3 years</option><option value="medium">3–10 years</option><option value="long">More than 10 years</option></select></div>
+          <div class="field"><label for="private-guide-comfort-v79">How would a large temporary loss affect you?</label><select id="private-guide-comfort-v79"><option value="unknown">Not sure yet</option><option value="low">I could not comfortably absorb it</option><option value="medium">I could tolerate some loss</option><option value="high">I understand substantial losses are possible</option></select></div>
+        </div>
+        <div class="controls"><button class="btn primary" id="private-guide-run-v79" type="button">Explain my current research</button><button class="btn" id="private-guide-export-v79" type="button" disabled>Export private report (JSON)</button></div>
+        <div id="private-guide-result-v79" aria-live="polite" style="margin-top:14px"><p class="tiny">Click Explain my current research when signed in. Results stay in this browser session until cleared.</p></div>
+        <details class="lab-details"><summary>New to investing? Plain-English terms</summary><div class="tiny" style="padding-top:10px"><p><strong>Volatility:</strong> how much prices moved up and down in the observed period.</p><p><strong>Drawdown:</strong> how far a portfolio fell from a prior high.</p><p><strong>Backtest:</strong> a calculation using past prices, not proof of future success.</p><p><strong>Walk-forward:</strong> a backtest that repeatedly fits on earlier data and checks later observations.</p><p><strong>Cash flow:</strong> money reported moving through a company; this is not the same as stock-price return.</p><p><strong>Concentration:</strong> how dependent your portfolio value is on one holding.</p></div></details>
+        <p class="tiny">This is a rule-based research explanation, not a generative AI chatbot, investment recommendation, or personalized suitability determination. Nothing is sent to an AI service.</p>
+      </div>
       <div class="pane"><div class="three"><div class="metric"><span class="muted">Virtual portfolio value</span><strong id="private-total">—</strong></div><div class="metric"><span class="muted">Available cash</span><strong id="private-cash">—</strong></div><div class="metric"><span class="muted">Invested value</span><strong id="private-invested">—</strong></div></div><div class="section-title"><h3>Holdings</h3><button class="btn sm" data-private-tab="trade">Trade</button></div><div id="private-positions"></div></div>
       <div class="pane"><h3>Holdings by weight</h3><div id="private-concentration" class="tiny" style="margin-top:12px">Add virtual holdings to see allocation.</div></div>
       <div class="pane" id="private-allocation-card-v74">
@@ -1148,7 +1160,7 @@ function renderSECTrend(company){
   '<p class="trend-caption">Revenue in USD billions · chronological issuer fiscal years. Values are historical filing data, not share-price performance.</p>';
 }
 function renderSECRanking(){
- const key=$('sec-rank-metric').value, rows=SEC.ranking(SEC_DATA,key);
+ const key=$('sec-rank-metric').value, rows=SEC.ranking(SEC_DATA,key).slice(0,30);
  let rank=0;
  $('sec-compare').innerHTML=table(['Rank','Company','Sector*','FY ended',SEC.METRICS[key].label],rows.map(row=>{
   const hasValue=row.value!==null;if(hasValue)rank++;
@@ -1184,14 +1196,14 @@ function renderSEC(){
  const latest=company.annual[0],m=latest.metrics,prior=company.annual[1]?.metrics;
  const yoy=prior ? ratio(m.revenue_usd-prior.revenue_usd,prior.revenue_usd) : 'Not available';
  const margin=ratio(m.operating_income_usd,m.revenue_usd);
- $('sec-status').textContent='SEC filing data as of '+SEC_DATA.as_of;
+ $('sec-status').textContent='SEC filing data cutoff: '+(company.as_of||SEC_DATA.as_of);
  out.innerHTML='<div class="metric"><span class="muted">Revenue · fiscal year ending '+latest.fiscal_end+'</span><strong>'+billions(m.revenue_usd)+'</strong></div>'+
  '<div class="metric"><span class="muted">Operating margin</span><strong>'+margin+'</strong></div>'+
  '<div class="metric"><span class="muted">Revenue YoY change</span><strong>'+yoy+'</strong></div>';
  const rows=company.annual.map(r=>{const f=r.metrics;return [r.fiscal_end,billions(f.revenue_usd),billions(f.operating_income_usd),ratio(f.operating_income_usd,f.revenue_usd),billions(f.free_cash_flow_usd)];});
  years.innerHTML=table(['FY ended','Revenue','Operating income','Operating margin','FCF proxy'],rows);
  renderSECTrend(company);renderSECRanking();renderSECProvenance(company);
- $('sec-source').innerHTML='Source: <a href="'+company.source_url+'" rel="noopener noreferrer" target="_blank">SEC Company Facts, '+company.symbol+'</a>. Each metric is selected from an eligible 10-K filed by '+SEC_DATA.as_of+'. FCF proxy = reported operating cash flow minus cash purchases of property and equipment (not FCFF). Missing values remain blank. *Sector groups are editorial and fiscal periods differ; compare across sectors cautiously. Sources and accession IDs are in the snapshot file.';
+ $('sec-source').innerHTML='Source: <a href="'+company.source_url+'" rel="noopener noreferrer" target="_blank">SEC Company Facts, '+company.symbol+'</a>. Each metric is selected from an eligible 10-K filed by '+(company.as_of||SEC_DATA.as_of)+'. FCF proxy = reported operating cash flow minus cash purchases of property and equipment (not FCFF). Missing values remain blank. *Sector groups are editorial and fiscal periods differ; compare across sectors cautiously. Sources and accession IDs are in the snapshot file.';
  const shock=Number($('sec-margin-shock').value);
  if(typeof m.operating_income_usd!=='number'||typeof m.revenue_usd!=='number'){
   scenario.textContent='Margin stress is unavailable because this issuer lacks a comparable reported operating-income or revenue figure for the selected fiscal year.';return;
@@ -1219,9 +1231,25 @@ function renderSECHighlights(){
  status.textContent='Filed by '+SEC_DATA.as_of+' · historical annual data, not live prices';
 }
 
+function filterSECCompaniesV79(){
+ if(!SEC_DATA||!Array.isArray(SEC_DATA.companies))return;
+ const q=$('sec-company-search-v79').value.trim().toLowerCase();
+ const visible=SEC_DATA.companies.filter(c=>!q||c.name.toLowerCase().includes(q)||c.symbol.toLowerCase().includes(q));
+ const select=$('sec-company'),previous=select.value;
+ const option=c=>'<option value="'+safeText(c.symbol)+'">'+safeText(c.name)+' ('+safeText(c.symbol)+')</option>';
+ if(!q) $('sec-company').innerHTML=SEC_DATA.companies.map(c=>'<option value="'+safeText(c.symbol)+'">'+safeText(c.name)+' ('+safeText(c.symbol)+')</option>').join('');
+ else select.innerHTML=visible.map(option).join('');
+ if(visible.some(c=>c.symbol===previous))select.value=previous;
+ $('sec-company-count-v79').textContent=visible.length+' of '+SEC_DATA.companies.length+' published SEC companies';
+ if(visible.length)renderSEC();
+ else{
+  $('sec-figures').textContent='No published company matches this search.';
+  for(const id of ['sec-years','sec-trend','sec-compare','sec-provenance','sec-scenario','sec-source'])$(id).textContent='';
+ }
+}
 function populate(){
  if(SEC_DATA && Array.isArray(SEC_DATA.companies)){
-  $('sec-company').innerHTML=SEC_DATA.companies.map(c=>'<option value="'+c.symbol+'">'+c.name+' ('+c.symbol+')</option>').join('');
+  filterSECCompaniesV79();
  }
  const options=M.ASSETS.map(a=>'<option value="'+a.symbol+'">'+a.name+' ('+a.symbol+')</option>').join('');
  $('trade-symbol').innerHTML=options;
@@ -1247,6 +1275,7 @@ $('rebalance-submit').addEventListener('click',rebalance);
 $('quant-run').addEventListener('click',runQuant);
 $('dcf-run').addEventListener('click',runDCF);
 $('ml-run').addEventListener('click',runPeers);
+$('sec-company-search-v79').addEventListener('input',filterSECCompaniesV79);
 $('sec-company').addEventListener('change',renderSEC);
 $('sec-margin-shock').addEventListener('input',renderSEC);
 $('sec-rank-metric').addEventListener('change',renderSECRanking);
@@ -1606,6 +1635,117 @@ function report(brief,source,period){
 root.QFPrivateDecision=Object.freeze({dailyReturns,correlation,sameSessions,correlations,virtualExposure,build,report});
 if(typeof module!=='undefined'&&module.exports)module.exports=root.QFPrivateDecision;
 })(typeof window!=='undefined'?window:globalThis);
+
+/* QuantForge V7.9: private, deterministic research explanation engine.
+   Explicit input only; no API, network, storage, account mutation, or trade actions. */
+(function(root){
+'use strict';
+const ok=x=>typeof x==='number'&&Number.isFinite(x);
+const pct=x=>`${(100*x).toFixed(1)}%`;
+const dollars=x=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(x);
+const isDate=x=>/^\d{4}-\d{2}-\d{2}(?:T.*)?$/.test(String(x||''));
+function analyze(input){
+ const s=input&&typeof input==='object'?input:{};
+ const notes=[],actions=[],facts=[],warnings=[];
+ const holdings=s.holdings&&typeof s.holdings==='object'?s.holdings:{};
+ const quotes=s.quotes&&typeof s.quotes==='object'?s.quotes:{};
+ const entries=Object.entries(holdings).filter(([sym,qty])=>/^[A-Z0-9./-]{1,24}$/.test(sym)&&ok(qty)&&qty>0);
+ const cash=ok(s.cash)&&s.cash>=0?s.cash:null;
+ const missing=entries.filter(([sym])=>!ok(quotes[sym]?.price)||quotes[sym].price<=0).map(x=>x[0]);
+ const valued=entries.filter(([sym])=>!missing.includes(sym)).map(([sym,qty])=>({symbol:sym,value:qty*quotes[sym].price}));
+ const invested=valued.reduce((a,x)=>a+x.value,0);
+ const complete=cash!==null&&missing.length===0;
+ const total=complete?cash+invested:null;
+ const max=complete&&total>0&&valued.length?valued.reduce((a,b)=>a.value>=b.value?a:b):null;
+ if(total===null){warnings.push('The total portfolio value is not reliable because cash or at least one holding quote is unavailable. Concentration percentages are withheld.');}
+ else if(total===0){facts.push('The virtual portfolio has no funded positions.');}
+ else {
+  facts.push(`Virtual portfolio: ${dollars(total)} total, including ${dollars(cash)} cash and ${dollars(invested)} in priced holdings.`);
+  if(max){const w=max.value/total;facts.push(`Largest priced position: ${max.symbol}, ${pct(w)} of total virtual value.`);
+   if(w>.35){warnings.push(`Concentration check: ${max.symbol} represents ${pct(w)} of the virtual portfolio. A single-company loss could disproportionately affect the result. The 35% screening threshold is a prompt to review, not a recommended target.`);}
+  }
+ }
+ if(s.now&&isDate(s.now)){
+  const now=Date.parse(s.now),stale=entries.filter(([sym])=>{
+   if(missing.includes(sym))return false;
+   const observed=Date.parse(String(quotes[sym]?.timestamp||''));
+   return Number.isFinite(observed)&&Number.isFinite(now)&&(now-observed)>7*86400000;
+  }).map(x=>x[0]);
+  if(stale.length){warnings.push(`Last available quotes for ${stale.join(', ')} are more than seven calendar days old. Review source timestamps before drawing conclusions.`);}
+ }
+ if(missing.length)actions.push({id:'trade',text:`Refresh observed prices for ${missing.join(', ')} before relying on portfolio weights.`});
+ if(!entries.length)actions.push({id:'ideas',text:'Start with Investment screening to compare candidates; you do not need to make a virtual trade.'});
+ const history=s.history;
+ const historicalValid=history&&Array.isArray(history.symbols)&&history.symbols.length>=2&&Array.isArray(history.dates)&&history.dates.length>=2;
+ if(!historicalValid){actions.push({id:'research',text:'Choose 2–5 investments and load historical market data before interpreting strategy risk.'});}
+ else {
+  facts.push(`Loaded research: ${history.symbols.join(', ')}; ${history.dates[0]} through ${history.dates[history.dates.length-1]}.`);
+  warnings.push('Historical price-only returns may exclude dividends and other execution costs; they are not total-return forecasts.');
+  const selected=Array.isArray(s.selected)?s.selected:[];
+  if(selected.length&&(selected.length!==history.symbols.length||selected.some(x=>!history.symbols.includes(x)))){
+   warnings.push('The current investment selection differs from loaded historical data. Reload before comparing strategies.');
+   actions.push({id:'research',text:'Reload historical data for the current selection.'});
+  }
+ }
+ const opt=s.optimizer;
+ if(opt&&historicalValid&&Array.isArray(opt.symbols)&&opt.symbols.join('|')===history.symbols.join('|')&&
+     ok(opt.equal?.annualVolatility)&&ok(opt.optimized?.annualVolatility)){
+  facts.push(`Portfolio allocation model (fitted sample): equal-weight volatility ${pct(opt.equal.annualVolatility)} versus optimized ${pct(opt.optimized.annualVolatility)}. This is an in-sample comparison, not a realized improvement.`);
+  if(!s.walkforward)actions.push({id:'walkforward',text:'Run Walk-forward to check how the allocation rule behaved on later, held-out historical windows.'});
+ }else if(historicalValid){actions.push({id:'optimization',text:'Calculate constrained allocations and inspect concentration and downside estimates.'});}
+ const wf=s.walkforward;
+ if(wf&&historicalValid&&Array.isArray(wf.symbols)&&wf.symbols.join('|')===history.symbols.join('|')&&
+    ok(wf.optimized?.metrics?.change)&&ok(wf.benchmark?.metrics?.change)){
+  const a=wf.optimized.metrics.change,b=wf.benchmark.metrics.change;
+  facts.push(`Historical rolling evaluation: strategy ${pct(a)} vs equal-weight benchmark ${pct(b)} after modeled fees, over the tested windows. Neither result predicts future returns.`);
+  if(ok(wf.optimized.metrics.maxDrawdown))facts.push(`Largest modeled strategy drawdown in those windows: ${pct(wf.optimized.metrics.maxDrawdown)}.`);
+  if(opt&&ok(opt.equal?.annualVolatility)&&ok(opt.optimized?.annualVolatility)){
+   if(opt.optimized.annualVolatility<opt.equal.annualVolatility&&a<b){
+    warnings.push('The allocation model reduced fitted volatility in-sample, but its later-window compounded return was below the equal-weight benchmark. These are different measures: lower estimated risk did not mean better tested return.');
+   }else if(a>b){
+    warnings.push('The strategy finished ahead of the benchmark in these past test windows, but that alone does not establish persistent superiority or justify a trade.');
+   }
+  }
+  warnings.push('Look for sensitivity to trading costs, tested dates, and selection bias before placing weight on backtest results.');
+ }else if(historicalValid){actions.push({id:'walkforward',text:'Run the walk-forward comparison; review both strategies on identical historical periods.'});}
+ const screening=s.screening;
+ if(screening&&Array.isArray(screening.comparisons)&&screening.comparisons.length){
+  facts.push(`Investment screening: ${screening.comparisons.length} candidates compared under a selected historical scoring lens. A ranking describes the chosen inputs and is not an estimate of future profit.`);
+  if(Array.isArray(screening.warnings)&&screening.warnings.length){
+   warnings.push('Screening quality checks raised '+screening.warnings.length+' warning(s); inspect the screening report before comparing ranks.');
+  }
+ }else actions.push({id:'ideas',text:'Run Investment screening to compare candidates before reviewing an individual company.'});
+ const allocation=s.purchaseImpact;
+ if(allocation&&ok(allocation.proposedBudget)&&allocation.after&&allocation.before){
+  facts.push(`Hypothetical purchase impact was calculated for ${dollars(allocation.proposedBudget)}. The virtual account was not changed.`);
+  if(ok(allocation.before.largest?.weight)&&ok(allocation.after.largest?.weight)){
+   facts.push(`Largest holding share: ${pct(allocation.before.largest.weight)} before versus ${pct(allocation.after.largest.weight)} after the proposed purchase.`);
+  }
+ }else if(entries.length){actions.push({id:'home',text:'Use Proposed purchase impact to compare concentration before recording any virtual transaction.'});}
+ if(s.robustness){facts.push('A walk-forward robustness report was calculated. Review how changing fees and evaluation windows changes the comparison before trusting the result.');}
+ else if(wf)actions.push({id:'walkforward',text:'After walk-forward, run the benchmark and cost-sensitivity checks.'});
+ if(s.forecast){facts.push('A hypothetical multi-year company cash-flow scenario was calculated. Growth, discount, margin, and terminal assumptions materially affect its value; it is not a per-share price target.');}
+ const company=s.company;
+ if(company&&Array.isArray(company.annual)&&company.annual.length){
+  const latest=company.annual[0],m=latest?.metrics||{};
+  const name=String(company.name||company.symbol||'Selected company').slice(0,90);
+  const fiscal=String(latest?.fiscal_end||'unknown period');
+  if(ok(m.revenue_usd))facts.push(`${name}: reported revenue ${dollars(m.revenue_usd)} for fiscal year ending ${fiscal}. Business revenue is not an investment return.`);
+  if(ok(m.free_cash_flow_usd))facts.push(`Reported-cash-flow-derived FCF proxy: ${dollars(m.free_cash_flow_usd)}; this is not free cash flow to the firm or equity valuation.`);
+  else warnings.push(`Comparable cash-flow proxy is unavailable for ${name}. Valuation conclusions should not fill missing inputs.`);
+  actions.push({id:'valuation',text:'Review SEC filing dates and vary cash-flow assumptions; do not interpret the discounted proxy as a stock price target.'});
+ }else actions.push({id:'valuation',text:'Choose a company in Valuation and load SEC statements to assess its business finances.'});
+ if(s.horizon==='short')warnings.push('You indicated a near-term need for the money. Stock and cryptocurrency prices can fall before you need cash; consider your actual liquidity requirements separately from this simulated portfolio.');
+ if(s.horizon==='unknown')actions.push({id:'home',text:'Identify when you might need the money before comparing investment risk.'});
+ if(s.comfort==='low')warnings.push('You indicated that a substantial loss would be difficult to tolerate. Historical drawdowns are only examples of what can go wrong, not worst-case limits.');
+ if(!actions.length)actions.push({id:'home',text:'Review the dates, assumptions, uncertainty, and saved research before making any decision.'});
+ notes.push('The report describes evidence and missing information. It cannot determine whether to buy, hold, or sell, and it does not know your debts, emergency savings, taxes, full finances, or personal suitability.');
+ notes.push('This report is generated locally from the current signed-in browser session. It is not a chat model, and no portfolio data is sent to an AI provider.');
+ return {title:'Your research, explained',facts,warnings,actions:actions.slice(0,7),notes,createdAt:s.now&&isDate(s.now)?s.now:null};
+}
+const api={analyze};if(typeof module!=='undefined'&&module.exports)module.exports=api;
+if(root)root.QFPrivateGuideV79=api;
+})(typeof window!=='undefined'?window:null);
 
 /* QuantForge private research: pure in-sample portfolio analytics.
  * No external requests, synthetic data, brokerage orders, or portfolio mutations.
@@ -2431,6 +2571,36 @@ if(typeof module!=='undefined'&&module.exports)module.exports=root.QFPrivateDeci
 (function () {
 'use strict';
 const $=id=>document.getElementById(id);
+let guideReportV79=null;
+function clearGuideV79(){
+ guideReportV79=null;
+ const out=$('private-guide-result-v79'),btn=$('private-guide-export-v79');
+ if(out)out.textContent='Research changed. Generate a new summary to use the latest results.';
+ if(btn)btn.disabled=true;
+}
+function runGuideV79(){
+ if(!privateState){message('Sign in and complete authenticator verification first.');return;}
+ const symbol=$('private-valuation-company').value;
+ const report=window.QFPrivateGuideV79.analyze({
+  cash:privateState.cash,holdings:privateState.holdings,quotes:quoted,
+  selected:researchSelection,history:historySeries,optimizer:optimizerResult,
+  walkforward:walkforwardResult,company:valuationCompanies[symbol]||null,
+  screening:ideaDecisionBrief,purchaseImpact:allocationResultV74,
+  robustness:robustnessResultV68,forecast:forecastResultV66,
+  horizon:$('private-guide-horizon-v79').value,comfort:$('private-guide-comfort-v79').value,
+  now:new Date().toISOString()
+ });
+ guideReportV79=report;
+ const ul=items=>'<ul class="tiny">'+items.map(item=>'<li>'+safe(item)+'</li>').join('')+'</ul>';
+ const actions=report.actions.map(a=>'<li>'+safe(a.text)+' <button class="text-link" type="button" data-guide-go-v79="'+safe(a.id)+'">Open '+safe(({trade:'Virtual trades',ideas:'Investment screening',research:'Market data',optimization:'Optimization',walkforward:'Walk-forward',valuation:'Valuation',home:'Overview'})[a.id]||'Overview')+'</button></li>').join('');
+ $('private-guide-result-v79').innerHTML='<h4>What the available evidence says</h4>'+ul(report.facts.length?report.facts:['No completed research calculations are available yet.'])+
+  '<h4>Important risks and limits</h4>'+ul(report.warnings.length?report.warnings:['No numerical risk conclusion can be drawn without verified market observations.'])+
+  '<h4>What to check next</h4><ol class="tiny">'+actions+'</ol><h4>How to use this report</h4>'+ul(report.notes)+
+  '<p class="tiny">Generated on request; results are not automatically updated. No real trades or data transfers took place.</p>';
+ $('private-guide-export-v79').disabled=false;
+ message('Research summary generated locally. No trades or external AI calls.');
+}
+
 const M=window.QFModel;
 let privateState=null, version=0, quoted={}, mfaFactorId=null;
 let researchSelection=[];
@@ -2486,6 +2656,7 @@ async function handleAuthState(state){
 }
 async function loadState(){
   clearAllocationV74();
+  clearGuideV79();
   const d=await api('private/state');privateState=d.portfolio;version=d.version;
   quoted={}; // Never carry fictional quotes across a private session.
   const symbols=Object.keys(privateState.holdings || {});
@@ -2548,7 +2719,7 @@ async function verifyMFA(){
 async function logout(){
   try{await api('auth/logout',{});}catch(_){ /* Clear visible private content regardless */ }
   ideasRunSequence++;ideaData=[];ideaFundamentals={};$('ideas-results').textContent='';$('ideas-run').disabled=false;clearDecisionBrief();
-  clearMFA();showStep('login');privateState=null;quoted={};historyLoadSequence++;historySeries=null;closeAssetBrowser();researchSelection=[];$('private-symbol').value='';$('private-selected-asset').textContent='No investment selected';renderResearchSelection();
+  clearGuideV79();clearMFA();showStep('login');privateState=null;quoted={};historyLoadSequence++;historySeries=null;closeAssetBrowser();researchSelection=[];$('private-symbol').value='';$('private-selected-asset').textContent='No investment selected';renderResearchSelection();
   optimizerResult=null;$('private-opt-export').disabled=true;$('private-opt-output').textContent='Load market history to begin.';$('private-opt-risk').textContent='';
   $('private-history-chart').textContent='Load a historical series to begin.';$('private-risk-results').textContent='';$('private-backtest-output').textContent='';$('private-valuation-output').textContent='';$('private-peers').textContent='';$('private-concentration').textContent='';$('private-positions').textContent='';
   $('private-wf-output').textContent='Load price history in Market data to begin.';$('private-wf-export').disabled=true;walkforwardResult=null;clearV66Walkforward();clearV66Forecast();
@@ -2873,6 +3044,7 @@ function refreshResearchContext(){
  }
 }
 function invalidateResearchHistory(reason){
+ clearGuideV79();
  historyLoadSequence++;
  historySeries=null;optimizerResult=null;walkforwardResult=null;clearV66Walkforward();
  $('private-opt-export').disabled=true;$('private-wf-export').disabled=true;
@@ -2989,6 +3161,7 @@ function privateBacktest(){
  message('Backtest comparison calculated.');
 }
 async function privateValuation(){
+ clearGuideV79();
  const symbol=$('private-valuation-company').value;
  if(!symbol){message('Choose a company with Browse companies first.');return;}
  $('private-valuation-output').textContent='Loading available SEC annual filings…';
@@ -3132,6 +3305,7 @@ function optimizerDiagnostics(res){
   '<p class="tiny">All statistics use the same observed period. A portfolio selected using these data is in-sample; the displayed historical result is not an out-of-sample backtest. Daily rebalancing is assumed when compounding weighted returns. No dividends, borrow costs, slippage, or brokerage orders are included. Variance contributions may be negative for hedging assets.</p>';
 }
 function runOptimization(){
+ clearGuideV79();
  if(!privateState){message('Sign in to run private portfolio research.');return;}
  if(!historySeries){message('Go to Market data and load 2–5 investments first.');privateTab('research');return;}
  $('private-opt-output').textContent='Calculating historical allocation…';
@@ -3320,6 +3494,7 @@ $('private-wf-v68-export').addEventListener('click',exportV68Robustness);
 
 const fcMoney=x=>finite(x)?usd(x):'Unavailable';
 function runFinancialForecast(){
+ clearGuideV79();
  if(!privateState){message('Sign in first.');return;}
  const symbol=$('private-valuation-company').value,company=valuationCompanies[symbol];
  if(!company){message('Load SEC annual statements for a selected company first.');return;}
@@ -3359,6 +3534,7 @@ function wfChart(d){
   '<p class="tiny">Green: optimized portfolio (all selected investments). Orange: equal-weight benchmark (the same investments). These are two strategies, not one line per company. To view prices for each investment, open Market data. Trading costs included; prices observed historically.</p>';
 }
 function runWalkforward(){
+ clearGuideV79();
  if(!privateState){message('Sign in first.');return;}
  if(!historySeries){message('Load investment history in Market data first.');privateTab('research');return;}
  try{
@@ -3426,6 +3602,18 @@ for(const id of ['private-fc-years','private-fc-growth','private-fc-margin','pri
 }
 
 document.querySelectorAll('[data-private-tab]').forEach(b=>b.addEventListener('click',()=>privateTab(b.dataset.privateTab)));
+$('private-guide-run-v79').addEventListener('click',runGuideV79);
+$('private-guide-export-v79').addEventListener('click',()=>{
+ if(!privateState||!guideReportV79)return;
+ downloadResearchJSON('quantforge-private-research-explanation.json',guideReportV79);
+});
+$('private-guide-result-v79').addEventListener('click',e=>{
+ const b=e.target.closest('[data-guide-go-v79]');
+ if(!b||!privateState)return;
+ const id=b.dataset.guideGoV79;
+ if(['home','trade','ideas','research','optimization','backtest','walkforward','valuation','settings'].includes(id))privateTab(id);
+});
+
 $('private-history-load').addEventListener('click',loadHistory);
 $('private-history-days').addEventListener('change',()=>invalidateResearchHistory('Historical period changed. Load the new date range first.'));
 $('private-backtest-run').addEventListener('click',privateBacktest);

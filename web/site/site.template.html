@@ -173,7 +173,7 @@ body{font-size:15px;line-height:1.62}main{width:min(1280px,100%)}.app{grid-templ
   <div class="sec-toolbar"><span class="tiny">Quick company examples:</span><button class="btn sm" data-sec-symbol="MSFT">Microsoft · Technology</button><button class="btn sm" data-sec-symbol="WMT">Walmart · Retail</button><button class="btn sm" data-sec-symbol="XOM">Exxon Mobil · Energy</button><button class="btn sm" data-go="methods">Data &amp; methods</button></div>
   <div class="pane"><div class="row"><h3>Financial performance by company</h3><span class="mini" id="sec-status">SEC annual filings</span></div>
   <div class="formgrid" style="margin-top:14px">
-    <div class="field"><label for="sec-company">Company</label><select id="sec-company"><option value="MSFT">Microsoft (MSFT)</option></select></div>
+    <div class="field"><label for="sec-company-search-v79">Find a company by name or ticker</label><input id="sec-company-search-v79" type="search" placeholder="Search published SEC companies" autocomplete="off" maxlength="90"><span class="tiny" id="sec-company-count-v79" role="status">Showing the published company snapshot</span></div><div class="field"><label for="sec-company">Company</label><select id="sec-company"><option value="MSFT">Microsoft (MSFT)</option></select></div>
     <div class="field"><label for="sec-margin-shock">Hypothetical margin change (percentage points)</label><input id="sec-margin-shock" type="number" min="-15" max="15" step="1" value="-3" /></div>
   </div>
   <div class="three" id="sec-figures" style="margin-top:16px"></div>
