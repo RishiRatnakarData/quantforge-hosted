@@ -27,7 +27,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from qrcode.image.svg import SvgPathImage
 
-from cloud import asset_directory, crypto_history, sec_fundamentals
+from cloud import asset_directory, crypto_history, sec_fundamentals, valuation_market_v73
 from quantforge.desk.engine import FEE_RATE, QTY, DeskError, cents, money, valid_quote
 from quantforge.desk.market import AlpacaDeskMarket
 from quantforge.live.provider import AlpacaClient, MarketDataError
@@ -417,6 +417,16 @@ def private_assets(request: Request, response: Response,
     try:
         return asset_directory.browse(category=category, letter=letter, query=query, page=page)
     except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+
+
+@app.get("/api/private/valuation-capital")
+def private_valuation_capital(request: Request, response: Response, symbol: str):
+    """Owner-verified SEC point-in-time financial structure for price-aware research."""
+    owner(request, response)
+    try:
+        return valuation_market_v73.get_capital(symbol)
+    except sec_fundamentals.SECFundamentalsError as exc:
         raise HTTPException(422, str(exc)) from exc
 
 

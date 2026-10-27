@@ -25,6 +25,7 @@ function showStep(step){
   $('private-login').hidden=step!=='login';
   $('private-mfa').hidden=step!=='mfa';
   $('private-signed').hidden=step!=='ready';
+  if(step!=='ready'){valueBridgeRequestV73++;const bridge=$('private-value-output-v73');if(bridge)bridge.textContent='';}
   $('private-status').textContent=step==='ready'?'Private · Authenticator verified':
     step==='mfa'?'Private · Authenticator required':'Private · Sign in required';
 }
@@ -247,6 +248,7 @@ function chooseAsset(symbol,name,kind){
   if(kind==='crypto'){message('Crypto assets do not have SEC corporate financial statements.');return;}
   $('private-valuation-company').value=symbol;
   $('private-valuation-selected').textContent=name+' ('+symbol+')';
+   valueBridgeRequestV73++;$('private-value-output-v73').textContent='';
   $('private-valuation-output').textContent='Select Run scenario to load available SEC filings.';
   $('private-fc-output').textContent='Load SEC statements for the newly selected company first.';clearV66Forecast();
   message('Selected '+name+'. SEC statements will be checked when you run the scenario.');
@@ -996,7 +998,64 @@ document.querySelectorAll('[data-private-tab]').forEach(b=>b.addEventListener('c
 $('private-history-load').addEventListener('click',loadHistory);
 $('private-history-days').addEventListener('change',()=>invalidateResearchHistory('Historical period changed. Load the new date range first.'));
 $('private-backtest-run').addEventListener('click',privateBacktest);
+/* V7.3: owner-only price/filing comparison; never calls brokerage order endpoints. */
+let valueBridgeRequestV73=0;
+async function loadValueBridgeV73(){
+ const symbol=$('private-valuation-company').value;
+ const out=$('private-value-output-v73');
+ if(!privateState){out.textContent='Sign in to load private valuation context.';return;}
+ if(!symbol){out.textContent='Choose a company by name first.';return;}
+ const company=valuationCompanies[symbol];
+ if(!company){out.textContent='Run scenario first to load this company’s SEC annual financials.';return;}
+ const state=privateState,seq=++valueBridgeRequestV73;
+ $('private-value-run-v73').disabled=true;
+ out.textContent='Loading SEC shares, balance-sheet disclosures and private market quote…';
+ try{
+  const [capital,quotes]=await Promise.all([
+   api('private/valuation-capital?symbol='+encodeURIComponent(symbol)),
+   api('private/quotes?symbols='+encodeURIComponent(symbol))
+  ]);
+  if(seq!==valueBridgeRequestV73||privateState!==state||$('private-valuation-company').value!==symbol)return;
+  const quote=(quotes.quotes||[]).find(q=>q.symbol===symbol);
+  if(!quote)throw Error('Observed price unavailable for this company.');
+  const result=window.QFPrivateValueV73.build(company,capital,quote,new Date().toISOString());
+  const num=(n)=>typeof n==='number'&&Number.isFinite(n)?n.toLocaleString('en-US',{maximumFractionDigits:2}):'Unavailable';
+  const money=n=>typeof n==='number'&&Number.isFinite(n)?usd(n):'Unavailable';
+  const pct=n=>typeof n==='number'&&Number.isFinite(n)?(n*100).toFixed(2)+'%':'Unavailable';
+  const multiple=n=>typeof n==='number'&&Number.isFinite(n)?n.toFixed(2)+'×':'Unavailable';
+  const rows=[
+   ['Alpaca observed market price',money(result.price)],
+   ['Quote source / timestamp',safe(result.venue)+' / '+safe(result.priceTime||'Unavailable')],
+   ['SEC common shares outstanding',num(result.shares)],
+   ['Shares reported period',safe(result.sharesTime||'Unavailable')],
+   ['Estimated market capitalization',money(result.marketCap)],
+   ['Annual FCF proxy fiscal period',safe(result.fiscalEnd||'Unavailable')],
+   ['Annual reported FCF proxy',money(result.reportedFcf)],
+   ['Price / annual FCF proxy',multiple(result.pFcf)],
+   ['Annual FCF proxy yield',pct(result.fcfYield)],
+   ['Market capitalization / annual revenue',multiple(result.pSales)],
+   ['Indicative EV (partial components)',money(result.approximateEV)]
+  ];
+  const notes=[...result.warnings,...result.limitations].map(x=>'<li>'+safe(x)+'</li>').join('');
+  const facts=/^https:\/\/data\.sec\.gov\/api\/xbrl\/companyfacts\/CIK[0-9]{10}\.json$/.test(result.secUrl||'')?result.secUrl:null;
+  out.innerHTML='<p class="tiny"><strong>Historical filing data and observed market quote—not an intrinsic-value target or investment recommendation.</strong></p>'+
+   displayTable(['Measure','Observed / calculated'],rows)+
+   '<p class="tiny">Source: '+safe(result.source)+' · '+(facts?'<a href="'+safe(facts)+'" target="_blank" rel="noopener noreferrer">Inspect SEC filing facts</a>':'SEC facts unavailable')+'</p>'+
+   '<h4>Interpretation and missing information</h4><ul class="tiny">'+notes+'</ul>';
+  message('Observed-price research loaded for '+symbol+'. No trades were placed.');
+ }catch(e){
+  if(seq===valueBridgeRequestV73&&privateState===state&&$('private-valuation-company').value===symbol){
+   out.textContent='Price and SEC comparison unavailable: '+e.message;
+   message(e.message);
+  }
+ }finally{
+  if(seq===valueBridgeRequestV73)$('private-value-run-v73').disabled=false;
+ }
+}
+$('private-value-run-v73').addEventListener('click',loadValueBridgeV73);
+
 $('private-valuation-run').addEventListener('click',privateValuation);
+$('private-valuation-run').addEventListener('click',()=>{valueBridgeRequestV73++;$('private-value-output-v73').textContent='';});
 $('private-capital-submit').addEventListener('click',changeCapital);
 privatePeers();
 
