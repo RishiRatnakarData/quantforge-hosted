@@ -604,6 +604,8 @@ for(const id of ['private-opt-objective','private-opt-cap'])$(id).addEventListen
 let walkforwardResult=null;
 /* V6.6: derived reports are ephemeral, not stored with virtual positions. */
 let forecastResultV66=null,forecastDiagnosticsV66=null,walkforwardDiagnosticsV66=null;
+/* V6.8: derived robustness scenarios are ephemeral and never alter saved portfolios. */
+let robustnessResultV68=null;
 function clearV66Walkforward(){
  walkforwardDiagnosticsV66=null;
  $('private-wf-diagnostics').hidden=true;
@@ -611,6 +613,10 @@ function clearV66Walkforward(){
  $('private-wf-robustness-output').textContent='';
  $('private-wf-report').disabled=true;
  $('private-wf-robustness').disabled=true;
+ robustnessResultV68=null;
+ $('private-wf-v68-run').disabled=true;
+ $('private-wf-v68-export').disabled=true;
+ $('private-wf-v68-output').textContent='Run Walk-forward first, then check robustness.';
 }
 function clearV66Forecast(){
  forecastResultV66=null;forecastDiagnosticsV66=null;
@@ -675,6 +681,10 @@ function showV66WalkforwardDiagnostics(d){
    'This fingerprint identifies the exact aligned price arrays used in this session; it does not prove source authenticity or allow a full replay without the licensed original bars. Asset and parameter selection can bias historical results.</p>');
  $('private-wf-diagnostics').hidden=false;$('private-wf-report').disabled=false;$('private-wf-robustness').disabled=false;
  $('private-wf-robustness-output').textContent='';
+ robustnessResultV68=null;
+ $('private-wf-v68-run').disabled=false;
+ $('private-wf-v68-export').disabled=true;
+ $('private-wf-v68-output').textContent='Run robustness checks to compare strategies over the same evaluation dates.';
 }
 function runV66CostSensitivity(){
  if(!privateState||!walkforwardResult||!historySeries){message('Run Walk-forward with loaded historical investments first.');return;}
@@ -686,6 +696,62 @@ function runV66CostSensitivity(){
    '<p class="tiny">The same assets, training boundaries, objective and cap are used in every scenario. Only the fee assumption changes. These are historical counterfactuals, not execution-quality estimates.</p>';
  }catch(e){$('private-wf-robustness-output').textContent=e.message;message(e.message);}
 }
+
+/* V6.8: comparative evaluation over identical dates, plus passive benchmark. */
+function runV68Robustness(){
+ if(!privateState||!walkforwardResult||!historySeries){message('Load investments and run Walk-forward before robustness checks.');return;}
+ try{
+  const r=window.QFPrivateRobustness.analyze(historySeries,walkforwardResult);
+  robustnessResultV68=r;
+  const passive=r.passive,base=r.strategyCases[0];
+  const scenarios=r.strategyCases.map(x=>[x.label,
+   x.objective==='minimum'?'Min volatility':x.objective==='inverse'?'Inverse volatility':'Return tilt',
+   percent(x.cap),String(x.feeBps),percent(x.optimizedReturn),
+   percent(x.equalWeightReturn),x.activeDifferencePp.toFixed(2)+' pp',usd(x.fees)]);
+  const omitted=r.leaveOneOut.map(w=>[String(w.excludedWindow),w.excludedDates,
+   percent(w.strategyReturn),percent(w.benchmarkReturn),w.differencePp.toFixed(2)+' pp']);
+  $('private-wf-v68-output').innerHTML=
+   '<h4 style="margin:14px 0 8px">Evaluation coverage</h4>'+
+   displayTable(['Measure','Result'],[
+    ['Underlying investments',r.symbols.map(researchCompanyLabel).join(' · ')],
+    ['Common out-of-sample period',r.dates.start+' to '+r.dates.end],
+    ['Evaluated sessions',String(r.evaluationSessions)],
+    ['Non-overlapping test windows',String(r.windowCount)],
+    ['Loaded market source',r.source]])+
+   (r.evaluationSessions<126||r.windowCount<6?'<p class="notice"><strong>Short evaluation:</strong> Use the 2-year period in Research investments, reload, and rerun Walk-forward for greater coverage when available.</p>':'')+
+   '<h4 style="margin:14px 0 8px">Passive benchmark (one initial purchase)</h4>'+
+   displayTable(['Portfolio','Compounded historical return','Volatility','Max drawdown','Modeled fees'],[
+    ['Selected rolling allocation',percent(base.optimizedReturn),percent(walkforwardResult.optimized.metrics.annualVol),percent(walkforwardResult.optimized.metrics.maxDrawdown),usd(walkforwardResult.optimized.fees)],
+    ['Equal-weight rebalanced',percent(base.equalWeightReturn),percent(walkforwardResult.benchmark.metrics.annualVol),percent(walkforwardResult.benchmark.metrics.maxDrawdown),usd(walkforwardResult.benchmark.fees)],
+    ['Equal-weight buy and hold',percent(passive.change),percent(passive.annualVol),percent(passive.maxDrawdown),usd(passive.fee)]])+
+   '<p class="tiny">The passive benchmark buys the same investments at the first evaluation close, includes its initial entry fee, and does not rebalance afterward. All three use the same price-only evaluation dates.</p>'+
+   '<h4 style="margin:14px 0 8px">Allocation-rule and constraint sensitivity</h4>'+
+   displayTable(['Case','Rule','Max weight','Fee (bps)','Rolling return','Rebalanced equal weight','Difference','Modeled rolling fees'],scenarios)+
+   '<p class="tiny">All scenario allocations refit using the same training and evaluation boundaries. Only the rule, position cap, or trading fee changes. These are preselected checks, not a competition to choose the highest historical return.</p>'+
+   '<h4 style="margin:14px 0 8px">Leave-one-window-out sensitivity</h4>'+
+   displayTable(['Excluded window','Removed evaluation dates','Rolling return','Rebalanced benchmark','Difference'],omitted)+
+   '<p class="tiny">Full-sample benchmark-relative difference: '+r.summary.fullActivePp.toFixed(2)+' pp. '+
+   'After excluding each test window in turn, the difference ranges from '+r.summary.looMinActivePp.toFixed(2)+
+   ' to '+r.summary.looMaxActivePp.toFixed(2)+' pp. '+
+   (r.summary.windowDependentSign?'<strong>The sign changes when at least one window is omitted.</strong> ':'')+
+   'Remaining periods are not refitted; this measures result concentration, not statistically independent validation.</p>'+
+   '<p class="tiny">Historical evaluation only; prices exclude dividends and transaction modeling omits spreads, slippage, and taxes. No investment advice or actual trades.</p>';
+  $('private-wf-v68-export').disabled=false;
+  message('Robustness comparisons calculated locally. No trades placed.');
+ }catch(e){robustnessResultV68=null;$('private-wf-v68-export').disabled=true;
+  $('private-wf-v68-output').textContent=e.message;message(e.message);}
+}
+function exportV68Robustness(){
+ if(!privateState||!historySeries||!walkforwardResult||!robustnessResultV68)return;
+ try{
+  const manifest=window.QFPrivateIntegrity.marketManifest(historySeries,walkforwardResult,$('private-history-days').value);
+  if(!window.QFPrivateIntegrity.verifyMarketFingerprint(historySeries,manifest))throw Error('Historical price integrity verification failed.');
+  downloadResearchJSON('quantforge-walkforward-robustness.json',window.QFPrivateRobustness.report(robustnessResultV68,manifest));
+  message('Historical robustness report downloaded locally.');
+ }catch(e){message('Robustness report unavailable: '+e.message);}
+}
+$('private-wf-v68-run').addEventListener('click',runV68Robustness);
+$('private-wf-v68-export').addEventListener('click',exportV68Robustness);
 
 const fcMoney=x=>finite(x)?usd(x):'Unavailable';
 function runFinancialForecast(){

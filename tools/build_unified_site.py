@@ -100,7 +100,11 @@ block='''<section class="tabpage" id="page-private">
         <div id="private-wf-output" style="margin-top:15px" aria-live="polite">Load historical investments in Market research to begin.</div>
         <div id="private-wf-diagnostics" class="pane" hidden style="margin-top:14px"><h3>Evaluation diagnostics</h3><div id="private-wf-diagnostics-content"></div>
           <div class="controls"><button class="btn" type="button" id="private-wf-robustness" disabled>Check transaction-cost sensitivity</button><button class="btn" type="button" id="private-wf-report" disabled>Download research report (JSON)</button></div>
-          <div id="private-wf-robustness-output" aria-live="polite"></div></div>
+          <div id="private-wf-robustness-output" aria-live="polite"></div>
+          <div class="pane" style="margin-top:16px"><h3>Strategy robustness and benchmarks</h3>
+          <p class="tiny">Compare a passive buy-and-hold benchmark, alternative allocation methods, higher fees, and leaving out each evaluation window. All allocation-rule comparisons hold the evaluation dates fixed. For longer tests, select 2 years in Research investments and reload history first.</p>
+          <div class="controls"><button class="btn" type="button" id="private-wf-v68-run" disabled>Check strategy robustness</button><button class="btn" type="button" id="private-wf-v68-export" disabled>Download robustness report (JSON)</button></div>
+          <div id="private-wf-v68-output" aria-live="polite">Run Walk-forward first, then check robustness.</div></div></div>
         <p class="tiny">Model uses price-only historical returns; no dividends, borrow costs, slippage, taxes, or corporate-action simulations. Backtests remain subject to selection bias and do not establish future performance.</p>
       </div>
     </section>
@@ -173,7 +177,7 @@ for slot, file in [('/* QF_MODEL */','model.js'),('/* QF_APP */','app.js'),('/* 
  text=(src/'site'/file).read_text(encoding="utf-8")
  if file=='private.js':
   # Bundled alongside the existing private script: still only three CSP-protected scripts.
-  text=(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_multimarket.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_forecast_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_walkforward_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_diagnostics_v66.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_integrity_v67.js').read_text(encoding='utf-8')+'\n'+text
+  text=(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_multimarket.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_forecast_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_walkforward_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_diagnostics_v66.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_integrity_v67.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_robustness_v68.js').read_text(encoding='utf-8')+'\n'+text
  if file=='app.js':
   assert text.count('/* QF_SEC_DATA */ null')==1
   # Bundle pure SEC analytics in the existing public app script. CSP remains 3 hashes.
