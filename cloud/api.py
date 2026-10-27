@@ -542,12 +542,31 @@ def private_history(request: Request, response: Response, symbols: str, days: in
     equities = [s for s in parsed if s not in crypto_history.SUPPORTED]
     try:
         client = AlpacaClient.from_environment() if equities else None
+        stock_feed = "sip"
+        stock_observations = {}
+        if equities:
+            try:
+                # Preserve the original SIP attempt for historical market-wide data.
+                stock_observations = {
+                    symbol: client.history(symbol, start.isoformat(), end.isoformat())
+                    for symbol in equities
+                }
+            except MarketDataError as exc:
+                # One denied SIP request means retry *all* stocks on IEX so an
+                # analysis never silently combines different equity data feeds.
+                if "HTTP 403" not in str(exc) or "feed or endpoint access denied" not in str(exc):
+                    raise
+                stock_feed = "iex"
+                stock_observations = {
+                    symbol: client.history(symbol, start.isoformat(), end.isoformat(), feed="iex")
+                    for symbol in equities
+                }
         observations = {}
         for symbol in parsed:
-            if symbol in crypto:
-                observations[symbol] = crypto_history.history(symbol, start.isoformat(), end.isoformat())
-            else:
-                observations[symbol] = client.history(symbol, start.isoformat(), end.isoformat())
+            observations[symbol] = (
+                crypto_history.history(symbol, start.isoformat(), end.isoformat())
+                if symbol in crypto else stock_observations[symbol]
+            )
     except (MarketDataError, crypto_history.CryptoHistoryError) as exc:
         raise HTTPException(422, str(exc)) from exc
     # Mix only actually observed shared dates. Crypto trades on weekends but
@@ -558,22 +577,29 @@ def private_history(request: Request, response: Response, symbols: str, days: in
         raise HTTPException(422, "Not enough overlapping daily observations for these investments.")
     closes = {symbol: {x["date"]: x["close"] for x in obs} for symbol, obs in observations.items()}
     annual = 365 if not equities else 252
+    equity_source = (
+        "Alpaca stocks IEX-only split-adjusted daily bars" if stock_feed == "iex"
+        else "Alpaca stocks SIP split-adjusted daily bars"
+    )
     source = (
         "Alpaca US crypto daily bars (UTC calendar days)" if not equities else
-        "Alpaca stocks SIP split-adjusted daily bars" if not crypto else
-        "Alpaca stocks SIP and US crypto daily bars (shared equity sessions)"
+        equity_source if not crypto else
+        f"{equity_source} and US crypto daily bars (shared equity sessions)"
     )
     coverage = (
         "Crypto venue daily closes; market open 24/7. No fees, spread or funding included." if not equities else
         "Stock prices are split-adjusted and exclude dividends. Crypto uses UTC daily bars; only shared stock sessions are compared. No synthetic weekend stock returns."
         if crypto else "Stock prices are split-adjusted and exclude dividends. Latest incomplete session excluded."
     )
+    if equities and stock_feed == "iex":
+        coverage += " IEX covers only one US exchange, not consolidated US trading; prices, volume and risk estimates can differ from SIP."
     return {"symbols": parsed, "dates": dates,
             "closes": {symbol: [closes[symbol][d] for d in dates] for symbol in parsed},
             "asset_classes": {symbol: "crypto" if symbol in crypto else "us_equity" for symbol in parsed},
             "sessions_per_year": annual,
             "calendar": "UTC calendar days" if not equities else "shared US stock sessions",
             "source": source, "coverage": coverage,
+            "equity_feed": stock_feed if equities else None,
             "as_of": end.isoformat(), "licensed_private": True}
 
 

@@ -120,8 +120,10 @@ class AlpacaClient:
                 "venue": "IEX", "coverage": "IEX only; not consolidated US market",
                 "source": "Alpaca personal API", "quote_type": "latest_traded_price"}
 
-    def history(self, ticker: str, start: str, end: str) -> list[dict]:
-        """Split-adjusted historical SIP 1-day bars; basic plan excludes last 15 minutes."""
+    def history(self, ticker: str, start: str, end: str, *, feed: str = "sip") -> list[dict]:
+        """Split-adjusted historical daily bars; caller selects SIP or IEX."""
+        if feed not in ("sip", "iex"):
+            raise MarketDataError("Only SIP or IEX historical stock feeds are supported.")
         symbol = valid_symbol(ticker)
         try:
             first, last = dt.date.fromisoformat(start), dt.date.fromisoformat(end)
@@ -135,7 +137,7 @@ class AlpacaClient:
         token: str | None = None
         for _ in range(50):
             params = {"timeframe": "1Day", "start": start, "end": end,
-                      "feed": "sip", "adjustment": "split", "limit": 10000,
+                      "feed": feed, "adjustment": "split", "limit": 10000,
                       "sort": "asc"}
             if token:
                 params["page_token"] = token
