@@ -75,6 +75,13 @@
 .ideas-score{font:650 26px Georgia,serif;color:var(--accent)}.ideas-brief{font-size:12px;color:#495f58}
 @media(max-width:650px){.story-grid{grid-template-columns:1fr}.story-grid p{min-height:0}}
 
+/* V7.2 owner-only decision research; never visible on the public homepage. */
+.decision-brief{border:1px solid #abcfc2;background:linear-gradient(135deg,#f8fcfa,#eef6f1);padding:17px;border-radius:12px;margin:20px 0}
+.decision-brief[hidden]{display:none!important}.decision-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0}
+.decision-tile{border:1px solid #d0e0d9;background:white;border-radius:9px;padding:12px;min-width:0}.decision-tile strong{font-size:16px;display:block;overflow-wrap:anywhere}.decision-tile span{font-size:11px;color:#587267}
+.decision-brief h4{font-size:13px;margin:19px 0 8px}.decision-brief .tiny{line-height:1.65}
+@media(max-width:650px){.decision-grid{grid-template-columns:1fr}.decision-brief .section-title{display:block}.decision-brief .section-title button{margin-top:10px;max-width:100%}}
+
 /* V7.1: public technical exhibit: no private data, scripts, or API requests. */
 .tech-lead{padding:clamp(22px,3.5vw,36px);border:1px solid #c8dcd3;border-radius:14px;background:linear-gradient(120deg,#fff 18%,#eff7f3 100%);margin-bottom:17px}
 .tech-lead h1{font:600 clamp(27px,3.7vw,40px)/1.15 Georgia,serif;max-width:780px;margin:8px 0 11px}.tech-lead p{max-width:760px;color:#4e685e;font-size:14px}

@@ -115,7 +115,7 @@ async function verifyMFA(){
 }
 async function logout(){
   try{await api('auth/logout',{});}catch(_){ /* Clear visible private content regardless */ }
-  ideasRunSequence++;ideaData=[];ideaFundamentals={};$('ideas-results').textContent='';$('ideas-run').disabled=false;
+  ideasRunSequence++;ideaData=[];ideaFundamentals={};$('ideas-results').textContent='';$('ideas-run').disabled=false;clearDecisionBrief();
   clearMFA();showStep('login');privateState=null;quoted={};historyLoadSequence++;historySeries=null;closeAssetBrowser();researchSelection=[];$('private-symbol').value='';$('private-selected-asset').textContent='No investment selected';renderResearchSelection();
   optimizerResult=null;$('private-opt-export').disabled=true;$('private-opt-output').textContent='Load market history to begin.';$('private-opt-risk').textContent='';
   $('private-history-chart').textContent='Load a historical series to begin.';$('private-risk-results').textContent='';$('private-backtest-output').textContent='';$('private-valuation-output').textContent='';$('private-peers').textContent='';$('private-concentration').textContent='';$('private-positions').textContent='';
@@ -302,7 +302,7 @@ function ideaSelectionRender(){
  $('ideas-count').textContent=ideaUniverse.length+' selected (maximum 10)';
  $('ideas-selected').innerHTML=ideaUniverse.map(symbol=>'<button type="button" class="asset-chip" data-ideas-remove="'+safe(symbol)+'">'+safe(assetNames[symbol]||symbol)+' ('+safe(symbol)+') ×</button>').join('')||'No investments selected.';
 }
-function invalidateIdeaResults(){ideasRunSequence++;ideaData=[];ideaFundamentals={};ideaSource='';$('ideas-results').textContent='';ideaStatus('Selection changed. Compare investments to refresh the research ranking.');}
+function invalidateIdeaResults(){ideasRunSequence++;ideaData=[];ideaFundamentals={};ideaSource='';$('ideas-results').textContent='';clearDecisionBrief();ideaStatus('Selection changed. Compare investments to refresh the research ranking.');}
 function ideaChoose(symbol,name,kind){
  if(kind==='crypto'){message('This stock and ETF shortlist does not compare 24/7 crypto with equity-session risk. Use Market research for cryptocurrency.');return false;}
  if(ideaUniverse.includes(symbol)){message(name+' is already in your shortlist.');return true;}
@@ -310,8 +310,36 @@ function ideaChoose(symbol,name,kind){
  ideaUniverse.push(symbol);assetNames[symbol]=name;ideaSelectionRender();invalidateIdeaResults();message('Added '+name+' to your investment shortlist.');return true;
 }
 function ideaPct(n){return typeof n==='number'&&Number.isFinite(n)?(100*n).toFixed(1)+'%':'Unavailable';}
+let ideaDecisionBrief=null;
+function clearDecisionBrief(){
+ ideaDecisionBrief=null;
+ $('ideas-brief').hidden=true;
+ $('ideas-brief-output').textContent='';
+ $('ideas-brief-export').disabled=true;
+}
+function renderDecisionBrief(){
+ if(!privateState||!ideaData.length){clearDecisionBrief();return;}
+ const model=window.QFPrivateDecision;
+ const brief=model.build(ideaData,$('ideas-lens').value,ideaFundamentals,privateState.holdings||{},quoted,privateState.cash);
+ ideaDecisionBrief=brief;
+ const top=brief.comparisons.slice(0,3);
+ const paired=brief.correlations.pairs.filter(x=>x.value>=.8).slice(0,3);
+ const selectedLens={balanced:'Balanced',growth:'Growth',defensive:'Risk-aware'}[brief.lens];
+ const topCards=top.map(r=>'<div class="decision-tile"><span>RESEARCH PRIORITY '+r.position+'</span><strong>'+safe(assetNames[r.symbol]||r.symbol)+'</strong><span>'+safe(r.symbol)+' · '+r.score+'/100 score · rank '+r.rankRange[0]+'–'+r.rankRange[1]+' across perspectives</span><p class="tiny">'+safe(r.cautions.length?r.cautions.slice(0,2).join('; '):'No threshold flags triggered in this dataset')+'</p></div>').join('');
+ const held=brief.comparisons.filter(x=>x.held);
+ const heldSummary=held.length?held.map(x=>{const weight=x.concentration==null?'unavailable weight':ideaPct(x.concentration)+' of virtual account';return safe(x.symbol)+' ('+safe(weight)+')';}).join(', '):'No selected candidate overlaps your virtual holdings.';
+ const corrSummary=paired.length?paired.map(p=>safe(p.a)+' / '+safe(p.b)+' ('+(p.value*100).toFixed(0)+'% historical daily-return correlation)').join('; '):'No pair above 0.80 among comparable histories.';
+ const cautions=brief.warnings.map(x=>'<li>'+safe(x)+'</li>').join('');
+ $('ideas-brief-output').innerHTML='<p class="tiny"><strong>'+safe(selectedLens)+' perspective · '+safe(ideaSource)+'</strong>. These are research priorities among the '+brief.selected.length+' securities you chose, not recommended purchases or projected returns.</p>'+
+  '<div class="decision-grid">'+topCards+'</div>'+
+  '<h4>How much do these ideas overlap?</h4><p class="tiny">'+corrSummary+' '+(brief.correlations.notAligned?' '+brief.correlations.notAligned+' pair(s) omitted because dates did not match.':'')+'</p>'+
+  '<h4>Already represented in your virtual portfolio?</h4><p class="tiny">'+heldSummary+' '+safe(brief.portfolio.note)+'</p>'+
+  '<h4>Before using real money</h4><ul class="tiny"><li>Compare the current market price with a defensible business valuation; SEC FCF proxies alone are not per-share values.</li><li>Check earnings, competitive risks, sector exposure, taxes, fees, personal time horizon, and potential loss of principal.</li>'+cautions+'</ul>';
+ $('ideas-brief').hidden=false;
+ $('ideas-brief-export').disabled=false;
+}
 function renderIdeas(){
- if(!ideaData.length){$('ideas-results').textContent='No comparable observations were returned.';return;}
+ if(!ideaData.length){$('ideas-results').textContent='No comparable observations were returned.';clearDecisionBrief();return;}
  const mode=$('ideas-lens').value;
  const ordered=window.QFPrivateIdeas.rank(ideaData,mode);
  const rows=ordered.map((x,i)=>{
@@ -323,6 +351,7 @@ function renderIdeas(){
    '<ul class="ideas-brief">'+why+'</ul>'+fundamentalsText+'<div class="controls"><button class="btn sm" type="button" data-ideas-valuation="'+safe(x.symbol)+'">Review SEC valuation</button><button class="btn sm" type="button" data-ideas-trade="'+safe(x.symbol)+'">Inspect virtual trade</button></div></article>';
  }).join('');
  $('ideas-results').innerHTML='<div class="notice">'+safe(ideaSource)+' · Price-only returns; no dividends, future forecasts, or current executable quote. A 100/100 score is not a 100% success probability. SEC figures are context and do not affect this market-risk ranking.</div>'+rows;
+ renderDecisionBrief();
 }
 async function compareIdeas(){
  if(!privateState){ideaStatus('Authenticate first.');return;}
@@ -332,7 +361,7 @@ async function compareIdeas(){
  const chunks=[];
  for(let i=0;i<selection.length;i+=5)chunks.push(selection.slice(i,i+5));
  if(chunks.at(-1).length===1)chunks.at(-1).unshift(selection[0]);
- ideaData=[];ideaFundamentals={};$('ideas-results').textContent='';$('ideas-run').disabled=true;
+ ideaData=[];ideaFundamentals={};$('ideas-results').textContent='';clearDecisionBrief();$('ideas-run').disabled=true;
  try{
   for(let i=0;i<chunks.length;i++){
    ideaStatus('Loading observed market history · group '+(i+1)+' of '+chunks.length+'…');
@@ -343,7 +372,7 @@ async function compareIdeas(){
     if(rows.some(x=>x.symbol===symbol))continue;
     const prices=data.closes?.[symbol];
     if(!prices||prices.length<126)throw Error('Insufficient history for '+symbol+'. Choose another candidate.');
-    rows.push({symbol,prices,annual:data.sessions_per_year});
+    rows.push({symbol,prices,dates:Array.isArray(data.dates)?data.dates.slice():null,annual:data.sessions_per_year});
    }
   }
   if(sources.size>1)throw Error('The selected groups used different market feeds. Reduce the shortlist so comparisons use one consistent source.');
@@ -366,9 +395,15 @@ async function compareIdeas(){
    renderIdeas();
    ideaStatus('Market observations and available SEC fundamentals loaded. Missing SEC figures remain unavailable'+(info.length?' ('+info.length+' issuer(s) unavailable).':'.'));
   }
- }catch(e){if(request===ideasRunSequence){ideaData=[];$('ideas-results').textContent='';ideaStatus('Unable to compare: '+e.message);}}
+ }catch(e){if(request===ideasRunSequence){ideaData=[];$('ideas-results').textContent='';clearDecisionBrief();ideaStatus('Unable to compare: '+e.message);}}
  finally{if(request===ideasRunSequence)$('ideas-run').disabled=false;}
 }
+$('ideas-brief-export').addEventListener('click',()=>{
+ if(!privateState||!ideaDecisionBrief){message('Load your current investment research before exporting.');return;}
+ const result=window.QFPrivateDecision.report(ideaDecisionBrief,ideaSource,$('ideas-period').value);
+ downloadResearchJSON('quantforge-investment-decision-brief.json',result);
+ message('Historical decision brief downloaded. Your account positions and raw market prices were excluded.');
+});
 $('ideas-browse').addEventListener('click',()=>openAssetBrowser('ideas'));
 $('ideas-reset').addEventListener('click',()=>{ideaUniverse=initialIdeas.map(x=>x[0]);ideaSelectionRender();invalidateIdeaResults();});
 $('ideas-run').addEventListener('click',compareIdeas);
