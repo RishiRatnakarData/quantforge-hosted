@@ -1088,8 +1088,11 @@ function renderAllocationV74(plan,risk){
   ['Hypothetical units added',plan.unitsBought.toFixed(6)],
   ['Cash before / after',usd(plan.cashBefore)+' / '+usd(plan.cashAfter)],
   ['Total virtual portfolio value (unchanged)',usd(plan.totalAfter)],
-  ['Largest position before / after',pct(plan.before.largest?.weight||0)+' / '+pct(plan.after.largest?.weight||0)],
-  ['Concentration HHI including cash (before / after)',plan.before.hhi.toFixed(4)+' / '+plan.after.hhi.toFixed(4)]
+  ['Invested share of total (before / after)',pct(plan.before.investedWeight)+' / '+pct(plan.after.investedWeight)],
+  ['Largest position as share of total (before / after)',pct(plan.before.largest?.weight||0)+' / '+pct(plan.after.largest?.weight||0)],
+  ['Largest position as share of invested assets', (plan.before.largestInvestedWeight===null?'Not applicable':pct(plan.before.largestInvestedWeight))+' / '+(plan.after.largestInvestedWeight===null?'Not applicable':pct(plan.after.largestInvestedWeight))],
+  ['Invested-only HHI (before / after)',(plan.before.investmentHhi===null?'Not applicable':plan.before.investmentHhi.toFixed(4))+' / '+(plan.after.investmentHhi===null?'Not applicable':plan.after.investmentHhi.toFixed(4))],
+  ['Cash-inclusive allocation HHI (not a risk measure)',plan.before.hhi.toFixed(4)+' / '+plan.after.hhi.toFixed(4)]
  ];
  const riskView=risk?.available?
   '<h4>Aligned-history volatility sensitivity</h4>'+displayTable(['Measure','Before','After'],[
@@ -1098,7 +1101,7 @@ function renderAllocationV74(plan,risk){
    '<p class="tiny">'+safe(risk.firstDate)+' to '+safe(risk.lastDate)+' · '+safe(risk.note)+'</p>':
    '<p class="notice">Historical volatility comparison unavailable: '+safe(risk?.reason||'Historical data not loaded.')+' The cash and concentration comparison remains available.</p>';
  $('private-allocation-results-v74').innerHTML='<p class="tiny"><strong>Hypothetical only: no portfolio balances or holdings were changed.</strong> All amounts use observed historical/last-trade quotes, not executable prices.</p>'+
-   displayTable(['Metric','What-if result'],lines)+'<h4>Before vs. after allocations</h4>'+displayTable(['Investment','Before','After','Change'],weights)+riskView+
+   displayTable(['Metric','What-if result'],lines)+'<p class="tiny">Cash-inclusive HHI treats all virtual cash as one allocation bucket. It can fall when cash is invested even as stock-market volatility rises. Invested-only HHI excludes cash, and is unavailable for an all-cash portfolio.</p>'+'<h4>Before vs. after allocations</h4>'+displayTable(['Investment','Before','After','Change'],weights)+riskView+
    '<h4>Assumptions and cautions</h4><ul class="tiny">'+plan.warnings.map(w=>'<li>'+safe(w)+'</li>').join('')+'</ul>';
  $('private-allocation-export-v74').disabled=false;
 }
