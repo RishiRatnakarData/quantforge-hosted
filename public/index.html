@@ -127,11 +127,26 @@ body{font-size:15px;line-height:1.62}main{width:min(1280px,100%)}.app{grid-templ
 @media(max-width:900px){.evidence-quant-grid{grid-template-columns:1fr}.evidence-data{max-height:none}}
 @media(max-width:800px){.app{display:block}.private-nav{gap:7px}.private-nav-group{flex-basis:220px}}
 @media(max-width:600px){.evidence-links{grid-template-columns:1fr}.private-nav-group{flex-basis:100%}.pane{padding:18px 16px}}
+
+/* V7.7 public research lab: clear, interactive evidence with accessible underlying records. */
+.lab-lead{border:1px solid #bbd9ca;border-radius:16px;padding:clamp(22px,4vw,33px);margin-bottom:20px;background:linear-gradient(115deg,#eef7f2,#fff)}
+.lab-lead h1{margin:8px 0 11px}.lab-lead p{font-size:14px;color:#4d675b;max-width:840px;line-height:1.7}.lab-truth{display:flex;flex-wrap:wrap;gap:9px;margin-top:17px}.lab-truth span{background:#fff;border:1px solid #cce4d6;border-radius:6px;padding:7px 10px;font-size:11px;color:#31584c;font-weight:700}
+.lab-skill-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin:16px 0 23px}.lab-skill{background:#fff;border:1px solid #d7e5de;border-radius:10px;padding:13px}.lab-skill strong{font-size:12px;display:block;color:#245a49}.lab-skill small{display:block;font-size:11px;color:#64786e;margin-top:6px}
+.lab-exhibit{margin-bottom:20px;scroll-margin-top:25px}.lab-section-heading{display:flex;gap:14px;flex-wrap:wrap;align-items:baseline;justify-content:space-between;margin-bottom:11px}.lab-section-heading strong{font-size:18px}.lab-section-heading span{font-size:11px;font-weight:700;color:#23614f}
+.lab-settings{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin-bottom:17px}.lab-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}.lab-fields .field{margin-bottom:8px}
+.lab-chart{border:1px solid #d8e8df;background:#fbfefc;border-radius:11px;padding:16px;margin:16px 0 10px}.lab-chart svg{display:block;width:100%;max-height:340px;height:auto}
+.lab-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.lab-metrics>div{padding:14px;border:1px solid #dae9e0;border-radius:10px;background:#f8fcf9}.lab-metrics small{display:block;font-size:11px;color:#5a7466}.lab-metrics strong{display:block;font:600 clamp(18px,2vw,25px)/1.2 Georgia,serif;color:#174e3e;margin:8px 0 3px}
+.lab-insight{font-size:14px!important;line-height:1.7!important;color:#314e40;background:#f1f7f3;border-left:3px solid #6ba98a;padding:12px 14px;margin:14px 0!important}.lab-foot{margin-top:13px;line-height:1.7!important}.lab-legend{display:flex;flex-wrap:wrap;gap:15px;margin:9px 0;font-size:11px;color:#536f61}.lab-legend span{display:inline-flex;align-items:center;gap:6px}.lab-key{display:inline-block;width:11px;height:11px;border-radius:3px}
+.lab-weight-head,.lab-weight-row{display:grid;grid-template-columns:minmax(145px,1fr) minmax(145px,1.6fr) 80px;gap:9px;align-items:center}.lab-weight-head{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:#536f61;border-bottom:1px solid #d7e5de;padding:12px 0}.lab-weight-row{padding:11px 0;border-bottom:1px solid #edf2ef;font-size:12px}.lab-weight-row strong{text-align:right}.lab-bars{display:grid;gap:4px}.lab-bar{height:8px;background:#b87935;border-radius:3px}.lab-bar.optimized{background:#16705d}
+.lab-details{margin-top:16px}.lab-details summary{color:#155947;font-size:13px;font-weight:700;cursor:pointer;padding:10px 0}.lab-exhibit .table-wrap{margin-top:12px}.lab-exhibit .table-wrap table{min-width:490px}.lab-evidence-links{display:flex;gap:15px;flex-wrap:wrap;margin:17px 0 0}.lab-evidence-links a{color:#156349;font-size:12px;font-weight:700}
+@media(max-width:1050px){.lab-skill-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:750px){.lab-skill-grid,.lab-metrics,.lab-fields,.lab-settings{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.lab-skill-grid,.lab-metrics,.lab-fields,.lab-settings{grid-template-columns:1fr}.lab-weight-head,.lab-weight-row{grid-template-columns:minmax(90px,1.3fr) minmax(95px,1.5fr) 58px;gap:5px}.lab-weight-row{font-size:11px}}
 </style></head><body>
-<div class="app"><aside class="side"><div class="brand"><div class="mark">Q</div>quantforge</div><nav id="navigation" aria-label="Main navigation"><span class="nav-caption">Public research</span><button class="nav-btn active" data-page="overview" aria-current="page">Overview</button><button class="nav-btn" data-page="sec">SEC Financials</button><span class="nav-caption">Public model demonstrations</span><button class="nav-btn" data-page="portfolio">Portfolio</button><button class="nav-btn" data-page="quant">Quant</button><button class="nav-btn" data-page="valuation">Valuation</button><button class="nav-btn" data-page="ml">Company peers</button><span class="nav-caption">Research implementation</span><button class="nav-btn" data-page="systems">Research systems</button><button class="nav-btn" data-page="methods">Methods &amp; engineering</button><span class="nav-caption">Authenticated</span><button class="nav-btn" data-page="private">My workspace</button></nav><div class="sidenote">Financial statements · statistical models<br>Private portfolio tools behind sign-in</div></aside>
+<div class="app"><aside class="side"><div class="brand"><div class="mark">Q</div>quantforge</div><nav id="navigation" aria-label="Main navigation"><span class="nav-caption">Public research</span><button class="nav-btn active" data-page="overview" aria-current="page">Overview</button><button class="nav-btn" data-page="sec">SEC Financials</button><span class="nav-caption">Public model demonstrations</span><button class="nav-btn" data-page="portfolio">Portfolio</button><button class="nav-btn" data-page="quant">Quant</button><button class="nav-btn" data-page="valuation">Valuation</button><button class="nav-btn" data-page="ml">Company peers</button><span class="nav-caption">Research implementation</span><button class="nav-btn" data-page="lab">Research lab</button><button class="nav-btn" data-page="systems">Research systems</button><button class="nav-btn" data-page="methods">Methods &amp; engineering</button><span class="nav-caption">Authenticated</span><button class="nav-btn" data-page="private">My workspace</button></nav><div class="sidenote">Financial statements · statistical models<br>Private portfolio tools behind sign-in</div></aside>
 <a class="skip-link" href="#main-content">Skip to content</a><main id="main-content"><div class="topbar"><span class="eyebrow">Financial research · models and data</span><span class="badge">RESEARCH / DEMO</span></div>
 <section class="tabpage active" id="page-overview">
-<div class="intro-simple"><span class="eyebrow">PERSONAL SOFTWARE &amp; DATA SCIENCE PROJECT</span><h1>Financial research, built end to end.</h1><p>QuantForge brings SEC financial disclosures, statistical modeling, portfolio mathematics, and software engineering into a single research platform. The public research pages present source-backed financial analysis and implemented model demonstrations; the authenticated workspace extends the same system into historical market research, portfolio testing, and virtual allocation studies.</p><div class="controls"><button class="btn primary" data-go="sec">Reported SEC analysis</button><button class="btn" data-go="quant">Public model results</button><button class="btn" data-go="methods">Implementation and tests</button></div></div>
+<div class="intro-simple"><span class="eyebrow">PERSONAL SOFTWARE &amp; DATA SCIENCE PROJECT</span><h1>Financial research, built end to end.</h1><p>QuantForge brings SEC financial disclosures, statistical modeling, portfolio mathematics, and software engineering into a single research platform. The public research pages present source-backed financial analysis and implemented model demonstrations; the authenticated workspace extends the same system into historical market research, portfolio testing, and virtual allocation studies.</p><div class="controls"><button class="btn primary" data-go="sec">Reported SEC analysis</button><button class="btn" data-go="lab">Interactive research lab</button><button class="btn" data-go="methods">Implementation and tests</button></div></div>
 <div class="project-story pane"><div class="section-title"><h3>Inside the project</h3><span class="mini">Four connected disciplines</span></div><div class="story-grid">
 <div><span class="eyebrow">01 · DATA ENGINEERING</span><h3>Source-backed statements</h3><p>SEC Company Facts ingestion, fiscal-period selection, filing lineage, missing-value controls, and reproducible exports.</p><button class="text-link" data-go="sec">Explore financials →</button></div>
 <div><span class="eyebrow">02 · QUANTITATIVE ANALYTICS</span><h3>Risk and optimization</h3><p>Covariance shrinkage, allocation constraints, downside simulation, and risk-return comparisons with clear modeling assumptions.</p><button class="text-link" data-go="quant">Quantitative model →</button></div>
@@ -148,7 +163,7 @@ body{font-size:15px;line-height:1.62}main{width:min(1280px,100%)}.app{grid-templ
   <div class="tech-tile"><span class="eyebrow">FUNDAMENTAL RESEARCH</span><strong>SEC scenario forecasting</strong><p>Reported annual filings, FCF proxies, discounting, terminal-value and sensitivity analysis.</p><span class="mini">Financial modeling</span></div>
   <div class="tech-tile"><span class="eyebrow">PRODUCT ENGINEERING</span><strong>Authenticated analytics</strong><p>Read-only market feeds, owner-only storage, MFA, content security, and CI.</p><span class="mini">Full-stack security</span></div>
  </div>
- <div class="controls" style="margin-top:0"><button class="btn primary" data-go="systems">Explore the research engine</button><button class="btn" data-go="methods">Read methodology &amp; architecture</button></div>
+ <div class="controls" style="margin-top:0"><button class="btn primary" data-go="lab">Explore interactive research findings</button><button class="btn" data-go="systems">Research systems</button><button class="btn" data-go="methods">Read methodology &amp; architecture</button></div>
 </div>
 <div class="pane"><div class="section-title"><h3>Reported annual financials · SEC EDGAR</h3><span class="mini">Historical company filings</span></div><div class="three" id="home-sec-highlights"></div><div class="controls"><button class="btn primary" data-go="sec">Explore SEC Financials</button><span class="tiny" id="home-sec-updated">Historical filings · not live stock prices</span></div></div>
 <div class="pane"><div class="section-title"><h3>Interactive portfolio example</h3><span class="mini">Simulated holdings and prices</span></div><div class="three"><div class="metric"><span class="muted">Sample portfolio value</span><strong id="home-value">—</strong></div><div class="metric"><span class="muted">Cash available</span><strong id="home-cash">—</strong></div><div class="metric"><span class="muted">Invested</span><strong id="home-invested">—</strong></div></div><div class="section-title"><h3>Sample allocation</h3><button class="btn sm" data-go="portfolio">Portfolio model</button></div><div id="home-allocation"></div></div>
@@ -183,13 +198,57 @@ body{font-size:15px;line-height:1.62}main{width:min(1280px,100%)}.app{grid-templ
 <section class="tabpage" id="page-valuation"><div class="pagehead"><h1>Valuation</h1><p>Interactive discounted cash flow methodology using illustrative company assumptions. These values are not actual company valuations; SEC Financials contains the real reported figures.</p></div><div class="pane"><h3>Company DCF</h3><div class="formgrid" style="margin-top:15px"><div class="field"><label for="dcf-company">Company</label><select id="dcf-company"><option value="MSFT">Microsoft (MSFT)</option><option value="AMZN">Amazon</option><option value="ADBE">Adobe</option></select></div><div class="field"><label for="dcf-growth">Revenue growth (%)</label><input id="dcf-growth" type="number" min="-40" max="80" value="5"></div><div class="field"><label for="dcf-wacc">WACC (%)</label><input id="dcf-wacc" type="number" min="1" max="80" value="10"></div><div class="field"><label for="dcf-term">Terminal growth (%)</label><input id="dcf-term" type="number" min="0" max="20" value="2.5" step="0.5"></div><div class="field"><label for="dcf-margin">Operating margin (%)</label><input id="dcf-margin" type="number" min="0" max="90" placeholder="Use illustrative base"></div></div><div class="controls"><button class="btn primary" id="dcf-run">Calculate DCF</button></div><p id="dcf-error" class="error" style="margin-top:8px"></p></div><div id="dcf-result"></div></section>
 <section class="tabpage" id="page-ml"><div class="pagehead"><h1>Company peers</h1><p>Compare company characteristics using standardized model inputs. The SEC Financials tab provides reported company figures.</p></div><div class="pane"><div class="formgrid"><div class="field"><label for="ml-company">Company</label><select id="ml-company"></select></div></div><div class="controls"><button class="btn primary" id="ml-run">Compare financial profiles</button></div><div class="tiny" style="margin-top:9px">Five features: revenue growth, operating margin, net margin, free-cash-flow margin and debt/assets.</div></div><div id="ml-result"></div></section>
 
+
+<section class="tabpage" id="page-lab">
+ <div class="lab-lead"><span class="eyebrow">PUBLIC INTERACTIVE RESEARCH · VERSION 7.7</span><h1>Financial research lab</h1>
+  <p>Follow the path from source-backed corporate disclosures to quantitative decisions and chronological model evaluation. The visualizations calculate results from available inputs and explain their meaning. Historical SEC facts are separate from synthetic investment scenarios.</p>
+  <div class="lab-truth"><span>Real annual SEC company facts</span><span>Recalculated quantitative models</span><span>Simulated market return experiments</span><span>No account or private market-data access</span></div>
+ </div>
+ <div class="lab-skill-grid" aria-label="Technical disciplines demonstrated">
+  <div class="lab-skill"><strong>Data engineering</strong><small>SEC ingestion, alignment, validation and provenance</small></div>
+  <div class="lab-skill"><strong>Data analytics &amp; BI</strong><small>Revenue KPIs, comparisons, trends and findings</small></div>
+  <div class="lab-skill"><strong>Data science</strong><small>Model fitting, rolling evaluation and sensitivity</small></div>
+  <div class="lab-skill"><strong>Financial analysis</strong><small>Margins, growth, company financial statements</small></div>
+  <div class="lab-skill"><strong>Quantitative finance</strong><small>Covariance, constrained allocation, fees and drawdowns</small></div>
+ </div>
+ <nav class="research-jumps" aria-label="Research lab contents"><a href="#lab-sec">Company financials</a><a href="#lab-optimization">Portfolio optimization</a><a href="#lab-walkforward">Walk-forward evaluation</a><a href="#lab-technical">Code and validation</a></nav>
+ <section class="pane lab-exhibit" id="lab-sec">
+  <div class="lab-section-heading"><strong>01 · Explore reported company financials</strong><span>Actual public SEC filings</span></div>
+  <p class="evidence-intro">Choose an issuer to see fiscal-year revenue, annual growth and operating margins. The finding and table update from the reviewed SEC snapshot; gaps remain unavailable rather than being replaced.</p>
+  <div class="lab-settings"><div class="field"><label for="lab-issuer">Company from verified SEC snapshot</label><select id="lab-issuer"><option>Loading financial data…</option></select></div></div>
+  <div id="lab-sec-results" aria-live="polite"></div>
+  <div class="lab-evidence-links"><button class="text-link" data-go="sec">Complete SEC financial explorer →</button><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/site/sec_analytics.js" rel="noopener noreferrer" target="_blank">SEC metric calculations</a><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/tools/build_public_sec_snapshot.py" rel="noopener noreferrer" target="_blank">SEC source pipeline</a></div>
+ </section>
+ <section class="pane lab-exhibit" id="lab-optimization">
+  <div class="lab-section-heading"><strong>02 · Optimize a hypothetical portfolio</strong><span>Deterministic synthetic return observations</span></div>
+  <p class="evidence-intro">Estimate sample covariance, stabilize the estimate, and fit a feasible long-only minimum-variance portfolio. This result responds to the position cap and can be compared directly with equal weights.</p>
+  <div class="lab-fields"><div class="field"><label for="lab-cap">Maximum weight per investment</label><select id="lab-cap"><option value="25">25%</option><option value="35">35%</option><option value="45">45%</option><option value="55" selected>55%</option><option value="75">75%</option><option value="100">100%</option></select></div><div class="field"><label for="lab-fee">Rebalance cost per traded dollar</label><select id="lab-fee"><option value="0">0 basis points</option><option value="10" selected>10 basis points</option><option value="25">25 basis points</option><option value="50">50 basis points</option></select></div><div class="field"><label for="lab-train">Rolling training window</label><select id="lab-train"><option value="80">80 sessions</option><option value="120" selected>120 sessions</option><option value="160">160 sessions</option></select></div></div>
+  <div class="controls"><button type="button" class="btn primary" id="lab-recalculate">Recalculate models</button><span class="tiny">Changing settings updates both quant exhibits below</span></div><p id="lab-error" class="error" role="alert"></p>
+  <div id="lab-opt-results" aria-live="polite"></div>
+ </section>
+ <section class="pane lab-exhibit" id="lab-walkforward">
+  <div class="lab-section-heading"><strong>03 · Evaluate unseen periods, including fees</strong><span>Simulated past-only rolling experiment</span></div>
+  <p class="evidence-intro">The model is fitted on preceding sessions, applied to a separate 20-session test window, and refitted at the next boundary. Both allocation strategies use the same five underlying synthetic investment baskets. Observe whether the in-sample risk advantage persists after costs and drawdowns.</p>
+  <div id="lab-walk-results" aria-live="polite"></div>
+ </section>
+ <section class="pane lab-exhibit" id="lab-technical">
+  <div class="lab-section-heading"><strong>04 · Trace each finding to the implementation</strong><span>Engineering evidence</span></div>
+  <p class="evidence-intro">The public research lab is dependency-free JavaScript delivered as part of the existing content-security-protected build. Synthetic returns use a reproducible seed, and the SEC exhibit reads only the approved snapshot. Private research methods are a separate authenticated implementation.</p>
+  <div class="evidence-links">
+   <div><strong>Public calculations and regression tests</strong><p>Projection to weight constraints, covariance construction, train/test separation, and missing SEC-data behavior.</p><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/site/public_lab_v77.js" rel="noopener noreferrer" target="_blank">Model source</a><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/tests/public_lab_v77.test.cjs" rel="noopener noreferrer" target="_blank">Automated tests</a></div>
+   <div><strong>Private research implementation</strong><p>Actual investment selection, portfolio research, historical evaluation and risk controls remain behind MFA; their source is auditable separately.</p><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/site/private_optimizer.js" rel="noopener noreferrer" target="_blank">Optimizer implementation</a><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/site/private_walkforward_v65.js" rel="noopener noreferrer" target="_blank">Walk-forward implementation</a></div>
+  </div>
+  <p class="tiny lab-foot">Interpretation: the public charts demonstrate an implemented statistical workflow, not independently validated market-beating performance. The current SEC snapshot is historical. The public synthetic return generator is not a market data provider, forecast, or estimate of live asset risk.</p>
+ </section>
+</section>
+
 <section class="tabpage" id="page-systems">
  <div class="tech-lead">
   <span class="eyebrow">RESEARCH SYSTEMS · PUBLIC TECHNICAL EXHIBIT</span>
   <h1>Quantitative research systems</h1>
   <p>The research platform combines SEC data engineering, constrained numerical optimization, historical out-of-sample evaluation, financial forecasting, and authenticated application development. The sections below document the implemented methods and validation boundaries; private market observations and account records remain inaccessible to public visitors.</p>
   <div class="tech-meta"><span class="tech-pill">Real SEC disclosures in public explorer</span><span class="tech-pill">Illustrative diagrams below</span><span class="tech-pill">Private datasets stay private</span></div>
-  <div class="controls"><button class="btn primary" data-go="sec">Inspect real SEC data</button><button class="btn" data-go="quant">Public quant demonstration</button><button class="btn" data-go="methods">Read engineering methods</button></div>
+  <div class="controls"><button class="btn primary" data-go="sec">Inspect real SEC data</button><button class="btn" data-go="lab">Run public research models</button><button class="btn" data-go="methods">Read engineering methods</button></div>
  </div>
  <div class="pane"><div class="section-title"><h3>One platform, four computational stages</h3><span class="mini">Architecture at a glance</span></div>
  <div class="tech-stack" aria-label="Research flow: ingest market and SEC sources, validate and align data, model investment risk and valuation, evaluate then export">
@@ -783,6 +842,207 @@ root.QFPublicEvidence=api;
 if(typeof module!=='undefined' && module.exports)module.exports=api;
 })(typeof globalThis!=='undefined'?globalThis:this);
 
+/* QuantForge V7.7: accessible public research lab. SEC facts and synthetic modeling never mix. */
+(function(root){
+'use strict';
+const names=['US equity basket','Technology basket','Investment-grade bonds','International equity','Gold exposure'];
+const finite=x=>typeof x==='number'&&Number.isFinite(x);
+const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const round=(x,d=1)=>finite(x)?x.toFixed(d):'—';
+const percent=(x,d=1)=>finite(x)?`${(100*x).toFixed(d)}%`:'—';
+const toMoney=x=>finite(x)?'$'+(x/1e9).toFixed(2)+'B':'Unavailable';
+function synthetic(count=360,seed=7707){
+ let x=seed>>>0;
+ const uniform=()=>{x=(1664525*x+1013904223)>>>0;return (x+.5)/4294967296;};
+ const normal=()=>Math.sqrt(-2*Math.log(uniform()))*Math.cos(2*Math.PI*uniform());
+ const drift=[.00023,.00028,.00007,.00017,.00008];
+ const vol=[.0085,.013,.003,.0095,.0075];
+ const data=[];
+ for(let t=0;t<count;t++){
+  const broad=normal(),rates=normal(),defensive=normal();
+  data.push(vol.map((v,i)=>{
+   const marketWeight=[.83,1.02,-.25,.71,.12][i];
+   const defensiveWeight=[.05,.04,.66,.10,.67][i];
+   const noise=.40*normal();
+   return drift[i]+v*(.65*marketWeight*broad+.45*defensiveWeight*defensive+.18*rates+noise);
+  }));
+ }
+ return data;
+}
+function covariance(data,shrink=.12){
+ if(!Array.isArray(data)||data.length<3||data.some(r=>!Array.isArray(r)||r.length!==5||r.some(x=>!finite(x))))throw Error('Invalid or insufficient training returns');
+ const n=data.length,k=5,mean=Array.from({length:k},(_,j)=>data.reduce((a,r)=>a+r[j],0)/n);
+ const cov=Array.from({length:k},()=>Array(k).fill(0));
+ for(const row of data)for(let i=0;i<k;i++)for(let j=0;j<k;j++)cov[i][j]+=(row[i]-mean[i])*(row[j]-mean[j])/(n-1);
+ for(let i=0;i<k;i++)for(let j=0;j<k;j++)if(i!==j)cov[i][j]*=(1-shrink);
+ return cov;
+}
+function project(v,cap){
+ const n=v.length;
+ if(!(cap>0&&cap<=1&&n*cap>=1-1e-10))throw Error('The investment weight limit makes the portfolio infeasible');
+ let lo=Math.min(...v)-1,hi=Math.max(...v)+1;
+ for(let k=0;k<90;k++){
+  const mid=(lo+hi)/2,sum=v.reduce((a,vi)=>a+Math.max(0,Math.min(cap,vi-mid)),0);
+  if(sum>1)lo=mid;else hi=mid;
+ }
+ const weights=v.map(vi=>Math.max(0,Math.min(cap,vi-(lo+hi)/2)));
+ // Correct rounding residue without changing feasibility.
+ let diff=1-weights.reduce((a,b)=>a+b,0);
+ for(let i=0;i<n&&Math.abs(diff)>1e-11;i++){
+  const change=diff>0?Math.min(diff,cap-weights[i]):Math.max(diff,-weights[i]);
+  weights[i]+=change;diff-=change;
+ }
+ return weights;
+}
+function variance(w,cov){return w.reduce((s,wi,i)=>s+wi*cov[i].reduce((a,c,j)=>a+c*w[j],0),0);}
+function optimize(cov,cap=.55){
+ if(!Array.isArray(cov)||cov.length!==5||cov.some((row,i)=>!Array.isArray(row)||row.length!==5||row.some((v,j)=>!finite(v)||Math.abs(v-cov[j]?.[i])>1e-8)))throw Error('Covariance matrix must be finite and symmetric');
+ const maxRow=Math.max(...cov.map(row=>row.reduce((a,x)=>a+Math.abs(x),0)));
+ const step=1/(2*Math.max(maxRow,1e-10));
+ let w=Array(5).fill(.2);
+ for(let i=0;i<1100;i++){
+  const grad=w.map((_,j)=>2*cov[j].reduce((acc,v,k)=>acc+v*w[k],0));
+  const next=project(w.map((v,j)=>v-step*grad[j]),cap);
+  const change=next.reduce((a,v,j)=>a+Math.abs(v-w[j]),0);
+  w=next;if(change<1e-11)break;
+ }
+ return w;
+}
+function modeledRisk(returns,cap=.55){
+ const cov=covariance(returns),optimal=optimize(cov,cap),equal=Array(5).fill(.2);
+ return {cov,optimal,equal,volOptimal:Math.sqrt(Math.max(0,variance(optimal,cov))*252),volEqual:Math.sqrt(Math.max(0,variance(equal,cov))*252)};
+}
+function drawdown(wealth){let peak=wealth[0],worst=0;for(const w of wealth){peak=Math.max(peak,w);worst=Math.min(worst,w/peak-1);}return worst;}
+function walkforward(data,{train=120,feeBps=10,cap=.55,test=20}={}){
+ if(!Array.isArray(data)||data.length<train+test||!Number.isInteger(train)||train<60||!Number.isInteger(test)||test<1||!finite(feeBps)||feeBps<0||feeBps>100)throw Error('Invalid evaluation settings');
+ const paths={optimized:[1],equal:[1]},weights={optimized:Array(5).fill(.2),equal:Array(5).fill(.2)},fees={optimized:0,equal:0},windows=[];
+ for(let start=train;start<data.length;start+=test){
+  const risk=modeledRisk(data.slice(start-train,start),cap);
+  const planned={optimized:risk.optimal,equal:risk.equal};
+  const begin=paths.optimized.length-1;
+  const rebalanceValue={};
+  for(const key of ['optimized','equal']){
+   const turnover=planned[key].reduce((acc,w,i)=>acc+Math.abs(w-weights[key][i]),0);
+   const fee=turnover*feeBps/10000;
+   const prior=paths[key][paths[key].length-1];
+   rebalanceValue[key]=prior*(1-fee);
+   fees[key]+=fee;
+   weights[key]=planned[key].slice();
+  }
+  const first=start,last=Math.min(data.length,start+test);
+  for(let t=first;t<last;t++){
+   for(const key of ['optimized','equal']){
+    const oldW=weights[key],r=oldW.reduce((acc,w,j)=>acc+w*data[t][j],0);
+    const previous=t===first?rebalanceValue[key]:paths[key][paths[key].length-1];
+    paths[key].push(previous*(1+r));
+    weights[key]=oldW.map((w,j)=>w*(1+data[t][j])/(1+r));
+   }
+  }
+  windows.push({trainStart:start-train+1,trainEnd:start,testStart:first+1,testEnd:last,optimized:paths.optimized.at(-1),equal:paths.equal.at(-1),start:begin});
+ }
+ return {paths,fees,windows,maxDrawdown:{optimized:drawdown(paths.optimized),equal:drawdown(paths.equal)},train,feeBps,cap};
+}
+function secSeries(snapshot,symbol){
+ if(!Array.isArray(snapshot?.companies))return [];
+ const issuer=snapshot.companies.find(c=>c.symbol===symbol);
+ if(!issuer||!Array.isArray(issuer.annual))return [];
+ return issuer.annual.filter(a=>a&&typeof a.fiscal_end==='string'&&finite(a.metrics?.revenue_usd)&&a.metrics.revenue_usd>0)
+  .map(a=>({end:a.fiscal_end,revenue:a.metrics.revenue_usd,operating:finite(a.metrics.operating_income_usd)?a.metrics.operating_income_usd:null}))
+  .sort((a,b)=>a.end.localeCompare(b.end));
+}
+function trend(series){
+ return series.map((r,i)=>({...r,margin:finite(r.operating)?r.operating/r.revenue:null,growth:i&&series[i-1].revenue>0?r.revenue/series[i-1].revenue-1:null}));
+}
+function lineChart(series,{title='Model series',labelA='Optimized',labelB='Equal weight'}={}){
+ if(!series?.length||series.every(s=>s.length<2))return '<p>Insufficient chart data.</p>';
+ const values=series.flat().filter(finite);
+ const lo=Math.min(...values),hi=Math.max(...values),pad=(hi-lo||Math.abs(hi)||1)*.12;
+ const min=lo-pad,max=hi+pad,width=690,height=285,plotW=610,plotH=209;
+ const x=(i,n)=>52+plotW*(n<=1?0:i/(n-1)),y=v=>20+plotH*(max-v)/(max-min);
+ const lines=series.map((s,i)=>`<polyline fill="none" stroke="${i?'#b87935':'#16705d'}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" points="${s.map((v,j)=>`${x(j,s.length).toFixed(2)},${y(v).toFixed(2)}`).join(' ')}"/>`).join('');
+ const grid=[0,.25,.5,.75,1].map(t=>`<line x1="52" x2="662" y1="${20+209*t}" y2="${20+209*t}" stroke="#dceae2"/><text x="46" y="${24+209*t}" font-size="11" fill="#536d61" text-anchor="end">${round(max-(max-min)*t,2)}</text>`).join('');
+ return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(title)}: ${esc(labelA)} compared with ${esc(labelB)} across evaluation sessions"><title>${esc(title)}</title>${grid}${lines}<text x="360" y="263" font-size="12" text-anchor="middle" fill="#536d61">Out-of-sample sessions →</text></svg><div class="lab-legend"><span><i class="lab-key" style="background:#16705d"></i>${esc(labelA)}</span><span><i class="lab-key" style="background:#b87935"></i>${esc(labelB)}</span></div>`;
+}
+function secChart(rows){
+ if(rows.length<2)return '<p>At least two annual records are required.</p>';
+ const vals=rows.map(r=>r.revenue/1e9),maximum=Math.max(...vals)*1.17;
+ const barW=650/rows.length*.54;
+ const bars=rows.map((r,i)=>{
+  const x=60+(i+.5)*625/rows.length-barW/2,h=180*vals[i]/maximum;
+  return `<rect x="${round(x,2)}" y="${round(222-h,2)}" width="${round(barW,2)}" height="${round(h,2)}" rx="3" fill="#287d69"><title>${esc(r.end)} annual revenue ${esc(toMoney(r.revenue))}</title></rect><text x="${round(x+barW/2,2)}" y="241" text-anchor="middle" font-size="10" fill="#536d61">${esc(r.end.slice(0,4))}</text>`;
+ }).join('');
+ return `<svg viewBox="0 0 735 260" role="img" aria-label="Reported annual revenue by fiscal year in billions of US dollars"><title>Annual reported revenue (US dollars)</title><line x1="45" x2="704" y1="222" y2="222" stroke="#a3b9ad"/>${bars}<text x="8" y="25" fill="#536d61" font-size="12">Revenue ($B)</text></svg>`;
+}
+function marginChart(rows){
+ const valid=rows.filter(r=>finite(r.margin));
+ if(valid.length<2)return '<p class="tiny">A margin trend is unavailable because fewer than two operating-income observations are comparable.</p>';
+ const values=valid.map(r=>r.margin*100),lo=Math.min(...values),hi=Math.max(...values),pad=(hi-lo||10)*.22;
+ const min=lo-pad,max=hi+pad;
+ const x=i=>48+(i/(rows.length-1))*625,y=v=>20+(180*(max-v)/(max-min));
+ const segments=[];let current=[];
+ for(let i=0;i<rows.length;i++){
+  if(!finite(rows[i].margin)){if(current.length>1)segments.push(current);current=[];continue;}
+  current.push(`${round(x(i),2)},${round(y(rows[i].margin*100),2)}`);
+ }
+ if(current.length>1)segments.push(current);
+ const lines=segments.map(points=>`<polyline fill="none" stroke="#b87935" stroke-width="3" stroke-linejoin="round" points="${points.join(' ')}"/>`).join('');
+ const dots=rows.map((r,i)=>finite(r.margin)?`<circle cx="${round(x(i),2)}" cy="${round(y(r.margin*100),2)}" r="4.5" fill="#b87935"><title>FY ${esc(r.end)} operating margin ${percent(r.margin)}</title></circle>`:'').join('');
+ const labels=rows.map((r,i)=>`<text x="${round(x(i),2)}" y="225" text-anchor="middle" fill="#64786e" font-size="10">${esc(r.end.slice(0,4))}</text>`).join('');
+ return `<svg viewBox="0 0 735 249" role="img" aria-label="Operating margin over reported annual fiscal years, percent"><title>SEC operating margin trend (percent)</title><line x1="45" x2="700" y1="200" y2="200" stroke="#b9cdc0"/>${lines}${dots}${labels}<text x="8" y="16" fill="#64786e" font-size="12">Operating margin (%)</text></svg>`;
+}
+function renderSec(snapshot,symbol){
+ const company=snapshot?.companies?.find(c=>c.symbol===symbol),rows=trend(secSeries(snapshot,symbol));
+ if(!company||!rows.length)return '<p class="notice">The reviewed SEC snapshot has no comparable annual figures for this issuer. No observations have been invented.</p>';
+ const current=rows.at(-1),previous=rows.at(-2);
+ const impact=current.growth===null?'Revenue growth is unavailable.':`Reported revenue ${current.growth>=0?'increased':'decreased'} ${percent(Math.abs(current.growth))} versus the preceding available fiscal record.`;
+ const table=rows.map(r=>`<tr><td>${esc(r.end)}</td><td>${toMoney(r.revenue)}</td><td>${percent(r.growth)}</td><td>${percent(r.margin)}</td></tr>`).join('');
+ const source=String(company.source_url||'');
+ const href=/^https:\/\/data\.sec\.gov\/api\/xbrl\/companyfacts\/CIK\d{10}\.json$/.test(source)?` <a href="${esc(source)}" target="_blank" rel="noopener noreferrer">SEC Company Facts</a>`:'';
+ return `<div class="lab-metrics"><div><small>Latest reported revenue</small><strong>${toMoney(current.revenue)}</strong></div><div><small>Change vs preceding FY</small><strong>${percent(current.growth)}</strong></div><div><small>Operating margin</small><strong>${percent(current.margin)}</strong></div></div><div class="lab-chart">${secChart(rows)}${marginChart(rows)}</div><p class="lab-insight"><strong>Finding:</strong> ${impact} ${finite(current.margin)?`Operating income was ${percent(current.margin)} of reported revenue.`:'Operating margin is unavailable.'}</p><div class="table-wrap"><table><thead><tr><th>Fiscal year-end</th><th>Revenue</th><th>Annual change</th><th>Operating margin</th></tr></thead><tbody>${table}</tbody></table></div><p class="tiny lab-foot">Source: SEC Company Facts${href}. Snapshot cutoff: ${esc(snapshot.as_of||'not specified')}. Comparison uses the preceding available annual record, which may not represent a consecutive year; issuer fiscal periods can differ. Revenue and operating income are reported; growth and margin are derived. Historical financials do not predict stock returns.</p>`;
+}
+function renderOptimize(data,cap){
+ const out=modeledRisk(data.slice(0,120),cap);
+ const drop=out.volEqual>0?(1-out.volOptimal/out.volEqual):0;
+ const bars=names.map((name,i)=>`<div class="lab-weight-row"><span>${esc(name)}</span><div class="lab-bars"><div class="lab-bar" style="width:${round(out.equal[i]*100,3)}%" title="Equal weight ${percent(out.equal[i])}"></div><div class="lab-bar optimized" style="width:${round(out.optimal[i]*100,3)}%" title="Constrained minimum variance ${percent(out.optimal[i])}"></div></div><strong>${percent(out.optimal[i])}</strong></div>`).join('');
+ return `<div class="lab-metrics"><div><small>Equal-weight fitted volatility</small><strong>${percent(out.volEqual)}</strong></div><div><small>Optimized fitted volatility</small><strong>${percent(out.volOptimal)}</strong></div><div><small>Fitted volatility difference</small><strong>${percent(drop)}</strong></div></div><p class="lab-insight"><strong>Finding:</strong> Under these synthetic training returns, the feasible minimum-variance solution ${drop>=0?'reduces':'does not reduce'} estimated annualized volatility by ${percent(Math.abs(drop))} compared with equal weighting. This is an in-sample estimate, not an investment return forecast.</p><div class="lab-weight-head"><span>Investment basket</span><span>Weights — baseline / optimized</span><span>Optimized</span></div>${bars}<div class="lab-legend"><span><i class="lab-key" style="background:#b87935"></i>Equal weight</span><span><i class="lab-key" style="background:#16705d"></i>Optimized</span></div><p class="tiny lab-foot">120 simulated sessions; sample covariance with 12% off-diagonal shrinkage; long-only, fully invested; per-asset weight cap ${round(cap*100,0)}%. Objective: min wᵀΣw. The fitted result is calculated, not a drawn example.</p>`;
+}
+function renderWalk(data,cap,feeBps,train){
+ const r=walkforward(data,{cap,feeBps,train});
+ const a=r.paths.optimized.at(-1),b=r.paths.equal.at(-1);
+ const difference=a/b-1;
+ const rows=r.windows.map((w,i)=>`<tr><td>${i+1}</td><td>${w.trainStart}–${w.trainEnd}</td><td>${w.testStart}–${w.testEnd}</td><td>${percent(w.optimized-1)}</td><td>${percent(w.equal-1)}</td></tr>`).join('');
+ return `<div class="lab-metrics"><div><small>Optimized ending wealth · start 1.00</small><strong>${round(a,3)}×</strong></div><div><small>Equal-weight ending wealth</small><strong>${round(b,3)}×</strong></div><div><small>Optimized maximum drawdown</small><strong>${percent(r.maxDrawdown.optimized)}</strong></div></div><div class="lab-chart">${lineChart([r.paths.optimized,r.paths.equal],{title:'Simulated, after-cost out-of-sample wealth',labelA:'Constrained minimum variance',labelB:'Rebalanced equal weight'})}</div><p class="lab-insight"><strong>Finding:</strong> In this controlled simulation, the optimized strategy finished ${difference>=0?'above':'below'} the equal-weight benchmark by ${percent(Math.abs(difference))} on a relative-wealth basis. Both strategies include modeled rebalancing costs; neither curve represents actual historical trading.</p><details class="lab-details"><summary>Inspect each past-only training and test window (${r.windows.length})</summary><div class="table-wrap"><table><thead><tr><th>Window</th><th>Train sessions</th><th>Unseen test sessions</th><th>Optimized cumulative</th><th>Benchmark cumulative</th></tr></thead><tbody>${rows}</tbody></table></div></details><p class="tiny lab-foot">${train} preceding sessions to fit each model; next 20 non-overlapping sessions for evaluation. ${round(feeBps,0)} basis points applied to two-sided traded weight at each window boundary. Equal-weight benchmark is periodically rebalanced. Simulated assets, dates and returns; real-data performance claims are not made.</p>`;
+}
+function mount(snapshot){
+ const byId=id=>document.getElementById(id);
+ const host=byId('lab-sec-results');
+ if(!host)return;
+ const companies=Array.isArray(snapshot?.companies)?snapshot.companies.filter(c=>Array.isArray(c.annual)&&c.annual.length>0):[];
+ const issuer=byId('lab-issuer');
+ issuer.innerHTML=companies.map(c=>`<option value="${esc(c.symbol)}">${esc(c.name)} (${esc(c.symbol)})</option>`).join('');
+ if(companies.some(c=>c.symbol==='MSFT'))issuer.value='MSFT';
+ function refreshSec(){host.innerHTML=renderSec(snapshot,issuer.value);}
+ function refreshModels(){
+  const cap=Number(byId('lab-cap').value)/100,fee=Number(byId('lab-fee').value),train=Number(byId('lab-train').value),error=byId('lab-error');
+  try{
+   if(!finite(cap)||cap<.2||cap>1||!finite(fee)||fee<0||fee>100||![80,120,160].includes(train))throw Error('Choose valid model assumptions');
+   const observations=synthetic();
+   byId('lab-opt-results').innerHTML=renderOptimize(observations,cap);
+   byId('lab-walk-results').innerHTML=renderWalk(observations,cap,fee,train);
+   error.textContent='';
+  }catch(e){error.textContent=e.message;}
+ }
+ issuer.addEventListener('change',refreshSec);
+ for(const id of ['lab-cap','lab-fee','lab-train'])byId(id).addEventListener('change',refreshModels);
+ byId('lab-recalculate').addEventListener('click',refreshModels);
+ if(!companies.length)issuer.disabled=true;
+ refreshSec();refreshModels();
+}
+const api={synthetic,covariance,project,variance,optimize,modeledRisk,walkforward,secSeries,trend,renderSec,renderOptimize,renderWalk,mount};
+root.QFResearchLab=api;
+if(typeof module!=='undefined'&&module.exports)module.exports=api;
+})(typeof globalThis!=='undefined'?globalThis:this);
+
 /* Public demo: prebuilt real SEC filing facts plus browser-only simulated model examples. */
 (function(){
 'use strict';
@@ -795,12 +1055,12 @@ let state={cash:3500,holdings:{MSFT:5,VOO:8,AAPL:3,'BTC/USD':0.006}};
 const table=(heads,rows)=>'<div class="table-wrap"><table><thead><tr>'+heads.map(h=>'<th>'+h+'</th>').join('')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+row.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
 const error=(id,msg)=>{$(id).textContent=msg||'';};
 const num=id=>Number($(id).value);
-const PUBLIC_PAGES=new Set(['overview','sec','portfolio','quant','valuation','ml','methods','systems']);
+const PUBLIC_PAGES=new Set(['overview','sec','portfolio','quant','valuation','ml','methods','systems','lab']);
 function nav(name,updateHash=true){
  if(name!=='private' && !PUBLIC_PAGES.has(name))return;
  document.querySelectorAll('.tabpage').forEach(e=>e.classList.toggle('active',e.id==='page-'+name));
  document.querySelectorAll('.nav-btn').forEach(e=>{const active=e.dataset.page===name;e.classList.toggle('active',active);if(active)e.setAttribute('aria-current','page');else e.removeAttribute('aria-current');});
- const labels={overview:'RESEARCH / DEMO',sec:'REPORTED SEC FINANCIALS',portfolio:'SIMULATED PORTFOLIO',quant:'SIMULATED RETURNS',valuation:'ILLUSTRATIVE DCF',ml:'SIMULATED PEER INPUTS',methods:'METHODOLOGY & SOURCES',systems:'RESEARCH SYSTEMS',private:'PRIVATE WORKSPACE'};
+ const labels={overview:'RESEARCH / DEMO',sec:'REPORTED SEC FINANCIALS',portfolio:'SIMULATED PORTFOLIO',quant:'SIMULATED RETURNS',valuation:'ILLUSTRATIVE DCF',ml:'SIMULATED PEER INPUTS',methods:'METHODOLOGY & SOURCES',systems:'RESEARCH SYSTEMS',lab:'INTERACTIVE RESEARCH LAB',private:'PRIVATE WORKSPACE'};
  const badge=document.querySelector('.topbar .badge');if(badge)badge.textContent=labels[name];
  const eyebrow=document.querySelector('.topbar .eyebrow');if(eyebrow)eyebrow.textContent=name==='private'?'Your portfolio · Personal use':'Financial research · models and data';
  if(updateHash && PUBLIC_PAGES.has(name))history.replaceState(null,'','#'+name);
@@ -972,6 +1232,7 @@ function populate(){
  $('ml-company').innerHTML=Object.keys(M.COMPANY_FACTS).map(s=>'<option value="'+s+'">'+M.COMPANY_NAMES[s]+'</option>').join('');
  portfolio();runQuant();runDCF();runPeers();renderSEC();renderSECHighlights();
  if(window.QFPublicEvidence)window.QFPublicEvidence.render(SEC_DATA, document.getElementById("systems-sec-quant-v76"));
+ if(window.QFResearchLab)window.QFResearchLab.mount(SEC_DATA);
 }
 document.addEventListener('click',e=>{
  const btn=e.target.closest('[data-page], [data-go], [data-symbol], [data-sec-symbol]');if(!btn)return;

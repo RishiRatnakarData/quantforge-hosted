@@ -225,7 +225,8 @@ for slot, file in [('/* QF_MODEL */','model.js'),('/* QF_APP */','app.js'),('/* 
   # Bundle pure SEC analytics in the existing public app script. CSP remains 3 hashes.
   analytics=(src/'site/sec_analytics.js').read_text(encoding='utf-8')
   evidence=(src/'site/public_evidence_v76.js').read_text(encoding='utf-8')
-  text=analytics+'\n'+evidence+'\n'+text.replace('/* QF_SEC_DATA */ null', snapshot_js)
+  lab=(src/'site/public_lab_v77.js').read_text(encoding='utf-8')
+  text=analytics+'\n'+evidence+'\n'+lab+'\n'+text.replace('/* QF_SEC_DATA */ null', snapshot_js)
  text=text.replace('</script','<\\/script')
  html=html.replace(slot,text)
 (root/'public/index.html').write_text(html, encoding="utf-8")
