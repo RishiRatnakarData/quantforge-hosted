@@ -115,7 +115,7 @@ async function verifyMFA(){
 }
 async function logout(){
   try{await api('auth/logout',{});}catch(_){ /* Clear visible private content regardless */ }
-  clearMFA();showStep('login');privateState=null;quoted={};historySeries=null;closeAssetBrowser();researchSelection=[];$('private-symbol').value='';$('private-selected-asset').textContent='No investment selected';renderResearchSelection();
+  clearMFA();showStep('login');privateState=null;quoted={};historyLoadSequence++;historySeries=null;closeAssetBrowser();researchSelection=[];$('private-symbol').value='';$('private-selected-asset').textContent='No investment selected';renderResearchSelection();
   optimizerResult=null;$('private-opt-export').disabled=true;$('private-opt-output').textContent='Load market history to begin.';$('private-opt-risk').textContent='';
   $('private-history-chart').textContent='Load a historical series to begin.';$('private-risk-results').textContent='';$('private-backtest-output').textContent='';$('private-valuation-output').textContent='';$('private-peers').textContent='';$('private-concentration').textContent='';$('private-positions').textContent='';
   $('private-wf-output').textContent='Load historical investments in Market research to begin.';$('private-wf-export').disabled=true;walkforwardResult=null;
@@ -255,10 +255,7 @@ function chooseAsset(symbol,name,kind){
    if(researchSelection.length>=5){message('You can compare up to five investments. Remove one first.');return;}
    researchSelection.push(symbol);
   }
-  renderResearchSelection();historySeries=null;optimizerResult=null;$('private-opt-export').disabled=true;$('private-opt-output').textContent='Selection changed. Load the updated historical series first.';$('private-opt-risk').textContent='';
-  $('private-wf-output').textContent='Selection changed. Load new historical data.';$('private-wf-export').disabled=true;walkforwardResult=null;
- $('private-history-chart').textContent='Load market history for the selected investments.';
-  $('private-backtest-output').textContent='';
+  renderResearchSelection();invalidateResearchHistory('Selection changed. Load the updated historical series first.');
   message('Added '+name+' to your historical research selection.');
  }
  closeAssetBrowser();
@@ -286,10 +283,7 @@ $('private-history-selection').addEventListener('click',e=>{
  const b=e.target.closest('[data-research-remove]');
  if(!b)return;
  researchSelection=researchSelection.filter(s=>s!==b.dataset.researchRemove);
- renderResearchSelection();historySeries=null;optimizerResult=null;$('private-opt-export').disabled=true;$('private-opt-output').textContent='Selection changed. Load the updated historical series first.';$('private-opt-risk').textContent='';
- $('private-wf-output').textContent='Selection changed. Load new historical data.';$('private-wf-export').disabled=true;walkforwardResult=null;
- $('private-history-chart').textContent='Load market history for the selected investments.';
- $('private-backtest-output').textContent='';
+ renderResearchSelection();invalidateResearchHistory('Selection changed. Load the updated historical series first.');
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('private-asset-browser').hidden)closeAssetBrowser();});
 renderResearchSelection();
@@ -297,6 +291,33 @@ renderResearchSelection();
 /* V6: authenticated research tools. No Alpaca credentials or private data in public code. */
 let optimizerResult=null;
 let historySeries=null;
+let historyLoadSequence=0;
+function researchCompanyLabel(symbol){return (assetNames[symbol]||symbol)+' ('+symbol+')';}
+function refreshResearchContext(){
+ const chosen=$('private-research-selected'),loaded=$('private-research-loaded'),status=$('private-research-state');
+ if(!chosen||!loaded||!status)return;
+ chosen.textContent=researchSelection.length?researchSelection.length+' selected: '+researchSelection.map(researchCompanyLabel).join(' · '):'None selected';
+ const d=historySeries;
+ if(d&&Array.isArray(d.symbols)&&Array.isArray(d.dates)&&d.dates.length){
+  loaded.textContent=d.symbols.length+' loaded: '+d.symbols.map(researchCompanyLabel).join(' · ')+
+   ' | '+d.dates[0]+' to '+d.dates[d.dates.length-1];
+  status.textContent='Ready: Optimization, Backtesting and Walk-forward use these '+d.symbols.length+' investments. Changing the selection or period requires reloading.';
+ }else{
+  loaded.textContent='No historical data loaded';
+  status.textContent=researchSelection.length>=2?'Not loaded yet. Click Load market history before running the analysis tools.':'Choose 2–5 investments and load history to begin.';
+ }
+}
+function invalidateResearchHistory(reason){
+ historyLoadSequence++;
+ historySeries=null;optimizerResult=null;walkforwardResult=null;
+ $('private-opt-export').disabled=true;$('private-wf-export').disabled=true;
+ $('private-history-source').textContent='';
+ $('private-history-chart').textContent='Load market history for the selected investments.';
+ $('private-risk-results').textContent='';$('private-opt-risk').textContent='';
+ $('private-opt-output').textContent=reason;$('private-backtest-output').textContent='';
+ $('private-wf-output').textContent=reason;
+ refreshResearchContext();
+}
 const finite=n=>typeof n==='number'&&Number.isFinite(n);
 const percent=n=>finite(n)?(n*100).toFixed(2)+'%':'Unavailable';
 const mean=a=>a.reduce((x,y)=>x+y,0)/a.length;
@@ -304,6 +325,8 @@ function sampleStdev(a){if(a.length<2)return 0;const m=mean(a);return Math.sqrt(
 function maxDD(values){let high=0,deep=0;for(const v of values){high=Math.max(high,v);if(high)deep=Math.min(deep,v/high-1);}return deep;}
 function displayTable(headers,rows){return '<div class="table-wrap"><table><thead><tr>'+headers.map(h=>'<th>'+safe(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+row.map(v=>'<td>'+safe(v)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';}
 function privateTab(tab){
+ const shared=$('private-research-dataset');if(shared)shared.hidden=!['research','optimization','backtest','walkforward'].includes(tab);
+ refreshResearchContext();
  document.querySelectorAll('[data-private-view]').forEach(p=>p.hidden=p.dataset.privateView!==tab);
  document.querySelectorAll('.private-nav [data-private-tab]').forEach(b=>b.classList.toggle('active',b.dataset.privateTab===tab));
 }
@@ -352,21 +375,24 @@ function privateCrossAsset(series){
 async function loadHistory(){
  const raw=researchSelection.join(',');
  const syms=researchSelection;
+ const period=$('private-history-days').value;
  if(syms.length<2||syms.length>5){message('Select 2–5 investments by name using Browse investments.');return;}
- message('Retrieving private market history…');$('private-history-source').textContent='';
+ invalidateResearchHistory('Loading market history…');
+ const request=historyLoadSequence;
+ message('Retrieving private market history…');
  try{
-  const d=await api('private/history?symbols='+encodeURIComponent(raw)+'&days='+encodeURIComponent($('private-history-days').value));
+  const d=await api('private/history?symbols='+encodeURIComponent(raw)+'&days='+encodeURIComponent(period));
   // A pending fetch may finish after sign-out or a changed investment selection.
-  if(!privateState || researchSelection.join(',')!==raw)return;
+  if(!privateState || researchSelection.join(',')!==raw || $('private-history-days').value!==period || request!==historyLoadSequence)return;
   optimizerResult=null;$('private-opt-export').disabled=true;
   $('private-opt-output').textContent='History loaded. Open Optimization to calculate allocations.';
   $('private-opt-risk').textContent='Risk diagnostics appear after an allocation is calculated.';
-  historySeries=d;walkforwardResult=null;$('private-wf-export').disabled=true;$('private-wf-output').textContent='History loaded. Run walk-forward evaluation when ready.';
+  historySeries=d;walkforwardResult=null;$('private-wf-export').disabled=true;$('private-wf-output').textContent='History loaded. Run walk-forward evaluation when ready.';refreshResearchContext();
   $('private-history-chart').innerHTML=svgIndexChart(d);
   $('private-history-source').textContent=d.source+' · through '+d.as_of+' · '+d.calendar;
   $('private-risk-results').innerHTML=privateRisk(d)+privateCrossAsset(d);
   message('Historical market research loaded.');
- }catch(e){optimizerResult=null;$('private-opt-export').disabled=true;historySeries=null;walkforwardResult=null;$('private-wf-export').disabled=true;$('private-wf-output').textContent='Load history again to continue.';message(e.message);$('private-history-chart').textContent='Market history unavailable.';$('private-risk-results').textContent='';$('private-backtest-output').textContent='';}
+ }catch(e){if(request!==historyLoadSequence)return;optimizerResult=null;$('private-opt-export').disabled=true;historySeries=null;walkforwardResult=null;$('private-wf-export').disabled=true;$('private-wf-output').textContent='Load history again to continue.';message(e.message);$('private-history-chart').textContent='Market history unavailable.';$('private-risk-results').textContent='';$('private-backtest-output').textContent='';refreshResearchContext();}
 }
 function wealthStats(values){let out=values.at(-1)/values[0]-1;return [percent(out),percent(maxDD(values))];}
 function privateBacktest(){
@@ -612,7 +638,8 @@ function wfChart(d){
   '<path d="'+path(a)+'" stroke="#0c7660" stroke-width="2" fill="none"/>'+
   '<path d="'+path(b)+'" stroke="#c58b31" stroke-width="2" fill="none"/>'+
   '<text x="26" y="232" font-size="11" fill="#526a60">'+safe(d.start)+'</text><text x="493" y="232" font-size="11" fill="#526a60">'+safe(d.end)+'</text></svg>'+
-  '<p class="tiny">Green: rolling fitted allocation. Orange: equal-weight benchmark. Trading costs included; prices observed historically.</p>';
+  '<p class="tiny"><strong>'+d.symbols.length+' investments are combined into two portfolio lines:</strong> '+d.symbols.map(s=>safe(researchCompanyLabel(s))).join(' · ')+'</p>'+
+  '<p class="tiny">Green: optimized portfolio (all selected investments). Orange: equal-weight benchmark (the same investments). These are two strategies, not one line per company. To view each investment price line separately, open Market research. Trading costs included; prices observed historically.</p>';
 }
 function runWalkforward(){
  if(!privateState){message('Sign in first.');return;}
@@ -665,6 +692,7 @@ for(const id of ['private-fc-years','private-fc-growth','private-fc-margin','pri
 
 document.querySelectorAll('[data-private-tab]').forEach(b=>b.addEventListener('click',()=>privateTab(b.dataset.privateTab)));
 $('private-history-load').addEventListener('click',loadHistory);
+$('private-history-days').addEventListener('change',()=>invalidateResearchHistory('Historical period changed. Load the new date range first.'));
 $('private-backtest-run').addEventListener('click',privateBacktest);
 $('private-valuation-run').addEventListener('click',privateValuation);
 $('private-capital-submit').addEventListener('click',changeCapital);
