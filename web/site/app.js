@@ -186,6 +186,7 @@ function populate(){
  $('quant-assets').innerHTML=['MSFT','VOO','AAPL','QQQ','BND','BTC/USD','ETH/USD'].map(s=>'<label class="inline-checkbox"><input type="checkbox" name="quant-asset" value="'+s+'" '+(['MSFT','VOO','BND'].includes(s)?'checked':'')+'>'+M.bySymbol[s].name+'</label>').join('');
  $('ml-company').innerHTML=Object.keys(M.COMPANY_FACTS).map(s=>'<option value="'+s+'">'+M.COMPANY_NAMES[s]+'</option>').join('');
  portfolio();runQuant();runDCF();runPeers();renderSEC();renderSECHighlights();
+ if(window.QFPublicEvidence)window.QFPublicEvidence.render(SEC_DATA, document.getElementById("systems-sec-quant-v76"));
 }
 document.addEventListener('click',e=>{
  const btn=e.target.closest('[data-page], [data-go], [data-symbol], [data-sec-symbol]');if(!btn)return;

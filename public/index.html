@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="index,follow"><title>QuantForge · SEC Financial Research and Quantitative Demonstrations</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="index,follow"><title>QuantForge | Financial Data, Quantitative Research & Software Engineering</title>
 <style>
 :root{--bg:#f7f9f8;--paper:#fff;--ink:#162928;--muted:#667672;--accent:#1d665a;--accent-light:#e5f0ed;--line:#dce6e2;--neg:#ae4a3b;--pos:#25735c}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #90cab7;outline-offset:2px}h1,h2,h3,p{margin:0}h1{font:600 clamp(26px,3vw,35px)/1.2 Georgia,serif}h2{font:600 23px/1.25 Georgia,serif}h3{font-size:14px;font-weight:650}small,.muted{color:var(--muted)}.eyebrow{font-size:11px;letter-spacing:.10em;text-transform:uppercase;color:var(--muted);font-weight:750}.app{display:grid;grid-template-columns:210px minmax(0,1fr);min-height:100vh}.side{border-right:1px solid var(--line);background:#fcfdfc;padding:24px 14px;display:flex;flex-direction:column;gap:32px}.brand{font-weight:750;font-size:19px;display:flex;align-items:center;gap:10px;padding:0 5px}.mark{background:#165e53;color:white;font:700 19px Georgia,serif;width:31px;height:31px;display:grid;place-items:center;border-radius:8px}.side nav{display:grid;gap:4px}.nav-btn{padding:11px 13px;border:0;background:transparent;color:#425a54;text-align:left;border-radius:7px;font-weight:560}.nav-btn:hover,.nav-btn.active{background:var(--accent-light);color:#064a3d}.nav-btn.active{box-shadow:inset 3px 0 var(--accent)}.sidenote{margin-top:auto;padding:12px;font-size:11px;color:var(--muted);border-top:1px solid var(--line)}main{width:min(1100px,100%);margin:0 auto;padding:31px clamp(20px,4vw,52px) 80px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:28px}.badge{background:var(--accent-light);color:var(--accent);font-size:11px;letter-spacing:.02em;padding:5px 11px;border-radius:30px;font-weight:700}.pagehead{margin-bottom:23px}.pagehead p{margin-top:8px;max-width:760px;color:var(--muted)}.pane{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:23px 25px;box-shadow:0 3px 22px rgba(25,55,46,.025);margin-bottom:17px}.pane.clean{box-shadow:none}.space{display:grid;gap:16px}.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.metric{padding:14px 0;border-bottom:1px solid var(--line)}.metric strong{display:block;font:600 24px/1.25 Georgia,serif;margin-top:5px}.row{display:flex;align-items:center;justify-content:space-between;gap:12px}.section-title{margin:8px 0 16px;display:flex;align-items:center;justify-content:space-between}.btn{border:1px solid #8eb2a9;background:transparent;color:#124f43;border-radius:6px;padding:9px 15px;font-weight:650}.btn:hover{background:var(--accent-light)}.btn.primary{background:var(--accent);color:white;border-color:var(--accent)}.btn.primary:hover{background:#105249}.btn.sm{font-size:12px;padding:7px 10px}.field{display:grid;gap:5px}.field label{font-size:12px;color:#485e56;font-weight:650}input,select{width:100%;padding:9px 10px;border:1px solid #cedcd7;border-radius:5px;background:white;color:#182e29;min-width:0}.formgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}.controls{display:flex;gap:9px;align-items:end;flex-wrap:wrap;margin-top:18px}table{width:100%;border-collapse:collapse;text-align:left;font-size:13px}th{color:#41675d;font-size:11px;letter-spacing:.01em;background:#f0f7f4;font-weight:750}th,td{padding:10px 11px;border-bottom:1px solid var(--line)}td:last-child,th:last-child{text-align:right}.table-wrap{overflow:auto}.tiny{font-size:11px;color:var(--muted)}.good{color:var(--pos)}.bad{color:var(--neg)}.notice{background:#f2f7f5;border-left:3px solid #83b6a7;color:#31584c;padding:11px 13px;font-size:12px;margin-bottom:16px}.error{color:var(--neg);font-weight:650;font-size:13px}.listcards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.asset{background:white;border:1px solid var(--line);border-radius:9px;padding:14px;text-align:left;cursor:pointer}.asset:hover{border-color:#78ad9d;box-shadow:0 3px 12px rgba(23,91,74,.06)}.asset strong{display:block}.asset span{font-size:12px;color:var(--muted)}.bar{background:#e8f2ee;border-radius:4px;height:10px;overflow:hidden}.bar>span{display:block;background:var(--accent);height:100%;border-radius:4px}.inline-checkbox{display:inline-flex;gap:6px;align-items:center;margin:9px 16px 8px 0}.inline-checkbox input{width:auto;accent-color:var(--accent)}.tabpage{display:none}.tabpage.active{display:block}.kpi-value{font:600 27px Georgia,serif}.footerline{border-top:1px solid var(--line);margin-top:25px;padding-top:15px;font-size:11px;color:var(--muted)}.footerline a{color:var(--accent)}.subtle{border-top:1px solid var(--line);margin-top:17px;padding-top:16px}.flex1{flex:1}.mini{display:inline-block;padding:3px 8px;border-radius:5px;background:#edf2f0;font-size:11px;color:#355a50}#private-research-dataset[hidden],#private-signed[hidden],#private-login[hidden],#private-mfa[hidden],#private-mfa-qr-wrap[hidden],#private-mfa-setup-actions[hidden]{display:none!important}#private-message{margin-top:8px}.navtop{display:none}.progress{height:7px;background:#e8f0ed;border-radius:8px;overflow:hidden}.progress>span{height:100%;display:block;background:#367969}code{font-size:.93em}@media(max-width:800px){.app{display:block}.side{display:block;border:0;border-bottom:1px solid var(--line);padding:12px 15px}.side nav{display:flex;overflow:auto;gap:6px;padding-top:11px}.nav-btn{white-space:nowrap;padding:7px 12px;font-size:12px}.sidenote{display:none}main{padding:24px 16px 52px}.formgrid,.three{grid-template-columns:repeat(2,minmax(0,1fr))}.two{grid-template-columns:1fr}.listcards{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:490px){.pane{padding:16px}.formgrid,.three,.listcards{grid-template-columns:1fr}.topbar{margin-bottom:17px}.row{align-items:flex-start}}
@@ -99,20 +99,48 @@
 @media(max-width:900px){.tech-overview{grid-template-columns:repeat(2,minmax(0,1fr))}.tech-stack{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.tech-columns,.tech-overview,.tech-stack,.tech-bullets{grid-template-columns:1fr}.tech-head{display:block}.tech-head .mini{margin-top:10px}.tech-lead{padding:20px}.tech-visual{padding:12px}.tech-rule strong{flex-basis:78px}}
 
+/* V7.6 editorial and navigation: readable text and public source-backed exhibit. */
+body{font-size:15px;line-height:1.62}main{width:min(1280px,100%)}.app{grid-template-columns:225px minmax(0,1fr)}
+.tiny,.tech-note,.tech-copy p,.tech-feature details p,.method-card p,.evidence-intro{font-size:12.5px;line-height:1.65}
+.tech-head p,.tech-tile p{font-size:13px;line-height:1.65}.section-title h3,.pane>h3{font-size:16px}
+.private-nav{border-bottom:0;display:flex;flex-wrap:wrap;gap:12px;margin:12px 0 20px}
+.private-nav-group{min-width:0;flex:1 1 195px;border:1px solid #dae7e0;border-radius:10px;padding:11px;background:#fbfdfb}
+.private-nav-title{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:#59776b;font-weight:800;display:block;margin:1px 0 8px}
+.private-nav-actions{display:flex;flex-wrap:wrap;gap:4px}
+.private-nav .private-nav-group button{font-size:12px;padding:8px 10px;text-align:left}
+.research-jumps{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 22px}
+.research-jumps a{border:1px solid #b9d5c8;padding:8px 12px;border-radius:8px;color:#165b4b;font-size:12px;background:#f8fcfa;text-decoration:none;font-weight:650}
+.research-jumps a:hover,.research-jumps a:focus-visible{background:#e1f1e8}
+.evidence-intro{color:#526a5f;max-width:850px;margin:0 0 14px}
+.evidence-quant-grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(240px,1fr);gap:15px;align-items:start}
+.evidence-graph{border:1px solid #dae7e1;padding:12px;border-radius:10px;background:#f9fcfa}
+.evidence-graph svg{display:block;width:100%;height:auto;max-height:360px}
+.evidence-legend{display:flex;flex-wrap:wrap;gap:7px;padding:0;margin:11px 0 0;list-style:none}
+.evidence-legend li{font-size:12px;display:inline-flex;gap:5px;align-items:center}
+.evidence-legend b{color:#226757;font-size:12px}.evidence-data{max-height:380px;overflow:auto}
+.evidence-data table{font-size:12px}.evidence-data th,.evidence-data td{padding:8px}
+.evidence-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.evidence-links>div{border:1px solid #d5e5dc;border-radius:9px;padding:16px;background:#fcfefc}
+.evidence-links strong{font-size:14px}.evidence-links p{font-size:12px;color:#5b7167;margin:7px 0 10px}
+.evidence-links a{font-size:12px;font-weight:700;color:#18624f;margin-right:15px;display:inline-block}
+.private-view .pane>p.tiny{max-width:850px}
+@media(max-width:900px){.evidence-quant-grid{grid-template-columns:1fr}.evidence-data{max-height:none}}
+@media(max-width:800px){.app{display:block}.private-nav{gap:7px}.private-nav-group{flex-basis:220px}}
+@media(max-width:600px){.evidence-links{grid-template-columns:1fr}.private-nav-group{flex-basis:100%}.pane{padding:18px 16px}}
 </style></head><body>
-<div class="app"><aside class="side"><div class="brand"><div class="mark">Q</div>quantforge</div><nav id="navigation" aria-label="Main navigation"><span class="nav-caption">Public research</span><button class="nav-btn active" data-page="overview" aria-current="page">Overview</button><button class="nav-btn" data-page="sec">SEC Financials</button><span class="nav-caption">Interactive models</span><button class="nav-btn" data-page="portfolio">Portfolio</button><button class="nav-btn" data-page="quant">Quant</button><button class="nav-btn" data-page="valuation">Valuation</button><button class="nav-btn" data-page="ml">Company peers</button><span class="nav-caption">Behind the analysis</span><button class="nav-btn" data-page="systems">Research systems</button><button class="nav-btn" data-page="methods">Methods &amp; engineering</button><span class="nav-caption">Authenticated</span><button class="nav-btn" data-page="private">My workspace</button></nav><div class="sidenote">Financial statements · statistical models<br>Private portfolio tools behind sign-in</div></aside>
+<div class="app"><aside class="side"><div class="brand"><div class="mark">Q</div>quantforge</div><nav id="navigation" aria-label="Main navigation"><span class="nav-caption">Public research</span><button class="nav-btn active" data-page="overview" aria-current="page">Overview</button><button class="nav-btn" data-page="sec">SEC Financials</button><span class="nav-caption">Public model demonstrations</span><button class="nav-btn" data-page="portfolio">Portfolio</button><button class="nav-btn" data-page="quant">Quant</button><button class="nav-btn" data-page="valuation">Valuation</button><button class="nav-btn" data-page="ml">Company peers</button><span class="nav-caption">Research implementation</span><button class="nav-btn" data-page="systems">Research systems</button><button class="nav-btn" data-page="methods">Methods &amp; engineering</button><span class="nav-caption">Authenticated</span><button class="nav-btn" data-page="private">My workspace</button></nav><div class="sidenote">Financial statements · statistical models<br>Private portfolio tools behind sign-in</div></aside>
 <a class="skip-link" href="#main-content">Skip to content</a><main id="main-content"><div class="topbar"><span class="eyebrow">Financial research · models and data</span><span class="badge">RESEARCH / DEMO</span></div>
 <section class="tabpage active" id="page-overview">
-<div class="intro-simple"><span class="eyebrow">PERSONAL SOFTWARE &amp; DATA SCIENCE PROJECT</span><h1>Financial research, built end to end.</h1><p>From SEC filings to tested statistical models and a private portfolio research platform. QuantForge brings data engineering, quantitative analysis, financial modeling, and secure application development into one project.</p><div class="controls"><button class="btn primary" data-go="sec">Explore real financial data</button><button class="btn" data-go="quant">Try a model</button><button class="btn" data-go="methods">Architecture &amp; methods</button></div></div>
+<div class="intro-simple"><span class="eyebrow">PERSONAL SOFTWARE &amp; DATA SCIENCE PROJECT</span><h1>Financial research, built end to end.</h1><p>QuantForge brings SEC financial disclosures, statistical modeling, portfolio mathematics, and software engineering into a single research platform. The public research pages present source-backed financial analysis and implemented model demonstrations; the authenticated workspace extends the same system into historical market research, portfolio testing, and virtual allocation studies.</p><div class="controls"><button class="btn primary" data-go="sec">Reported SEC analysis</button><button class="btn" data-go="quant">Public model results</button><button class="btn" data-go="methods">Implementation and tests</button></div></div>
 <div class="project-story pane"><div class="section-title"><h3>Inside the project</h3><span class="mini">Four connected disciplines</span></div><div class="story-grid">
 <div><span class="eyebrow">01 · DATA ENGINEERING</span><h3>Source-backed statements</h3><p>SEC Company Facts ingestion, fiscal-period selection, filing lineage, missing-value controls, and reproducible exports.</p><button class="text-link" data-go="sec">Explore financials →</button></div>
-<div><span class="eyebrow">02 · QUANTITATIVE ANALYTICS</span><h3>Risk and optimization</h3><p>Covariance shrinkage, allocation constraints, downside simulation, and risk-return comparisons with clear modeling assumptions.</p><button class="text-link" data-go="quant">Try quantitative models →</button></div>
+<div><span class="eyebrow">02 · QUANTITATIVE ANALYTICS</span><h3>Risk and optimization</h3><p>Covariance shrinkage, allocation constraints, downside simulation, and risk-return comparisons with clear modeling assumptions.</p><button class="text-link" data-go="quant">Quantitative model →</button></div>
 <div><span class="eyebrow">03 · STATISTICAL RESEARCH</span><h3>Validation beyond backtests</h3><p>Rolling out-of-sample evaluation, fees, benchmark comparisons, robustness checks, and integrity fingerprints in the private research system.</p><button class="text-link" data-go="methods">Explore methodology →</button></div>
 <div><span class="eyebrow">04 · SOFTWARE ENGINEERING</span><h3>Private, tested application</h3><p>FastAPI, Cloudflare Pages, Supabase-authenticated MFA, owner-only market-data access, automated regression tests, and CI.</p><button class="text-link" data-go="methods">See system design →</button></div>
 </div></div>
 
 <div class="pane" id="public-research-engine">
- <div class="section-title"><h3>Beyond the public demonstrations</h3><span class="mini">Technical implementation</span></div>
+ <div class="section-title"><h3>Research implemented beyond the public models</h3><span class="mini">Technical implementation</span></div>
  <p class="explain-note" style="margin:0 0 16px">The public models here are intentionally accessible; the authenticated research engine is substantially deeper. Its methods, algorithms, validation design, and architecture are documented publicly without exposing personal research sessions or licensed market data.</p>
  <div class="tech-overview">
   <div class="tech-tile"><span class="eyebrow">RESEARCH ENGINE</span><strong>Walk-forward testing</strong><p>Past-only training, non-overlapping evaluation, costs, passive and rebalanced benchmarks.</p><span class="mini">Statistical validation</span></div>
@@ -123,8 +151,8 @@
  <div class="controls" style="margin-top:0"><button class="btn primary" data-go="systems">Explore the research engine</button><button class="btn" data-go="methods">Read methodology &amp; architecture</button></div>
 </div>
 <div class="pane"><div class="section-title"><h3>Reported annual financials · SEC EDGAR</h3><span class="mini">Historical company filings</span></div><div class="three" id="home-sec-highlights"></div><div class="controls"><button class="btn primary" data-go="sec">Explore SEC Financials</button><span class="tiny" id="home-sec-updated">Historical filings · not live stock prices</span></div></div>
-<div class="pane"><div class="section-title"><h3>Interactive portfolio example</h3><span class="mini">Simulated holdings and prices</span></div><div class="three"><div class="metric"><span class="muted">Sample portfolio value</span><strong id="home-value">—</strong></div><div class="metric"><span class="muted">Cash available</span><strong id="home-cash">—</strong></div><div class="metric"><span class="muted">Invested</span><strong id="home-invested">—</strong></div></div><div class="section-title"><h3>Sample allocation</h3><button class="btn sm" data-go="portfolio">Try virtual portfolio</button></div><div id="home-allocation"></div></div>
-<div class="pane"><div class="section-title"><h3>Explore virtual assets</h3><span class="muted tiny">Illustrative prices · not live quotes</span></div><div class="listcards" id="assets-list"></div></div><div class="pane"><div class="section-title"><h3>Model demonstrations</h3><span class="muted tiny">Illustrative calculations · simulated financial inputs</span></div><div class="listcards"><button class="asset" data-go="quant"><strong>Portfolio optimization</strong><span>Covariance, volatility and modeled downside</span></button><button class="asset" data-go="valuation"><strong>DCF valuation</strong><span>Five-year cash flows and sensitivity</span></button><button class="asset" data-go="ml"><strong>Company similarity</strong><span>Standardized financial features</span></button></div></div></section>
+<div class="pane"><div class="section-title"><h3>Interactive portfolio example</h3><span class="mini">Simulated holdings and prices</span></div><div class="three"><div class="metric"><span class="muted">Sample portfolio value</span><strong id="home-value">—</strong></div><div class="metric"><span class="muted">Cash available</span><strong id="home-cash">—</strong></div><div class="metric"><span class="muted">Invested</span><strong id="home-invested">—</strong></div></div><div class="section-title"><h3>Sample allocation</h3><button class="btn sm" data-go="portfolio">Portfolio model</button></div><div id="home-allocation"></div></div>
+<div class="pane"><div class="section-title"><h3>Illustrative investment universe</h3><span class="muted tiny">Illustrative prices · not live quotes</span></div><div class="listcards" id="assets-list"></div></div><div class="pane"><div class="section-title"><h3>Model demonstrations</h3><span class="muted tiny">Illustrative calculations · simulated financial inputs</span></div><div class="listcards"><button class="asset" data-go="quant"><strong>Portfolio optimization</strong><span>Covariance, volatility and modeled downside</span></button><button class="asset" data-go="valuation"><strong>DCF valuation</strong><span>Five-year cash flows and sensitivity</span></button><button class="asset" data-go="ml"><strong>Company similarity</strong><span>Standardized financial features</span></button></div></div></section>
 <section class="tabpage" id="page-sec">
   <div class="pagehead"><h1>SEC Financials</h1><p>Annual financial statements, trends, and comparative metrics sourced from SEC EDGAR.</p></div>
   <div class="sec-toolbar"><span class="tiny">Explore a different sector:</span><button class="btn sm" data-sec-symbol="MSFT">Microsoft · Technology</button><button class="btn sm" data-sec-symbol="WMT">Walmart · Retail</button><button class="btn sm" data-sec-symbol="XOM">Exxon Mobil · Energy</button><button class="btn sm" data-go="methods">Data &amp; methods</button></div>
@@ -158,10 +186,10 @@
 <section class="tabpage" id="page-systems">
  <div class="tech-lead">
   <span class="eyebrow">RESEARCH SYSTEMS · PUBLIC TECHNICAL EXHIBIT</span>
-  <h1>Under the hood of the research engine.</h1>
-  <p>QuantForge combines SEC data engineering, constrained portfolio mathematics, leakage-aware historical evaluation, financial modeling, and authenticated application design. This is a transparent technical explanation of the owner-only capabilities—not access to private data.</p>
+  <h1>Quantitative research systems</h1>
+  <p>The research platform combines SEC data engineering, constrained numerical optimization, historical out-of-sample evaluation, financial forecasting, and authenticated application development. The sections below document the implemented methods and validation boundaries; private market observations and account records remain inaccessible to public visitors.</p>
   <div class="tech-meta"><span class="tech-pill">Real SEC disclosures in public explorer</span><span class="tech-pill">Illustrative diagrams below</span><span class="tech-pill">Private datasets stay private</span></div>
-  <div class="controls"><button class="btn primary" data-go="sec">Inspect real SEC data</button><button class="btn" data-go="quant">Try public quant model</button><button class="btn" data-go="methods">Read engineering methods</button></div>
+  <div class="controls"><button class="btn primary" data-go="sec">Inspect real SEC data</button><button class="btn" data-go="quant">Public quant demonstration</button><button class="btn" data-go="methods">Read engineering methods</button></div>
  </div>
  <div class="pane"><div class="section-title"><h3>One platform, four computational stages</h3><span class="mini">Architecture at a glance</span></div>
  <div class="tech-stack" aria-label="Research flow: ingest market and SEC sources, validate and align data, model investment risk and valuation, evaluate then export">
@@ -170,10 +198,18 @@
   <div class="tech-step"><span class="eyebrow">03 / MODELS</span><strong>Quantify trade-offs</strong><small>Portfolio risk, constrained allocation, scenario DCF proxies, historical-momentum research and stress tests</small></div>
   <div class="tech-step"><span class="eyebrow">04 / EVALUATION</span><strong>Challenge the result</strong><small>Past-only fitting, out-of-sample windows, fees, passive benchmarks, leave-one-window-out robustness and research reports</small></div>
  </div><p class="tech-note">The public deployment hosts static demonstrations and a reviewed SEC snapshot. Market observations and personal virtual accounts are only accessed in authenticated private workflows.</p></div>
- <div class="pane"><div class="section-title"><h3>Technical capability walkthrough</h3><span class="mini">Algorithms · diagnostics · engineering judgment</span></div>
+ <nav class="research-jumps" aria-label="Research systems sections"><a href="#systems-public-evidence">Reported SEC comparison</a><a href="#systems-optimization">Optimization</a><a href="#systems-walkforward">Walk-forward</a><a href="#systems-valuation">Forecasting</a><a href="#systems-screening">Investment screening</a><a href="#systems-code-evidence">Code and tests</a></nav>
+ <section class="pane" id="systems-public-evidence" aria-labelledby="systems-sec-evidence-title">
+  <div class="section-title"><h3 id="systems-sec-evidence-title">Observed financial relationships in SEC filings</h3><span class="mini">Reported annual facts · calculated comparisons</span></div>
+  <p class="evidence-intro">Annual revenue growth and operating margin are calculated from the public SEC Company Facts snapshot. Each point represents a company and its latest comparable fiscal periods. Unlike the illustrated strategy charts below, these values come from reported company filings.</p>
+  <div id="systems-sec-quant-v76" aria-live="polite"><p class="tiny">Reported financial comparisons are available when the verified SEC snapshot is present.</p></div>
+  <p class="tech-note">This is an exploratory comparison, not a factor-return model or a company ranking. Fiscal year-ends differ, and operating margin and revenue growth alone do not determine a stock's future performance.</p>
+  <div class="controls"><button class="btn" data-go="sec">SEC issuer details and filing tags</button></div>
+ </section>
+ <div class="pane"><div class="section-title"><h3>Research methods and implementation evidence</h3><span class="mini">Algorithms · diagnostics · engineering judgment</span></div>
 
  <article class="tech-feature" id="systems-optimization">
-  <div class="tech-head"><div><span class="eyebrow">QUANTITATIVE FINANCE / NUMERICAL OPTIMIZATION</span><h3>01. Portfolio optimization is a constrained mathematical problem</h3><p>Allocation weights are fitted from observed returns and an estimated covariance matrix, subject to feasibility and concentration limits.</p></div><span class="mini">Implemented privately</span></div>
+  <div class="tech-head"><div><span class="eyebrow">QUANTITATIVE FINANCE / NUMERICAL OPTIMIZATION</span><h3>01. Constrained portfolio optimization</h3><p>Allocation weights are fitted from observed returns and an estimated covariance matrix, subject to feasibility and concentration limits.</p></div><span class="mini">Implemented privately</span></div>
   <div class="tech-columns"><div class="tech-copy">
    <div class="tech-formula">min wᵀΣw &nbsp; subject to &nbsp; Σwᵢ = 1; &nbsp; 0 ≤ wᵢ ≤ cap</div>
    <p><strong>Why it matters:</strong> the objective is predicted portfolio variance, not a guarantee of realized return. The private optimizer supports a covariance-based minimum-risk allocation and alternative inverse-volatility / return-tilt allocations.</p>
@@ -191,7 +227,7 @@
  </article>
 
  <article class="tech-feature" id="systems-validation">
-  <div class="tech-head"><div><span class="eyebrow">STATISTICAL VALIDATION / TIME SERIES</span><h3>02. Walk-forward research tests future windows, not fitted history</h3><p>A model trains on past observations, then is evaluated on the following unseen sessions. The allocation is refitted at later boundaries.</p></div><span class="mini">Implemented privately</span></div>
+  <div class="tech-head"><div><span class="eyebrow">STATISTICAL VALIDATION / TIME SERIES</span><h3>02. Rolling walk-forward evaluation</h3><p>A model trains on past observations, then is evaluated on the following unseen sessions. The allocation is refitted at later boundaries.</p></div><span class="mini">Implemented privately</span></div>
   <div class="tech-columns"><div class="tech-copy"><div class="tech-formula">Train[t₀:t₁] → Fit w₁ → Test[t₁:t₂] → Roll forward</div>
    <p>The private study supports non-overlapping evaluation windows, modeled turnover and basis-point transaction fees, two rebalanced strategies, and a passive equal-weight buy-and-hold comparison.</p>
    <ul><li>Run each allocation rule against matched evaluation dates.</li><li>Reconcile per-window fees to total reported costs.</li><li>Perform leave-one-window-out diagnostics; a changed winner signals sample dependence.</li><li>Preserve observations and model settings in versioned research manifests.</li></ul>
@@ -210,7 +246,7 @@
  </article>
 
  <article class="tech-feature" id="systems-valuation">
-  <div class="tech-head"><div><span class="eyebrow">FINANCIAL MODELING / SEC DISCLOSURES</span><h3>03. Forecast sensitivity starts with reported facts</h3><p>Observed company financials are kept distinct from hypothetical revenue-growth, cash-flow-margin and discounting assumptions.</p></div><span class="mini">Real source + modeled scenarios</span></div>
+  <div class="tech-head"><div><span class="eyebrow">FINANCIAL MODELING / SEC DISCLOSURES</span><h3>03. SEC-backed forecast sensitivity</h3><p>Observed company financials are kept distinct from hypothetical revenue-growth, cash-flow-margin and discounting assumptions.</p></div><span class="mini">Real source + modeled scenarios</span></div>
   <div class="tech-columns"><div class="tech-copy">
    <div class="tech-formula">FCFₜ = Revenue₀(1+g)ᵗ × margin</div>
    <div class="tech-formula">PV = Σ FCFₜ/(1+r)ᵗ + TV/(1+r)ᴺ</div>
@@ -226,7 +262,7 @@
  </article>
 
  <article class="tech-feature" id="systems-ideas">
-  <div class="tech-head"><div><span class="eyebrow">DATA SCIENCE / EXPLAINABLE RESEARCH</span><h3>04. Investment ideas rank evidence, not certainty</h3><p>A private shortlist compares price momentum, realized volatility and drawdown, while displaying available SEC fundamentals separately.</p></div><span class="mini">Owner-only research</span></div>
+  <div class="tech-head"><div><span class="eyebrow">DATA SCIENCE / EXPLAINABLE RESEARCH</span><h3>04. Historical investment screening</h3><p>A private shortlist compares price momentum, realized volatility and drawdown, while displaying available SEC fundamentals separately.</p></div><span class="mini">Owner-only research</span></div>
   <div class="tech-columns"><div class="tech-copy">
    <div class="tech-formula">Score = Σ (lens weightₖ × normalized metricₖ)</div>
    <p>Growth, balanced and risk-aware lenses change how much weight the model places on trailing return, recent momentum, annualized volatility and historical drawdown. The score is an explainable heuristic, not a probability of gain.</p>
@@ -255,14 +291,25 @@
   </div>
   <p class="tech-note">The diagrams document intended and tested boundaries, not a claim that any production system is immune to attack. SHA-256 fingerprints detect changed in-memory inputs but do not authenticate the provider or replace archived source data.</p>
  </div>
- <div class="tech-invite"><span class="eyebrow">TRY THE PUBLIC SIDE</span><h3>Methods and interactive examples, without sign-in</h3>
-  <p>Compare real annual company filings in SEC Financials, run illustrative optimization and valuation models, or inspect the data and test methodology. Advanced live market-data research remains authenticated.</p>
+ <section class="pane" id="systems-code-evidence" aria-labelledby="systems-code-title">
+  <div class="section-title"><h3 id="systems-code-title">Implementation and test evidence</h3><span class="mini">Source code · numerical checks</span></div>
+  <p class="evidence-intro">The public exhibits document methods that are implemented in the project. The source files and focused regression tests provide a direct way to inspect the algorithms, data boundaries, and handling of failure cases without signing into the private workspace.</p>
+  <div class="evidence-links">
+   <div><strong>SEC data preparation</strong><p>Annual Company Facts selection, derived metrics, filing lineage, and CSV validation.</p><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/site/sec_analytics.js" target="_blank" rel="noopener noreferrer">Calculation source</a><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/tests/sec_analytics.test.cjs" target="_blank" rel="noopener noreferrer">Regression tests</a></div>
+   <div><strong>Portfolio optimization</strong><p>Constrained weights, shrinkage covariance estimates, infeasible allocations, and risk comparisons.</p><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/site/private_optimizer.js" target="_blank" rel="noopener noreferrer">Optimization source</a><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/tests/private_optimizer.test.cjs" target="_blank" rel="noopener noreferrer">Regression tests</a></div>
+   <div><strong>Rolling evaluation and robustness</strong><p>Past-only fitting, evaluation windows, transaction costs, passive baselines, and allocation-rule comparisons.</p><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/site/private_robustness_v68.js" target="_blank" rel="noopener noreferrer">Robustness source</a><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/tests/private_robustness_v68.test.cjs" target="_blank" rel="noopener noreferrer">Regression tests</a></div>
+   <div><strong>Forecast diagnostics and data integrity</strong><p>SEC scenario sensitivity, missing-data controls, SHA-256 fingerprints, and research manifests.</p><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/site/private_integrity_v67.js" target="_blank" rel="noopener noreferrer">Integrity source</a><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/tests/private_integrity_v67.test.cjs" target="_blank" rel="noopener noreferrer">Regression tests</a></div>
+  </div>
+  <p class="tech-note">These source references verify the implementation and test coverage, not the profitability of any allocation strategy. Private research datasets, account details, and credentials are not part of the public exhibit.</p>
+ </section>
+ <div class="tech-invite"><span class="eyebrow">PUBLIC MODELS</span><h3>Public financial data and modeled examples</h3>
+  <p>Reported SEC annual statements and illustrative statistical models are available publicly. Historical market-data research and personal virtual accounts remain authenticated.</p>
   <div class="controls"><button class="btn primary" data-go="sec">Explore SEC data</button><button class="btn" data-go="quant">Run simulated optimization</button><button class="btn" data-go="methods">See detailed engineering</button></div></div>
 </section>
 
 <section class="tabpage" id="page-methods">
   <div class="pagehead"><span class="eyebrow">METHODS</span><h1>Methods &amp; engineering</h1><p>Data sources, analytical methods, assumptions, and application architecture.</p></div>
-  <div class="pane" style="background:#f1f7f3;border-color:#bad5c7"><div class="section-title"><h3>Advanced private research, publicly documented</h3><span class="mini">Implementation walkthrough</span></div><p class="explain-note" style="margin:0 0 13px">The authenticated workspace implements walk-forward optimization, volatility and tail-risk diagnostics, investment shortlisting, discounted cash-flow scenario grids, and research integrity checks. The Research systems page shows equations, validation boundaries, explanatory diagrams and exact analytical assumptions—without a private sign-in.</p><button class="btn primary" data-go="systems">Explore algorithms &amp; research systems</button></div>
+  <div class="pane" style="background:#f1f7f3;border-color:#bad5c7"><div class="section-title"><h3>Advanced private research, publicly documented</h3><span class="mini">Implementation walkthrough</span></div><p class="explain-note" style="margin:0 0 13px">The authenticated workspace implements walk-forward optimization, volatility and tail-risk diagnostics, investment shortlisting, discounted cash-flow scenario grids, and research integrity checks. The Research systems page documents equations, modeling assumptions, numerical checks, and source references without exposing private research records.</p><button class="btn primary" data-go="systems">Explore algorithms &amp; research systems</button></div>
   <div class="method-intro"><div><strong>Source data</strong><span>SEC EDGAR Company Facts</span></div><div><strong>Demonstration calculations</strong><span>Simulated portfolio / DCF / quantitative returns</span></div><div><strong>Separate private workspace</strong><span>Owner-only authentication and observations</span></div></div>
   <div class="pane"><div class="section-title"><h3>Data lineage</h3><span class="mini" id="methods-asof">Historical SEC snapshot</span></div>
    <div class="pipeline"><div class="pipe-step"><span>01 · INGEST</span><strong>SEC EDGAR</strong><small>Company Facts / 10-K annual facts</small></div><span class="pipe-arrow" aria-hidden="true">→</span><div class="pipe-step"><span>02 · VALIDATE</span><strong>Periods &amp; provenance</strong><small>CIK, filing dates, units, annual windows</small></div><span class="pipe-arrow" aria-hidden="true">→</span><div class="pipe-step"><span>03 · PUBLISH</span><strong>Read-only snapshot</strong><small>Build-time JSON + protected browser scripts</small></div></div>
@@ -289,7 +336,7 @@
   <div class="pane"><div class="section-title"><h3>Engineering practices</h3><span class="mini">Architecture and tests</span></div>
   <div class="method-grid"><div class="method-card"><h3>Data engineering</h3><p>Named SEC issuer identifiers, annual-period filtering, filing cutoffs, input validation, recorded sources and accession details.</p></div><div class="method-card"><h3>Statistical modeling</h3><p>Constrained optimization, covariance-based portfolio analysis, downside simulation, DCF, and nearest-neighbor feature standardization.</p></div><div class="method-card"><h3>Application engineering</h3><p>Python backend, static hosted frontend, automated Python and JavaScript checks, continuous integration, and a restrictive script Content Security Policy.</p></div><div class="method-card"><h3>Privacy boundary</h3><p>Public research data is separate from the owner-only workspace. Private holdings and Alpaca access are protected by authenticated endpoints and authenticator MFA.</p></div></div>
   <p class="explain-note">The private workspace provides real market observations and virtual trading for the owner only. Public visitors cannot use that API as an open data source.</p></div>
-  <div class="pane"><div class="section-title"><h3>How the research is tested</h3><span class="mini">Quality gates and failure cases</span></div>
+  <div class="pane"><div class="section-title"><h3>Research validation and failure cases</h3><span class="mini">Quality gates and failure cases</span></div>
   <div class="table-wrap"><table><thead><tr><th>Layer</th><th>Example invariants</th><th>Why it matters</th></tr></thead><tbody>
   <tr><td>Historical data</td><td>Finite positive prices; aligned time series; observed-versus-derived SEC metrics</td><td>Rejects inconsistent or fabricated model inputs</td></tr>
   <tr><td>Optimization</td><td>Weights sum to one; asset caps feasible; covariance symmetric; finite estimates</td><td>Prevents invalid portfolios from appearing plausible</td></tr>
@@ -326,10 +373,14 @@
   </div>
   <div id="private-signed" hidden>
     <div class="controls"><span class="mini">Personal research · authenticated</span><button class="btn sm" id="private-logout">Sign out</button></div>
-    <nav class="private-nav" aria-label="Private workspace sections"><button class="active" data-private-tab="home">Portfolio</button><button data-private-tab="trade">Virtual trading</button><button data-private-tab="ideas">Investment ideas</button><button data-private-tab="research">Market research</button><button data-private-tab="optimization">Optimization</button><button data-private-tab="backtest">Backtesting</button><button data-private-tab="walkforward">Walk-forward</button><button data-private-tab="valuation">Valuation &amp; peers</button><button data-private-tab="settings">Settings &amp; notes</button></nav>
+    <nav class="private-nav" aria-label="Private workspace sections">
+      <div class="private-nav-group" role="group" aria-label="Portfolio and decisions"><span class="private-nav-title">Portfolio &amp; decisions</span><div class="private-nav-actions"><button class="active" data-private-tab="home">Portfolio</button><button data-private-tab="trade">Virtual trading</button><button data-private-tab="ideas">Investment ideas</button></div></div>
+      <div class="private-nav-group" role="group" aria-label="Quantitative research"><span class="private-nav-title">Quantitative research</span><div class="private-nav-actions"><button data-private-tab="research">Market research</button><button data-private-tab="optimization">Optimization</button><button data-private-tab="backtest">Backtesting</button><button data-private-tab="walkforward">Walk-forward</button></div></div>
+      <div class="private-nav-group" role="group" aria-label="Companies and account"><span class="private-nav-title">Companies &amp; account</span><div class="private-nav-actions"><button data-private-tab="valuation">Valuation &amp; peers</button><button data-private-tab="settings">Settings &amp; notes</button></div></div>
+    </nav>
     <div id="private-research-dataset" class="pane" hidden aria-label="Research investments">
       <div class="section-title"><h3>Research investments</h3><span class="tiny">Shared by Market research, Optimization, Backtesting and Walk-forward</span></div>
-      <p class="tiny">Choose 2–5 investments by name, choose a historical period, and load the prices once. All four research views use that same loaded dataset.</p>
+      <p class="tiny">A single selected historical dataset is shared across market research, optimization, backtesting, and walk-forward evaluation. Changing the investments or observation period invalidates prior calculations.</p>
       <div class="formgrid" style="margin-top:14px"><div class="field"><label for="private-history-selection">Selected investments (2–5)</label><input type="hidden" id="private-history-symbols" value=""><div id="private-history-selection" class="chosen-assets">Choose investments to compare.</div><button class="btn sm" type="button" id="private-browse-research">Browse investments</button></div>
       <div class="field"><label for="private-history-days">Period</label><select id="private-history-days"><option value="90">3 months</option><option value="180">6 months</option><option selected value="365">1 year</option><option value="730">2 years</option></select></div></div>
       <div class="controls"><button class="btn primary" id="private-history-load">Load market history</button><span class="tiny" id="private-history-source"></span></div>
@@ -337,19 +388,19 @@
         <p class="tiny" style="margin:0 0 8px"><strong>Selected investments:</strong> <span id="private-research-selected" aria-live="polite">None selected</span></p>
         <div class="tiny"><strong>Loaded for analysis:</strong> <span id="private-research-loaded" aria-live="polite">No historical data loaded</span></div>
       </div>
-      <p class="tiny" id="private-research-state" role="status" aria-live="polite">Select investments, then load history to activate the analysis tools.</p>
+      <p class="tiny" id="private-research-state" role="status" aria-live="polite">No market history loaded for the current selection.</p>
     </div>
     <section class="private-view" data-private-view="home">
       <div class="pane"><div class="three"><div class="metric"><span class="muted">Virtual total</span><strong id="private-total">—</strong></div><div class="metric"><span class="muted">Available cash</span><strong id="private-cash">—</strong></div><div class="metric"><span class="muted">Invested value</span><strong id="private-invested">—</strong></div></div><div class="section-title"><h3>Holdings</h3><button class="btn sm" data-private-tab="trade">Trade</button></div><div id="private-positions"></div></div>
       <div class="pane"><h3>Portfolio concentration</h3><div id="private-concentration" class="tiny" style="margin-top:12px">Add virtual holdings to see allocation.</div></div>
       <div class="pane" id="private-allocation-card-v74">
         <h3>Portfolio allocation what-if</h3>
-        <p class="tiny">Explore a proposed purchase using your current virtual cash and observed prices. Nothing is submitted to the virtual trading ledger or real brokerage.</p>
+        <p class="tiny">A proposed cash-funded allocation is compared with the current virtual portfolio using observed prices. The results are hypothetical; no virtual or brokerage order is submitted.</p>
         <div class="formgrid" style="margin-top:14px">
           <div class="field"><label for="private-allocation-symbol-v74">Investment</label><select id="private-allocation-symbol-v74"><option value="">Choose an investment</option></select></div>
           <div class="field"><label for="private-allocation-budget-v74">Hypothetical spending in USD</label><input id="private-allocation-budget-v74" type="number" min="1" step="1" value="250"></div>
         </div>
-        <p id="private-allocation-selection-v74" class="tiny">Use Investment ideas to choose companies by name first, then refresh your list.</p>
+        <p id="private-allocation-selection-v74" class="tiny">Candidates reflect the current Investment ideas shortlist and virtual holdings.</p>
         <div class="controls"><button class="btn" type="button" id="private-allocation-choices-v74">Refresh investment list</button><button class="btn primary" type="button" id="private-allocation-run-v74">Analyze proposed purchase</button><button class="btn" type="button" id="private-allocation-export-v74" disabled>Export research JSON</button></div>
         <div id="private-allocation-results-v74" aria-live="polite" style="margin-top:15px"></div>
       </div>
@@ -363,7 +414,7 @@
     </section>
     <section class="private-view" data-private-view="ideas" hidden>
       <div class="pane"><span class="eyebrow">PERSONAL RESEARCH · OBSERVED DATA</span><h2 style="margin:7px 0 9px">Investment ideas</h2>
-        <p class="muted">A plain-language research shortlist built from private historical market observations and, where available, SEC company filings. The ranking is a transparent screening heuristic, <strong>not</strong> a return forecast, buy signal, or individualized advice.</p>
+        <p class="muted">Selected investments are compared using historical price trends, volatility, drawdown, and available SEC financial context. Relative scores summarize this evidence; they are not predicted returns or buy signals.</p>
         <div class="section-title" style="margin-top:18px"><h3>Companies to examine</h3><span class="tiny" id="ideas-count"></span></div>
         <div id="ideas-selected" class="chosen-assets" aria-live="polite"></div>
         <div class="controls"><button class="btn sm" type="button" id="ideas-browse">Browse investments</button><button class="btn sm" type="button" id="ideas-reset">Restore starting shortlist</button></div>
@@ -439,12 +490,12 @@
       <div class="field"><label for="private-valuation-terminal">Terminal growth (%)</label><input id="private-valuation-terminal" type="number" min="-5" max="8" value="2"></div></div>
       <div class="controls"><button class="btn primary" id="private-valuation-run">Run scenario</button></div><div id="private-valuation-output" style="margin-top:15px"></div><div id="private-value-card-v73" style="margin-top:18px;border-top:1px solid #d8e6df;padding-top:14px">
           <h3>Market price &amp; SEC valuation context</h3>
-          <p class="tiny">Connect a selected company's SEC-reported shares and annual cash flows to its latest available private Alpaca quote. Not a fair-value estimate or buy/sell recommendation.</p>
+          <p class="tiny">SEC-reported shares and annual cash flows are compared with the latest available Alpaca market observation. Ratios depend on disclosure dates and quote coverage; they are not fair-value estimates.</p>
           <div class="controls"><button type="button" class="btn" id="private-value-run-v73">Compare observed market price</button></div>
           <div id="private-value-output-v73" aria-live="polite" style="margin-top:12px"></div>
         </div></div>
       <div class="pane"><h3>Multi-year SEC financial projections</h3>
-        <p class="tiny">Choose a company above and load its SEC annual disclosures first. Enter hypothetical annual revenue growth and free-cash-flow margin; projections never overwrite reported financials. Scenarios differ by ±4 percentage points of growth and ±3 points of FCF margin.</p>
+        <p class="tiny">Projections use the selected company’s reported SEC annual baseline and hypothetical revenue growth, FCF-margin, and discount-rate assumptions. Conservative and optimistic cases vary growth by 4 percentage points and FCF margin by 3 points. Reported statements remain unchanged.</p>
         <div class="formgrid" style="margin-top:14px">
           <div class="field"><label for="private-fc-years">Projection horizon</label><select id="private-fc-years"><option value="3">3 years</option><option selected value="5">5 years</option><option value="7">7 years</option></select></div>
           <div class="field"><label for="private-fc-growth">Base annual revenue growth (%)</label><input id="private-fc-growth" type="number" min="-30" max="40" value="6" step="0.5"></div>
@@ -678,6 +729,60 @@ function snapshotCsv(snapshot){
 root.QFSecAnalytics={METRICS,metricValue,ranking,revenueSeries,snapshotCsv};
 })(typeof globalThis!=='undefined'?globalThis:this);
 
+/* Public source-backed research evidence, separate from authenticated investment data. */
+(function(root){
+'use strict';
+const finite = value => typeof value === 'number' && Number.isFinite(value);
+const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+function rows(snapshot){
+ if(!Array.isArray(snapshot?.companies))return [];
+ return snapshot.companies.map(company=>{
+  const latest=company.annual?.[0], earlier=company.annual?.[1];
+  const current=latest?.metrics||{},prior=earlier?.metrics||{};
+  if(!finite(current.revenue_usd)||current.revenue_usd<=0||
+     !finite(prior.revenue_usd)||prior.revenue_usd<=0||
+     !finite(current.operating_income_usd))return null;
+  const growth=100*(current.revenue_usd/prior.revenue_usd-1);
+  const margin=100*current.operating_income_usd/current.revenue_usd;
+  if(!finite(growth)||!finite(margin))return null;
+  return {symbol:String(company.symbol||''),name:String(company.name||''),
+          fiscalEnd:String(latest.fiscal_end||''),growth,margin};
+ }).filter(Boolean).sort((a,b)=>a.symbol.localeCompare(b.symbol));
+}
+function bounds(numbers){
+ const low=Math.min(...numbers),high=Math.max(...numbers),span=high-low||Math.max(Math.abs(high),1);
+ return [low-span*0.17,high+span*0.17];
+}
+function view(snapshot){
+ const data=rows(snapshot);
+ if(data.length<2)return '<p class="notice">Comparable SEC revenue and operating-income observations are unavailable for this exhibit. No illustrative values were substituted.</p>';
+ const [minX,maxX]=bounds(data.map(x=>x.growth)),[minY,maxY]=bounds(data.map(x=>x.margin));
+ const plotX=v=>64+(v-minX)/(maxX-minX)*480;
+ const plotY=v=>253-(v-minY)/(maxY-minY)*200;
+ const grids=[0,.25,.5,.75,1].map(t=>{
+  const x=64+480*t,y=253-200*t;
+  const xval=minX+(maxX-minX)*t,yval=minY+(maxY-minY)*t;
+  return `<line x1="${x}" x2="${x}" y1="53" y2="253" stroke="#e2eee7"/>`+
+         `<line x1="64" x2="544" y1="${y}" y2="${y}" stroke="#e2eee7"/>`+
+         `<text x="${x}" y="275" text-anchor="middle" fill="#526b5e" font-size="10">${xval.toFixed(1)}%</text>`+
+         `<text x="54" y="${y+4}" text-anchor="end" fill="#526b5e" font-size="10">${yval.toFixed(1)}%</text>`;
+ }).join('');
+ const circles=data.map((r,i)=>{
+  const x=plotX(r.growth),y=plotY(r.margin);
+  return `<circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="6.5" fill="#18745c" opacity=".86"><title>${escapeHTML(r.name)} (${escapeHTML(r.symbol)}): revenue growth ${r.growth.toFixed(2)}%, operating margin ${r.margin.toFixed(2)}%, FY ${escapeHTML(r.fiscalEnd)}</title></circle>`+
+         `<text x="${Math.min(547,x+9).toFixed(2)}" y="${Math.max(35,y-9).toFixed(2)}" font-size="10" fill="#274d40">${escapeHTML(r.symbol)}</text>`;
+ }).join('');
+ const table=data.map(r=>`<tr><td>${escapeHTML(r.symbol)}</td><td>${escapeHTML(r.fiscalEnd)}</td><td>${r.growth.toFixed(2)}%</td><td>${r.margin.toFixed(2)}%</td></tr>`).join('');
+ const asOf=escapeHTML(snapshot?.as_of||'Cutoff not recorded');
+ return `<div class="evidence-quant-grid"><div class="evidence-graph"><svg viewBox="0 0 600 320" role="img" aria-label="SEC annual revenue growth compared with operating margins for ${data.length} companies; corresponding values are in the adjacent table"><title>Revenue growth and operating margin from published SEC annual facts</title>${grids}${circles}<text x="304" y="305" text-anchor="middle" fill="#36584d" font-size="12">Annual revenue growth (%)</text><text x="15" y="155" transform="rotate(-90 15 155)" text-anchor="middle" fill="#36584d" font-size="12">Operating margin (%)</text></svg><p class="tiny">${data.length} comparable companies · SEC source cutoff ${asOf}. Company fiscal years differ. Each marker reflects historical disclosures, not market returns.</p></div>`+
+ `<div class="evidence-data table-wrap"><table><thead><tr><th>Issuer</th><th>FY ending</th><th>Revenue growth</th><th>Operating margin</th></tr></thead><tbody>${table}</tbody></table></div></div>`;
+}
+function render(snapshot, element){if(element)element.innerHTML=view(snapshot);}
+const api={rows,view,render};
+root.QFPublicEvidence=api;
+if(typeof module!=='undefined' && module.exports)module.exports=api;
+})(typeof globalThis!=='undefined'?globalThis:this);
+
 /* Public demo: prebuilt real SEC filing facts plus browser-only simulated model examples. */
 (function(){
 'use strict';
@@ -866,6 +971,7 @@ function populate(){
  $('quant-assets').innerHTML=['MSFT','VOO','AAPL','QQQ','BND','BTC/USD','ETH/USD'].map(s=>'<label class="inline-checkbox"><input type="checkbox" name="quant-asset" value="'+s+'" '+(['MSFT','VOO','BND'].includes(s)?'checked':'')+'>'+M.bySymbol[s].name+'</label>').join('');
  $('ml-company').innerHTML=Object.keys(M.COMPANY_FACTS).map(s=>'<option value="'+s+'">'+M.COMPANY_NAMES[s]+'</option>').join('');
  portfolio();runQuant();runDCF();runPeers();renderSEC();renderSECHighlights();
+ if(window.QFPublicEvidence)window.QFPublicEvidence.render(SEC_DATA, document.getElementById("systems-sec-quant-v76"));
 }
 document.addEventListener('click',e=>{
  const btn=e.target.closest('[data-page], [data-go], [data-symbol], [data-sec-symbol]');if(!btn)return;
@@ -2398,10 +2504,10 @@ function renderDecisionBrief(){
  const heldSummary=held.length?held.map(x=>{const weight=x.concentration==null?'unavailable weight':ideaPct(x.concentration)+' of virtual account';return safe(x.symbol)+' ('+safe(weight)+')';}).join(', '):'No selected candidate overlaps your virtual holdings.';
  const corrSummary=paired.length?paired.map(p=>safe(p.a)+' / '+safe(p.b)+' ('+(p.value*100).toFixed(0)+'% historical daily-return correlation)').join('; '):'No pair above 0.80 among comparable histories.';
  const cautions=brief.warnings.map(x=>'<li>'+safe(x)+'</li>').join('');
- $('ideas-brief-output').innerHTML='<p class="tiny"><strong>'+safe(selectedLens)+' perspective · '+safe(ideaSource)+'</strong>. These are research priorities among the '+brief.selected.length+' securities you chose, not recommended purchases or projected returns.</p>'+
+ $('ideas-brief-output').innerHTML='<p class="tiny"><strong>'+safe(selectedLens)+' perspective · '+safe(ideaSource)+'</strong>. Relative rankings for the '+brief.selected.length+' selected securities; not predicted returns or trade recommendations.</p>'+
   '<div class="decision-grid">'+topCards+'</div>'+
-  '<h4>How much do these ideas overlap?</h4><p class="tiny">'+corrSummary+' '+(brief.correlations.notAligned?' '+brief.correlations.notAligned+' pair(s) omitted because dates did not match.':'')+'</p>'+
-  '<h4>Already represented in your virtual portfolio?</h4><p class="tiny">'+heldSummary+' '+safe(brief.portfolio.note)+'</p>'+
+  '<h4>Historical correlation between candidates</h4><p class="tiny">'+corrSummary+' '+(brief.correlations.notAligned?' '+brief.correlations.notAligned+' pair(s) omitted because dates did not match.':'')+'</p>'+
+  '<h4>Existing virtual portfolio exposure</h4><p class="tiny">'+heldSummary+' '+safe(brief.portfolio.note)+'</p>'+
   '<h4>Before using real money</h4><ul class="tiny"><li>Compare the current market price with a defensible business valuation; SEC FCF proxies alone are not per-share values.</li><li>Check earnings, competitive risks, sector exposure, taxes, fees, personal time horizon, and potential loss of principal.</li>'+cautions+'</ul>';
  $('ideas-brief').hidden=false;
  $('ideas-brief-export').disabled=false;
@@ -2585,7 +2691,7 @@ async function loadHistory(){
   // A pending fetch may finish after sign-out or a changed investment selection.
   if(!privateState || researchSelection.join(',')!==raw || $('private-history-days').value!==period || request!==historyLoadSequence)return;
   optimizerResult=null;$('private-opt-export').disabled=true;
-  $('private-opt-output').textContent='History loaded. Open Optimization to calculate allocations.';
+  $('private-opt-output').textContent='Historical observations loaded for portfolio calculations.';
   $('private-opt-risk').textContent='Risk diagnostics appear after an allocation is calculated.';
   historySeries=d;walkforwardResult=null;$('private-wf-export').disabled=true;$('private-wf-output').textContent='History loaded. Run walk-forward evaluation when ready.';refreshResearchContext();
   $('private-history-chart').innerHTML=svgIndexChart(d);
@@ -2679,7 +2785,7 @@ function privatePeers(){
  });
  $('private-peers').innerHTML=rows.length?displayTable(['Company','Fiscal year end','Revenue','Operating margin','FCF proxy'],rows)+
   '<p class="tiny">Selected-company comparisons use different fiscal periods and accounting practices; not sector-normalized rankings.</p>':
-  '<p class="tiny">Select companies above and run their SEC scenarios to build your own comparison table.</p>';
+  '<p class="tiny">Company comparison values appear after the corresponding SEC annual scenarios are loaded.</p>';
 }
 async function changeCapital(){
  if(!privateState)return;
@@ -2918,7 +3024,7 @@ function runV68Robustness(){
     ['Evaluated sessions',String(r.evaluationSessions)],
     ['Non-overlapping test windows',String(r.windowCount)],
     ['Loaded market source',r.source]])+
-   (r.evaluationSessions<126||r.windowCount<6?'<p class="notice"><strong>Short evaluation:</strong> Use the 2-year period in Research investments, reload, and rerun Walk-forward for greater coverage when available.</p>':'')+
+   (r.evaluationSessions<126||r.windowCount<6?'<p class="notice"><strong>Short evaluation:</strong> The current observation window contains limited out-of-sample coverage; longer eligible history may produce more test windows.</p>':'')+
    '<h4 style="margin:14px 0 8px">Passive benchmark (one initial purchase)</h4>'+
    displayTable(['Portfolio','Compounded historical return','Volatility','Max drawdown','Modeled fees'],[
     ['Selected rolling allocation',percent(base.optimizedReturn),percent(walkforwardResult.optimized.metrics.annualVol),percent(walkforwardResult.optimized.metrics.maxDrawdown),usd(walkforwardResult.optimized.fees)],

@@ -36,10 +36,14 @@ block='''<section class="tabpage" id="page-private">
   </div>
   <div id="private-signed" hidden>
     <div class="controls"><span class="mini">Personal research · authenticated</span><button class="btn sm" id="private-logout">Sign out</button></div>
-    <nav class="private-nav" aria-label="Private workspace sections"><button class="active" data-private-tab="home">Portfolio</button><button data-private-tab="trade">Virtual trading</button><button data-private-tab="ideas">Investment ideas</button><button data-private-tab="research">Market research</button><button data-private-tab="optimization">Optimization</button><button data-private-tab="backtest">Backtesting</button><button data-private-tab="walkforward">Walk-forward</button><button data-private-tab="valuation">Valuation &amp; peers</button><button data-private-tab="settings">Settings &amp; notes</button></nav>
+    <nav class="private-nav" aria-label="Private workspace sections">
+      <div class="private-nav-group" role="group" aria-label="Portfolio and decisions"><span class="private-nav-title">Portfolio &amp; decisions</span><div class="private-nav-actions"><button class="active" data-private-tab="home">Portfolio</button><button data-private-tab="trade">Virtual trading</button><button data-private-tab="ideas">Investment ideas</button></div></div>
+      <div class="private-nav-group" role="group" aria-label="Quantitative research"><span class="private-nav-title">Quantitative research</span><div class="private-nav-actions"><button data-private-tab="research">Market research</button><button data-private-tab="optimization">Optimization</button><button data-private-tab="backtest">Backtesting</button><button data-private-tab="walkforward">Walk-forward</button></div></div>
+      <div class="private-nav-group" role="group" aria-label="Companies and account"><span class="private-nav-title">Companies &amp; account</span><div class="private-nav-actions"><button data-private-tab="valuation">Valuation &amp; peers</button><button data-private-tab="settings">Settings &amp; notes</button></div></div>
+    </nav>
     <div id="private-research-dataset" class="pane" hidden aria-label="Research investments">
       <div class="section-title"><h3>Research investments</h3><span class="tiny">Shared by Market research, Optimization, Backtesting and Walk-forward</span></div>
-      <p class="tiny">Choose 2–5 investments by name, choose a historical period, and load the prices once. All four research views use that same loaded dataset.</p>
+      <p class="tiny">A single selected historical dataset is shared across market research, optimization, backtesting, and walk-forward evaluation. Changing the investments or observation period invalidates prior calculations.</p>
       <div class="formgrid" style="margin-top:14px"><div class="field"><label for="private-history-selection">Selected investments (2–5)</label><input type="hidden" id="private-history-symbols" value=""><div id="private-history-selection" class="chosen-assets">Choose investments to compare.</div><button class="btn sm" type="button" id="private-browse-research">Browse investments</button></div>
       <div class="field"><label for="private-history-days">Period</label><select id="private-history-days"><option value="90">3 months</option><option value="180">6 months</option><option selected value="365">1 year</option><option value="730">2 years</option></select></div></div>
       <div class="controls"><button class="btn primary" id="private-history-load">Load market history</button><span class="tiny" id="private-history-source"></span></div>
@@ -47,19 +51,19 @@ block='''<section class="tabpage" id="page-private">
         <p class="tiny" style="margin:0 0 8px"><strong>Selected investments:</strong> <span id="private-research-selected" aria-live="polite">None selected</span></p>
         <div class="tiny"><strong>Loaded for analysis:</strong> <span id="private-research-loaded" aria-live="polite">No historical data loaded</span></div>
       </div>
-      <p class="tiny" id="private-research-state" role="status" aria-live="polite">Select investments, then load history to activate the analysis tools.</p>
+      <p class="tiny" id="private-research-state" role="status" aria-live="polite">No market history loaded for the current selection.</p>
     </div>
     <section class="private-view" data-private-view="home">
       <div class="pane"><div class="three"><div class="metric"><span class="muted">Virtual total</span><strong id="private-total">—</strong></div><div class="metric"><span class="muted">Available cash</span><strong id="private-cash">—</strong></div><div class="metric"><span class="muted">Invested value</span><strong id="private-invested">—</strong></div></div><div class="section-title"><h3>Holdings</h3><button class="btn sm" data-private-tab="trade">Trade</button></div><div id="private-positions"></div></div>
       <div class="pane"><h3>Portfolio concentration</h3><div id="private-concentration" class="tiny" style="margin-top:12px">Add virtual holdings to see allocation.</div></div>
       <div class="pane" id="private-allocation-card-v74">
         <h3>Portfolio allocation what-if</h3>
-        <p class="tiny">Explore a proposed purchase using your current virtual cash and observed prices. Nothing is submitted to the virtual trading ledger or real brokerage.</p>
+        <p class="tiny">A proposed cash-funded allocation is compared with the current virtual portfolio using observed prices. The results are hypothetical; no virtual or brokerage order is submitted.</p>
         <div class="formgrid" style="margin-top:14px">
           <div class="field"><label for="private-allocation-symbol-v74">Investment</label><select id="private-allocation-symbol-v74"><option value="">Choose an investment</option></select></div>
           <div class="field"><label for="private-allocation-budget-v74">Hypothetical spending in USD</label><input id="private-allocation-budget-v74" type="number" min="1" step="1" value="250"></div>
         </div>
-        <p id="private-allocation-selection-v74" class="tiny">Use Investment ideas to choose companies by name first, then refresh your list.</p>
+        <p id="private-allocation-selection-v74" class="tiny">Candidates reflect the current Investment ideas shortlist and virtual holdings.</p>
         <div class="controls"><button class="btn" type="button" id="private-allocation-choices-v74">Refresh investment list</button><button class="btn primary" type="button" id="private-allocation-run-v74">Analyze proposed purchase</button><button class="btn" type="button" id="private-allocation-export-v74" disabled>Export research JSON</button></div>
         <div id="private-allocation-results-v74" aria-live="polite" style="margin-top:15px"></div>
       </div>
@@ -73,7 +77,7 @@ block='''<section class="tabpage" id="page-private">
     </section>
     <section class="private-view" data-private-view="ideas" hidden>
       <div class="pane"><span class="eyebrow">PERSONAL RESEARCH · OBSERVED DATA</span><h2 style="margin:7px 0 9px">Investment ideas</h2>
-        <p class="muted">A plain-language research shortlist built from private historical market observations and, where available, SEC company filings. The ranking is a transparent screening heuristic, <strong>not</strong> a return forecast, buy signal, or individualized advice.</p>
+        <p class="muted">Selected investments are compared using historical price trends, volatility, drawdown, and available SEC financial context. Relative scores summarize this evidence; they are not predicted returns or buy signals.</p>
         <div class="section-title" style="margin-top:18px"><h3>Companies to examine</h3><span class="tiny" id="ideas-count"></span></div>
         <div id="ideas-selected" class="chosen-assets" aria-live="polite"></div>
         <div class="controls"><button class="btn sm" type="button" id="ideas-browse">Browse investments</button><button class="btn sm" type="button" id="ideas-reset">Restore starting shortlist</button></div>
@@ -149,12 +153,12 @@ block='''<section class="tabpage" id="page-private">
       <div class="field"><label for="private-valuation-terminal">Terminal growth (%)</label><input id="private-valuation-terminal" type="number" min="-5" max="8" value="2"></div></div>
       <div class="controls"><button class="btn primary" id="private-valuation-run">Run scenario</button></div><div id="private-valuation-output" style="margin-top:15px"></div><div id="private-value-card-v73" style="margin-top:18px;border-top:1px solid #d8e6df;padding-top:14px">
           <h3>Market price &amp; SEC valuation context</h3>
-          <p class="tiny">Connect a selected company's SEC-reported shares and annual cash flows to its latest available private Alpaca quote. Not a fair-value estimate or buy/sell recommendation.</p>
+          <p class="tiny">SEC-reported shares and annual cash flows are compared with the latest available Alpaca market observation. Ratios depend on disclosure dates and quote coverage; they are not fair-value estimates.</p>
           <div class="controls"><button type="button" class="btn" id="private-value-run-v73">Compare observed market price</button></div>
           <div id="private-value-output-v73" aria-live="polite" style="margin-top:12px"></div>
         </div></div>
       <div class="pane"><h3>Multi-year SEC financial projections</h3>
-        <p class="tiny">Choose a company above and load its SEC annual disclosures first. Enter hypothetical annual revenue growth and free-cash-flow margin; projections never overwrite reported financials. Scenarios differ by ±4 percentage points of growth and ±3 points of FCF margin.</p>
+        <p class="tiny">Projections use the selected company’s reported SEC annual baseline and hypothetical revenue growth, FCF-margin, and discount-rate assumptions. Conservative and optimistic cases vary growth by 4 percentage points and FCF margin by 3 points. Reported statements remain unchanged.</p>
         <div class="formgrid" style="margin-top:14px">
           <div class="field"><label for="private-fc-years">Projection horizon</label><select id="private-fc-years"><option value="3">3 years</option><option selected value="5">5 years</option><option value="7">7 years</option></select></div>
           <div class="field"><label for="private-fc-growth">Base annual revenue growth (%)</label><input id="private-fc-growth" type="number" min="-30" max="40" value="6" step="0.5"></div>
@@ -220,7 +224,8 @@ for slot, file in [('/* QF_MODEL */','model.js'),('/* QF_APP */','app.js'),('/* 
   assert text.count('/* QF_SEC_DATA */ null')==1
   # Bundle pure SEC analytics in the existing public app script. CSP remains 3 hashes.
   analytics=(src/'site/sec_analytics.js').read_text(encoding='utf-8')
-  text=analytics+'\n'+text.replace('/* QF_SEC_DATA */ null', snapshot_js)
+  evidence=(src/'site/public_evidence_v76.js').read_text(encoding='utf-8')
+  text=analytics+'\n'+evidence+'\n'+text.replace('/* QF_SEC_DATA */ null', snapshot_js)
  text=text.replace('</script','<\\/script')
  html=html.replace(slot,text)
 (root/'public/index.html').write_text(html, encoding="utf-8")

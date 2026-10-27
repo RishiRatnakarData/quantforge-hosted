@@ -334,10 +334,10 @@ function renderDecisionBrief(){
  const heldSummary=held.length?held.map(x=>{const weight=x.concentration==null?'unavailable weight':ideaPct(x.concentration)+' of virtual account';return safe(x.symbol)+' ('+safe(weight)+')';}).join(', '):'No selected candidate overlaps your virtual holdings.';
  const corrSummary=paired.length?paired.map(p=>safe(p.a)+' / '+safe(p.b)+' ('+(p.value*100).toFixed(0)+'% historical daily-return correlation)').join('; '):'No pair above 0.80 among comparable histories.';
  const cautions=brief.warnings.map(x=>'<li>'+safe(x)+'</li>').join('');
- $('ideas-brief-output').innerHTML='<p class="tiny"><strong>'+safe(selectedLens)+' perspective · '+safe(ideaSource)+'</strong>. These are research priorities among the '+brief.selected.length+' securities you chose, not recommended purchases or projected returns.</p>'+
+ $('ideas-brief-output').innerHTML='<p class="tiny"><strong>'+safe(selectedLens)+' perspective · '+safe(ideaSource)+'</strong>. Relative rankings for the '+brief.selected.length+' selected securities; not predicted returns or trade recommendations.</p>'+
   '<div class="decision-grid">'+topCards+'</div>'+
-  '<h4>How much do these ideas overlap?</h4><p class="tiny">'+corrSummary+' '+(brief.correlations.notAligned?' '+brief.correlations.notAligned+' pair(s) omitted because dates did not match.':'')+'</p>'+
-  '<h4>Already represented in your virtual portfolio?</h4><p class="tiny">'+heldSummary+' '+safe(brief.portfolio.note)+'</p>'+
+  '<h4>Historical correlation between candidates</h4><p class="tiny">'+corrSummary+' '+(brief.correlations.notAligned?' '+brief.correlations.notAligned+' pair(s) omitted because dates did not match.':'')+'</p>'+
+  '<h4>Existing virtual portfolio exposure</h4><p class="tiny">'+heldSummary+' '+safe(brief.portfolio.note)+'</p>'+
   '<h4>Before using real money</h4><ul class="tiny"><li>Compare the current market price with a defensible business valuation; SEC FCF proxies alone are not per-share values.</li><li>Check earnings, competitive risks, sector exposure, taxes, fees, personal time horizon, and potential loss of principal.</li>'+cautions+'</ul>';
  $('ideas-brief').hidden=false;
  $('ideas-brief-export').disabled=false;
@@ -521,7 +521,7 @@ async function loadHistory(){
   // A pending fetch may finish after sign-out or a changed investment selection.
   if(!privateState || researchSelection.join(',')!==raw || $('private-history-days').value!==period || request!==historyLoadSequence)return;
   optimizerResult=null;$('private-opt-export').disabled=true;
-  $('private-opt-output').textContent='History loaded. Open Optimization to calculate allocations.';
+  $('private-opt-output').textContent='Historical observations loaded for portfolio calculations.';
   $('private-opt-risk').textContent='Risk diagnostics appear after an allocation is calculated.';
   historySeries=d;walkforwardResult=null;$('private-wf-export').disabled=true;$('private-wf-output').textContent='History loaded. Run walk-forward evaluation when ready.';refreshResearchContext();
   $('private-history-chart').innerHTML=svgIndexChart(d);
@@ -615,7 +615,7 @@ function privatePeers(){
  });
  $('private-peers').innerHTML=rows.length?displayTable(['Company','Fiscal year end','Revenue','Operating margin','FCF proxy'],rows)+
   '<p class="tiny">Selected-company comparisons use different fiscal periods and accounting practices; not sector-normalized rankings.</p>':
-  '<p class="tiny">Select companies above and run their SEC scenarios to build your own comparison table.</p>';
+  '<p class="tiny">Company comparison values appear after the corresponding SEC annual scenarios are loaded.</p>';
 }
 async function changeCapital(){
  if(!privateState)return;
@@ -854,7 +854,7 @@ function runV68Robustness(){
     ['Evaluated sessions',String(r.evaluationSessions)],
     ['Non-overlapping test windows',String(r.windowCount)],
     ['Loaded market source',r.source]])+
-   (r.evaluationSessions<126||r.windowCount<6?'<p class="notice"><strong>Short evaluation:</strong> Use the 2-year period in Research investments, reload, and rerun Walk-forward for greater coverage when available.</p>':'')+
+   (r.evaluationSessions<126||r.windowCount<6?'<p class="notice"><strong>Short evaluation:</strong> The current observation window contains limited out-of-sample coverage; longer eligible history may produce more test windows.</p>':'')+
    '<h4 style="margin:14px 0 8px">Passive benchmark (one initial purchase)</h4>'+
    displayTable(['Portfolio','Compounded historical return','Volatility','Max drawdown','Modeled fees'],[
     ['Selected rolling allocation',percent(base.optimizedReturn),percent(walkforwardResult.optimized.metrics.annualVol),percent(walkforwardResult.optimized.metrics.maxDrawdown),usd(walkforwardResult.optimized.fees)],

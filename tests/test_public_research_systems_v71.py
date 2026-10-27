@@ -34,6 +34,6 @@ def test_no_private_data_or_unsafe_script_added():
 
 def test_methods_reflects_deep_private_explanations():
     content = site()
-    assert "How the research is tested" in content
+    assert "Research validation and failure cases" in content
     assert "Advanced private research, publicly documented" in content
     assert "tests provide scoped evidence" in content
