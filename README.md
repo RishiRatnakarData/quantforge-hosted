@@ -1,3 +1,104 @@
+<!-- QuantForge V7.0 — Current hosted platform -->
+# QuantForge
+
+**Financial research, built end to end.** A personal project spanning SEC data engineering, quantitative portfolio research, financial modeling, and a secured owner-only investment workspace.
+
+**[Public research website](https://quantforge-648.pages.dev)** · [Methods](docs/methodology/QUANT_RESEARCH_METHODS.md) · [SEC financial models](docs/methodology/SEC_AND_DCF.md) · [Release history](RELEASE_NOTES_V7_0.md)
+
+## What this project demonstrates
+
+QuantForge is a working application, not a static notebook. Its public research site uses historical **SEC EDGAR financial disclosures** and clearly labeled simulated investment examples. Its authenticated private workspace uses on-demand **Alpaca historical market observations**, SEC company facts, and a persistent virtual portfolio. Private market observations and owner data are not redistributed through the public demonstration.
+
+| Area | Technical implementation | Evidence / boundaries |
+| --- | --- | --- |
+| **Data engineering** | SEC XBRL Company Facts, fiscal-year filtering, filing provenance, source tags, missing-data treatment, CSV exports | Reported versus calculated fields are distinguishable; unavailable values are not silently zero-filled |
+| **Quantitative research** | Covariance analysis, risk contribution, constrained allocations, historical downside metrics, Monte Carlo examples | Historical, model-dependent results; no guarantee of future performance |
+| **Statistical validation** | Rolling train/test windows, out-of-sample comparisons, transaction-fee attribution, passive and rebalanced benchmarks, leave-one-window-out robustness | Evaluation dates and research manifests are explicit; no live trading claims |
+| **Financial modeling** | SEC-grounded operating and free-cash-flow proxies, editable forward scenarios, multi-year forecasting and valuation sensitivity | Simplified cash-flow proxies are not company equity value or share-price targets |
+| **Software engineering** | Python/FastAPI, HTML/JavaScript UI, Cloudflare Pages proxy, Render, Supabase MFA/RLS, pytest, Node tests, GitHub Actions | Owner-only API access; inline-script CSP checks; no real brokerage orders |
+
+## Public website
+
+- **SEC Financials:** verified historical annual disclosures, revenue growth, operating margins, free-cash-flow proxies, provenance and selected-company comparisons.
+- **Portfolio / Quant / Valuation / Company peers:** interactive educational calculations using explicitly **illustrative** input prices and company data, separate from the actual private research feeds.
+- **Methods & engineering:** sources, mathematical assumptions, system architecture, data quality, testing and security boundaries.
+
+The public website does **not** expose personal holdings, account credentials, Alpaca feeds, or a market-data redistribution endpoint.
+
+## Private investment workspace
+
+The single-owner workspace uses authenticator MFA before opening its portfolio or private research APIs.
+
+- **Portfolio and virtual transactions:** virtual cash, holdings, read-only market prices, virtual trades, research notes and individually deletable notes. No actual brokerage order is placed.
+- **Browse by investment name:** stocks/ETFs and supported cryptocurrency pairs from the private asset directory. Ticker memorization is not required.
+- **Market research:** aligned historical prices, market coverage labels, descriptive risk statistics and stress scenarios; crypto-only histories use a different calendar convention from equity-session comparisons.
+- **Investment ideas (V7.0):** a user-selected, up-to-ten-investment **research shortlist** with balanced, growth and risk-aware scoring lenses. Each score combines past trend, volatility and drawdown measures. Available SEC business fundamentals are presented separately. These are **historical screening heuristics, not live buy signals, estimated investment returns, or personalized recommendations**.
+- **Optimization and backtesting:** constrained risk-aware allocations, correlation/risk diagnostics, equal-weight comparisons and portfolio assumptions.
+- **Walk-forward analysis:** past-only fitted allocations, later unseen test windows, benchmark comparisons, costs, robustness scenarios, research exports and SHA-256 observation fingerprints.
+- **SEC valuation & forecasting:** annual company disclosures where eligible, forward scenarios, discount-rate/growth sensitivity and terminal-value dependence.
+
+**Data limitations:** historical stock returns exclude dividends and may use IEX-only single-exchange prices on Alpaca Basic. ETF prices do not describe fund holdings or fees. SEC reported annual figures and stock quotes are different data types. Backtested and projected results are hypothetical; selected assets, parameter tuning and observed periods can materially affect conclusions.
+
+## Architecture
+
+```text
+PUBLIC
+SEC EDGAR company facts -> validated snapshot -> Cloudflare Pages
+                                                 | public historical research
+                                                 `-- simulated browser-only models
+
+PRIVATE (authenticated owner, MFA/AAL2)
+Browser -> Cloudflare /api proxy -> Render / FastAPI
+                                 |-- Supabase Auth / MFA and private portfolio (RLS)
+                                 |-- Alpaca read-only market observations / asset directory
+                                 `-- SEC EDGAR annual filings (on demand / cached)
+
+QUALITY GATES
+GitHub Actions -> Python lint + unit/integration tests + private/public JS tests
+               -> compiled bundle CSP integrity + offline smoke tests
+```
+
+Provider API credentials are configured server-side only. Access to the private data routes requires authorization; the client cannot submit real-money brokerage orders.
+
+## Validation
+
+The **V6.9** release was validated on Windows with **332 passing Python tests and 70 passing JavaScript tests**, and its GitHub CI completed on Python 3.11 and 3.12. V7.0 adds shortlist scoring, UI, and source-regression tests and must pass the same complete local and CI gates before publication. See [V6.9 release notes](RELEASE_NOTES_V6_9.md) and [V7.0 release notes](RELEASE_NOTES_V7_0.md).
+
+Run the main validation suite from a configured development environment:
+
+```powershell
+.\.venv\Scripts\python.exe -m ruff check .
+.\.venv\Scripts\python.exe -m pytest -q
+node --test web/tests/*.test.cjs
+.\.venv\Scripts\python.exe tools/build_unified_site.py
+.\.venv\Scripts\python.exe tools/audit_public_bundle.py
+.\.venv\Scripts\python.exe tools/prepublish_check.py
+```
+
+The `node --test web/tests/*.test.cjs` glob is suitable for the CI shell; on Windows PowerShell, pass the paths from `Get-ChildItem web/tests -Filter '*.test.cjs'` to Node instead.
+
+### Local legacy desk
+
+This repository also retains a local Python research desk and earlier offline quantitative modules. From a configured Python 3.11–3.13 environment:
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
+.\.venv\Scripts\python.exe -m quantforge investment-desk --demo --db .private\demo.sqlite3
+```
+
+The local `--demo` command uses fictional input prices and runs separately from the hosted private portfolio. Configuration guides and earlier research derivations are available under [`docs/`](docs/). Earlier V4/V5 release notes are historical records, not descriptions of the current production status.
+
+## Research integrity and responsible interpretation
+
+QuantForge is an educational and research project. It does not provide guaranteed stock picks, investment advice, tax advice, or financial planning, and it never executes real-money trades. A high ranking in the private shortlist means only that the chosen candidate scored well on a **specified historical screen**. Real investment decisions require independent diligence regarding price paid, company risks, diversification, liquidity, fees, tax consequences, and the investor's financial situation.
+
+Licensed provider observations, API credentials, MFA factors, personal notes and portfolio records are excluded from public source and static assets.
+
+---
+
+<details><summary>Historical V4–V5 local-desk README (archived reference)</summary>
+
 > **V5.7 limited public real-data section:** The public website includes a sourced SEC Financials tab for 12 named issuers spanning multiple industries when a validated SEC snapshot has been generated. Other demo calculations remain fictional; private Alpaca/portfolio data are unchanged. See [V5.7 runbook](docs/PUBLIC_SEC_DEMO_V5_7.md).
 
 > **V5.6.1 hosted MFA security upgrade:** See [Windows/deployment guide](docs/MFA_UPGRADE_V5_6_1.md). The V5.6.1 upgrade did not alter the public demo; the private workspace now requires an authenticator code and Supabase AAL2 RLS. The source archive alone does not deploy these changes.
@@ -205,3 +306,5 @@ The preflight is an additional safety check, **not** authorization to publish li
 Market trade observations are venue-limited and may be stale. No historical price-series calibration is used in the personal desk's risk simulation. Stress outcomes, trading fees, risk limits, and DCF assumptions are illustrative. The SEC company-facts API does not replace independent filing review, and its selected financial fields may be reported in different amended filings. The generalized DCF depends on strict standardized SEC facts and assumed future inputs; unsupported issuers produce missing-data messages rather than prices. Earlier quantitative research is a separate track with recorded out-of-sample limitations. The current application is personal and local; no public web service is offered.
 
 The repository is suitable for technical inspection, **not** for publishing its original owner's financial records, credentials or licensed market-data outputs. No source data or private database is required to run the fictional demo.
+
+</details>

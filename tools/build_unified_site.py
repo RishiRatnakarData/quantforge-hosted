@@ -36,7 +36,7 @@ block='''<section class="tabpage" id="page-private">
   </div>
   <div id="private-signed" hidden>
     <div class="controls"><span class="mini">Personal research · authenticated</span><button class="btn sm" id="private-logout">Sign out</button></div>
-    <nav class="private-nav" aria-label="Private workspace sections"><button class="active" data-private-tab="home">Portfolio</button><button data-private-tab="trade">Virtual trading</button><button data-private-tab="research">Market research</button><button data-private-tab="optimization">Optimization</button><button data-private-tab="backtest">Backtesting</button><button data-private-tab="walkforward">Walk-forward</button><button data-private-tab="valuation">Valuation &amp; peers</button><button data-private-tab="settings">Settings &amp; notes</button></nav>
+    <nav class="private-nav" aria-label="Private workspace sections"><button class="active" data-private-tab="home">Portfolio</button><button data-private-tab="trade">Virtual trading</button><button data-private-tab="ideas">Investment ideas</button><button data-private-tab="research">Market research</button><button data-private-tab="optimization">Optimization</button><button data-private-tab="backtest">Backtesting</button><button data-private-tab="walkforward">Walk-forward</button><button data-private-tab="valuation">Valuation &amp; peers</button><button data-private-tab="settings">Settings &amp; notes</button></nav>
     <div id="private-research-dataset" class="pane" hidden aria-label="Research investments">
       <div class="section-title"><h3>Research investments</h3><span class="tiny">Shared by Market research, Optimization, Backtesting and Walk-forward</span></div>
       <p class="tiny">Choose 2–5 investments by name, choose a historical period, and load the prices once. All four research views use that same loaded dataset.</p>
@@ -59,6 +59,23 @@ block='''<section class="tabpage" id="page-private">
       <div class="field"><label for="private-side">Action</label><select id="private-side"><option value="buy">Buy with USD budget</option><option value="sell">Sell units</option></select></div>
       <div class="field"><label for="private-amount">USD budget / units</label><input type="number" min="0.00000001" step="any" id="private-amount" value="100"></div></div>
       <div class="controls"><button class="btn" id="private-quote-submit">Get market price</button><button class="btn primary" id="private-trade-submit">Record virtual trade</button></div><p id="private-quote" class="tiny" style="margin-top:12px">No quote loaded.</p></div>
+    </section>
+    <section class="private-view" data-private-view="ideas" hidden>
+      <div class="pane"><span class="eyebrow">PERSONAL RESEARCH · OBSERVED DATA</span><h2 style="margin:7px 0 9px">Investment ideas</h2>
+        <p class="muted">A plain-language research shortlist built from private historical market observations and, where available, SEC company filings. The ranking is a transparent screening heuristic, <strong>not</strong> a return forecast, buy signal, or individualized advice.</p>
+        <div class="section-title" style="margin-top:18px"><h3>Companies to examine</h3><span class="tiny" id="ideas-count"></span></div>
+        <div id="ideas-selected" class="chosen-assets" aria-live="polite"></div>
+        <div class="controls"><button class="btn sm" type="button" id="ideas-browse">Browse investments</button><button class="btn sm" type="button" id="ideas-reset">Restore starting shortlist</button></div>
+        <div class="formgrid" style="margin-top:17px">
+          <div class="field"><label for="ideas-lens">Research perspective</label><select id="ideas-lens"><option value="balanced">Balanced: momentum and downside</option><option value="growth">Growth: recent trends emphasized</option><option value="defensive">Risk-aware: volatility and drawdown emphasized</option></select></div>
+          <div class="field"><label for="ideas-period">Historical observation window</label><select id="ideas-period"><option value="365" selected>1 year</option><option value="730">2 years</option></select></div>
+        </div>
+        <label class="inline-checkbox"><input id="ideas-sec" type="checkbox" checked> Include available SEC business fundamentals (slower)</label>
+        <div class="controls"><button class="btn primary" id="ideas-run" type="button">Compare selected investments</button></div>
+        <p class="tiny" role="status" aria-live="polite" id="ideas-status">Choose companies by name or use the starting shortlist.</p>
+        <div id="ideas-results" aria-live="polite"></div>
+      </div>
+      <div class="pane"><h3>How to interpret this</h3><p class="tiny" style="margin-top:9px">A higher research score indicates a more favorable balance of <strong>past</strong> momentum and realized risk under the selected lens. It is not an estimated probability of profit, expected return, or price target. SEC results describe past business finances separately; ETFs generally do not have comparable company income statements. Reassess against valuation, diversification, fees, tax impact, investment horizon, and the risk of loss before any real-money decision. IEX-only bars are not consolidated market-wide prices.</p></div>
     </section>
     <section class="private-view" data-private-view="research" hidden>
       <div class="pane"><h3>Historical market research</h3><p class="tiny">Historical daily stocks, ETFs, and supported USD cryptocurrencies from the private Alpaca connection. Stock prices exclude dividends; crypto trades every day.</p>
@@ -177,7 +194,7 @@ for slot, file in [('/* QF_MODEL */','model.js'),('/* QF_APP */','app.js'),('/* 
  text=(src/'site'/file).read_text(encoding="utf-8")
  if file=='private.js':
   # Bundled alongside the existing private script: still only three CSP-protected scripts.
-  text=(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_multimarket.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_forecast_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_walkforward_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_diagnostics_v66.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_integrity_v67.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_robustness_v68.js').read_text(encoding='utf-8')+'\n'+text
+  text=(src/'site/private_ideas_v70.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_multimarket.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_forecast_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_walkforward_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_diagnostics_v66.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_integrity_v67.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_robustness_v68.js').read_text(encoding='utf-8')+'\n'+text
  if file=='app.js':
   assert text.count('/* QF_SEC_DATA */ null')==1
   # Bundle pure SEC analytics in the existing public app script. CSP remains 3 hashes.

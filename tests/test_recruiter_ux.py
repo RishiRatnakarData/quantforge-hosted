@@ -10,7 +10,7 @@ def read(rel):
 
 def test_public_research_first_and_navigation():
     html = read("web/site/site.template.html")
-    assert 'Financial data, portfolios &amp; risk.' in html
+    assert 'Financial research, built end to end.' in html
     assert 'id="page-methods"' in html
     assert 'data-page="methods"' in html
     assert 'data-go="methods"' in html

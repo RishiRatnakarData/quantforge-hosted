@@ -63,11 +63,28 @@
 .picker-item{text-align:left;display:flex;flex-direction:column;gap:4px;border:1px solid var(--line);border-radius:8px;padding:11px;background:#fff;cursor:pointer}
 .picker-item:hover,.picker-item:focus-visible{border-color:#62a890;background:#f2faf6}.picker-item strong{font-size:13px;white-space:normal;overflow-wrap:anywhere}.picker-item span{font-size:11px;color:var(--muted)}
 @media(max-width:560px){.picker-shell{padding:13px;max-height:94vh}.picker-results{grid-template-columns:1fr}.picker-header h2{font-size:18px}}
+
+/* V7.0: personal-project storytelling and compact owner-only decision workspace */
+.story-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.story-grid>div{padding:16px;border:1px solid var(--line);border-radius:10px;background:#fcfefd}
+.story-grid h3{margin:7px 0 6px;font-size:16px}.story-grid p{font-size:12px;color:var(--muted);min-height:55px;margin:0 0 10px}
+.architecture-flow{display:grid;gap:12px;margin:16px 0}.architecture-lane{padding:15px;border-radius:9px;border:1px solid #bcd9ca;background:#f5fbf8;display:grid;gap:4px}
+.architecture-lane span:last-child{font-size:12px;color:#425f55}.architecture-lane strong{font-size:14px}
+.ideas-card{border:1px solid var(--line);padding:15px;border-radius:10px;margin:11px 0;background:#fcfefd}
+.ideas-card h3{margin:3px 0 7px;font-size:16px}.ideas-meta{display:flex;flex-wrap:wrap;gap:9px;margin:8px 0}.ideas-meta>span{padding:5px 8px;border-radius:5px;background:#edf4f0;font-size:11px}
+.ideas-score{font:650 26px Georgia,serif;color:var(--accent)}.ideas-brief{font-size:12px;color:#495f58}
+@media(max-width:650px){.story-grid{grid-template-columns:1fr}.story-grid p{min-height:0}}
 </style></head><body>
 <div class="app"><aside class="side"><div class="brand"><div class="mark">Q</div>quantforge</div><nav id="navigation" aria-label="Main navigation"><span class="nav-caption">Public research</span><button class="nav-btn active" data-page="overview" aria-current="page">Overview</button><button class="nav-btn" data-page="sec">SEC Financials</button><span class="nav-caption">Interactive models</span><button class="nav-btn" data-page="portfolio">Portfolio</button><button class="nav-btn" data-page="quant">Quant</button><button class="nav-btn" data-page="valuation">Valuation</button><button class="nav-btn" data-page="ml">Company peers</button><span class="nav-caption">Behind the analysis</span><button class="nav-btn" data-page="methods">Methods &amp; engineering</button><span class="nav-caption">Authenticated</span><button class="nav-btn" data-page="private">My workspace</button></nav><div class="sidenote">Financial statements · statistical models<br>Private portfolio tools behind sign-in</div></aside>
 <a class="skip-link" href="#main-content">Skip to content</a><main id="main-content"><div class="topbar"><span class="eyebrow">Financial research · models and data</span><span class="badge">RESEARCH / DEMO</span></div>
 <section class="tabpage active" id="page-overview">
-<div class="intro-simple"><span class="eyebrow">PERSONAL PROJECT</span><h1>Financial data, portfolios &amp; risk.</h1><p>QuantForge brings together company filings, portfolio modeling, quantitative research, and an authenticated investment workspace.</p><div class="controls"><button class="btn primary" data-go="sec">Financial research</button><button class="btn" data-go="quant">Quant models</button><button class="btn" data-go="methods">How it works</button></div></div>
+<div class="intro-simple"><span class="eyebrow">PERSONAL SOFTWARE &amp; DATA SCIENCE PROJECT</span><h1>Financial research, built end to end.</h1><p>From SEC filings to tested statistical models and a private portfolio research platform. QuantForge brings data engineering, quantitative analysis, financial modeling, and secure application development into one project.</p><div class="controls"><button class="btn primary" data-go="sec">Explore real financial data</button><button class="btn" data-go="quant">Try a model</button><button class="btn" data-go="methods">Architecture &amp; methods</button></div></div>
+<div class="project-story pane"><div class="section-title"><h3>Inside the project</h3><span class="mini">Four connected disciplines</span></div><div class="story-grid">
+<div><span class="eyebrow">01 · DATA ENGINEERING</span><h3>Source-backed statements</h3><p>SEC Company Facts ingestion, fiscal-period selection, filing lineage, missing-value controls, and reproducible exports.</p><button class="text-link" data-go="sec">Explore financials →</button></div>
+<div><span class="eyebrow">02 · QUANTITATIVE ANALYTICS</span><h3>Risk and optimization</h3><p>Covariance shrinkage, allocation constraints, downside simulation, and risk-return comparisons with clear modeling assumptions.</p><button class="text-link" data-go="quant">Try quantitative models →</button></div>
+<div><span class="eyebrow">03 · STATISTICAL RESEARCH</span><h3>Validation beyond backtests</h3><p>Rolling out-of-sample evaluation, fees, benchmark comparisons, robustness checks, and integrity fingerprints in the private research system.</p><button class="text-link" data-go="methods">Explore methodology →</button></div>
+<div><span class="eyebrow">04 · SOFTWARE ENGINEERING</span><h3>Private, tested application</h3><p>FastAPI, Cloudflare Pages, Supabase-authenticated MFA, owner-only market-data access, automated regression tests, and CI.</p><button class="text-link" data-go="methods">See system design →</button></div>
+</div></div>
 <div class="pane"><div class="section-title"><h3>Reported annual financials · SEC EDGAR</h3><span class="mini">Historical company filings</span></div><div class="three" id="home-sec-highlights"></div><div class="controls"><button class="btn primary" data-go="sec">Explore SEC Financials</button><span class="tiny" id="home-sec-updated">Historical filings · not live stock prices</span></div></div>
 <div class="pane"><div class="section-title"><h3>Interactive portfolio example</h3><span class="mini">Simulated holdings and prices</span></div><div class="three"><div class="metric"><span class="muted">Sample portfolio value</span><strong id="home-value">—</strong></div><div class="metric"><span class="muted">Cash available</span><strong id="home-cash">—</strong></div><div class="metric"><span class="muted">Invested</span><strong id="home-invested">—</strong></div></div><div class="section-title"><h3>Sample allocation</h3><button class="btn sm" data-go="portfolio">Try virtual portfolio</button></div><div id="home-allocation"></div></div>
 <div class="pane"><div class="section-title"><h3>Explore virtual assets</h3><span class="muted tiny">Illustrative prices · not live quotes</span></div><div class="listcards" id="assets-list"></div></div><div class="pane"><div class="section-title"><h3>Model demonstrations</h3><span class="muted tiny">Illustrative calculations · simulated financial inputs</span></div><div class="listcards"><button class="asset" data-go="quant"><strong>Portfolio optimization</strong><span>Covariance, volatility and modeled downside</span></button><button class="asset" data-go="valuation"><strong>DCF valuation</strong><span>Five-year cash flows and sensitivity</span></button><button class="asset" data-go="ml"><strong>Company similarity</strong><span>Standardized financial features</span></button></div></div></section>
@@ -119,6 +136,12 @@
   <p class="explain-note">Missing values remain unavailable rather than zero-filled. Company fiscal year-ends are not aligned; broad sector groupings are editorial and are not normalized industry classifications.</p></div>
   <div class="pane"><div class="section-title"><h3>Model demonstrations and boundaries</h3><span class="mini">Interactive · illustrative</span></div>
   <div class="method-grid"><div class="method-card"><h3>Portfolio simulator</h3><p>Virtual positions, example prices, rebalancing weights, and estimated fees. Everything stays in the browser session and does not place orders.</p><button class="text-link" data-go="portfolio">Open simulator →</button></div><div class="method-card"><h3>Quantitative modeling</h3><p>Simulated returns, covariance, constrained allocation, and Monte Carlo downside. Results are not calibrated forecasts of market risk.</p><button class="text-link" data-go="quant">Inspect quant model →</button></div><div class="method-card"><h3>DCF sensitivity</h3><p>Illustrative cash-flow assumptions with discounting and terminal-value sensitivity. These are not live company valuations.</p><button class="text-link" data-go="valuation">Test DCF →</button></div><div class="method-card"><h3>Company similarity</h3><p>Standardized synthetic fundamentals demonstrate nearest-neighbor comparisons. Use SEC Financials for actual company comparisons.</p><button class="text-link" data-go="ml">Inspect peers →</button></div></div></div>
+  <div class="pane"><div class="section-title"><h3>System architecture</h3><span class="mini">Public and private boundaries</span></div>
+  <div class="architecture-flow" aria-label="Architecture: public SEC snapshots to browser, private authentication via Cloudflare proxy, Render FastAPI, Supabase, Alpaca and SEC EDGAR">
+    <div class="architecture-lane"><span class="eyebrow">PUBLIC</span><strong>SEC EDGAR filings</strong><span>Validated annual snapshot → Cloudflare Pages → browser-only demonstrations</span></div>
+    <div class="architecture-lane"><span class="eyebrow">OWNER-ONLY</span><strong>Authenticator-protected research</strong><span>Cloudflare API proxy → FastAPI → Supabase MFA / private portfolio + Alpaca market observations + SEC facts</span></div>
+  </div>
+  <p class="tiny" style="margin-top:12px">Private API credentials stay server-side. No Alpaca observations, personal positions, or authenticator secrets are bundled into the public demonstration. Research scripts have deterministic tests, and GitHub CI validates both Python and JavaScript with a restrictive Content Security Policy.</p></div>
   <div class="pane"><div class="section-title"><h3>Engineering practices</h3><span class="mini">Architecture and tests</span></div>
   <div class="method-grid"><div class="method-card"><h3>Data engineering</h3><p>Named SEC issuer identifiers, annual-period filtering, filing cutoffs, input validation, recorded sources and accession details.</p></div><div class="method-card"><h3>Statistical modeling</h3><p>Constrained optimization, covariance-based portfolio analysis, downside simulation, DCF, and nearest-neighbor feature standardization.</p></div><div class="method-card"><h3>Application engineering</h3><p>Python backend, static hosted frontend, automated Python and JavaScript checks, continuous integration, and a restrictive script Content Security Policy.</p></div><div class="method-card"><h3>Privacy boundary</h3><p>Public research data is separate from the owner-only workspace. Private holdings and Alpaca access are protected by authenticated endpoints and authenticator MFA.</p></div></div>
   <p class="explain-note">The private workspace provides real market observations and virtual trading for the owner only. Public visitors cannot use that API as an open data source.</p></div>
@@ -151,7 +174,7 @@
   </div>
   <div id="private-signed" hidden>
     <div class="controls"><span class="mini">Personal research · authenticated</span><button class="btn sm" id="private-logout">Sign out</button></div>
-    <nav class="private-nav" aria-label="Private workspace sections"><button class="active" data-private-tab="home">Portfolio</button><button data-private-tab="trade">Virtual trading</button><button data-private-tab="research">Market research</button><button data-private-tab="optimization">Optimization</button><button data-private-tab="backtest">Backtesting</button><button data-private-tab="walkforward">Walk-forward</button><button data-private-tab="valuation">Valuation &amp; peers</button><button data-private-tab="settings">Settings &amp; notes</button></nav>
+    <nav class="private-nav" aria-label="Private workspace sections"><button class="active" data-private-tab="home">Portfolio</button><button data-private-tab="trade">Virtual trading</button><button data-private-tab="ideas">Investment ideas</button><button data-private-tab="research">Market research</button><button data-private-tab="optimization">Optimization</button><button data-private-tab="backtest">Backtesting</button><button data-private-tab="walkforward">Walk-forward</button><button data-private-tab="valuation">Valuation &amp; peers</button><button data-private-tab="settings">Settings &amp; notes</button></nav>
     <div id="private-research-dataset" class="pane" hidden aria-label="Research investments">
       <div class="section-title"><h3>Research investments</h3><span class="tiny">Shared by Market research, Optimization, Backtesting and Walk-forward</span></div>
       <p class="tiny">Choose 2–5 investments by name, choose a historical period, and load the prices once. All four research views use that same loaded dataset.</p>
@@ -174,6 +197,23 @@
       <div class="field"><label for="private-side">Action</label><select id="private-side"><option value="buy">Buy with USD budget</option><option value="sell">Sell units</option></select></div>
       <div class="field"><label for="private-amount">USD budget / units</label><input type="number" min="0.00000001" step="any" id="private-amount" value="100"></div></div>
       <div class="controls"><button class="btn" id="private-quote-submit">Get market price</button><button class="btn primary" id="private-trade-submit">Record virtual trade</button></div><p id="private-quote" class="tiny" style="margin-top:12px">No quote loaded.</p></div>
+    </section>
+    <section class="private-view" data-private-view="ideas" hidden>
+      <div class="pane"><span class="eyebrow">PERSONAL RESEARCH · OBSERVED DATA</span><h2 style="margin:7px 0 9px">Investment ideas</h2>
+        <p class="muted">A plain-language research shortlist built from private historical market observations and, where available, SEC company filings. The ranking is a transparent screening heuristic, <strong>not</strong> a return forecast, buy signal, or individualized advice.</p>
+        <div class="section-title" style="margin-top:18px"><h3>Companies to examine</h3><span class="tiny" id="ideas-count"></span></div>
+        <div id="ideas-selected" class="chosen-assets" aria-live="polite"></div>
+        <div class="controls"><button class="btn sm" type="button" id="ideas-browse">Browse investments</button><button class="btn sm" type="button" id="ideas-reset">Restore starting shortlist</button></div>
+        <div class="formgrid" style="margin-top:17px">
+          <div class="field"><label for="ideas-lens">Research perspective</label><select id="ideas-lens"><option value="balanced">Balanced: momentum and downside</option><option value="growth">Growth: recent trends emphasized</option><option value="defensive">Risk-aware: volatility and drawdown emphasized</option></select></div>
+          <div class="field"><label for="ideas-period">Historical observation window</label><select id="ideas-period"><option value="365" selected>1 year</option><option value="730">2 years</option></select></div>
+        </div>
+        <label class="inline-checkbox"><input id="ideas-sec" type="checkbox" checked> Include available SEC business fundamentals (slower)</label>
+        <div class="controls"><button class="btn primary" id="ideas-run" type="button">Compare selected investments</button></div>
+        <p class="tiny" role="status" aria-live="polite" id="ideas-status">Choose companies by name or use the starting shortlist.</p>
+        <div id="ideas-results" aria-live="polite"></div>
+      </div>
+      <div class="pane"><h3>How to interpret this</h3><p class="tiny" style="margin-top:9px">A higher research score indicates a more favorable balance of <strong>past</strong> momentum and realized risk under the selected lens. It is not an estimated probability of profit, expected return, or price target. SEC results describe past business finances separately; ETFs generally do not have comparable company income statements. Reassess against valuation, diversification, fees, tax impact, investment horizon, and the risk of loss before any real-money decision. IEX-only bars are not consolidated market-wide prices.</p></div>
     </section>
     <section class="private-view" data-private-view="research" hidden>
       <div class="pane"><h3>Historical market research</h3><p class="tiny">Historical daily stocks, ETFs, and supported USD cryptocurrencies from the private Alpaca connection. Stock prices exclude dividends; crypto trades every day.</p>
@@ -680,7 +720,74 @@ const methodsAsOf=$('methods-asof');if(methodsAsOf && SEC_DATA && SEC_DATA.as_of
 
 })();
 </script>
-<script>/* QuantForge private research: pure in-sample portfolio analytics.
+<script>/* Private-only, explainable investment research shortlist. No provider calls or trade mutations. */
+(function(root){
+'use strict';
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const finite=x=>typeof x==='number'&&Number.isFinite(x);
+function researchMetrics(prices,annualization=252){
+ if(!Array.isArray(prices)||prices.length<126||prices.length>800||!
+    [252,365].includes(annualization)||prices.some(x=>!finite(x)||x<=0)){
+  throw Error('At least 126 valid, positive historical closes are required.');
+ }
+ const r=[];
+ for(let i=1;i<prices.length;i++)r.push(prices[i]/prices[i-1]-1);
+ const mu=r.reduce((a,b)=>a+b,0)/r.length;
+ const vol=Math.sqrt(r.reduce((a,b)=>a+(b-mu)**2,0)/(r.length-1))*Math.sqrt(annualization);
+ let peak=prices[0],drawdown=0;
+ for(const x of prices){peak=Math.max(peak,x);drawdown=Math.min(drawdown,x/peak-1);}
+ const lookback=Math.min(63,prices.length-1);
+ const momentumQuarter=prices.at(-1)/prices.at(-1-lookback)-1;
+ const momentumYear=prices.at(-1)/prices[0]-1;
+ const losses=r.map(x=>-x).sort((a,b)=>a-b);
+ const var95=losses[Math.min(losses.length-1,Math.floor(0.95*losses.length))];
+ return {observations:prices.length,quarterReturn:momentumQuarter,periodReturn:momentumYear,
+  annualVol:vol,maxDrawdown:drawdown,var95,priceOnly:true};
+}
+function researchScore(m,mode='balanced'){
+ if(!['balanced','growth','defensive'].includes(mode))throw Error('Unknown research lens');
+ const price=clamp(50+100*m.periodReturn,0,100);
+ const recent=clamp(50+170*m.quarterReturn,0,100);
+ const risk=clamp(110-170*m.annualVol,0,100);
+ const draw=clamp(100+170*m.maxDrawdown,0,100);
+ const weights={balanced:[.27,.23,.30,.20],growth:[.43,.32,.15,.10],defensive:[.13,.10,.45,.32]}[mode];
+ const components=[price,recent,risk,draw];
+ if(components.some(x=>!finite(x)))throw Error('Invalid metrics');
+ return Math.round(components.reduce((s,x,i)=>s+x*weights[i],0));
+}
+function analyze(symbol,prices,mode='balanced',annual=252){
+ const m=researchMetrics(prices,annual);
+ const score=researchScore(m,mode);
+ const notes=[];
+ if(m.periodReturn>0)notes.push('Positive return across the observed period');
+ else notes.push('Negative return across the observed period');
+ if(m.quarterReturn>0.04)notes.push('Positive recent price momentum');
+ else if(m.quarterReturn<0)notes.push('Recent price momentum is negative');
+ if(m.annualVol>.40)notes.push('High historical annualized volatility');
+ if(m.maxDrawdown<-.25)notes.push('Large historical peak-to-trough decline');
+ if(m.periodReturn>0.25)notes.push('Strong past gains could reverse');
+ return {symbol,score,metrics:m,notes};
+}
+function rank(rows,mode='balanced'){
+ if(!Array.isArray(rows))throw Error('Missing candidates');
+ const results=rows.map(x=>analyze(x.symbol,x.prices,mode,x.annual||252));
+ return results.sort((a,b)=>b.score-a.score||a.symbol.localeCompare(b.symbol));
+}
+function fundamentals(company){
+ if(!company||!Array.isArray(company.annual))return null;
+ const periods=[...company.annual].sort((a,b)=>String(b.fiscal_end).localeCompare(String(a.fiscal_end)));
+ const latest=periods[0],prior=periods[1];if(!latest)return null;
+ const metric=(row,key)=>row&&row.metrics?row.metrics[key]:null;
+ const revenue=metric(latest,'revenue_usd'),old=metric(prior,'revenue_usd'),fcf=metric(latest,'free_cash_flow_usd');
+ const revGrowth=finite(revenue)&&finite(old)&&old>0?revenue/old-1:null;
+ const fcfMargin=finite(fcf)&&finite(revenue)&&revenue>0?fcf/revenue:null;
+ return {fiscalEnd:latest.fiscal_end,revenueGrowth:revGrowth,fcfMargin,asOf:company.as_of||'',source:company.source||'SEC EDGAR'};
+}
+root.QFPrivateIdeas=Object.freeze({researchMetrics,researchScore,analyze,rank,fundamentals});
+if(typeof module!=='undefined'&&module.exports)module.exports=root.QFPrivateIdeas;
+})(typeof window!=='undefined'?window:globalThis);
+
+/* QuantForge private research: pure in-sample portfolio analytics.
  * No external requests, synthetic data, brokerage orders, or portfolio mutations.
  * The public demo model is deliberately not imported here.
  */
@@ -1617,6 +1724,7 @@ async function verifyMFA(){
 }
 async function logout(){
   try{await api('auth/logout',{});}catch(_){ /* Clear visible private content regardless */ }
+  ideasRunSequence++;ideaData=[];ideaFundamentals={};$('ideas-results').textContent='';$('ideas-run').disabled=false;
   clearMFA();showStep('login');privateState=null;quoted={};historyLoadSequence++;historySeries=null;closeAssetBrowser();researchSelection=[];$('private-symbol').value='';$('private-selected-asset').textContent='No investment selected';renderResearchSelection();
   optimizerResult=null;$('private-opt-export').disabled=true;$('private-opt-output').textContent='Load market history to begin.';$('private-opt-risk').textContent='';
   $('private-history-chart').textContent='Load a historical series to begin.';$('private-risk-results').textContent='';$('private-backtest-output').textContent='';$('private-valuation-output').textContent='';$('private-peers').textContent='';$('private-concentration').textContent='';$('private-positions').textContent='';
@@ -1740,6 +1848,10 @@ async function loadBrowserPage(){
 function chooseAsset(symbol,name,kind){
  if(!privateState)return;
  assetNames[symbol]=name;
+ if(browserState.mode==='ideas'){
+  if(ideaChoose(symbol,name,kind))closeAssetBrowser();
+  return;
+ }
  if(browserState.mode==='valuation'){
   if(kind==='crypto'){message('Crypto assets do not have SEC corporate financial statements.');return;}
   $('private-valuation-company').value=symbol;
@@ -1789,6 +1901,98 @@ $('private-history-selection').addEventListener('click',e=>{
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('private-asset-browser').hidden)closeAssetBrowser();});
 renderResearchSelection();
+
+/* V7.0 investment ideas are owner-only and never modify virtual holdings. */
+const initialIdeas=[['AAPL','Apple'],['MSFT','Microsoft'],['NVDA','NVIDIA'],['GOOGL','Alphabet'],['AMZN','Amazon'],['JPM','JPMorgan Chase'],['WMT','Walmart'],['VOO','Vanguard S&P 500 ETF']];
+let ideaUniverse=initialIdeas.map(x=>x[0]),ideaData=[],ideaFundamentals={},ideasRunSequence=0,ideaSource='';
+for(const [s,n] of initialIdeas)assetNames[s]=n;
+function ideaStatus(value){$('ideas-status').textContent=value;}
+function ideaSelectionRender(){
+ $('ideas-count').textContent=ideaUniverse.length+' selected (maximum 10)';
+ $('ideas-selected').innerHTML=ideaUniverse.map(symbol=>'<button type="button" class="asset-chip" data-ideas-remove="'+safe(symbol)+'">'+safe(assetNames[symbol]||symbol)+' ('+safe(symbol)+') ×</button>').join('')||'No investments selected.';
+}
+function invalidateIdeaResults(){ideasRunSequence++;ideaData=[];ideaFundamentals={};ideaSource='';$('ideas-results').textContent='';ideaStatus('Selection changed. Compare investments to refresh the research ranking.');}
+function ideaChoose(symbol,name,kind){
+ if(kind==='crypto'){message('This stock and ETF shortlist does not compare 24/7 crypto with equity-session risk. Use Market research for cryptocurrency.');return false;}
+ if(ideaUniverse.includes(symbol)){message(name+' is already in your shortlist.');return true;}
+ if(ideaUniverse.length>=10){message('Choose up to ten investments. Remove one before adding another.');return false;}
+ ideaUniverse.push(symbol);assetNames[symbol]=name;ideaSelectionRender();invalidateIdeaResults();message('Added '+name+' to your investment shortlist.');return true;
+}
+function ideaPct(n){return typeof n==='number'&&Number.isFinite(n)?(100*n).toFixed(1)+'%':'Unavailable';}
+function renderIdeas(){
+ if(!ideaData.length){$('ideas-results').textContent='No comparable observations were returned.';return;}
+ const mode=$('ideas-lens').value;
+ const ordered=window.QFPrivateIdeas.rank(ideaData,mode);
+ const rows=ordered.map((x,i)=>{
+  const m=x.metrics,sec=ideaFundamentals[x.symbol];
+  const fundamentalsText=sec?'<p class="ideas-brief">SEC reported context: revenue growth '+ideaPct(sec.revenueGrowth)+', FCF / revenue '+ideaPct(sec.fcfMargin)+' · fiscal end '+safe(sec.fiscalEnd||'unavailable')+'</p>':'<p class="ideas-brief">SEC company fundamentals: unavailable or not comparable for this security.</p>';
+  const why=x.notes.map(n=>'<li>'+safe(n)+'</li>').join('');
+  return '<article class="ideas-card"><div class="row"><div><span class="eyebrow">RESEARCH PRIORITY '+(i+1)+'</span><h3>'+safe(assetNames[x.symbol]||x.symbol)+' <span class="tiny">'+safe(x.symbol)+'</span></h3></div><div><div class="ideas-score">'+x.score+'<span class="tiny">/100</span></div><span class="tiny">Heuristic score</span></div></div>'+
+   '<div class="ideas-meta"><span>Period price return: '+ideaPct(m.periodReturn)+'</span><span>Recent 63-session return: '+ideaPct(m.quarterReturn)+'</span><span>Annualized volatility: '+ideaPct(m.annualVol)+'</span><span>Maximum drawdown: '+ideaPct(m.maxDrawdown)+'</span></div>'+
+   '<ul class="ideas-brief">'+why+'</ul>'+fundamentalsText+'<div class="controls"><button class="btn sm" type="button" data-ideas-valuation="'+safe(x.symbol)+'">Review SEC valuation</button><button class="btn sm" type="button" data-ideas-trade="'+safe(x.symbol)+'">Inspect virtual trade</button></div></article>';
+ }).join('');
+ $('ideas-results').innerHTML='<div class="notice">'+safe(ideaSource)+' · Price-only returns; no dividends, future forecasts, or current executable quote. A 100/100 score is not a 100% success probability. SEC figures are context and do not affect this market-risk ranking.</div>'+rows;
+}
+async function compareIdeas(){
+ if(!privateState){ideaStatus('Authenticate first.');return;}
+ const selection=[...ideaUniverse];
+ if(selection.length<2||selection.length>10){ideaStatus('Choose between 2 and 10 investments.');return;}
+ const period=$('ideas-period').value,request=++ideasRunSequence,rows=[],sources=new Set(),dates=[];
+ const chunks=[];
+ for(let i=0;i<selection.length;i+=5)chunks.push(selection.slice(i,i+5));
+ if(chunks.at(-1).length===1)chunks.at(-1).unshift(selection[0]);
+ ideaData=[];ideaFundamentals={};$('ideas-results').textContent='';$('ideas-run').disabled=true;
+ try{
+  for(let i=0;i<chunks.length;i++){
+   ideaStatus('Loading observed market history · group '+(i+1)+' of '+chunks.length+'…');
+   const data=await api('private/history?symbols='+encodeURIComponent(chunks[i].join(','))+'&days='+period);
+   if(!privateState||request!==ideasRunSequence)return;
+   sources.add(data.source||'Alpaca private daily market bars');dates.push(data.as_of||'');
+   for(const symbol of chunks[i]){
+    if(rows.some(x=>x.symbol===symbol))continue;
+    const prices=data.closes?.[symbol];
+    if(!prices||prices.length<126)throw Error('Insufficient history for '+symbol+'. Choose another candidate.');
+    rows.push({symbol,prices,annual:data.sessions_per_year});
+   }
+  }
+  if(sources.size>1)throw Error('The selected groups used different market feeds. Reduce the shortlist so comparisons use one consistent source.');
+  if(new Set(dates).size>1)throw Error('Historical observations have different as-of dates. Retry for comparable data.');
+  ideaData=rows;ideaSource=[...sources][0]+' · as of '+dates[0];
+  renderIdeas();
+  ideaStatus('Compared '+rows.length+' investments using observed historical market data.');
+  if($('ideas-sec').checked){
+   const info=[];
+   for(const x of rows){
+    if(!privateState||request!==ideasRunSequence)return;
+    if(['VOO','SPY','QQQ','VTI','IVV'].includes(x.symbol))continue;
+    try{
+     const sec=await api('private/sec/company?symbol='+encodeURIComponent(x.symbol));
+     const view=window.QFPrivateIdeas.fundamentals(sec);
+     if(view)ideaFundamentals[x.symbol]=view;
+    }catch(_){info.push(x.symbol);}
+   }
+   if(!privateState||request!==ideasRunSequence)return;
+   renderIdeas();
+   ideaStatus('Market observations and available SEC fundamentals loaded. Missing SEC figures remain unavailable'+(info.length?' ('+info.length+' issuer(s) unavailable).':'.'));
+  }
+ }catch(e){if(request===ideasRunSequence){ideaData=[];$('ideas-results').textContent='';ideaStatus('Unable to compare: '+e.message);}}
+ finally{if(request===ideasRunSequence)$('ideas-run').disabled=false;}
+}
+$('ideas-browse').addEventListener('click',()=>openAssetBrowser('ideas'));
+$('ideas-reset').addEventListener('click',()=>{ideaUniverse=initialIdeas.map(x=>x[0]);ideaSelectionRender();invalidateIdeaResults();});
+$('ideas-run').addEventListener('click',compareIdeas);
+$('ideas-lens').addEventListener('change',()=>{if(ideaData.length)renderIdeas();});
+$('ideas-period').addEventListener('change',invalidateIdeaResults);
+$('ideas-sec').addEventListener('change',invalidateIdeaResults);
+$('ideas-selected').addEventListener('click',e=>{const b=e.target.closest('[data-ideas-remove]');if(!b)return;ideaUniverse=ideaUniverse.filter(x=>x!==b.dataset.ideasRemove);ideaSelectionRender();invalidateIdeaResults();});
+$('ideas-results').addEventListener('click',e=>{
+ const valuation=e.target.closest('[data-ideas-valuation]'),trade=e.target.closest('[data-ideas-trade]');
+ if(!privateState||(!valuation&&!trade))return;
+ const sym=(valuation||trade).dataset[valuation?'ideasValuation':'ideasTrade'];
+ if(valuation){$('private-valuation-company').value=sym;$('private-valuation-selected').textContent=(assetNames[sym]||sym)+' ('+sym+')';$('private-valuation-output').textContent='Run scenario to load reported SEC filings.';clearV66Forecast();privateTab('valuation');}
+ else{$('private-symbol').value=sym;$('private-selected-asset').textContent=(assetNames[sym]||sym)+' ('+sym+')';$('private-quote').textContent='Retrieve a private observation before considering a virtual transaction.';privateTab('trade');}
+});
+ideaSelectionRender();
 
 /* V6: authenticated research tools. No Alpaca credentials or private data in public code. */
 let optimizerResult=null;
