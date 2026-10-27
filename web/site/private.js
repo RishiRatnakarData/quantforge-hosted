@@ -27,8 +27,8 @@ function showStep(step){
   $('private-signed').hidden=step!=='ready';
   if(step!=='ready')clearAllocationV74();else allocationChoicesV74();
   if(step!=='ready'){valueBridgeRequestV73++;const bridge=$('private-value-output-v73');if(bridge)bridge.textContent='';}
-  $('private-status').textContent=step==='ready'?'Private · Authenticator verified':
-    step==='mfa'?'Private · Authenticator required':'Private · Sign in required';
+  $('private-status').textContent=step==='ready'?'Private · Signed in with MFA':
+    step==='mfa'?'Private · Verification required':'Private · Sign in required';
 }
 function clearMFA(){
   mfaFactorId=null;
@@ -63,7 +63,7 @@ async function loadState(){
   if(symbols.length){
     try{const q=await api('private/quotes?symbols='+encodeURIComponent(symbols.join(',')));
       for(const item of q.quotes) quoted[item.symbol]=item;
-    }catch(e){message('Portfolio loaded, but live quotes are unavailable: '+e.message);}
+    }catch(e){message('Portfolio loaded, but market prices are unavailable: '+e.message);}
   }
   render();
 }
@@ -84,7 +84,7 @@ function render(){
     (rows.join('')||'<tr><td colspan="5">No virtual holdings yet.</td></tr>')+'</tbody></table></div>';
   $('private-watchlist').textContent=(privateState.watchlist||[]).join(', ')||'None';
   const entries=Object.entries(holdings),worth=privateState.cash+valued;
-  $('private-concentration').innerHTML=entries.length?entries.map(([symbol,units])=>{const weight=quoted[symbol]?units*quoted[symbol].price/worth:null;return '<div class="row"><span>'+safe(symbol)+'</span><strong>'+(weight===null?'Quote unavailable':percent(weight))+'</strong></div>';}).join(''):'No holdings yet. Visit Virtual trading to begin.';
+  $('private-concentration').innerHTML=entries.length?entries.map(([symbol,units])=>{const weight=quoted[symbol]?units*quoted[symbol].price/worth:null;return '<div class="row"><span>'+safe(symbol)+'</span><strong>'+(weight===null?'Quote unavailable':percent(weight))+'</strong></div>';}).join(''):'No virtual holdings yet. Open Virtual trades to add one.';
   $('private-notes').innerHTML=(privateState.notes||[]).map((n,i)=>'<div class="saved-note"><div class="saved-note-body"><p>'+safe(n.text)+'</p><span class="tiny">'+safe(n.at||'Saved note')+'</span></div><button class="btn sm" type="button" data-note-delete="'+i+'" aria-label="Delete note '+(i+1)+'">Delete</button></div>').join('')||'<p class="tiny">No notes saved.</p>';
 }
 async function login(){
@@ -122,7 +122,7 @@ async function logout(){
   clearMFA();showStep('login');privateState=null;quoted={};historyLoadSequence++;historySeries=null;closeAssetBrowser();researchSelection=[];$('private-symbol').value='';$('private-selected-asset').textContent='No investment selected';renderResearchSelection();
   optimizerResult=null;$('private-opt-export').disabled=true;$('private-opt-output').textContent='Load market history to begin.';$('private-opt-risk').textContent='';
   $('private-history-chart').textContent='Load a historical series to begin.';$('private-risk-results').textContent='';$('private-backtest-output').textContent='';$('private-valuation-output').textContent='';$('private-peers').textContent='';$('private-concentration').textContent='';$('private-positions').textContent='';
-  $('private-wf-output').textContent='Load historical investments in Market research to begin.';$('private-wf-export').disabled=true;walkforwardResult=null;clearV66Walkforward();clearV66Forecast();
+  $('private-wf-output').textContent='Load price history in Market data to begin.';$('private-wf-export').disabled=true;walkforwardResult=null;clearV66Walkforward();clearV66Forecast();
   $('private-fc-output').textContent='Load SEC statements for a selected company first.';
   $('private-total').textContent='—';$('private-invested').textContent='—';
   $('private-cash').textContent='—';$('private-notes').textContent='';valuationCompanies={};$('private-valuation-company').value='';$('private-valuation-selected').textContent='No company selected';message('Signed out.');privateTab('home');
@@ -308,7 +308,7 @@ function ideaSelectionRender(){
 }
 function invalidateIdeaResults(){ideasRunSequence++;ideaData=[];ideaFundamentals={};ideaSource='';$('ideas-results').textContent='';clearDecisionBrief();ideaStatus('Selection changed. Compare investments to refresh the research ranking.');}
 function ideaChoose(symbol,name,kind){
- if(kind==='crypto'){message('This stock and ETF shortlist does not compare 24/7 crypto with equity-session risk. Use Market research for cryptocurrency.');return false;}
+ if(kind==='crypto'){message('This stock and ETF screen does not compare 24/7 crypto trading with equity-session risk. Use Market data for cryptocurrency.');return false;}
  if(ideaUniverse.includes(symbol)){message(name+' is already in your shortlist.');return true;}
  if(ideaUniverse.length>=10){message('Choose up to ten investments. Remove one before adding another.');return false;}
  ideaUniverse.push(symbol);assetNames[symbol]=name;ideaSelectionRender();invalidateIdeaResults();message('Added '+name+' to your investment shortlist.');return true;
@@ -437,7 +437,7 @@ function refreshResearchContext(){
  if(d&&Array.isArray(d.symbols)&&Array.isArray(d.dates)&&d.dates.length){
   loaded.textContent=d.symbols.length+' loaded: '+d.symbols.map(researchCompanyLabel).join(' · ')+
    ' | '+d.dates[0]+' to '+d.dates[d.dates.length-1];
-  status.textContent='Ready: Optimization, Backtesting and Walk-forward use these '+d.symbols.length+' investments. Changing the selection or period requires reloading.';
+  status.textContent='History loaded: Optimization, Backtests and Walk-forward use these '+d.symbols.length+' investments. Changing the selection or period requires reloading.';
  }else{
   loaded.textContent='No historical data loaded';
   status.textContent=researchSelection.length>=2?'Not loaded yet. Click Load market history before running the analysis tools.':'Choose 2–5 investments and load history to begin.';
@@ -557,7 +557,7 @@ function privateBacktest(){
   ['Maximum drawdown',holdStats[1],rebalanceStats[1]],
   ['Rebalancing costs',usd(0),usd(paid)]
  ])+'<p class="tiny">Equal-weight initial allocation, monthly close rebalances, '+safe($('private-test-fee').value)+' bps on gross dollar turnover. No slippage, dividends, taxes or corporate-action forecasts. Historical illustration only; no brokerage orders.</p>';
- message('Historical strategy comparison calculated.');
+ message('Backtest comparison calculated.');
 }
 async function privateValuation(){
  const symbol=$('private-valuation-company').value;
@@ -704,7 +704,7 @@ function optimizerDiagnostics(res){
 }
 function runOptimization(){
  if(!privateState){message('Sign in to run private portfolio research.');return;}
- if(!historySeries){message('Go to Market research and load 2–5 investments first.');privateTab('research');return;}
+ if(!historySeries){message('Go to Market data and load 2–5 investments first.');privateTab('research');return;}
  $('private-opt-output').textContent='Calculating historical allocation…';
  try{
   const result=window.QFPrivateOptimizer.run(historySeries,{
@@ -752,7 +752,7 @@ function clearV66Walkforward(){
  robustnessResultV68=null;
  $('private-wf-v68-run').disabled=true;
  $('private-wf-v68-export').disabled=true;
- $('private-wf-v68-output').textContent='Run Walk-forward first, then check robustness.';
+ $('private-wf-v68-output').textContent='Run Walk-forward before sensitivity checks.';
 }
 function clearV66Forecast(){
  forecastResultV66=null;forecastDiagnosticsV66=null;
@@ -927,11 +927,11 @@ function wfChart(d){
   '<path d="'+path(b)+'" stroke="#c58b31" stroke-width="2" fill="none"/>'+
   '<text x="26" y="232" font-size="11" fill="#526a60">'+safe(d.start)+'</text><text x="493" y="232" font-size="11" fill="#526a60">'+safe(d.end)+'</text></svg>'+
   '<p class="tiny"><strong>'+d.symbols.length+' investments are combined into two portfolio lines:</strong> '+d.symbols.map(s=>safe(researchCompanyLabel(s))).join(' · ')+'</p>'+
-  '<p class="tiny">Green: optimized portfolio (all selected investments). Orange: equal-weight benchmark (the same investments). These are two strategies, not one line per company. To view each investment price line separately, open Market research. Trading costs included; prices observed historically.</p>';
+  '<p class="tiny">Green: optimized portfolio (all selected investments). Orange: equal-weight benchmark (the same investments). These are two strategies, not one line per company. To view prices for each investment, open Market data. Trading costs included; prices observed historically.</p>';
 }
 function runWalkforward(){
  if(!privateState){message('Sign in first.');return;}
- if(!historySeries){message('Load investments in Market research first.');privateTab('research');return;}
+ if(!historySeries){message('Load investment history in Market data first.');privateTab('research');return;}
  try{
   const d=window.QFPrivateWalkforward.run(historySeries,{
    train:Number($('private-wf-train').value),step:Number($('private-wf-step').value),
@@ -1072,7 +1072,7 @@ function allocationChoicesV74(){
  const all=[...new Set([...suggested,...holdings])].filter(s=>/^[A-Z0-9][A-Z0-9.\/-]{0,19}$/.test(s)).sort();
  picker.innerHTML='<option value="">Choose an investment</option>'+all.map(s=>'<option value="'+safe(s)+'">'+safe(assetNames[s]||s)+' ('+safe(s)+')</option>').join('');
  if(all.includes(previous))picker.value=previous;
- $('private-allocation-selection-v74').textContent=all.length?'Choose among your Investment ideas shortlist and held positions. Add more by name in Investment ideas first.':'Open Investment ideas to select companies by name, then return here.';
+ $('private-allocation-selection-v74').textContent=all.length?'Choose from your screened investments or holdings. Add companies in Investment screening.':'Select companies by name in Investment screening, then return here.';
 }
 function renderAllocationV74(plan,risk){
  const pct=n=>typeof n==='number'&&Number.isFinite(n)?(n*100).toFixed(2)+'%':'Unavailable';

@@ -15,7 +15,7 @@ function nav(name,updateHash=true){
  if(name!=='private' && !PUBLIC_PAGES.has(name))return;
  document.querySelectorAll('.tabpage').forEach(e=>e.classList.toggle('active',e.id==='page-'+name));
  document.querySelectorAll('.nav-btn').forEach(e=>{const active=e.dataset.page===name;e.classList.toggle('active',active);if(active)e.setAttribute('aria-current','page');else e.removeAttribute('aria-current');});
- const labels={overview:'RESEARCH / DEMO',sec:'REPORTED SEC FINANCIALS',portfolio:'SIMULATED PORTFOLIO',quant:'SIMULATED RETURNS',valuation:'ILLUSTRATIVE DCF',ml:'SIMULATED PEER INPUTS',methods:'METHODOLOGY & SOURCES',systems:'RESEARCH SYSTEMS',lab:'INTERACTIVE RESEARCH LAB',private:'PRIVATE WORKSPACE'};
+ const labels={overview:'PUBLIC OVERVIEW',sec:'HISTORICAL SEC DATA',portfolio:'SIMULATED PORTFOLIO',quant:'SIMULATED RISK MODEL',valuation:'DCF ASSUMPTIONS',ml:'SIMULATED PEER MODEL',methods:'DATA & ENGINEERING',systems:'RESEARCH METHODS',lab:'INTERACTIVE ANALYSIS',private:'PRIVATE WORKSPACE'};
  const badge=document.querySelector('.topbar .badge');if(badge)badge.textContent=labels[name];
  const eyebrow=document.querySelector('.topbar .eyebrow');if(eyebrow)eyebrow.textContent=name==='private'?'Your portfolio · Personal use':'Financial research · models and data';
  if(updateHash && PUBLIC_PAGES.has(name))history.replaceState(null,'','#'+name);
@@ -32,7 +32,7 @@ function portfolio(){
  ...holds.holdings.map(({s,value})=>[M.bySymbol[s].name+' <span class="tiny">('+s+')</span>',state.holdings[s].toFixed(6),fmt(M.bySymbol[s].price),fmt(value),pct(total?value/total:0)]),
  ['Cash','—','—',fmt(state.cash),pct(total?state.cash/total:1)]]);
  const exp=holds.lookthrough.filter(x=>x.symbol!=='OTHER'&&x.symbol!=='BONDS');
- $('lookthrough-table').innerHTML=table(['Underlying company / category','Value','Of invested'],exp.map(x=>[x.symbol,fmt(x.value),pct(x.pct)]))+'<p class="tiny" style="margin-top:12px">Weights are invented for demonstration; unlabeled holdings are grouped as OTHER.</p>';
+ $('lookthrough-table').innerHTML=table(['Underlying company / category','Value','Of invested'],exp.map(x=>[x.symbol,fmt(x.value),pct(x.pct)]))+'<p class="tiny" style="margin-top:12px">These example ETF weights are hypothetical; unspecified holdings are grouped as OTHER.</p>';
 }
 function transact(){
  const s=$('trade-symbol').value,action=$('trade-action').value,amount=num('trade-amount'),fee=amount*0.0005;

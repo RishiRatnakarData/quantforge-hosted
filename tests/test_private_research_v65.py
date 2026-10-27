@@ -21,7 +21,7 @@ def test_forecasting_uses_cached_private_sec_company_not_public_model_fixtures()
     assert "window.QFPrivateForecast.run(company" in source
     assert "valuationCompanies[symbol]" in source
     assert 'id="private-fc-run"' in builder
-    assert "Multi-year SEC financial projections" in builder
+    assert "Multi-year cash-flow scenarios" in builder
     assert "QFPrivateForecast" in (ROOT / "public/index.html").read_text(encoding="utf-8")
 
 

@@ -18,9 +18,9 @@ def test_ideas_private_only_and_company_selection():
 
 def test_public_project_case_study_is_concrete():
     template = (ROOT / "web/site/site.template.html").read_text(encoding="utf-8")
-    assert "Financial research, built end to end." in template
-    assert "Source-backed statements" in template
-    assert "Validation beyond backtests" in template
+    assert "Company financials, portfolio risk, and strategy testing." in template
+    assert "Observed financial relationships in SEC filings" in template
+    assert "Rolling walk-forward evaluation" in template
     assert "System architecture" in template
     assert "reviewer" not in template.lower()
 

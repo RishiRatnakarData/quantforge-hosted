@@ -10,7 +10,7 @@ def read(rel):
 
 def test_public_research_first_and_navigation():
     html = read("web/site/site.template.html")
-    assert 'Financial research, built end to end.' in html
+    assert 'Company financials, portfolio risk, and strategy testing.' in html
     assert 'id="page-methods"' in html
     assert 'data-page="methods"' in html
     assert 'data-go="methods"' in html
@@ -36,7 +36,7 @@ def test_methods_disclosures_are_precise():
 def test_public_badge_stays_correct_after_navigation():
     app = read("web/site/app.js")
     private = read("web/site/private.js")
-    assert "METHODOLOGY & SOURCES" in app
+    assert "DATA & ENGINEERING" in app
     assert "PUBLIC_PAGES=new Set(" in app
     assert "aria-current" in app
     assert "history.replaceState" in app

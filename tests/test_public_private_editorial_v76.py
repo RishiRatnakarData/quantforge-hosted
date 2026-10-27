@@ -20,9 +20,9 @@ def test_real_public_sec_evidence_and_source_links():
 
 def test_presentation_language_is_project_centered():
     html = read("web/site/site.template.html")
-    assert "Quantitative research systems" in html
-    assert "Research validation and failure cases" in html
-    assert "The research platform combines" in html
+    assert "Research methods" in html
+    assert "Data and model validation" in html
+    assert "These notes explain the data pipeline" in html
     assert "Learn how" not in html
     assert "powerful, cutting-edge AI" not in html
 

@@ -13,7 +13,7 @@ def test_systems_is_visible_and_navigable():
     assert 'data-page="systems"' in content
     assert content.count('data-go="systems"') >= 2
     assert "'systems'" in app
-    assert "systems:'RESEARCH SYSTEMS'" in app
+    assert "systems:'RESEARCH METHODS'" in app
 
 def test_engineering_mathematics_and_bias_limits_are_substantive():
     content = site()
@@ -34,6 +34,6 @@ def test_no_private_data_or_unsafe_script_added():
 
 def test_methods_reflects_deep_private_explanations():
     content = site()
-    assert "Research validation and failure cases" in content
-    assert "Advanced private research, publicly documented" in content
+    assert "Data and model validation" in content
+    assert "Private models and public source code" in content
     assert "tests provide scoped evidence" in content

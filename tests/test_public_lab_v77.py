@@ -8,7 +8,7 @@ def read(name):
     return (ROOT / name).read_text(encoding="utf-8")
 
 
-def test_research_lab_is_accessible_and_navigable():
+def test_analysis_dashboard_is_accessible_and_navigable():
     site = read("web/site/site.template.html")
     app = read("web/site/app.js")
     for fragment in (
@@ -21,7 +21,7 @@ def test_research_lab_is_accessible_and_navigable():
         'aria-live="polite"',
     ):
         assert fragment in site
-    assert "lab:'INTERACTIVE RESEARCH LAB'" in app
+    assert "lab:'INTERACTIVE ANALYSIS'" in app
     assert "window.QFResearchLab.mount(SEC_DATA)" in app
     assert "'systems','lab'" in app
 
@@ -36,8 +36,8 @@ def test_all_five_career_disciplines_have_actual_exhibits():
         "Quantitative finance",
         "Maximum weight per investment",
         "Rolling training window",
-        "Company from verified SEC snapshot",
-        "No account or private market-data access",
+        "Company (SEC filings)",
+        "Private data: sign-in required",
     ):
         assert text in site
 

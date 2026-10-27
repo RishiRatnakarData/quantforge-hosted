@@ -7,15 +7,15 @@ from pathlib import Path
 root=Path(__file__).resolve().parents[1]
 src=root/'web'
 html=(src/'site/site.template.html').read_text(encoding="utf-8")
-nav='<button class="nav-btn" data-page="private">My workspace</button>'
+nav='<button class="nav-btn" data-page="private">Private workspace</button>'
 html=html.replace('</nav>',nav+'</nav>',1)
 block='''<section class="tabpage" id="page-private">
-  <div class="pagehead"><h1>My workspace</h1><p id="private-status">Private · Sign in required</p></div>
+  <div class="pagehead"><h1>Private workspace</h1><p id="private-status">Private · Sign in required</p><p class="tiny">Personal holdings, market-history analysis, and company valuation. Sign-in and authenticator verification required.</p></div>
   <div class="pane" id="private-login"><h3>Sign in</h3>
     <div class="formgrid" style="margin-top:14px">
       <div class="field"><label for="private-email">Email</label><input id="private-email" type="email" autocomplete="username" placeholder="Your private account"></div>
       <div class="field"><label for="private-password">Password</label><input id="private-password" type="password" autocomplete="current-password" placeholder="Password"></div>
-    </div><div class="controls"><button class="btn primary" id="private-login-submit">Sign in</button><span class="tiny">Only the authorized owner account can sign in.</span></div>
+    </div><div class="controls"><button class="btn primary" id="private-login-submit">Sign in</button><span class="tiny">Owner access only. Password and authenticator verification are required.</span></div>
   </div>
   <div id="private-mfa" class="pane" hidden>
     <h3 id="private-mfa-title">Authenticator verification</h3>
@@ -35,52 +35,52 @@ block='''<section class="tabpage" id="page-private">
       <button class="btn" id="private-mfa-logout">Sign out</button></div>
   </div>
   <div id="private-signed" hidden>
-    <div class="controls"><span class="mini">Personal research · authenticated</span><button class="btn sm" id="private-logout">Sign out</button></div>
+    <div class="controls"><span class="mini">Private portfolio · authenticated</span><button class="btn sm" id="private-logout">Sign out</button></div>
     <nav class="private-nav" aria-label="Private workspace sections">
-      <div class="private-nav-group" role="group" aria-label="Portfolio and decisions"><span class="private-nav-title">Portfolio &amp; decisions</span><div class="private-nav-actions"><button class="active" data-private-tab="home">Portfolio</button><button data-private-tab="trade">Virtual trading</button><button data-private-tab="ideas">Investment ideas</button></div></div>
-      <div class="private-nav-group" role="group" aria-label="Quantitative research"><span class="private-nav-title">Quantitative research</span><div class="private-nav-actions"><button data-private-tab="research">Market research</button><button data-private-tab="optimization">Optimization</button><button data-private-tab="backtest">Backtesting</button><button data-private-tab="walkforward">Walk-forward</button></div></div>
-      <div class="private-nav-group" role="group" aria-label="Companies and account"><span class="private-nav-title">Companies &amp; account</span><div class="private-nav-actions"><button data-private-tab="valuation">Valuation &amp; peers</button><button data-private-tab="settings">Settings &amp; notes</button></div></div>
+      <div class="private-nav-group" role="group" aria-label="Portfolio management"><span class="private-nav-title">Portfolio</span><div class="private-nav-actions"><button class="active" data-private-tab="home">Overview</button><button data-private-tab="trade">Virtual trades</button><button data-private-tab="ideas">Investment screening</button></div></div>
+      <div class="private-nav-group" role="group" aria-label="Market and strategy analysis"><span class="private-nav-title">Market &amp; strategies</span><div class="private-nav-actions"><button data-private-tab="research">Market data</button><button data-private-tab="optimization">Optimization</button><button data-private-tab="backtest">Backtests</button><button data-private-tab="walkforward">Walk-forward</button></div></div>
+      <div class="private-nav-group" role="group" aria-label="Company research and account settings"><span class="private-nav-title">Companies &amp; settings</span><div class="private-nav-actions"><button data-private-tab="valuation">Valuation</button><button data-private-tab="settings">Notes &amp; account</button></div></div>
     </nav>
     <div id="private-research-dataset" class="pane" hidden aria-label="Research investments">
-      <div class="section-title"><h3>Research investments</h3><span class="tiny">Shared by Market research, Optimization, Backtesting and Walk-forward</span></div>
-      <p class="tiny">A single selected historical dataset is shared across market research, optimization, backtesting, and walk-forward evaluation. Changing the investments or observation period invalidates prior calculations.</p>
+      <div class="section-title"><h3>Research investments</h3><span class="tiny">Used in Market data, Optimization, Backtests and Walk-forward</span></div>
+      <p class="tiny">Choose 2–5 investments and a time period, then load their price history. Optimization, backtesting and walk-forward testing use the same loaded observations. Changing the selection or period requires reloading and recalculating.</p>
       <div class="formgrid" style="margin-top:14px"><div class="field"><label for="private-history-selection">Selected investments (2–5)</label><input type="hidden" id="private-history-symbols" value=""><div id="private-history-selection" class="chosen-assets">Choose investments to compare.</div><button class="btn sm" type="button" id="private-browse-research">Browse investments</button></div>
-      <div class="field"><label for="private-history-days">Period</label><select id="private-history-days"><option value="90">3 months</option><option value="180">6 months</option><option selected value="365">1 year</option><option value="730">2 years</option></select></div></div>
+      <div class="field"><label for="private-history-days">History period</label><select id="private-history-days"><option value="90">3 months</option><option value="180">6 months</option><option selected value="365">1 year</option><option value="730">2 years</option></select></div></div>
       <div class="controls"><button class="btn primary" id="private-history-load">Load market history</button><span class="tiny" id="private-history-source"></span></div>
       <div class="pane" style="background:var(--card,#f6faf8);padding:12px;margin-top:12px;border:1px solid #c9ded5;border-radius:9px">
         <p class="tiny" style="margin:0 0 8px"><strong>Selected investments:</strong> <span id="private-research-selected" aria-live="polite">None selected</span></p>
-        <div class="tiny"><strong>Loaded for analysis:</strong> <span id="private-research-loaded" aria-live="polite">No historical data loaded</span></div>
+        <div class="tiny"><strong>Historical data loaded:</strong> <span id="private-research-loaded" aria-live="polite">No historical data loaded</span></div>
       </div>
       <p class="tiny" id="private-research-state" role="status" aria-live="polite">No market history loaded for the current selection.</p>
     </div>
     <section class="private-view" data-private-view="home">
-      <div class="pane"><div class="three"><div class="metric"><span class="muted">Virtual total</span><strong id="private-total">—</strong></div><div class="metric"><span class="muted">Available cash</span><strong id="private-cash">—</strong></div><div class="metric"><span class="muted">Invested value</span><strong id="private-invested">—</strong></div></div><div class="section-title"><h3>Holdings</h3><button class="btn sm" data-private-tab="trade">Trade</button></div><div id="private-positions"></div></div>
-      <div class="pane"><h3>Portfolio concentration</h3><div id="private-concentration" class="tiny" style="margin-top:12px">Add virtual holdings to see allocation.</div></div>
+      <div class="pane"><div class="three"><div class="metric"><span class="muted">Virtual portfolio value</span><strong id="private-total">—</strong></div><div class="metric"><span class="muted">Available cash</span><strong id="private-cash">—</strong></div><div class="metric"><span class="muted">Invested value</span><strong id="private-invested">—</strong></div></div><div class="section-title"><h3>Holdings</h3><button class="btn sm" data-private-tab="trade">Trade</button></div><div id="private-positions"></div></div>
+      <div class="pane"><h3>Holdings by weight</h3><div id="private-concentration" class="tiny" style="margin-top:12px">Add virtual holdings to see allocation.</div></div>
       <div class="pane" id="private-allocation-card-v74">
-        <h3>Portfolio allocation what-if</h3>
-        <p class="tiny">A proposed cash-funded allocation is compared with the current virtual portfolio using observed prices. The results are hypothetical; no virtual or brokerage order is submitted.</p>
+        <h3>Proposed purchase impact</h3>
+        <p class="tiny">Check how a hypothetical cash-funded purchase changes your current virtual portfolio weights, using available market observations. This calculation neither records a virtual trade nor places a brokerage order.</p>
         <div class="formgrid" style="margin-top:14px">
           <div class="field"><label for="private-allocation-symbol-v74">Investment</label><select id="private-allocation-symbol-v74"><option value="">Choose an investment</option></select></div>
-          <div class="field"><label for="private-allocation-budget-v74">Hypothetical spending in USD</label><input id="private-allocation-budget-v74" type="number" min="1" step="1" value="250"></div>
+          <div class="field"><label for="private-allocation-budget-v74">Proposed spending (USD)</label><input id="private-allocation-budget-v74" type="number" min="1" step="1" value="250"></div>
         </div>
-        <p id="private-allocation-selection-v74" class="tiny">Candidates reflect the current Investment ideas shortlist and virtual holdings.</p>
-        <div class="controls"><button class="btn" type="button" id="private-allocation-choices-v74">Refresh investment list</button><button class="btn primary" type="button" id="private-allocation-run-v74">Analyze proposed purchase</button><button class="btn" type="button" id="private-allocation-export-v74" disabled>Export research JSON</button></div>
+        <p id="private-allocation-selection-v74" class="tiny">Choose from screened investments or current virtual holdings.</p>
+        <div class="controls"><button class="btn" type="button" id="private-allocation-choices-v74">Refresh choices</button><button class="btn primary" type="button" id="private-allocation-run-v74">Calculate impact</button><button class="btn" type="button" id="private-allocation-export-v74" disabled>Export research JSON</button></div>
         <div id="private-allocation-results-v74" aria-live="polite" style="margin-top:15px"></div>
       </div>
     </section>
     <section class="private-view" data-private-view="trade" hidden>
-      <div class="pane"><h3>Market observation &amp; virtual trade</h3><p class="tiny">Stocks, ETFs, and supported crypto pairs. Market observations are private and read-only; no brokerage orders are placed.</p>
+      <div class="pane"><h3>Prices and virtual trades</h3><p class="tiny">Request the latest available stock, ETF, or supported cryptocurrency observation, then record a simulated trade if desired. Prices are source- and time-stamped; no brokerage order is sent.</p>
       <div class="formgrid" style="margin-top:12px"><div class="field"><label for="private-selected-asset">Investment</label><input type="hidden" id="private-symbol" value=""><div class="selected-asset" id="private-selected-asset">No investment selected</div><button class="btn sm" type="button" id="private-browse-trade">Browse investments</button></div>
       <div class="field"><label for="private-side">Action</label><select id="private-side"><option value="buy">Buy with USD budget</option><option value="sell">Sell units</option></select></div>
       <div class="field"><label for="private-amount">USD budget / units</label><input type="number" min="0.00000001" step="any" id="private-amount" value="100"></div></div>
       <div class="controls"><button class="btn" id="private-quote-submit">Get market price</button><button class="btn primary" id="private-trade-submit">Record virtual trade</button></div><p id="private-quote" class="tiny" style="margin-top:12px">No quote loaded.</p></div>
     </section>
     <section class="private-view" data-private-view="ideas" hidden>
-      <div class="pane"><span class="eyebrow">PERSONAL RESEARCH · OBSERVED DATA</span><h2 style="margin:7px 0 9px">Investment ideas</h2>
-        <p class="muted">Selected investments are compared using historical price trends, volatility, drawdown, and available SEC financial context. Relative scores summarize this evidence; they are not predicted returns or buy signals.</p>
-        <div class="section-title" style="margin-top:18px"><h3>Companies to examine</h3><span class="tiny" id="ideas-count"></span></div>
+      <div class="pane"><span class="eyebrow">HISTORICAL PRICE AND FINANCIAL DATA</span><h2 style="margin:7px 0 9px">Investment screening</h2>
+        <p class="muted">Compare selected stocks and ETFs using historical momentum, volatility, drawdown, and available SEC fundamentals. Scores rank candidates under the selected criteria; they do not estimate future returns or recommend trades.</p>
+        <div class="section-title" style="margin-top:18px"><h3>Screening list</h3><span class="tiny" id="ideas-count"></span></div>
         <div id="ideas-selected" class="chosen-assets" aria-live="polite"></div>
-        <div class="controls"><button class="btn sm" type="button" id="ideas-browse">Browse investments</button><button class="btn sm" type="button" id="ideas-reset">Restore starting shortlist</button></div>
+        <div class="controls"><button class="btn sm" type="button" id="ideas-browse">Browse investments</button><button class="btn sm" type="button" id="ideas-reset">Reset list</button></div>
         <div class="formgrid" style="margin-top:17px">
           <div class="field"><label for="ideas-lens">Research perspective</label><select id="ideas-lens"><option value="balanced">Balanced: momentum and downside</option><option value="growth">Growth: recent trends emphasized</option><option value="defensive">Risk-aware: volatility and drawdown emphasized</option></select></div>
           <div class="field"><label for="ideas-period">Historical observation window</label><select id="ideas-period"><option value="365" selected>1 year</option><option value="730">2 years</option></select></div>
@@ -89,42 +89,40 @@ block='''<section class="tabpage" id="page-private">
         <div class="controls"><button class="btn primary" id="ideas-run" type="button">Compare selected investments</button></div>
         <p class="tiny" role="status" aria-live="polite" id="ideas-status">Choose companies by name or use the starting shortlist.</p>
         <div id="ideas-brief" class="decision-brief" hidden>
-          <div class="section-title"><div><span class="eyebrow">HISTORICAL DECISION SUPPORT</span><h3>Investment decision brief</h3></div><button class="btn sm" type="button" id="ideas-brief-export" disabled>Download research brief (JSON)</button></div>
-          <p class="tiny">A concise comparison of what deserves further research, portfolio overlap, and what the data cannot establish. Not a buy/sell instruction.</p>
+          <div class="section-title"><div><span class="eyebrow">HISTORICAL DECISION SUPPORT</span><h3>Screening summary</h3></div><button class="btn sm" type="button" id="ideas-brief-export" disabled>Download research brief (JSON)</button></div>
+          <p class="tiny">Summarizes comparative measures, overlap with existing holdings, and unresolved risks. Historical ranks are not trade recommendations.</p>
           <div id="ideas-brief-output" aria-live="polite"></div>
         </div>
         <div id="ideas-results" aria-live="polite"></div>
       </div>
-      <div class="pane"><h3>How to interpret this</h3><p class="tiny" style="margin-top:9px">A higher research score indicates a more favorable balance of <strong>past</strong> momentum and realized risk under the selected lens. It is not an estimated probability of profit, expected return, or price target. SEC results describe past business finances separately; ETFs generally do not have comparable company income statements. Reassess against valuation, diversification, fees, tax impact, investment horizon, and the risk of loss before any real-money decision. IEX-only bars are not consolidated market-wide prices.</p></div>
+      <div class="pane"><h3>Reading the scores</h3><p class="tiny" style="margin-top:9px">A higher research score indicates a more favorable balance of <strong>past</strong> momentum and realized risk under the selected lens. It is not an estimated probability of profit, expected return, or price target. SEC results describe past business finances separately; ETFs generally do not have comparable company income statements. Reassess against valuation, diversification, fees, tax impact, investment horizon, and the risk of loss before any real-money decision. IEX-only bars are not consolidated market-wide prices.</p></div>
     </section>
     <section class="private-view" data-private-view="research" hidden>
-      <div class="pane"><h3>Historical market research</h3><p class="tiny">Historical daily stocks, ETFs, and supported USD cryptocurrencies from the private Alpaca connection. Stock prices exclude dividends; crypto trades every day.</p>
-      <p class="tiny">The investments and date range currently loaded for this analysis are shown in Research investments above.</p>
+      <div class="pane"><h3>Historical prices and risk</h3><p class="tiny">Load daily stock, ETF, or supported USD cryptocurrency prices from the private Alpaca connection. Equity prices are price-only, excluding dividends; cryptocurrency trades seven days a week.</p>
+      <p class="tiny">Check the Research investments panel above for selected symbols, loaded observations, and date coverage.</p>
       <div id="private-history-chart" class="private-chart" style="margin-top:15px">Load a historical series to begin.</div><div id="private-risk-results"></div>
       </div>
     </section>
     <section class="private-view" data-private-view="optimization" hidden>
-      <div class="pane"><h3>Portfolio optimization</h3>
-        <p class="tiny">Use the historical prices selected in Market research to explore constrained, long-only allocations. The research calculation stays separate from your virtual positions. Nothing is traded or saved to your portfolio.</p>
+      <div class="pane"><h3>Optimize an allocation</h3><p class="tiny">Use the loaded historical returns to calculate long-only weights subject to concentration limits. Review correlations and risk contributions before interpreting the proposed allocation. Results do not alter your virtual holdings.</p>
         <div class="formgrid" style="margin-top:15px">
           <div class="field"><label for="private-opt-objective">Allocation method</label><select id="private-opt-objective"><option value="minimum">Minimum historical volatility</option><option value="inverse">Inverse-volatility allocation</option><option value="tilt">Historical return tilt</option></select></div>
           <div class="field"><label for="private-opt-cap">Maximum weight per investment</label><select id="private-opt-cap"><option value="0.35">35%</option><option value="0.40">40%</option><option value="0.50">50%</option><option selected value="0.60">60%</option><option value="0.75">75%</option><option value="1.00">100%</option></select></div>
         </div>
         <div class="controls"><button class="btn primary" id="private-opt-run" type="button">Calculate allocations</button><button class="btn" id="private-opt-export" type="button" disabled>Export allocations CSV</button></div>
-        <div id="private-opt-output" style="margin-top:16px" aria-live="polite">Select 2–5 investments in Market research, load their history, then calculate an allocation.</div>
+        <div id="private-opt-output" style="margin-top:16px" aria-live="polite">Select 2–5 investments in Market data, load their history, then calculate an allocation.</div>
       </div>
-      <div class="pane"><h3>Risk diagnostics</h3><p class="tiny">Empirical covariance uses 20% diagonal shrinkage. Historical correlations, contribution to variance, drawdowns, and tail losses are descriptive, not forecasts.</p><div id="private-opt-risk" style="margin-top:15px">Risk diagnostics appear after an allocation is calculated.</div></div>
+      <div class="pane"><h3>Risk diagnostics</h3><p class="tiny">Risk estimates use historical returns and a 20% diagonal covariance shrinkage. Correlations, drawdowns, and tail-loss statistics describe the selected sample; they do not predict future outcomes.</p><div id="private-opt-risk" style="margin-top:15px">Risk diagnostics appear after an allocation is calculated.</div></div>
     </section>
     <section class="private-view" data-private-view="backtest" hidden>
-      <div class="pane"><h3>Historical strategy simulator</h3><p class="tiny">Equal-weight buy-and-hold versus monthly rebalancing, using the symbols and daily history selected in Market research. Includes hypothetical transaction fees; no forward-looking optimization.</p>
+      <div class="pane"><h3>Buy-and-hold vs. rebalancing</h3><p class="tiny">Compare equal-weight buy-and-hold and monthly rebalancing on the loaded historical price series, after modeled transaction fees. These are retrospective calculations, not an executable trading record.</p>
       <div class="formgrid" style="margin-top:14px"><div class="field"><label for="private-test-capital">Starting virtual capital ($)</label><input id="private-test-capital" type="number" min="100" max="1000000" step="100" value="10000"></div>
       <div class="field"><label for="private-test-fee">Fee per rebalance (basis points)</label><input id="private-test-fee" type="number" min="0" max="100" step="1" value="5"></div></div>
       <div class="controls"><button class="btn primary" id="private-backtest-run">Run backtest</button></div>
       <div id="private-backtest-output" style="margin-top:15px"></div></div>
     </section>
     <section class="private-view" data-private-view="walkforward" hidden>
-      <div class="pane"><h3>Walk-forward strategy validation</h3>
-        <p class="tiny">Fit portfolio weights using previous historical observations, then evaluate the allocation on later dates. Refit at every test-window boundary. Compare against equal-weight rebalancing using the same transaction-fee assumptions. No brokerage orders.</p>
+      <div class="pane"><h3>Walk-forward strategy comparison</h3><p class="tiny">Fit portfolio weights on earlier prices and evaluate on subsequent periods, refitting at each boundary. Compare against equal-weight rebalancing using the same transaction-fee assumptions. No brokerage orders.</p>
         <div class="formgrid" style="margin-top:14px">
           <div class="field"><label for="private-wf-train">Training window</label><select id="private-wf-train"><option value="63">63 observations</option><option selected value="126">126 observations</option><option value="252">252 observations</option></select></div>
           <div class="field"><label for="private-wf-step">Out-of-sample test window</label><select id="private-wf-step"><option selected value="21">21 observations</option><option value="42">42 observations</option></select></div>
@@ -134,30 +132,30 @@ block='''<section class="tabpage" id="page-private">
           <div class="field"><label for="private-wf-capital">Research capital ($)</label><input id="private-wf-capital" type="number" min="100" max="1000000" value="10000"></div>
         </div>
         <div class="controls"><button class="btn primary" type="button" id="private-wf-run">Run walk-forward test</button><button class="btn" id="private-wf-export" type="button" disabled>Export test windows CSV</button></div>
-        <div id="private-wf-output" style="margin-top:15px" aria-live="polite">Load historical investments in Market research to begin.</div>
-        <div id="private-wf-diagnostics" class="pane" hidden style="margin-top:14px"><h3>Evaluation diagnostics</h3><div id="private-wf-diagnostics-content"></div>
+        <div id="private-wf-output" style="margin-top:15px" aria-live="polite">Load price history in Market data to begin.</div>
+        <div id="private-wf-diagnostics" class="pane" hidden style="margin-top:14px"><h3>Performance and risk diagnostics</h3><div id="private-wf-diagnostics-content"></div>
           <div class="controls"><button class="btn" type="button" id="private-wf-robustness" disabled>Check transaction-cost sensitivity</button><button class="btn" type="button" id="private-wf-report" disabled>Download research report (JSON)</button></div>
           <div id="private-wf-robustness-output" aria-live="polite"></div>
-          <div class="pane" style="margin-top:16px"><h3>Strategy robustness and benchmarks</h3>
-          <p class="tiny">Compare a passive buy-and-hold benchmark, alternative allocation methods, higher fees, and leaving out each evaluation window. All allocation-rule comparisons hold the evaluation dates fixed. For longer tests, select 2 years in Research investments and reload history first.</p>
+          <div class="pane" style="margin-top:16px"><h3>Benchmark and sensitivity checks</h3>
+          <p class="tiny">Compare a passive benchmark, alternative weight rules, larger fees, and leave-one-window-out sensitivity on matched evaluation dates. Select a longer history in Research investments and reload if the analysis has too few test windows.</p>
           <div class="controls"><button class="btn" type="button" id="private-wf-v68-run" disabled>Check strategy robustness</button><button class="btn" type="button" id="private-wf-v68-export" disabled>Download robustness report (JSON)</button></div>
           <div id="private-wf-v68-output" aria-live="polite">Run Walk-forward first, then check robustness.</div></div></div>
         <p class="tiny">Model uses price-only historical returns; no dividends, borrow costs, slippage, taxes, or corporate-action simulations. Backtests remain subject to selection bias and do not establish future performance.</p>
       </div>
     </section>
     <section class="private-view" data-private-view="valuation" hidden>
-      <div class="pane"><h3>Financial valuation scenarios</h3><p class="tiny">Historical company financials from SEC filings, with editable forecast assumptions. Alpaca supplies market prices, not audited accounting statements.</p>
+      <div class="pane"><h3>SEC-based valuation scenarios</h3><p class="tiny">Start with company cash-flow disclosures and vary growth, discount, and terminal-value assumptions. Alpaca prices are separate market observations, not accounting data. Scenario values are not price targets.</p>
       <div class="formgrid" style="margin-top:14px"><div class="field"><label for="private-valuation-company">Company</label><input id="private-valuation-company" type="hidden"><div class="selected-asset" id="private-valuation-selected">No company selected</div><button class="btn sm" id="private-browse-valuation" type="button">Browse companies</button></div>
       <div class="field"><label for="private-valuation-growth">Annual FCF growth (%)</label><input id="private-valuation-growth" type="number" min="-30" max="40" value="4"></div>
       <div class="field"><label for="private-valuation-wacc">Discount rate (%)</label><input id="private-valuation-wacc" type="number" min="2" max="30" value="10"></div>
       <div class="field"><label for="private-valuation-terminal">Terminal growth (%)</label><input id="private-valuation-terminal" type="number" min="-5" max="8" value="2"></div></div>
       <div class="controls"><button class="btn primary" id="private-valuation-run">Run scenario</button></div><div id="private-valuation-output" style="margin-top:15px"></div><div id="private-value-card-v73" style="margin-top:18px;border-top:1px solid #d8e6df;padding-top:14px">
-          <h3>Market price &amp; SEC valuation context</h3>
+          <h3>Market price and financial context</h3>
           <p class="tiny">SEC-reported shares and annual cash flows are compared with the latest available Alpaca market observation. Ratios depend on disclosure dates and quote coverage; they are not fair-value estimates.</p>
           <div class="controls"><button type="button" class="btn" id="private-value-run-v73">Compare observed market price</button></div>
           <div id="private-value-output-v73" aria-live="polite" style="margin-top:12px"></div>
         </div></div>
-      <div class="pane"><h3>Multi-year SEC financial projections</h3>
+      <div class="pane"><h3>Multi-year cash-flow scenarios</h3>
         <p class="tiny">Projections use the selected company’s reported SEC annual baseline and hypothetical revenue growth, FCF-margin, and discount-rate assumptions. Conservative and optimistic cases vary growth by 4 percentage points and FCF margin by 3 points. Reported statements remain unchanged.</p>
         <div class="formgrid" style="margin-top:14px">
           <div class="field"><label for="private-fc-years">Projection horizon</label><select id="private-fc-years"><option value="3">3 years</option><option selected value="5">5 years</option><option value="7">7 years</option></select></div>
@@ -168,24 +166,24 @@ block='''<section class="tabpage" id="page-private">
         </div>
         <div class="controls"><button class="btn primary" id="private-fc-run" type="button">Forecast selected company</button></div>
         <div id="private-fc-output" style="margin-top:15px" aria-live="polite">Load SEC statements for a selected company first.</div>
-        <div id="private-fc-diagnostics" class="pane" hidden style="margin-top:14px"><h3>Forecast assumption sensitivity</h3><div id="private-fc-diagnostics-content"></div>
+        <div id="private-fc-diagnostics" class="pane" hidden style="margin-top:14px"><h3>Valuation sensitivity</h3><div id="private-fc-diagnostics-content"></div>
           <div class="controls"><button class="btn" type="button" id="private-fc-report" disabled>Download financial research report (JSON)</button></div></div>
       </div>
-      <div class="pane"><h3>Selected company comparison</h3><div id="private-peers"></div></div>
+      <div class="pane"><h3>Company comparison</h3><div id="private-peers"></div></div>
     </section>
     <section class="private-view" data-private-view="settings" hidden>
-      <div class="pane"><h3>Virtual account balance</h3><p class="tiny">Change your simulation budget without any bank transfer or brokerage order. Deposits and withdrawals affect only uninvested cash. Reset clears virtual positions and trades but preserves notes.</p>
+      <div class="pane"><h3>Virtual cash balance</h3><p class="tiny">Add or withdraw simulated cash, or reset virtual holdings and transaction history. These changes do not move actual money. Saved research notes are preserved after a portfolio reset.</p>
       <div class="formgrid" style="margin-top:14px"><div class="field"><label for="private-capital-action">Change</label><select id="private-capital-action"><option value="deposit">Add virtual cash</option><option value="withdraw">Withdraw virtual cash</option><option value="reset">Start a new virtual portfolio</option></select></div><div class="field"><label for="private-capital-amount">Amount ($)</label><input id="private-capital-amount" type="number" min="1" max="1000000" step="1" value="10000"></div></div>
       <div class="controls"><button class="btn" id="private-capital-submit">Update virtual balance</button></div></div>
-      <div class="pane"><h3>Research notes</h3><div class="field" style="margin-top:12px"><label for="private-note">Private note</label><textarea id="private-note" maxlength="2000" rows="3" placeholder="Write a research note..."></textarea></div>
+      <div class="pane"><h3>Saved research notes</h3><div class="field" style="margin-top:12px"><label for="private-note">Private note</label><textarea id="private-note" maxlength="2000" rows="3" placeholder="Write a research note..."></textarea></div>
       <div class="controls"><button class="btn" id="private-note-submit">Save note</button></div><div id="private-notes"></div><p class="tiny">Watchlist: <span id="private-watchlist">None</span></p></div>
     </section>
   </div>
   <div id="private-asset-browser" class="private-picker" hidden role="dialog" aria-modal="true" aria-labelledby="asset-browser-title">
     <div class="picker-shell">
-      <div class="picker-header"><div><h2 id="asset-browser-title">Choose an investment</h2><p class="tiny">Browse by name. No ticker knowledge required.</p></div><button class="btn sm" id="asset-browser-close" type="button" aria-label="Close investment browser">Close</button></div>
+      <div class="picker-header"><div><h2 id="asset-browser-title">Choose an investment</h2><p class="tiny">Search by company or fund name; ticker symbols are optional.</p></div><button class="btn sm" id="asset-browser-close" type="button" aria-label="Close investment browser">Close</button></div>
       <div class="controls picker-controls"><button class="btn sm" data-asset-category="popular" type="button">Popular</button><button class="btn sm" data-asset-category="all" type="button">All stocks &amp; ETFs</button><button class="btn sm" data-asset-category="crypto" type="button">Supported crypto</button></div>
-      <div class="field"><label for="asset-browser-search">Filter by company name (optional)</label><input id="asset-browser-search" maxlength="60" autocomplete="off" placeholder="Optional name search"></div>
+      <div class="field"><label for="asset-browser-search">Search by name (optional)</label><input id="asset-browser-search" maxlength="60" autocomplete="off" placeholder="Optional name search"></div>
       <div class="picker-letters" id="asset-browser-letters" aria-label="Browse by first letter"></div>
       <div id="asset-browser-status" class="tiny" role="status" aria-live="polite">Select a category.</div>
       <div id="asset-browser-results" class="picker-results"></div>

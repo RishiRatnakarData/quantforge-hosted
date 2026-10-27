@@ -11,7 +11,7 @@ def test_sec_explorer_real_data_controls():
         'id="sec-provenance"', 'id="sec-ranking-note"',
     ):
         assert identifier in html
-    assert 'Download source-backed CSV' in html
+    assert 'Download SEC figures (CSV)' in html
     assert 'Fiscal year-end dates may differ' in html or 'not a synchronized period' in html
 
 

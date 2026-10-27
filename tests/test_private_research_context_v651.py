@@ -10,7 +10,7 @@ def test_shared_selection_widget_present_only_once():
     assert builder.count('id="private-history-load"') == 1
     assert builder.count('id="private-research-dataset"') == 1
     assert builder.count('id="private-research-loaded"') == 1
-    assert 'Shared by Market research, Optimization, Backtesting and Walk-forward' in builder
+    assert 'Used in Market data, Optimization, Backtests and Walk-forward' in builder
 
 
 def test_research_widget_uses_real_loaded_history_not_selection_as_data():
