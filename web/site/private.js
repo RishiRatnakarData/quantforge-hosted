@@ -633,6 +633,17 @@ function showV66ForecastDiagnostics(d,company,opts){
  $('private-fc-diagnostics-content').innerHTML='<p class="tiny">Sensitivity of the <strong>hypothetical discounted FCF proxy</strong> to annual revenue growth (columns) and discount rate (rows). FCF margin, horizon, and terminal growth remain unchanged. Not a share price or market forecast.</p>'+displayTable(header,rows)+
   '<p class="tiny">'+grid.historicalPeriods+' SEC annual periods · observed annual revenue growth range: '+
   (grid.observedGrowthMin==null?'Unavailable':percent(grid.observedGrowthMin)+' to '+percent(grid.observedGrowthMax))+'. Past growth is not a forecast or an estimate of predictive accuracy. Unavailable cells fail the modeling limits.</p>';
+ const exposure=window.QFPrivateIntegrity.forecastRisk(d);
+ const base=exposure.scenarios.find(x=>x.scenario==='Base case');
+ const fmtShare=base?.terminalShare==null?'Unavailable':percent(base.terminalShare);
+ $('private-fc-diagnostics-content').insertAdjacentHTML('afterbegin',
+  '<h4 style="margin:12px 0 8px">Model risk and SEC baseline</h4>'+displayTable(['Diagnostic','Value'],[
+   ['Observed latest FCF proxy / revenue',exposure.observedFcfMargin===null?'Unavailable':percent(exposure.observedFcfMargin)],
+   ['Assumed base FCF / revenue',exposure.modelFcfMargin===null?'Unavailable':percent(exposure.modelFcfMargin)],
+   ['Base-case discounted terminal share',fmtShare],
+   ['Reported SEC fiscal years',String(exposure.reportedFiscalYears)]])+
+   '<p class="tiny"><strong>Terminal-value dependence:</strong> '+safe(exposure.warnings.join(' '))+
+   ' SEC baseline and scenario assumptions are captured in the downloaded research manifest.</p>');
  $('private-fc-diagnostics').hidden=false;$('private-fc-report').disabled=false;
 }
 function showV66WalkforwardDiagnostics(d){
@@ -651,6 +662,17 @@ function showV66WalkforwardDiagnostics(d){
    ['Optimized total fee reconciliation',usd(result.totalFees[0])],
    ['Equal-weight total fee reconciliation',usd(result.totalFees[1])]])+
   '<p class="tiny">Allocation change = half the absolute difference between consecutive fitted weight vectors; it is <strong>not</strong> transaction-dollar turnover. Positive window differences do not imply statistical significance. This is a historical simulation with selected assets and assumptions.</p>';
+ const manifest=window.QFPrivateIntegrity.marketManifest(historySeries,d,$('private-history-days').value);
+ const count=d.dates.length-1;
+ $('private-wf-diagnostics-content').insertAdjacentHTML('afterbegin',
+  '<h4 style="margin:12px 0 8px">Data integrity and evaluation coverage</h4>'+displayTable(['Check','Value'],[
+   ['Selected investments',d.symbols.map(x=>safe(researchCompanyLabel(x))).join(' · ')],
+   ['Aligned market-data observations',String(manifest.data.observationCount)],
+   ['Observed coverage',safe(manifest.data.observedStart)+' to '+safe(manifest.data.observedEnd)],
+   ['Evaluation coverage',d.windows.length+' windows; '+count+' evaluated observations'],
+   ['SHA-256 data fingerprint',safe(manifest.data.fingerprint.slice(0,16))+'…']])+
+   '<p class="tiny">'+(d.windows.length<6||count<126?'<strong>Limited sample:</strong> Only '+d.windows.length+' windows / '+count+' observations were evaluated. ':'')+
+   'This fingerprint identifies the exact aligned price arrays used in this session; it does not prove source authenticity or allow a full replay without the licensed original bars. Asset and parameter selection can bias historical results.</p>');
  $('private-wf-diagnostics').hidden=false;$('private-wf-report').disabled=false;$('private-wf-robustness').disabled=false;
  $('private-wf-robustness-output').textContent='';
 }
@@ -750,11 +772,19 @@ $('private-wf-export').addEventListener('click',exportWalkforward);
 $('private-wf-robustness').addEventListener('click',runV66CostSensitivity);
 $('private-wf-report').addEventListener('click',()=>{
  if(!privateState||!walkforwardResult||!walkforwardDiagnosticsV66)return;
- downloadResearchJSON('quantforge-walkforward-research.json',window.QFPrivateDiagnostics.report('walkforward',walkforwardResult,walkforwardDiagnosticsV66));
+ try{
+  const base=window.QFPrivateDiagnostics.report('walkforward',walkforwardResult,walkforwardDiagnosticsV66);
+  const report=window.QFPrivateIntegrity.attachWalkforward(base,historySeries,walkforwardResult,$('private-history-days').value);
+  if(!window.QFPrivateIntegrity.verifyMarketFingerprint(historySeries,report.manifest))throw Error('Price-series integrity check failed.');
+  downloadResearchJSON('quantforge-walkforward-research.json',report);
+ }catch(e){message('Research export unavailable: '+e.message);}
 });
 $('private-fc-report').addEventListener('click',()=>{
  if(!privateState||!forecastResultV66||!forecastDiagnosticsV66)return;
- downloadResearchJSON('quantforge-sec-forecast-research.json',window.QFPrivateDiagnostics.report('forecast',forecastResultV66,forecastDiagnosticsV66));
+ try{
+  const base=window.QFPrivateDiagnostics.report('forecast',forecastResultV66,forecastDiagnosticsV66);
+  downloadResearchJSON('quantforge-sec-forecast-research.json',window.QFPrivateIntegrity.attachForecast(base,forecastResultV66));
+ }catch(e){message('Research export unavailable: '+e.message);}
 });
 for(const id of ['private-wf-train','private-wf-step','private-wf-mode','private-wf-cap','private-wf-fee','private-wf-capital']){
  $(id).addEventListener('change',()=>{walkforwardResult=null;clearV66Walkforward();$('private-wf-export').disabled=true;
