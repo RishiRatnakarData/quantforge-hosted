@@ -255,7 +255,7 @@ def test_demo_has_no_secrets_or_backend_calls_on_startup():
     root = Path(__file__).resolve().parents[1]
     html = (root / "public/index.html").read_text(encoding="utf-8")
     script = (root / "web/site/private.js").read_text(encoding="utf-8")
-    assert "Private workspace" in html and "PUBLIC OVERVIEW" in html
+    assert "Private workspace" in html and "RESEARCH OVERVIEW" in html
     assert "ALPACA_API_SECRET_KEY" not in html and "SUPABASE_" not in html
     assert "checkSession();\n})();" not in script
 
