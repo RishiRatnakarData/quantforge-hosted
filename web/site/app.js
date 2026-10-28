@@ -15,8 +15,8 @@ function nav(name,updateHash=true){
  if(name!=='private' && !PUBLIC_PAGES.has(name))return;
  document.querySelectorAll('.tabpage').forEach(e=>e.classList.toggle('active',e.id==='page-'+name));
  document.querySelectorAll('.nav-btn').forEach(e=>{const active=e.dataset.page===name;e.classList.toggle('active',active);if(active)e.setAttribute('aria-current','page');else e.removeAttribute('aria-current');});
- const activeButton=document.querySelector('.nav-btn.active');const group=activeButton?.closest('details.qf-nav-fold');if(group)group.open=true;
- const labels={overview:'PUBLIC OVERVIEW',sec:'HISTORICAL SEC DATA',portfolio:'SIMULATED PORTFOLIO',quant:'SIMULATED RISK MODEL',valuation:'DCF ASSUMPTIONS',ml:'SIMULATED PEER MODEL',methods:'DATA & ENGINEERING',systems:'RESEARCH METHODS',lab:'INTERACTIVE ANALYSIS',private:'PRIVATE WORKSPACE'};
+ // Public navigation is always visible; private navigation expands its own task groups.
+ const labels={overview:'RESEARCH OVERVIEW',sec:'HISTORICAL SEC DATA',portfolio:'SIMULATED PORTFOLIO',quant:'SIMULATED RISK MODEL',valuation:'DCF ASSUMPTIONS',ml:'SIMULATED PEER MODEL',methods:'DATA & ENGINEERING',systems:'RESEARCH METHODS',lab:'INTERACTIVE ANALYSIS',private:'PRIVATE WORKSPACE'};
  const badge=document.querySelector('.topbar .badge');if(badge)badge.textContent=labels[name];
  const eyebrow=document.querySelector('.topbar .eyebrow');if(eyebrow)eyebrow.textContent=name==='private'?'Your portfolio · Personal use':'Financial research · models and data';
  if(updateHash && PUBLIC_PAGES.has(name))history.replaceState(null,'','#'+name);
@@ -107,6 +107,7 @@ function renderSECTrend(company){
 }
 function renderSECRanking(){
  const key=$('sec-rank-metric').value, rows=SEC.ranking(SEC_DATA,key).slice(0,30);
+ const peerPanel=$('qf-sec-peer-chart-v81');if(peerPanel&&window.QFPublicVisualsV81)peerPanel.innerHTML=window.QFPublicVisualsV81.rankingHtml(rows,SEC.METRICS[key].label,SEC.METRICS[key].unit);
  let rank=0;
  $('sec-compare').innerHTML=table(['Rank','Company','Sector*','FY ended',SEC.METRICS[key].label],rows.map(row=>{
   const hasValue=row.value!==null;if(hasValue)rank++;
@@ -130,6 +131,25 @@ function downloadSECCsv(){
  URL.revokeObjectURL(url);
 }
 
+function renderV81SecCharts(company){
+ const graph=$('qf-sec-chart-v81'),projection=$('qf-sec-project-output-v81');
+ if(!graph||!window.QFPublicVisualsV81)return;
+ graph.innerHTML=window.QFPublicVisualsV81.historicalHtml(company,$('qf-sec-metric-v81').value);
+ // A newly chosen issuer invalidates the previously calculated hypothetical future path.
+ if(projection)projection.textContent='Assumptions have not yet been applied to this company. Select a growth rate and calculate.';
+}
+function refreshV81Chart(){
+ const company=SEC_DATA?.companies?.find(c=>c.symbol===$('sec-company').value);
+ if(company&&window.QFPublicVisualsV81)$('qf-sec-chart-v81').innerHTML=window.QFPublicVisualsV81.historicalHtml(company,$('qf-sec-metric-v81').value);
+}
+function projectV81(){
+ const company=SEC_DATA?.companies?.find(c=>c.symbol===$('sec-company').value);
+ if(!company||!window.QFPublicVisualsV81)return;
+ const growth=$('qf-sec-growth-v81').value.trim()===''?NaN:Number($('qf-sec-growth-v81').value);
+ const years=Number($('qf-sec-horizon-v81').value);
+ $('qf-sec-project-output-v81').innerHTML=window.QFPublicVisualsV81.projectionHtml(company,growth,years);
+}
+
 function renderSEC(){
  const out=$('sec-figures'),years=$('sec-years'),peers=$('sec-compare'),scenario=$('sec-scenario');
  if(!SEC_DATA || !Array.isArray(SEC_DATA.companies) || SEC_DATA.companies.length===0){
@@ -148,7 +168,7 @@ function renderSEC(){
  '<div class="metric"><span class="muted">Revenue YoY change</span><strong>'+yoy+'</strong></div>';
  const rows=company.annual.map(r=>{const f=r.metrics;return [r.fiscal_end,billions(f.revenue_usd),billions(f.operating_income_usd),ratio(f.operating_income_usd,f.revenue_usd),billions(f.free_cash_flow_usd)];});
  years.innerHTML=table(['FY ended','Revenue','Operating income','Operating margin','FCF proxy'],rows);
- renderSECTrend(company);renderSECRanking();renderSECProvenance(company);
+ renderSECTrend(company);renderSECRanking();renderSECProvenance(company);renderV81SecCharts(company);
  $('sec-source').innerHTML='Source: <a href="'+company.source_url+'" rel="noopener noreferrer" target="_blank">SEC Company Facts, '+company.symbol+'</a>. Each metric is selected from an eligible 10-K filed by '+(company.as_of||SEC_DATA.as_of)+'. FCF proxy = reported operating cash flow minus cash purchases of property and equipment (not FCFF). Missing values remain blank. *Sector groups are editorial and fiscal periods differ; compare across sectors cautiously. Sources and accession IDs are in the snapshot file.';
  const shock=Number($('sec-margin-shock').value);
  if(typeof m.operating_income_usd!=='number'||typeof m.revenue_usd!=='number'){
@@ -223,12 +243,15 @@ $('dcf-run').addEventListener('click',runDCF);
 $('ml-run').addEventListener('click',runPeers);
 $('sec-company-search-v79').addEventListener('input',filterSECCompaniesV79);
 $('sec-company').addEventListener('change',renderSEC);
+$('qf-sec-metric-v81').addEventListener('change',refreshV81Chart);
+$('qf-sec-project-v81').addEventListener('click',projectV81);
 $('sec-margin-shock').addEventListener('input',renderSEC);
 $('sec-rank-metric').addEventListener('change',renderSECRanking);
 $('sec-export').addEventListener('click',downloadSECCsv);
 window.addEventListener('hashchange',()=>{const target=window.location.hash.slice(1);if(PUBLIC_PAGES.has(target))nav(target,false);});
 populate();
 const initial=window.location.hash.slice(1);if(PUBLIC_PAGES.has(initial))nav(initial,false);
+const qfCountV81=$('qf-company-count-v81');if(qfCountV81)qfCountV81.textContent=SEC_DATA?.companies?.length?SEC_DATA.companies.length+' companies':'Company financials unavailable';
 const methodsAsOf=$('methods-asof');if(methodsAsOf && SEC_DATA && SEC_DATA.as_of)methodsAsOf.textContent='SEC filing cutoff · '+SEC_DATA.as_of;
 
 })();

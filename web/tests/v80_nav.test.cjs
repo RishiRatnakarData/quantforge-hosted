@@ -13,10 +13,10 @@ test('critical public anchors and model pages remain',()=>{
   assert.ok(html.includes(`id="page-${name}"`));
   assert.ok(html.includes(`data-page="${name}"`));
  }
- assert.equal((html.match(/class="qf-nav-fold"/g)||[]).length,2);
+ assert.equal((html.match(/class="qf-nav-section"/g)||[]).length,3);
 });
-test('navigation opens groups for directly activated pages',()=>{
- assert.match(pub,/activeButton\?\.closest\('details\.qf-nav-fold'\)/);
+test('public pages remain visible while private groups open for activated pages',()=>{
+ assert.doesNotMatch(pub,/activeButton\?\.closest\('details\.qf-nav-fold'\)/);
  assert.match(priv,/activeButton\?\.closest\('details\.private-nav-group'\)/);
 });
 test('private MFA, guide, and research selection remain',()=>{

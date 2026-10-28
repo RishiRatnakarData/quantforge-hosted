@@ -11,9 +11,9 @@ def source(path):
 
 def test_overview_is_specific_without_unearned_claims():
     page = source("web/site/site.template.html")
-    assert "Company financials, portfolio risk, and strategy testing." in page
-    assert "historical SEC company filings" in page
-    assert "Public investment examples use simulated returns" in page
+    assert "Financial analysis grounded in reported company data." in page
+    assert "annual company financials from SEC filings" in page
+    assert "Reported company data is identified separately from simulated returns and hypothetical forecasts." in page
     assert "Financial research, built end to end" not in page
     assert "PERSONAL SOFTWARE &amp; DATA SCIENCE PROJECT" not in page
 

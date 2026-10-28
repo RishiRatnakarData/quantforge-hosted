@@ -16,7 +16,7 @@ def test_public_routes_and_disclosures_retained():
     assert 'Simulated returns' in page
     assert 'investment return examples are simulated' in page
     assert page.index('id="home-sec-highlights"') < page.index('class="project-story pane"')
-    assert page.count('class="qf-nav-fold"') == 2
+    assert page.count('class="qf-nav-section"') == 3
     assert page.count('class="qf-secondary-details"') == 2
     assert 'SEC_DATA' not in page  # populated by CSP-protected build, not untrusted HTML.
 
@@ -40,7 +40,7 @@ def test_ui_only_changes_preserve_client_guardrails():
     for expr in ("function api(path, body)", "const init={credentials:'same-origin'", "api('private/state')"):
         assert expr in private
     assert 'closest(\'details.private-nav-group\')' in private
-    assert "closest('details.qf-nav-fold')" in app
+    assert "closest('details.qf-nav-fold')" not in app
     assert "const PUBLIC_PAGES=new Set" in app
 
 

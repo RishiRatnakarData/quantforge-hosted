@@ -227,41 +227,109 @@ main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
 @media(max-width:450px){.side nav{grid-template-columns:repeat(2,minmax(0,1fr))}.pane{padding:17px 15px}.topbar{align-items:flex-start;flex-wrap:wrap}.topbar .eyebrow{max-width:90%}.research-hero{grid-template-columns:1fr}.hero-facts{border-left:0;border-top:1px solid #d1e3dc;padding:15px 0 0}.section-title{align-items:flex-start}.private-nav .private-nav-group button{width:100%}.lab-section-heading strong{font-size:16px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.journey-card:hover{transform:none}}
 
+
+/* QuantForge V8.1: purposeful dashboards with responsive layout and stable controls. */
+#page-overview .intro-simple p{max-width:70ch}
+#page-overview .qf-home-roadmap{margin-top:24px}
+#page-overview .qf-roadmap-card{min-height:124px}
+.qf-home-meta{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px;color:#47695e;font-size:12px}
+.qf-home-meta strong{color:#115c4b}
+.qf-evidence-shortcut{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:15px 19px;background:#f4faf6;border:1px solid #d5e5d8;border-radius:12px;margin-bottom:22px}
+.qf-evidence-shortcut p{margin:0;line-height:1.6;max-width:68ch}
+.qf-sec-viz{margin-top:16px;border:1px solid #d7e7de;padding:clamp(14px,2vw,22px);border-radius:12px;background:#fff}
+.qf-sec-viz h3{margin:0 0 7px}
+.qf-sec-viz h4{margin:12px 0;font-size:15px}
+.qf-sec-viz .qf-chart-subline{line-height:1.6;color:#416559;font-size:13px;max-width:75ch}
+.qf-sec-viz svg{display:block;max-width:100%;height:auto;margin-top:8px}
+.qf-sec-viz .formgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin-top:14px}
+.qf-chart-table{overflow-x:auto;max-width:100%;margin-top:8px}
+.qf-chart-table table{width:100%;min-width:320px;border-collapse:collapse;font-size:12px}
+.qf-chart-table th,.qf-chart-table td{padding:9px 12px;border-bottom:1px solid #e2eae5;text-align:left}
+.qf-chart-empty{color:#47695e;font-size:13px;padding:12px;background:#f6faf8;border-radius:8px}
+.qf-chart-key{display:flex;flex-wrap:wrap;gap:13px;font-size:12px;color:#466d5e;padding:10px 0}
+.qf-peer-bars{display:grid;gap:10px;margin:12px 0}
+.qf-peer-row{display:grid;grid-template-columns:65px minmax(0,1fr) 64px;gap:10px;align-items:center;font-size:12px}
+.qf-peer-track{background:#edf4ef;border-radius:8px;height:17px;overflow:hidden}
+.qf-peer-track span{display:block;background:#2e7c64;height:100%;border-radius:8px}
+.qf-peer-row strong{text-align:right;font-variant-numeric:tabular-nums}
+#private-signed .qf-private-start{margin-bottom:19px}
+.qf-private-start>p{max-width:72ch;line-height:1.65}
+.qf-private-paths{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0}
+.qf-private-paths button{min-height:102px;display:flex;flex-direction:column;align-items:flex-start;text-align:left;justify-content:flex-start;gap:7px;padding:15px;border:1px solid #d3e3d9;border-radius:11px;background:white;cursor:pointer}
+.qf-private-paths button:hover,.qf-private-paths button:focus-visible{border-color:#7cb69d;background:#f7fcf8}
+.qf-private-paths strong{font-size:14px;color:#145b49}
+.qf-private-paths small{font-size:12px;line-height:1.5;color:#58756a}
+#private-guide-card-v79{background:#f9fdfa}
+.qf-private-section-intro{margin-bottom:14px;line-height:1.6;max-width:76ch;color:#466a5d}
+#private-guide-result-v79 h4{border-top:1px solid #d9e6de;padding-top:14px}
+#private-guide-result-v79 li{line-height:1.7}
+.qf-private-nav-note{font-size:12px;color:#56756b;margin:0 0 15px}
+@media(max-width:900px){.qf-private-paths{grid-template-columns:1fr 1fr}}
+@media(max-width:650px){.qf-private-paths{grid-template-columns:1fr}.qf-sec-viz .formgrid{grid-template-columns:1fr}.qf-peer-row{grid-template-columns:50px minmax(0,1fr) 53px;gap:6px}#private-signed .qf-private-paths button{min-height:0}}
+/* On wide screens, keep private sections in a task-oriented in-workspace rail.
+   Below the breakpoint the existing grouped navigation becomes responsive cards. */
+@media(min-width:1220px){
+ #private-signed{display:grid;grid-template-columns:176px minmax(0,1fr);column-gap:17px;align-items:start}
+ #private-signed>.controls{grid-column:1/-1}
+ #private-signed>.private-nav{grid-column:1;grid-row:2/span 3;display:flex;flex-direction:column;gap:10px;position:sticky;top:16px;margin:0;align-self:start}
+ #private-signed>.private-nav>.private-nav-group{width:100%}
+ #private-signed>#private-research-dataset{grid-column:2;grid-row:2}
+ #private-signed>.private-view{grid-column:2;grid-row:3;min-width:0}
+ #private-signed>.private-view[hidden]{display:none!important}
+}
+
+
+/* V8.1.1: every public route remains visible under consistently labeled sections. */
+.qf-nav-section{display:grid;gap:4px;min-width:0}
+.qf-nav-section+.qf-nav-section{margin-top:10px;padding-top:13px;border-top:1px solid var(--line)}
+.qf-nav-section .nav-caption{display:block;margin:0;padding:7px 12px 5px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:760;color:#5b7469}
+.side .qf-nav-section .nav-btn{display:flex;justify-content:flex-start;text-align:left;width:100%;min-height:42px;white-space:normal}
+.side .qf-nav-section .nav-btn.active{font-weight:760}
+.qf-source-link{color:#155f4f;font-weight:700;font-size:12px;text-underline-offset:3px;white-space:normal}
+.qf-source-link:focus-visible{outline:3px solid #90cab7;outline-offset:2px}
+@media(max-width:800px){
+ .side nav{display:grid;grid-template-columns:1fr;gap:9px;overflow:visible}
+ .qf-nav-section{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+ .qf-nav-section+.qf-nav-section{margin:0;padding:0;border:0}
+ .qf-nav-section .nav-caption{grid-column:1/-1;padding:2px 0 1px}
+ .side .qf-nav-section .nav-btn{justify-content:center;text-align:center;width:100%;padding:9px 10px;min-height:43px}
+}
+@media(max-width:450px){.qf-nav-section{grid-template-columns:repeat(3,minmax(0,1fr))}.side .qf-nav-section .nav-btn{font-size:11px;padding:8px 5px}}
+
 </style></head><body>
-<div class="app"><aside class="side"><div class="brand"><div class="mark">Q</div>quantforge</div><nav id="navigation" aria-label="Main navigation"><span class="nav-caption">Financial analysis</span><button class="nav-btn active" data-page="overview" aria-current="page">Overview</button><button class="nav-btn" data-page="sec">SEC company data</button><button class="nav-btn" data-page="lab">Analysis dashboard</button><details class="qf-nav-fold"><summary>Simulated model examples</summary><div class="qf-nav-content"><button class="nav-btn" data-page="portfolio">Portfolio simulator</button><button class="nav-btn" data-page="quant">Risk &amp; allocation</button><button class="nav-btn" data-page="valuation">DCF scenarios</button><button class="nav-btn" data-page="ml">Peer comparison</button></div></details><details class="qf-nav-fold"><summary>Methods &amp; code</summary><div class="qf-nav-content"><button class="nav-btn" data-page="systems">Research methods</button><button class="nav-btn" data-page="methods">Data &amp; engineering</button></div></details><span class="nav-caption">Personal</span></nav><div class="sidenote">Historical SEC data · reproducible models<br>Personal investment research requires sign-in</div></aside>
-<a class="skip-link" href="#main-content">Skip to content</a><main id="main-content"><div class="topbar"><span class="eyebrow">SEC filings · portfolio models · research methods</span><span class="badge">PUBLIC OVERVIEW</span></div>
+<div class="app"><aside class="side"><div class="brand"><div class="mark">Q</div>quantforge</div><nav id="navigation" aria-label="Main navigation">
+  <div class="qf-nav-section" role="group" aria-label="Financial research pages">
+    <span class="nav-caption">Financial research</span>
+    <button class="nav-btn active" data-page="overview" aria-current="page">Overview</button>
+    <button class="nav-btn" data-page="sec">Company financials</button>
+    <button class="nav-btn" data-page="lab">Analysis dashboard</button>
+  </div>
+  <div class="qf-nav-section" role="group" aria-label="Interactive modeling tools">
+    <span class="nav-caption">Interactive models</span>
+    <button class="nav-btn" data-page="portfolio">Portfolio simulator</button>
+    <button class="nav-btn" data-page="quant">Risk &amp; allocation</button>
+    <button class="nav-btn" data-page="valuation">DCF scenarios</button>
+    <button class="nav-btn" data-page="ml">Peer comparison</button>
+  </div>
+  <div class="qf-nav-section" role="group" aria-label="Research methodology and engineering">
+    <span class="nav-caption">Methods &amp; engineering</span>
+    <button class="nav-btn" data-page="systems">Research methods</button>
+    <button class="nav-btn" data-page="methods">Data &amp; engineering</button>
+  </div>
+</nav><div class="sidenote">Historical SEC data · reproducible models<br>Personal investment research requires sign-in</div></aside>
+<a class="skip-link" href="#main-content">Skip to content</a><main id="main-content"><div class="topbar"><span class="eyebrow">SEC filings · portfolio models · research methods</span><span class="badge">RESEARCH OVERVIEW</span></div>
 <section class="tabpage active" id="page-overview">
-<div class="intro-simple"><span class="eyebrow">FINANCIAL DATA &amp; QUANTITATIVE ANALYSIS</span><h1>Company financials, portfolio risk, and strategy testing.</h1><p>QuantForge analyzes historical SEC company filings and provides working portfolio, risk, and valuation models. Explore reported financial trends, change model assumptions, and examine how strategies are evaluated. Public investment examples use simulated returns; a separate MFA-protected workspace uses available historical market data for personal research.</p></div>
+<div class="intro-simple"><span class="eyebrow">FINANCIAL DATA &amp; QUANTITATIVE ANALYSIS</span><h1>Financial analysis grounded in reported company data.</h1><p>Explore annual company financials from SEC filings, compare calculated metrics, and test portfolio-model assumptions. Reported company data is identified separately from simulated returns and hypothetical forecasts.</p></div>
+<div class="qf-home-meta"><span><strong id="qf-company-count-v81">Available companies</strong> · historical SEC company facts</span><span>Original filings · explicit simulation labels · tested models</span></div>
 <nav class="qf-home-roadmap" aria-label="Choose an analysis">
  <button type="button" class="qf-roadmap-card" data-go="sec"><span>01 · REPORTED DATA</span><strong>Explore company financials</strong><small>Start with real SEC revenue, income, and cash-flow disclosures.</small></button>
- <button type="button" class="qf-roadmap-card" data-go="lab"><span>02 · CALCULATED MODELS</span><strong>Compare risk and strategies</strong><small>Adjust simulated assumptions and inspect what changes.</small></button>
- <button type="button" class="qf-roadmap-card" data-go="private"><span>03 · PERSONAL RESEARCH</span><strong>Open your private workspace</strong><small>Analyze selected investments and explain the available findings after MFA sign-in.</small></button>
+ <button type="button" class="qf-roadmap-card" data-go="lab"><span>02 · CALCULATED MODELS</span><strong>Explore the analysis dashboard</strong><small>Compare reported financials and test simulated portfolio strategies.</small></button>
+ <button type="button" class="qf-roadmap-card" data-go="systems"><span>03 · CODE &amp; EVIDENCE</span><strong>Explore research methods</strong><small>Inspect source lineage, model assumptions, engineering checks, and published code.</small></button>
 </nav>
 <div class="pane"><div class="section-title"><h3>Company financials from SEC filings</h3><span class="mini">Historical company filings</span></div><div class="three" id="home-sec-highlights"></div><div class="controls"><button class="btn primary" data-go="sec">Explore SEC Financials</button><span class="tiny" id="home-sec-updated">Historical filings · not live stock prices</span></div></div>
-<details class="qf-secondary-details"><summary>How the research platform works</summary>
-<div class="project-story pane"><div class="section-title"><h3>What the project covers</h3><span class="mini">From filings to model evaluation</span></div><div class="story-grid">
-<div><span class="eyebrow">01 · DATA ENGINEERING</span><h3>SEC financial data</h3><p>Annual company facts with filing dates, fiscal-year selection, reported values, calculated margins, and missing-data checks.</p><button class="text-link" data-go="sec">Explore financials →</button></div>
-<div><span class="eyebrow">02 · QUANTITATIVE ANALYTICS</span><h3>Portfolio risk</h3><p>Estimate covariance, apply position limits, compare allocations, and inspect volatility and downside assumptions.</p><button class="text-link" data-go="quant">Quantitative model →</button></div>
-<div><span class="eyebrow">03 · STATISTICAL RESEARCH</span><h3>Strategy evaluation</h3><p>Walk-forward testing with past-only training, separate evaluation windows, modeled costs, and benchmark comparisons.</p><button class="text-link" data-go="methods">Explore methodology →</button></div>
-<div><span class="eyebrow">04 · SOFTWARE ENGINEERING</span><h3>Data and application engineering</h3><p>Python processing, documented data sources, an authenticated research API, automated tests, and deployment checks.</p><button class="text-link" data-go="methods">See system design →</button></div>
-</div></div>
 
-<div class="pane" id="public-research-engine">
- <div class="section-title"><h3>More research in the private workspace</h3><span class="mini">Separate data and access</span></div>
- <p class="explain-note" style="margin:0 0 16px">Public examples can be explored without signing in. The private workspace adds historical market observations, investment selection, portfolio studies, and saved research. Methods and source code can be reviewed without access to private holdings or licensed data.</p>
- <div class="tech-overview">
-  <div class="tech-tile"><span class="eyebrow">TIME SERIES</span><strong>Walk-forward testing</strong><p>Past-only training, non-overlapping evaluation, costs, passive and rebalanced benchmarks.</p><span class="mini">Statistical validation</span></div>
-  <div class="tech-tile"><span class="eyebrow">PORTFOLIO RISK</span><strong>Constrained optimization</strong><p>Covariance estimation, weight caps, risk diagnostics, alternative allocation rules.</p><span class="mini">Optimization + risk</span></div>
-  <div class="tech-tile"><span class="eyebrow">COMPANY FINANCIALS</span><strong>SEC scenario forecasting</strong><p>Reported annual filings, FCF proxies, discounting, terminal-value and sensitivity analysis.</p><span class="mini">Financial modeling</span></div>
-  <div class="tech-tile"><span class="eyebrow">APPLICATION DESIGN</span><strong>Authenticated analytics</strong><p>Read-only market feeds, owner-only storage, MFA, content security, and CI.</p><span class="mini">Full-stack security</span></div>
- </div>
- <div class="controls" style="margin-top:0"><button class="btn primary" data-go="lab">Explore the analysis</button><button class="btn" data-go="systems">Research methods</button><button class="btn" data-go="methods">Data &amp; engineering</button></div>
-</div>
-</details>
-<details class="qf-secondary-details"><summary>Additional simulated portfolio and model examples</summary>
-<div class="pane"><div class="section-title"><h3>Sample portfolio</h3><span class="mini">Simulated holdings and prices</span></div><div class="three"><div class="metric"><span class="muted">Sample portfolio value</span><strong id="home-value">—</strong></div><div class="metric"><span class="muted">Cash available</span><strong id="home-cash">—</strong></div><div class="metric"><span class="muted">Invested</span><strong id="home-invested">—</strong></div></div><div class="section-title"><h3>Sample allocation</h3><button class="btn sm" data-go="portfolio">Portfolio model</button></div><div id="home-allocation"></div></div>
-<div class="pane"><div class="section-title"><h3>Example investments</h3><span class="muted tiny">Illustrative prices · not live quotes</span></div><div class="listcards" id="assets-list"></div></div><div class="pane"><div class="section-title"><h3>Additional model examples</h3><span class="muted tiny">Illustrative calculations · simulated financial inputs</span></div><div class="listcards"><button class="asset" data-go="quant"><strong>Portfolio optimization</strong><span>Covariance, volatility and modeled downside</span></button><button class="asset" data-go="valuation"><strong>DCF valuation</strong><span>Five-year cash flows and sensitivity</span></button><button class="asset" data-go="ml"><strong>Company similarity</strong><span>Standardized financial features</span></button></div></div>
-</details></section>
+<div class="qf-evidence-shortcut"><p><strong>How to interpret these results:</strong> Company statements are historical SEC figures. Portfolio examples and forward scenarios are hypothetical, not live prices or investment recommendations.</p><button class="btn" data-go="methods">Sources and methodology</button><a class="qf-source-link" href="https://github.com/RishiRatnakarData/quantforge-hosted" target="_blank" rel="noopener noreferrer">View GitHub source and tests</a></div>
+</section>
 <section class="tabpage" id="page-sec">
   <div class="pagehead"><h1>SEC company financials</h1><p>Explore reported annual revenue, operating income, growth, and cash flow from the reviewed SEC Company Facts snapshot. Filing dates and fiscal periods are shown alongside the figures.</p></div>
   <div class="sec-toolbar"><span class="tiny">Quick company examples:</span><button class="btn sm" data-sec-symbol="MSFT">Microsoft · Technology</button><button class="btn sm" data-sec-symbol="WMT">Walmart · Retail</button><button class="btn sm" data-sec-symbol="XOM">Exxon Mobil · Energy</button><button class="btn sm" data-go="methods">Data &amp; methods</button></div>
@@ -274,9 +342,21 @@ main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
   <div id="sec-scenario" style="margin:14px 0"></div>
   <div class="section-title"><h3>Annual revenue trend</h3><span class="mini">Reported · fiscal year</span></div>
   <div id="sec-trend" class="sec-trend" aria-live="polite"></div>
+  <div class="qf-sec-viz" aria-labelledby="qf-sec-metric-heading-v81">
+   <h3 id="qf-sec-metric-heading-v81">Operating performance charts</h3>
+   <p class="qf-chart-subline">Compare annual operating profitability, income, and a free cash flow proxy. Each point is from a reported company fiscal period; not a stock return.</p>
+   <div class="formgrid"><div class="field"><label for="qf-sec-metric-v81">Chart metric</label><select id="qf-sec-metric-v81"><option value="margin">Operating margin</option><option value="fcf">Free cash flow proxy</option><option value="income">Net income</option></select></div></div>
+   <div id="qf-sec-chart-v81" aria-live="polite"></div>
+  </div>
+  <details class="qf-sec-viz" id="qf-sec-scenario-v81"><summary><strong>Explore a revenue-growth scenario</strong> · optional illustration</summary>
+   <p class="qf-chart-subline">This is a calculation starting from reported annual revenue. The future growth rate is your assumption, not an analyst estimate or a share-price forecast.</p>
+   <div class="formgrid"><div class="field"><label for="qf-sec-growth-v81">Assumed annual revenue growth (%)</label><input id="qf-sec-growth-v81" type="number" min="-30" max="40" step="1" value="5"></div><div class="field"><label for="qf-sec-horizon-v81">Scenario years</label><select id="qf-sec-horizon-v81"><option value="1">1 year</option><option value="3" selected>3 years</option><option value="5">5 years</option></select></div></div>
+   <div class="controls"><button class="btn" type="button" id="qf-sec-project-v81">Calculate hypothetical path</button></div><div id="qf-sec-project-output-v81" aria-live="polite">Choose your assumptions and calculate. Nothing here predicts an actual company outcome.</div>
+  </details>
   <div class="section-title" style="margin-top:17px"><h3>Reported annual figures</h3></div><div id="sec-years"></div>
   <div class="section-title" style="margin-top:24px"><h3>Compare companies</h3><span class="tiny">Latest available fiscal year</span></div>
   <div class="sec-comparison-controls"><div class="field"><label for="sec-rank-metric">Compare by financial metric</label><select id="sec-rank-metric"><option value="revenue">Annual revenue</option><option value="growth">Revenue growth (YoY)</option><option value="margin">Operating margin</option><option value="fcf">Free cash flow proxy</option></select></div><button class="btn" type="button" id="sec-export">Download SEC figures (CSV)</button></div>
+  <div id="qf-sec-peer-chart-v81" class="qf-sec-viz" aria-label="Graphic comparison of published companies"></div>
   <div id="sec-compare"></div>
   <p class="tiny" id="sec-ranking-note" style="margin-top:8px">Rankings compare the latest available annual filing for each issuer, not a synchronized period or a sector-neutral investment signal. Missing values are unranked.</p>
   <details class="sec-evidence subtle"><summary>Inspect source tags and filing provenance</summary><div id="sec-provenance" style="margin-top:12px"></div></details>
@@ -284,7 +364,11 @@ main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
   </div>
   <div class="notice">SEC company financials are real, historical disclosures. The margin scenario is hypothetical. Public portfolio, Quant, DCF and Company peers use illustrative or simulated inputs; they are not actual market results, valuations, or investment recommendations.</div>
 </section>
-<section class="tabpage" id="page-portfolio"><div class="pagehead"><h1>Portfolio simulator</h1><p>Try virtual purchases, examine portfolio weights, and calculate a rebalance using example prices. Nothing connects to a brokerage account or uses live quotes.</p></div><div class="pane"><div class="three"><div class="metric"><span class="muted">Total value</span><strong id="portfolio-total">—</strong></div><div class="metric"><span class="muted">Cash</span><strong id="portfolio-cash">—</strong></div><div class="metric"><span class="muted">Holdings</span><strong id="portfolio-invested">—</strong></div></div><div class="section-title"><h3>Positions</h3></div><div class="table-wrap" id="portfolio-table"></div></div>
+<section class="tabpage" id="page-portfolio">
+<details class="qf-secondary-details"><summary>Additional simulated portfolio and model examples</summary>
+<div class="pane"><div class="section-title"><h3>Sample portfolio</h3><span class="mini">Simulated holdings and prices</span></div><div class="three"><div class="metric"><span class="muted">Sample portfolio value</span><strong id="home-value">—</strong></div><div class="metric"><span class="muted">Cash available</span><strong id="home-cash">—</strong></div><div class="metric"><span class="muted">Invested</span><strong id="home-invested">—</strong></div></div><div class="section-title"><h3>Sample allocation</h3><button class="btn sm" data-go="portfolio">Portfolio model</button></div><div id="home-allocation"></div></div>
+<div class="pane"><div class="section-title"><h3>Example investments</h3><span class="muted tiny">Illustrative prices · not live quotes</span></div><div class="listcards" id="assets-list"></div></div><div class="pane"><div class="section-title"><h3>Additional model examples</h3><span class="muted tiny">Illustrative calculations · simulated financial inputs</span></div><div class="listcards"><button class="asset" data-go="quant"><strong>Portfolio optimization</strong><span>Covariance, volatility and modeled downside</span></button><button class="asset" data-go="valuation"><strong>DCF valuation</strong><span>Five-year cash flows and sensitivity</span></button><button class="asset" data-go="ml"><strong>Company similarity</strong><span>Standardized financial features</span></button></div></div>
+</details><div class="pagehead"><h1>Portfolio simulator</h1><p>Try virtual purchases, examine portfolio weights, and calculate a rebalance using example prices. Nothing connects to a brokerage account or uses live quotes.</p></div><div class="pane"><div class="three"><div class="metric"><span class="muted">Total value</span><strong id="portfolio-total">—</strong></div><div class="metric"><span class="muted">Cash</span><strong id="portfolio-cash">—</strong></div><div class="metric"><span class="muted">Holdings</span><strong id="portfolio-invested">—</strong></div></div><div class="section-title"><h3>Positions</h3></div><div class="table-wrap" id="portfolio-table"></div></div>
 <div class="pane"><h3>Simulated trade</h3><div class="formgrid" style="margin-top:14px"><div class="field"><label for="trade-symbol">Investment</label><select id="trade-symbol"></select></div><div class="field"><label for="trade-action">Action</label><select id="trade-action"><option value="buy">Buy</option><option value="sell">Sell</option></select></div><div class="field"><label for="trade-amount">Amount ($)</label><input id="trade-amount" type="number" min="1" value="300"></div></div><div class="controls"><button class="btn primary" id="trade-submit">Record virtual trade</button><span class="tiny">Assumed 0.05% transaction fee; no real orders</span></div><div id="trade-message" style="margin-top:8px"></div></div>
 <div class="pane"><h3>ETF holdings overlap</h3><div class="tiny" style="margin:6px 0 16px">Illustrative ETF weights, not actual fund holdings</div><div id="lookthrough-table"></div></div>
 <div class="pane"><h3>Rebalancing plan</h3><div class="tiny" style="margin:6px 0 15px">Target weights sum to 100% including cash. Suggestions only; no transactions.</div><div class="formgrid"><div class="field"><label for="target-msft">Microsoft %</label><input type="number" id="target-msft" min="0" max="100" value="25"></div><div class="field"><label for="target-voo">VOO %</label><input type="number" id="target-voo" min="0" max="100" value="45"></div><div class="field"><label for="target-aapl">Apple %</label><input type="number" id="target-aapl" min="0" max="100" value="10"></div><div class="field"><label for="target-btc">Bitcoin %</label><input type="number" id="target-btc" min="0" max="100" value="5"></div><div class="field"><label for="target-cash">Cash %</label><input type="number" id="target-cash" min="0" max="100" value="15"></div></div><div class="controls"><button class="btn" id="rebalance-submit">Calculate plan</button></div><div id="rebalance-result" style="margin-top:16px"></div></div></section>
@@ -461,6 +545,26 @@ main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
 </section>
 
 <section class="tabpage" id="page-methods">
+<details class="qf-secondary-details"><summary>How the research platform works</summary>
+<div class="project-story pane"><div class="section-title"><h3>What the project covers</h3><span class="mini">From filings to model evaluation</span></div><div class="story-grid">
+<div><span class="eyebrow">01 · DATA ENGINEERING</span><h3>SEC financial data</h3><p>Annual company facts with filing dates, fiscal-year selection, reported values, calculated margins, and missing-data checks.</p><button class="text-link" data-go="sec">Explore financials →</button></div>
+<div><span class="eyebrow">02 · QUANTITATIVE ANALYTICS</span><h3>Portfolio risk</h3><p>Estimate covariance, apply position limits, compare allocations, and inspect volatility and downside assumptions.</p><button class="text-link" data-go="quant">Quantitative model →</button></div>
+<div><span class="eyebrow">03 · STATISTICAL RESEARCH</span><h3>Strategy evaluation</h3><p>Walk-forward testing with past-only training, separate evaluation windows, modeled costs, and benchmark comparisons.</p><button class="text-link" data-go="methods">Explore methodology →</button></div>
+<div><span class="eyebrow">04 · SOFTWARE ENGINEERING</span><h3>Data and application engineering</h3><p>Python processing, documented data sources, an authenticated research API, automated tests, and deployment checks.</p><button class="text-link" data-go="methods">See system design →</button></div>
+</div></div>
+
+<div class="pane" id="public-research-engine">
+ <div class="section-title"><h3>More research in the private workspace</h3><span class="mini">Separate data and access</span></div>
+ <p class="explain-note" style="margin:0 0 16px">Public examples can be explored without signing in. The private workspace adds historical market observations, investment selection, portfolio studies, and saved research. Methods and source code can be reviewed without access to private holdings or licensed data.</p>
+ <div class="tech-overview">
+  <div class="tech-tile"><span class="eyebrow">TIME SERIES</span><strong>Walk-forward testing</strong><p>Past-only training, non-overlapping evaluation, costs, passive and rebalanced benchmarks.</p><span class="mini">Statistical validation</span></div>
+  <div class="tech-tile"><span class="eyebrow">PORTFOLIO RISK</span><strong>Constrained optimization</strong><p>Covariance estimation, weight caps, risk diagnostics, alternative allocation rules.</p><span class="mini">Optimization + risk</span></div>
+  <div class="tech-tile"><span class="eyebrow">COMPANY FINANCIALS</span><strong>SEC scenario forecasting</strong><p>Reported annual filings, FCF proxies, discounting, terminal-value and sensitivity analysis.</p><span class="mini">Financial modeling</span></div>
+  <div class="tech-tile"><span class="eyebrow">APPLICATION DESIGN</span><strong>Authenticated analytics</strong><p>Read-only market feeds, owner-only storage, MFA, content security, and CI.</p><span class="mini">Full-stack security</span></div>
+ </div>
+ <div class="controls" style="margin-top:0"><button class="btn primary" data-go="lab">Explore the analysis</button><button class="btn" data-go="systems">Research methods</button><button class="btn" data-go="methods">Data &amp; engineering</button></div>
+</div>
+</details>
   <div class="pagehead"><span class="eyebrow">METHODS</span><h1>Data and engineering</h1><p>Where the data comes from, how the models are checked, and how the public site is separated from private research.</p></div>
   <div class="pane" style="background:#f1f7f3;border-color:#bad5c7"><div class="section-title"><h3>Private models and public source code</h3><span class="mini">Implementation references</span></div><p class="explain-note" style="margin:0 0 13px">The private workspace supports historical market analysis, portfolio optimization, strategy evaluation, investment screening, and SEC-based valuation scenarios. The methods page explains the underlying calculations; the repository contains the implementations and tests.</p><button class="btn primary" data-go="systems">View research methods</button></div>
   <div class="method-intro"><div><strong>Source data</strong><span>SEC EDGAR Company Facts</span></div><div><strong>Demonstration calculations</strong><span>Simulated portfolio / DCF / quantitative returns</span></div><div><strong>Separate private workspace</strong><span>Owner-only authentication and observations</span></div></div>
