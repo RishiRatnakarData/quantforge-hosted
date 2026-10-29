@@ -5,10 +5,11 @@ const $=id=>document.getElementById(id);
 let guideReportV79=null;
 let privateDecisionCenterV84=null;
 let researchOSRunV90=0, researchOSInternalLoadV90=false;
-let candidateDossierV90=null,candidateQuoteV90=null;
+let candidateDossierV90=null,candidateQuoteV90=null,candidateFactorV91=null;
 function clearResearchOSV90(){
  researchOSRunV90++;
- candidateDossierV90=null;candidateQuoteV90=null;
+ candidateDossierV90=null;candidateQuoteV90=null;candidateFactorV91=null;
+ const button=$('private-v90-run');if(button)button.disabled=false;
  const report=$('private-v90-report');
  if(report)report.textContent='Research inputs changed. Run complete research to rebuild an evidence-linked assessment.';
 }
@@ -33,6 +34,7 @@ function renderResearchOSV90(result){
  '<h3>Evidence from your research models</h3><div class="qf-v9-grid">'+cells+'</div>'+
  '<details class="pane"><summary>Required data and follow-up research</summary>'+list(result.steps,'Review assumptions and refresh observations before making a financial decision.')+'</details>'+
  '<details class="pane"><summary>Policy assumptions and important limitations</summary><p class="tiny">Risk approach: '+safe(result.constraints.risk)+' · Horizon: '+safe(result.constraints.horizon)+' · Single-name limit: '+(100*result.constraints.maxWeight).toFixed(0)+'% · Drawdown screen: '+(100*result.constraints.maxDrawdown).toFixed(0)+'%</p>'+list(result.limitations,'No additional limitations.')+'</details>'+
+ '<details class="pane"><summary>V9.1 model execution and data provenance</summary><p class="tiny">'+safe(result.orchestration?.completed??0)+' of '+safe(result.orchestration?.total??0)+' methods completed · '+safe(result.orchestration?.failed??0)+' failed · '+safe(result.orchestration?.unavailable??0)+' unavailable.</p><div class="qf-v9-grid">'+(result.orchestration?.models||[]).map(m=>'<article class="qf-v9-evidence"><strong>'+safe(m.title)+'</strong><span class="tiny"> · '+safe(m.status)+' · '+safe(m.scope)+'</span><p>'+safe(m.detail)+'</p><small class="tiny">'+safe(m.source)+(m.period?' · '+safe(m.period.start)+' to '+safe(m.period.end)+' · '+safe(m.period.sessions)+' observations':'')+'</small></article>').join('')+'</div></details>'+
  '<div class="controls"><button type="button" class="btn" data-private-tab="lab">Inspect models &amp; charts</button><button type="button" class="btn" data-private-tab="trade">Compare hypothetical portfolio impact</button></div>';
 }
 async function runResearchOSV90(){
@@ -44,35 +46,94 @@ async function runResearchOSV90(){
   if(held.length>=2){researchSelection=held;renderResearchSelection();selected=[...researchSelection];}
  }
  if(selected.length<2||selected.length>5){
-  status.textContent='Choose 2–5 investments to establish comparable history. Browse by name, then select which one to assess.';
+  status.textContent='Choose 2–5 investments and select one company to assess. No decision has been generated.';
   return;
  }
  let sym=$('private-v90-candidate').value;
  if(!selected.includes(sym))sym=selected[0];
  $('private-v90-candidate').value=sym;
  const id=++researchOSRunV90,session=privateState;
+ let activeHistory=null;
+ const preferences=['private-v90-risk','private-v90-horizon','private-v90-maxweight','private-v90-maxdrawdown','private-v90-days'].map(x=>$(x).value).join('|');
+ const current=()=>id===researchOSRunV90&&privateState===session&&
+  (!activeHistory||historySeries===activeHistory)&&selected.join(',')===researchSelection.join(',')&&$('private-v90-candidate').value===sym&&
+  preferences===['private-v90-risk','private-v90-horizon','private-v90-maxweight','private-v90-maxdrawdown','private-v90-days'].map(x=>$(x).value).join('|');
+ const engine=window.QFPrivateResearchOrchestratorV91;
+ let plan=null,results=null;
+ const record=(key,state,detail)=>{results=engine.mark(results,key,state,detail);};
  button.disabled=true;
- status.textContent='Step 1/4: loading dated and matched market history…';
+ status.textContent='Stage 1/4: loading matching and dated observations…';
  try{
-  // Always refresh the selected period; never reuse old hidden model outputs.
   $('private-history-days').value=$('private-v90-days').value;
   researchOSInternalLoadV90=true;
   try{await loadHistory();}finally{researchOSInternalLoadV90=false;}
-  if(id!==researchOSRunV90||!privateState||privateState!==session||selected.join(',')!==researchSelection.join(','))return;
-  if(!historySeries||historySeries.symbols.length!==selected.length||!selected.every(s=>historySeries.symbols.includes(s)))
-   throw Error('Current selected investments have no matching valid historical observations. No decision was generated.');
-  status.textContent='Step 2/4: computing eligible portfolio and strategy models…';
-  runOptimization();
-  if(historySeries.dates.length>=110)runWalkforward();
-  if(walkforwardResult?.windows?.length>=3)runV68Robustness();
-  if(id!==researchOSRunV90||!privateState)return;
-  refreshCandidateChoicesV85();
-  $('private-candidate-select-v85').value=sym;
-  status.textContent='Step 3/4: retrieving company filings, dated quotes, and candidate-specific risk…';
-  await runCandidateDossierV85();
-  if(id!==researchOSRunV90||!privateState||privateState!==session||sym!==$('private-v90-candidate').value)return;
-  const ff=frenchFactorsV87?window.QFPrivateFrenchFactorsV87.assess({history:historySeries,selection:researchSelection,symbol:sym,factors:frenchFactorsV87}):null;
-  status.textContent='Step 4/4: reconciling the evidence against your risk criteria…';
+  if(!current())return;
+  activeHistory=historySeries;
+  plan=engine.plan({selection:selected,symbol:sym,history:historySeries,
+   train:Number($('private-wf-train').value),step:Number($('private-wf-step').value),
+   cap:Number($('private-wf-cap').value),frenchImported:!!frenchFactorsV87});
+  results=engine.ledger(plan);
+  const eligible=key=>plan.models.find(x=>x.key===key).eligible;
+  if(eligible('history'))record('history','completed',`${plan.period.sessions} dated closes from ${plan.period.start} to ${plan.period.end}; ${plan.period.source}.`);
+  else record('history','ineligible',plan.models[0].reason||'History could not be validated.');
+  if(eligible('optimization')){
+   status.textContent='Stage 2/4: optimizing observed multi-asset allocations…';
+   try{runOptimization();if(!current())return;
+    record('optimization',optimizerResult?.symbols?.length===selected.length&&optimizerResult?.periodEnd===plan.period.end?'completed':'failed',
+     optimizerResult?.periodEnd===plan.period.end?'Computed constrained in-sample allocation; not an investment forecast.':'Optimizer did not produce a matching allocation. Inspect Research Lab.');
+   }catch(e){record('optimization','failed','Optimization was unavailable; review its settings in Research Lab.');}
+  }
+  if(eligible('backtest')){
+   status.textContent='Stage 2/4: comparing historical buy-and-hold and monthly rebalancing…';
+   try{privateBacktest();if(!current())return;
+    const success=!!$('private-backtest-output').querySelector('table');
+    record('backtest',success?'completed':'failed',success?
+     'Historical equal-weight buy-and-hold and rebalancing comparison generated in Research Lab.':'Historical comparison did not complete; check capital and fee assumptions.');
+   }catch(e){record('backtest','failed','Historical comparison could not be evaluated.');}
+  }
+  if(eligible('walkforward')){
+   status.textContent='Stage 2/4: evaluating past-only, non-overlapping strategy windows…';
+   try{runWalkforward();if(!current())return;
+    record('walkforward',walkforwardResult?.end===plan.period.end&&walkforwardResult?.windows?.length>=2?'completed':'failed',
+     walkforwardResult?.end===plan.period.end?`${walkforwardResult.windows.length} evaluated test windows; selected multi-asset universe.`:'Walk-forward did not produce eligible, matching test windows.');
+   }catch(e){record('walkforward','failed','Chronological evaluation failed; review Research Lab.');}
+  }
+  if(walkforwardResult?.windows?.length>=3&&results.find(x=>x.key==='walkforward').status==='completed'){
+   status.textContent='Stage 2/4: testing robustness and model sensitivities…';
+   try{runV68Robustness();if(!current())return;
+    record('robustness',robustnessResultV68?.windowCount>=3?'completed':'failed',
+     robustnessResultV68?.windowCount>=3?'Sensitivity analyses and leave-one-window-out checks completed.':'Robustness calculations did not produce validated results.');
+   }catch(e){record('robustness','failed','Robustness verification was unavailable.');}
+  }else record('robustness','ineligible','Requires a successfully evaluated walk-forward with three or more test windows.');
+  if(eligible('candidate')){
+   status.textContent='Stage 3/4: retrieving company SEC evidence, observed quotes and downside statistics…';
+   try{
+    refreshCandidateChoicesV85();$('private-candidate-select-v85').value=sym;
+    await runCandidateDossierV85();
+    if(!current())return;
+    record('candidate',candidateDossierV90?.ready&&candidateDossierV90.symbol===sym?'completed':'failed',
+     candidateDossierV90?.ready?'Candidate risk and available SEC data reconciled with loaded history.':'Company dossier incomplete; required evidence may be unavailable.');
+    if(candidateFactorV91?.ready&&candidateFactorV91.symbol===sym){
+     const p=candidateFactorV91;
+     record('proxy','completed',p.market?.ready?'Market ETF regression available; ETF proxies are not official FF3 factors.':
+      'Candidate historical rolling risk assessed; ETF benchmark regression was unavailable.');
+    }else record('proxy','failed','Candidate proxy and rolling-risk assessment were not produced.');
+   }catch(e){
+    if(!current())return;
+    record('candidate','failed','Company evidence acquisition or evaluation failed; review Research Lab.');
+    record('proxy','skipped','Candidate computation did not complete.');
+    $('private-candidate-run-v85').disabled=false;
+   }
+  }
+  let ff=null;
+  if(eligible('french')){
+   try{ff=window.QFPrivateFrenchFactorsV87.assess({history:historySeries,selection:researchSelection,symbol:sym,factors:frenchFactorsV87});
+    record('french',ff?.ready?'completed':'ineligible',ff?.ready?
+     `${ff.aligned} exactly aligned imported factor observations; not an investable forecast.`:ff?.reason||'Imported factor data did not match market observations.');
+   }catch(e){record('french','failed','Imported factor estimates could not be validated.');}
+  }
+  if(!current())return;
+  status.textContent='Stage 4/4: reconciling actual model outcomes and applying research policy…';
   const assessment=window.QFPrivateResearchOSV90.assess({
    asOf:new Date().toISOString(),symbol:sym,selection:researchSelection,history:historySeries,
    dossier:candidateDossierV90,quote:candidateQuoteV90||quoted[sym]||null,
@@ -81,11 +142,12 @@ async function runResearchOSV90(){
    risk:$('private-v90-risk').value,horizon:$('private-v90-horizon').value,
    maxWeight:Number($('private-v90-maxweight').value),maxDrawdown:Number($('private-v90-maxdrawdown').value)
   });
-  if(id!==researchOSRunV90||!privateState)return;
-  renderResearchOSV90(assessment);
-  message('Automated research assessment completed; no trades or external AI services were used.');
- }catch(e){if(id===researchOSRunV90&&privateState)status.textContent='Research incomplete: '+String(e.message||e)+' You can inspect individual models in Research Lab.';}
- finally{if(id===researchOSRunV90)button.disabled=false;}
+  if(!current())return;
+  renderResearchOSV90(engine.reconcile(assessment,results));
+  message('Automated evidence review completed. Partial failures are disclosed; no trade was placed.');
+ }catch(e){
+  if(current())status.textContent='Research stopped without a new decision: '+String(e.message||e).slice(0,240)+'. Please inspect the Research Lab.';
+ }finally{if(current())button.disabled=false;}
 }
 
 function clearDecisionCenterV84(){
@@ -184,7 +246,7 @@ function runFrenchV87(){
 let candidateRequestV85=0;
 function clearCandidateDossierV85(){
  candidateRequestV85++;
- candidateDossierV90=null;candidateQuoteV90=null;
+ candidateDossierV90=null;candidateQuoteV90=null;candidateFactorV91=null;
  const supplemental=$('private-v86-output');if(supplemental)supplemental.textContent='';
  const official=$('private-v87-factor-output');if(official)official.textContent='';
  const out=$('private-candidate-output-v85');
@@ -363,6 +425,7 @@ async function runCandidateDossierV85(){
   proxies:proxyChoices,value,years:Number($('private-v86-years').value)
  });
  renderFactorScenariosV86(factorResult);
+ candidateFactorV91=factorResult;
  $('private-candidate-run-v85').disabled=false;
  message('Private candidate analysis calculated. No portfolio changes or broker orders.');
 }
