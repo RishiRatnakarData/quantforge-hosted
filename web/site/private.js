@@ -4,6 +4,90 @@
 const $=id=>document.getElementById(id);
 let guideReportV79=null;
 let privateDecisionCenterV84=null;
+let researchOSRunV90=0, researchOSInternalLoadV90=false;
+let candidateDossierV90=null,candidateQuoteV90=null;
+function clearResearchOSV90(){
+ researchOSRunV90++;
+ candidateDossierV90=null;candidateQuoteV90=null;
+ const report=$('private-v90-report');
+ if(report)report.textContent='Research inputs changed. Run complete research to rebuild an evidence-linked assessment.';
+}
+function refreshResearchOSChoicesV90(){
+ const picker=$('private-v90-candidate');if(!picker)return;
+ const prior=picker.value;
+ picker.innerHTML='<option value="">Select a candidate</option>'+researchSelection.map(s=>
+  '<option value="'+safe(s)+'">'+safe(assetNames[s]||s)+' ('+safe(s)+')</option>').join('');
+ if(researchSelection.includes(prior))picker.value=prior;
+ else if(researchSelection.length)picker.value=researchSelection[0];
+ const note=$('private-v90-selection');
+ if(note)note.textContent=researchSelection.length?
+  'Research universe: '+researchSelection.map(s=>assetNames[s]||s).join(' · ')+' · '+researchSelection.length+' selected. Company assessment uses the chosen candidate; portfolio strategies use the complete selection.':
+  'Choose 2–5 investments with Browse companies by name; select the candidate from the list.';
+}
+function renderResearchOSV90(result){
+ const out=$('private-v90-report');if(!out)return;
+ const list=(xs,empty)=>'<ul class="tiny">'+(xs.length?xs:[empty]).map(x=>'<li>'+safe(x)+'</li>').join('')+'</ul>';
+ const cells=result.evidence.map(e=>'<article class="qf-v9-evidence"><strong>'+safe(e.title)+'</strong><span class="tiny"> · '+safe(e.state)+'</span><p>'+safe(e.detail)+'</p><small class="tiny">Source: '+safe(e.source)+'</small></article>').join('');
+ out.innerHTML='<div class="qf-v9-result"><span class="eyebrow">AUTOMATED RESEARCH · '+safe(result.policy)+'</span><h3>'+safe(result.decision)+'</h3><p>'+safe(result.reason)+'</p><p class="tiny">'+safe(result.summary)+' · '+safe(result.symbol)+' · As of '+safe(result.asOf||'unavailable')+'</p></div>'+
+ '<div class="qf-v9-grid"><div><h3>Why this assessment?</h3>'+list(result.pro,'No supporting quantitative screens are currently verified.')+'</div><div><h3>Reasons for caution</h3>'+list(result.con,'No threshold breaches detected in completed checks; missing evidence can still change this assessment.')+'</div></div>'+
+ '<h3>Evidence from your research models</h3><div class="qf-v9-grid">'+cells+'</div>'+
+ '<details class="pane"><summary>Required data and follow-up research</summary>'+list(result.steps,'Review assumptions and refresh observations before making a financial decision.')+'</details>'+
+ '<details class="pane"><summary>Policy assumptions and important limitations</summary><p class="tiny">Risk approach: '+safe(result.constraints.risk)+' · Horizon: '+safe(result.constraints.horizon)+' · Single-name limit: '+(100*result.constraints.maxWeight).toFixed(0)+'% · Drawdown screen: '+(100*result.constraints.maxDrawdown).toFixed(0)+'%</p>'+list(result.limitations,'No additional limitations.')+'</details>'+
+ '<div class="controls"><button type="button" class="btn" data-private-tab="lab">Inspect models &amp; charts</button><button type="button" class="btn" data-private-tab="trade">Compare hypothetical portfolio impact</button></div>';
+}
+async function runResearchOSV90(){
+ if(!privateState){message('Sign in with MFA before running research.');return;}
+ const status=$('private-v90-report'),button=$('private-v90-run');
+ let selected=[...researchSelection];
+ if(selected.length<2){
+  const held=Object.entries(privateState.holdings||{}).filter(([,qty])=>finite(qty)&&qty>0).map(([sym])=>sym).slice(0,5);
+  if(held.length>=2){researchSelection=held;renderResearchSelection();selected=[...researchSelection];}
+ }
+ if(selected.length<2||selected.length>5){
+  status.textContent='Choose 2–5 investments to establish comparable history. Browse by name, then select which one to assess.';
+  return;
+ }
+ let sym=$('private-v90-candidate').value;
+ if(!selected.includes(sym))sym=selected[0];
+ $('private-v90-candidate').value=sym;
+ const id=++researchOSRunV90,session=privateState;
+ button.disabled=true;
+ status.textContent='Step 1/4: loading dated and matched market history…';
+ try{
+  // Always refresh the selected period; never reuse old hidden model outputs.
+  $('private-history-days').value=$('private-v90-days').value;
+  researchOSInternalLoadV90=true;
+  try{await loadHistory();}finally{researchOSInternalLoadV90=false;}
+  if(id!==researchOSRunV90||!privateState||privateState!==session||selected.join(',')!==researchSelection.join(','))return;
+  if(!historySeries||historySeries.symbols.length!==selected.length||!selected.every(s=>historySeries.symbols.includes(s)))
+   throw Error('Current selected investments have no matching valid historical observations. No decision was generated.');
+  status.textContent='Step 2/4: computing eligible portfolio and strategy models…';
+  runOptimization();
+  if(historySeries.dates.length>=110)runWalkforward();
+  if(walkforwardResult?.windows?.length>=3)runV68Robustness();
+  if(id!==researchOSRunV90||!privateState)return;
+  refreshCandidateChoicesV85();
+  $('private-candidate-select-v85').value=sym;
+  status.textContent='Step 3/4: retrieving company filings, dated quotes, and candidate-specific risk…';
+  await runCandidateDossierV85();
+  if(id!==researchOSRunV90||!privateState||privateState!==session||sym!==$('private-v90-candidate').value)return;
+  const ff=frenchFactorsV87?window.QFPrivateFrenchFactorsV87.assess({history:historySeries,selection:researchSelection,symbol:sym,factors:frenchFactorsV87}):null;
+  status.textContent='Step 4/4: reconciling the evidence against your risk criteria…';
+  const assessment=window.QFPrivateResearchOSV90.assess({
+   asOf:new Date().toISOString(),symbol:sym,selection:researchSelection,history:historySeries,
+   dossier:candidateDossierV90,quote:candidateQuoteV90||quoted[sym]||null,
+   portfolio:privateState,optimizer:optimizerResult,walkforward:walkforwardResult,
+   robustness:robustnessResultV68,french:ff,
+   risk:$('private-v90-risk').value,horizon:$('private-v90-horizon').value,
+   maxWeight:Number($('private-v90-maxweight').value),maxDrawdown:Number($('private-v90-maxdrawdown').value)
+  });
+  if(id!==researchOSRunV90||!privateState)return;
+  renderResearchOSV90(assessment);
+  message('Automated research assessment completed; no trades or external AI services were used.');
+ }catch(e){if(id===researchOSRunV90&&privateState)status.textContent='Research incomplete: '+String(e.message||e)+' You can inspect individual models in Research Lab.';}
+ finally{if(id===researchOSRunV90)button.disabled=false;}
+}
+
 function clearDecisionCenterV84(){
  privateDecisionCenterV84=null;
  const out=$('private-decision-result-v84');
@@ -100,6 +184,7 @@ function runFrenchV87(){
 let candidateRequestV85=0;
 function clearCandidateDossierV85(){
  candidateRequestV85++;
+ candidateDossierV90=null;candidateQuoteV90=null;
  const supplemental=$('private-v86-output');if(supplemental)supplemental.textContent='';
  const official=$('private-v87-factor-output');if(official)official.textContent='';
  const out=$('private-candidate-output-v85');
@@ -270,6 +355,7 @@ async function runCandidateDossierV85(){
  let value=null;
  if(company&&capital&&q){try{value=window.QFPrivateValueV73.build(company,capital,q,new Date().toISOString());}catch(_){/* Valuation withheld when issuer or dates disagree. */}}
  const dossier=window.QFPrivateCandidateV85.evaluate({symbol:sym,selection:researchSelection,history:h,company,value,portfolio:session,quotes:quoted,now:new Date().toISOString()});
+ candidateDossierV90=dossier;candidateQuoteV90=q||quoted[sym]||null;
  renderCandidateDossierV85(dossier);
  const proxyChoices=[$('private-v86-proxy1').value,$('private-v86-proxy2').value].filter(Boolean);
  const factorResult=window.QFPrivateFactorScenariosV86.assess({
@@ -347,7 +433,7 @@ function clearMFA(){
   $('private-mfa-setup-actions').hidden=true;
 }
 async function handleAuthState(state){
-  if(state.signed_in){clearMFA();showStep('ready');await loadState();privatePeers();return;}
+  if(state.signed_in){clearMFA();showStep('ready');await loadState();privateTab('decision');privatePeers();return;}
   if(!state.mfa_required){clearMFA();showStep('login');return;}
   showStep('mfa');
   if(state.mfa_setup){
@@ -366,6 +452,7 @@ async function handleAuthState(state){
 }
 async function loadState(){
   clearAllocationV74();
+  clearResearchOSV90();
   clearGuideV79();
   const d=await api('private/state');privateState=d.portfolio;version=d.version;
   quoted={}; // Never carry fictional quotes across a private session.
@@ -427,6 +514,7 @@ async function verifyMFA(){
   }catch(e){message(e.message);}
 }
 async function logout(){
+  clearResearchOSV90();
   try{await api('auth/logout',{});}catch(_){ /* Clear visible private content regardless */ }
   ideasRunSequence++;ideaData=[];ideaFundamentals={};$('ideas-results').textContent='';$('ideas-run').disabled=false;clearDecisionBrief();
   clearImportedFrenchV87();clearGuideV79();clearMFA();showStep('login');privateState=null;quoted={};historyLoadSequence++;historySeries=null;closeAssetBrowser();researchSelection=[];$('private-symbol').value='';$('private-selected-asset').textContent='No investment selected';renderResearchSelection();
@@ -510,6 +598,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-page],[dat
 /* Private asset directory: click-to-select. Name search is optional. */
 function renderResearchSelection(){
  const target=$('private-history-selection');
+ refreshResearchOSChoicesV90();
  $('private-history-symbols').value=researchSelection.join(',');
  if(!researchSelection.length){target.textContent='Choose investments to compare.';return;}
  target.innerHTML=researchSelection.map(symbol=>'<button type="button" class="asset-chip" data-research-remove="'+safe(symbol)+'" aria-label="Remove '+safe(symbol)+'">'+safe(assetNames[symbol]||symbol)+' ('+safe(symbol)+') ×</button>').join('');
@@ -755,6 +844,7 @@ function refreshResearchContext(){
  }
 }
 function invalidateResearchHistory(reason){
+ if(!researchOSInternalLoadV90)clearResearchOSV90();
  clearGuideV79();
  historyLoadSequence++;
  historySeries=null;optimizerResult=null;walkforwardResult=null;clearV66Walkforward();
@@ -775,6 +865,7 @@ function displayTable(headers,rows){return '<div class="table-wrap"><table><thea
 function privateTab(tab){
  if(tab==='decision')clearDecisionCenterV84();
  if(tab==='decision')refreshCandidateChoicesV85();
+ if(tab==='decision')refreshResearchOSChoicesV90();
  const shared=$('private-research-dataset');if(shared)shared.hidden=!['research','optimization','backtest','walkforward'].includes(tab);
  refreshResearchContext();
  document.querySelectorAll('[data-private-view]').forEach(p=>p.hidden=p.dataset.privateView!==tab);
@@ -1316,6 +1407,12 @@ for(const id of ['private-fc-years','private-fc-growth','private-fc-margin','pri
 }
 
 document.querySelectorAll('[data-private-tab]').forEach(b=>b.addEventListener('click',()=>privateTab(b.dataset.privateTab)));
+$('private-v90-browse').addEventListener('click',()=>openAssetBrowser('research'));
+$('private-v90-run').addEventListener('click',runResearchOSV90);
+$('private-v90-report').addEventListener('click',e=>{const b=e.target.closest('[data-private-tab]');if(b&&privateState&&['lab','trade','research','candidate'].includes(b.dataset.privateTab))privateTab(b.dataset.privateTab);});
+for(const id of ['private-v90-candidate','private-v90-risk','private-v90-horizon','private-v90-maxweight','private-v90-maxdrawdown','private-v90-days'])
+ $(id).addEventListener('change',clearResearchOSV90);
+
 $('private-decision-run-v84').addEventListener('click',runDecisionCenterV84);
 $('private-candidate-run-v85').addEventListener('click',runCandidateDossierV85);
 $('private-v87-factor-file').addEventListener('change',importFrenchV87);
@@ -1332,7 +1429,7 @@ $('private-decision-result-v84').addEventListener('click',e=>{
  const b=e.target.closest('[data-v84-go]');
  if(!b||!privateState)return;
  const route=b.dataset.v84Go;
- if(['home','trade','ideas','research','optimization','walkforward','valuation'].includes(route))privateTab(route);
+ if(['home','trade','ideas','research','optimization','walkforward','valuation','candidate','lab'].includes(route))privateTab(route);
 });
 $('private-guide-run-v79').addEventListener('click',runGuideV79);
 $('private-guide-export-v79').addEventListener('click',()=>{

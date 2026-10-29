@@ -33,7 +33,7 @@ def test_private_workspace_and_charts_stay_intact():
     builder=(ROOT/'tools/build_unified_site.py').read_text(encoding='utf-8')
     app=(ROOT/'web/site/app.js').read_text(encoding='utf-8')
     assert 'data-page="private">Private workspace</button>' in builder
-    assert builder.count('class="private-nav-group"') == 3
+    assert builder.count('class="private-nav-group"') == 5
     assert 'id="private-mfa-code"' in builder
     assert 'id="private-research-loaded"' in builder
     assert 'QFPublicVisualsV81' in app

@@ -37,9 +37,11 @@ block='''<section class="tabpage" id="page-private">
   <div id="private-signed" hidden>
     <div class="controls"><span class="mini">Private portfolio · authenticated</span><button class="btn sm" id="private-logout">Sign out</button></div>
     <nav class="private-nav" aria-label="Private workspace sections">
-      <details class="private-nav-group" role="group" aria-label="Portfolio management" open><summary class="private-nav-title">Portfolio</summary><div class="private-nav-actions"><button class="active" data-private-tab="home">Overview</button><button data-private-tab="trade">Virtual trades</button><button data-private-tab="ideas">Investment screening</button><button data-private-tab="decision">Decision center</button></div></details>
-      <details class="private-nav-group" role="group" aria-label="Market and strategy analysis"><summary class="private-nav-title">Investment analysis</summary><div class="private-nav-actions"><button data-private-tab="research">Market data</button><button data-private-tab="optimization">Optimization</button><button data-private-tab="backtest">Backtests</button><button data-private-tab="walkforward">Walk-forward</button></div></details>
-      <details class="private-nav-group" role="group" aria-label="Company research and account settings"><summary class="private-nav-title">Companies &amp; reference</summary><div class="private-nav-actions"><button data-private-tab="valuation">Valuation</button><button data-private-tab="settings">Research guide &amp; notes</button></div></details>
+      <details class="private-nav-group" role="group" aria-label="Decision Center" open><summary class="private-nav-title">01 · Decision Center</summary><div class="private-nav-actions"><button class="active" data-private-tab="decision">Automated assessment</button></div></details>
+      <details class="private-nav-group" role="group" aria-label="Explore Investments"><summary class="private-nav-title">02 · Explore Investments</summary><div class="private-nav-actions"><button data-private-tab="ideas">Company discovery &amp; screening</button></div></details>
+      <details class="private-nav-group" role="group" aria-label="My Portfolio"><summary class="private-nav-title">03 · My Portfolio</summary><div class="private-nav-actions"><button data-private-tab="home">Holdings overview</button><button data-private-tab="trade">Virtual trades &amp; scenarios</button></div></details>
+      <details class="private-nav-group" role="group" aria-label="Advanced Research Lab"><summary class="private-nav-title">04 · Advanced Research Lab</summary><div class="private-nav-actions"><button data-private-tab="lab">Research Lab overview</button><button data-private-tab="research">Market data &amp; datasets</button><button data-private-tab="candidate">Individual company &amp; factors</button><button data-private-tab="valuation">Company valuation</button><button data-private-tab="optimization">Optimization &amp; risk</button><button data-private-tab="backtest">Historical backtests</button><button data-private-tab="walkforward">Walk-forward &amp; robustness</button></div></details>
+      <details class="private-nav-group" role="group" aria-label="Research Settings and History"><summary class="private-nav-title">05 · Research Settings &amp; History</summary><div class="private-nav-actions"><button data-private-tab="settings">Research preferences, guide &amp; notes</button></div></details>
     </nav>
     <div id="private-research-dataset" class="pane" hidden aria-label="Research investments">
       <div class="section-title"><h3>Research investments</h3><span class="tiny">Used in Market data, Optimization, Backtests and Walk-forward</span></div>
@@ -53,19 +55,53 @@ block='''<section class="tabpage" id="page-private">
       </div>
       <p class="tiny" id="private-research-state" role="status" aria-live="polite">No market history loaded for the current selection.</p>
     </div>
-    <section class="private-view" data-private-view="home">
+    <section class="private-view" data-private-view="lab" hidden>
+      <div class="pane qf-v9-shell"><span class="eyebrow">ADVANCED RESEARCH · METHODS LIBRARY</span><h2>Advanced Research Lab</h2>
+      <p>The Decision Center runs applicable research automatically. Use this lab to inspect algorithms, change assumptions, and investigate statistical findings in greater detail.</p>
+      <p class="tiny">Investment analysis is organized by purpose. Models use dated, matched observations; they do not execute orders.</p>
+      <div class="qf-v9-lab-grid">
+        <button type="button" data-private-tab="candidate"><strong>Company &amp; factor research</strong><small>SEC fundamentals, downside risk, market ETF beta, independent FF3 regressions</small></button>
+        <button type="button" data-private-tab="valuation"><strong>Valuation &amp; scenario modeling</strong><small>Cash-flow assumptions, financial statements and observed-price ratios</small></button>
+        <button type="button" data-private-tab="research"><strong>Market data &amp; price history</strong><small>Inspect aligned observations and selected investments</small></button>
+        <button type="button" data-private-tab="optimization"><strong>Optimization &amp; risk</strong><small>Covariance, concentration and constrained allocations</small></button>
+        <button type="button" data-private-tab="backtest"><strong>Historical backtests</strong><small>Compare buy-and-hold versus periodic rebalancing</small></button>
+        <button type="button" data-private-tab="walkforward"><strong>Walk-forward &amp; robustness</strong><small>Past-only fitting, transaction costs and window sensitivity</small></button>
+      </div></div>
+    </section>
+    <section class="private-view" data-private-view="home" hidden>
       <div class="qf-private-start"><h2>Portfolio overview</h2><p class="qf-private-section-intro">Check your virtual holdings, then choose a research task. Detailed calculators and the plain-English guide live in their own sections.</p><div class="qf-private-paths"><button type="button" data-private-tab="ideas"><strong>Find investments</strong><small>Compare selected stocks and funds</small></button><button type="button" data-private-tab="research"><strong>Analyze market history</strong><small>Load prices for risk and strategy testing</small></button><button type="button" data-private-tab="decision"><strong>Assess current evidence</strong><small>Compare findings, gaps and next steps</small></button><button type="button" data-private-tab="settings"><strong>Read my research guide</strong><small>Explain completed analyses in plain language</small></button></div></div>
       <p class="qf-private-nav-note">All holdings and transactions in this workspace are virtual. Prices are dated observations, not guarantees.</p>
       <div class="pane"><div class="three"><div class="metric"><span class="muted">Virtual portfolio value</span><strong id="private-total">—</strong></div><div class="metric"><span class="muted">Available cash</span><strong id="private-cash">—</strong></div><div class="metric"><span class="muted">Invested value</span><strong id="private-invested">—</strong></div></div><div class="section-title"><h3>Holdings</h3><button class="btn sm" data-private-tab="trade">Trade</button></div><div id="private-positions"></div></div>
       <div class="pane"><h3>Holdings by weight</h3><div id="private-concentration" class="tiny" style="margin-top:12px">Add virtual holdings to see allocation.</div></div>
     </section>
-    <section class="private-view" data-private-view="decision" hidden>
+    <section class="private-view" data-private-view="decision">
+      <div class="pane qf-v9-shell" id="private-decision-os-v90">
+        <span class="eyebrow">PRIVATE · AUTOMATED RESEARCH</span><h2>Investment Decision Center</h2>
+        <p>Choose the investments you want analyzed. QuantForge loads available observations, runs eligible models, checks your criteria and proposes an action with a full evidence trail. You can inspect all algorithms in Advanced Research Lab.</p>
+        <div class="qf-v9-fields">
+          <div class="field"><label for="private-v90-candidate">Investment to assess</label><select id="private-v90-candidate"><option value="">Choose an investment from your selection</option></select></div>
+          <div class="field"><label for="private-v90-risk">Risk approach</label><select id="private-v90-risk"><option value="conservative">Conservative</option><option selected value="balanced">Balanced</option><option value="growth">Growth-oriented</option></select></div>
+          <div class="field"><label for="private-v90-horizon">Investment horizon</label><select id="private-v90-horizon"><option value="short">Under 1 year</option><option selected value="medium">1–5 years</option><option value="long">5+ years</option></select></div>
+          <div class="field"><label for="private-v90-maxweight">Single-name portfolio ceiling</label><select id="private-v90-maxweight"><option value="0.10">10%</option><option selected value="0.20">20%</option><option value="0.35">35%</option></select></div>
+          <div class="field"><label for="private-v90-maxdrawdown">Historical drawdown screen</label><select id="private-v90-maxdrawdown"><option value="0.15">15%</option><option selected value="0.25">25%</option><option value="0.40">40%</option></select></div>
+          <div class="field"><label for="private-v90-days">Research history period</label><select id="private-v90-days"><option value="180">6 months</option><option selected value="365">1 year</option><option value="730">2 years</option></select></div>
+        </div>
+        <div class="controls"><button type="button" class="btn" id="private-v90-browse">Browse companies by name</button><button type="button" class="btn primary" id="private-v90-run">Run complete research</button><span class="tiny">No automatic trading · No external AI costs</span></div>
+        <p class="tiny" id="private-v90-selection" aria-live="polite">Choose 2–5 investments; historical comparisons require more than one security.</p>
+        <div id="private-v90-report" aria-live="polite" role="status"><p class="tiny">Start a research run to receive a conditional investment assessment, reasons, objections and a full audit of usable models.</p></div>
+      </div>
+      <details class="pane qf-v9-legacy"><summary>Previously completed research review (manual)</summary>
       <div class="pane" id="private-decision-center-v84">
         <span class="eyebrow">PRIVATE RESEARCH · INTEGRATED ASSESSMENT</span>
         <h2 style="margin:9px 0">Investment Decision Center</h2>
         <p class="qf-private-section-intro">Bring together the analyses already run in this session. See the covered investments, what the models agree or disagree about, which evidence is missing, and the next calculation to perform. Nothing here moves money or changes your virtual portfolio.</p>
         <div class="controls"><button class="btn primary" type="button" id="private-decision-run-v84">Assess current evidence</button><span class="tiny">Generated on demand · MFA-protected</span></div>
         <div id="private-decision-result-v84" aria-live="polite" style="margin-top:15px"><p class="tiny">Choose Assess current evidence to review your completed analyses.</p></div>
+      </div></details>
+    </section>
+    <section class="private-view" data-private-view="candidate" hidden>
+      <div class="pane"><span class="eyebrow">RESEARCH LAB · SINGLE COMPANY</span><h2>Company &amp; Factor Research</h2>
+      <p class="tiny">Expert methods and charts are collected here. The Decision Center uses eligible results automatically without requiring you to operate every model.</p>
         <section class="qf-v85-candidate" id="private-candidate-v85" aria-labelledby="private-candidate-title-v85">
           <span class="eyebrow">SINGLE-INVESTMENT RESEARCH</span><h3 id="private-candidate-title-v85">Candidate risk, valuation and portfolio scenarios</h3>
           <p class="tiny">Choose from the investments whose historical prices you actually loaded. Review SEC-derived company facts when available, observed-price valuation ratios, downside risk and a peer-relative return comparison. The selected peers are not a market-index factor model.</p>
@@ -250,6 +286,30 @@ html=html.replace('<div class="footerline">',block+'\n<div class="footerline">',
 html=html.replace('<script>/* QF_APP */</script>', '<script>/* QF_APP */</script>\n<script>/* QF_PRIVATE */</script>')
 html=html.replace('All figures are fictional; none are market observations.','All demo figures are fictional; the private workspace uses a separate data source.')
 html=html.replace('Methods are simplified client-side implementations for review.', 'Public analysis uses separate simplified client-side calculations; private positions use the authenticated API.')
+qfv9_css="""
+/* V9 private operating system: public site remains visually unchanged. */
+#private-signed .qf-v9-shell h2{margin:8px 0 10px;font-size:24px}
+#private-signed .qf-v9-shell>p{font-size:13px;line-height:1.75;color:#435f50}
+#private-signed .qf-v9-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:19px 0}
+#private-signed .qf-v9-fields .field{min-width:0}
+#private-signed .qf-v9-result{border:1px solid #c9dfd2;background:#f5faf6;border-radius:11px;padding:17px 20px;margin:18px 0}
+#private-signed .qf-v9-result h3{margin:7px 0 10px;color:#174c3a;font-size:21px}
+#private-signed .qf-v9-grid,#private-signed .qf-v9-lab-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin:14px 0}
+#private-signed .qf-v9-evidence{border:1px solid #d5e5dc;border-radius:9px;padding:13px 15px;min-width:0;background:#fff}
+#private-signed .qf-v9-evidence p{font-size:12px;color:#456557;line-height:1.5}
+#private-signed .qf-v9-lab-grid button{border:1px solid #d4e2d9;border-radius:10px;background:#f9fcfa;padding:15px;display:flex;flex-direction:column;gap:7px;text-align:left;cursor:pointer}
+#private-signed .qf-v9-lab-grid small{color:#4c6759;font-size:12px;line-height:1.5}
+#private-signed .qf-v9-legacy{margin-top:16px}
+#private-signed .qf-v9-legacy summary{cursor:pointer;font-weight:700;color:#1b5d45}
+#private-signed .private-nav{grid-template-columns:repeat(5,minmax(0,1fr))}
+#private-signed .private-nav-group{min-width:0}
+#private-signed .private-nav .private-nav-group button{white-space:normal}
+@media(min-width:1220px){#private-signed>.private-nav{display:flex;flex-direction:column}#private-signed>.private-nav>.private-nav-group{width:100%}}
+@media(max-width:1200px){#private-signed .private-nav{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:700px){#private-signed .private-nav{grid-template-columns:1fr 1fr}#private-signed .qf-v9-fields,#private-signed .qf-v9-grid,#private-signed .qf-v9-lab-grid{grid-template-columns:1fr}}
+@media(max-width:450px){#private-signed .private-nav{grid-template-columns:1fr}}
+"""
+html=html.replace('</style>',qfv9_css+'</style>',1)
 html=html.replace('.navtop{display:none}', '#private-research-dataset[hidden],#private-signed[hidden],#private-login[hidden],#private-mfa[hidden],#private-mfa-qr-wrap[hidden],#private-mfa-setup-actions[hidden]{display:none!important}#private-message{margin-top:8px}.navtop{display:none}')
 html=html.replace('body></html>','body></html>')
 # Ensure all app scripts stay CSP-protected; no external JS libraries.
@@ -275,7 +335,7 @@ for slot, file in [('/* QF_MODEL */','model.js'),('/* QF_APP */','app.js'),('/* 
  text=(src/'site'/file).read_text(encoding="utf-8")
  if file=='private.js':
   # Bundled alongside the existing private script: still only three CSP-protected scripts.
-  text=(src/'site/private_ideas_v70.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_allocation_v74.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_value_v73.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_v72.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_guide_v79.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_center_v84.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_candidate_v85.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_factor_scenarios_v86.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_french_factors_v87.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_multimarket.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_forecast_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_walkforward_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_diagnostics_v66.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_integrity_v67.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_robustness_v68.js').read_text(encoding='utf-8')+'\n'+text
+  text=(src/'site/private_ideas_v70.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_allocation_v74.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_value_v73.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_v72.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_guide_v79.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_center_v84.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_candidate_v85.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_factor_scenarios_v86.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_french_factors_v87.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_os_v90.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_multimarket.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_forecast_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_walkforward_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_diagnostics_v66.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_integrity_v67.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_robustness_v68.js').read_text(encoding='utf-8')+'\n'+text
  if file=='app.js':
   assert text.count('/* QF_SEC_DATA */ null')==1
   # Bundle pure SEC analytics in the existing public app script. CSP remains 3 hashes.

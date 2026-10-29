@@ -12,7 +12,7 @@ def test_decision_center_is_mfa_protected_by_existing_private_shell():
     builder = read("tools/build_unified_site.py")
     source = read("web/site/private.js")
     assert 'id="private-signed" hidden' in builder
-    assert 'data-private-view="decision" hidden' in builder
+    assert 'data-private-view="decision"' in builder  # V9 defaults to Decision Center inside MFA-protected shell
     assert 'data-private-tab="decision"' in builder
     assert 'id="private-decision-run-v84"' in builder
     assert "if(!privateState){message('Complete sign-in and MFA" in source

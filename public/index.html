@@ -416,6 +416,28 @@ main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
 #page-methods .qf-methods-guide>h2{font-size:clamp(19px,2vw,23px);margin:0 0 15px;color:#1b4335}
 #page-methods .qf-methods-guide .pane{margin-bottom:16px}
 #page-methods .qf-methods-guide .project-story{margin-top:0}
+
+/* V9 private operating system: public site remains visually unchanged. */
+#private-signed .qf-v9-shell h2{margin:8px 0 10px;font-size:24px}
+#private-signed .qf-v9-shell>p{font-size:13px;line-height:1.75;color:#435f50}
+#private-signed .qf-v9-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:19px 0}
+#private-signed .qf-v9-fields .field{min-width:0}
+#private-signed .qf-v9-result{border:1px solid #c9dfd2;background:#f5faf6;border-radius:11px;padding:17px 20px;margin:18px 0}
+#private-signed .qf-v9-result h3{margin:7px 0 10px;color:#174c3a;font-size:21px}
+#private-signed .qf-v9-grid,#private-signed .qf-v9-lab-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin:14px 0}
+#private-signed .qf-v9-evidence{border:1px solid #d5e5dc;border-radius:9px;padding:13px 15px;min-width:0;background:#fff}
+#private-signed .qf-v9-evidence p{font-size:12px;color:#456557;line-height:1.5}
+#private-signed .qf-v9-lab-grid button{border:1px solid #d4e2d9;border-radius:10px;background:#f9fcfa;padding:15px;display:flex;flex-direction:column;gap:7px;text-align:left;cursor:pointer}
+#private-signed .qf-v9-lab-grid small{color:#4c6759;font-size:12px;line-height:1.5}
+#private-signed .qf-v9-legacy{margin-top:16px}
+#private-signed .qf-v9-legacy summary{cursor:pointer;font-weight:700;color:#1b5d45}
+#private-signed .private-nav{grid-template-columns:repeat(5,minmax(0,1fr))}
+#private-signed .private-nav-group{min-width:0}
+#private-signed .private-nav .private-nav-group button{white-space:normal}
+@media(min-width:1220px){#private-signed>.private-nav{display:flex;flex-direction:column}#private-signed>.private-nav>.private-nav-group{width:100%}}
+@media(max-width:1200px){#private-signed .private-nav{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:700px){#private-signed .private-nav{grid-template-columns:1fr 1fr}#private-signed .qf-v9-fields,#private-signed .qf-v9-grid,#private-signed .qf-v9-lab-grid{grid-template-columns:1fr}}
+@media(max-width:450px){#private-signed .private-nav{grid-template-columns:1fr}}
 </style></head><body>
 <div class="app"><aside class="side"><div class="brand"><div class="mark">Q</div>quantforge</div><p class="qf-v83-owner"><span>Designed and developed by</span><strong>Rishi&nbsp;Ratnakar</strong></p><nav id="navigation" aria-label="Main navigation">
   <div class="qf-nav-section" role="group" aria-label="Financial research pages">
@@ -811,9 +833,11 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
   <div id="private-signed" hidden>
     <div class="controls"><span class="mini">Private portfolio · authenticated</span><button class="btn sm" id="private-logout">Sign out</button></div>
     <nav class="private-nav" aria-label="Private workspace sections">
-      <details class="private-nav-group" role="group" aria-label="Portfolio management" open><summary class="private-nav-title">Portfolio</summary><div class="private-nav-actions"><button class="active" data-private-tab="home">Overview</button><button data-private-tab="trade">Virtual trades</button><button data-private-tab="ideas">Investment screening</button><button data-private-tab="decision">Decision center</button></div></details>
-      <details class="private-nav-group" role="group" aria-label="Market and strategy analysis"><summary class="private-nav-title">Investment analysis</summary><div class="private-nav-actions"><button data-private-tab="research">Market data</button><button data-private-tab="optimization">Optimization</button><button data-private-tab="backtest">Backtests</button><button data-private-tab="walkforward">Walk-forward</button></div></details>
-      <details class="private-nav-group" role="group" aria-label="Company research and account settings"><summary class="private-nav-title">Companies &amp; reference</summary><div class="private-nav-actions"><button data-private-tab="valuation">Valuation</button><button data-private-tab="settings">Research guide &amp; notes</button></div></details>
+      <details class="private-nav-group" role="group" aria-label="Decision Center" open><summary class="private-nav-title">01 · Decision Center</summary><div class="private-nav-actions"><button class="active" data-private-tab="decision">Automated assessment</button></div></details>
+      <details class="private-nav-group" role="group" aria-label="Explore Investments"><summary class="private-nav-title">02 · Explore Investments</summary><div class="private-nav-actions"><button data-private-tab="ideas">Company discovery &amp; screening</button></div></details>
+      <details class="private-nav-group" role="group" aria-label="My Portfolio"><summary class="private-nav-title">03 · My Portfolio</summary><div class="private-nav-actions"><button data-private-tab="home">Holdings overview</button><button data-private-tab="trade">Virtual trades &amp; scenarios</button></div></details>
+      <details class="private-nav-group" role="group" aria-label="Advanced Research Lab"><summary class="private-nav-title">04 · Advanced Research Lab</summary><div class="private-nav-actions"><button data-private-tab="lab">Research Lab overview</button><button data-private-tab="research">Market data &amp; datasets</button><button data-private-tab="candidate">Individual company &amp; factors</button><button data-private-tab="valuation">Company valuation</button><button data-private-tab="optimization">Optimization &amp; risk</button><button data-private-tab="backtest">Historical backtests</button><button data-private-tab="walkforward">Walk-forward &amp; robustness</button></div></details>
+      <details class="private-nav-group" role="group" aria-label="Research Settings and History"><summary class="private-nav-title">05 · Research Settings &amp; History</summary><div class="private-nav-actions"><button data-private-tab="settings">Research preferences, guide &amp; notes</button></div></details>
     </nav>
     <div id="private-research-dataset" class="pane" hidden aria-label="Research investments">
       <div class="section-title"><h3>Research investments</h3><span class="tiny">Used in Market data, Optimization, Backtests and Walk-forward</span></div>
@@ -827,19 +851,53 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
       </div>
       <p class="tiny" id="private-research-state" role="status" aria-live="polite">No market history loaded for the current selection.</p>
     </div>
-    <section class="private-view" data-private-view="home">
+    <section class="private-view" data-private-view="lab" hidden>
+      <div class="pane qf-v9-shell"><span class="eyebrow">ADVANCED RESEARCH · METHODS LIBRARY</span><h2>Advanced Research Lab</h2>
+      <p>The Decision Center runs applicable research automatically. Use this lab to inspect algorithms, change assumptions, and investigate statistical findings in greater detail.</p>
+      <p class="tiny">Investment analysis is organized by purpose. Models use dated, matched observations; they do not execute orders.</p>
+      <div class="qf-v9-lab-grid">
+        <button type="button" data-private-tab="candidate"><strong>Company &amp; factor research</strong><small>SEC fundamentals, downside risk, market ETF beta, independent FF3 regressions</small></button>
+        <button type="button" data-private-tab="valuation"><strong>Valuation &amp; scenario modeling</strong><small>Cash-flow assumptions, financial statements and observed-price ratios</small></button>
+        <button type="button" data-private-tab="research"><strong>Market data &amp; price history</strong><small>Inspect aligned observations and selected investments</small></button>
+        <button type="button" data-private-tab="optimization"><strong>Optimization &amp; risk</strong><small>Covariance, concentration and constrained allocations</small></button>
+        <button type="button" data-private-tab="backtest"><strong>Historical backtests</strong><small>Compare buy-and-hold versus periodic rebalancing</small></button>
+        <button type="button" data-private-tab="walkforward"><strong>Walk-forward &amp; robustness</strong><small>Past-only fitting, transaction costs and window sensitivity</small></button>
+      </div></div>
+    </section>
+    <section class="private-view" data-private-view="home" hidden>
       <div class="qf-private-start"><h2>Portfolio overview</h2><p class="qf-private-section-intro">Check your virtual holdings, then choose a research task. Detailed calculators and the plain-English guide live in their own sections.</p><div class="qf-private-paths"><button type="button" data-private-tab="ideas"><strong>Find investments</strong><small>Compare selected stocks and funds</small></button><button type="button" data-private-tab="research"><strong>Analyze market history</strong><small>Load prices for risk and strategy testing</small></button><button type="button" data-private-tab="decision"><strong>Assess current evidence</strong><small>Compare findings, gaps and next steps</small></button><button type="button" data-private-tab="settings"><strong>Read my research guide</strong><small>Explain completed analyses in plain language</small></button></div></div>
       <p class="qf-private-nav-note">All holdings and transactions in this workspace are virtual. Prices are dated observations, not guarantees.</p>
       <div class="pane"><div class="three"><div class="metric"><span class="muted">Virtual portfolio value</span><strong id="private-total">—</strong></div><div class="metric"><span class="muted">Available cash</span><strong id="private-cash">—</strong></div><div class="metric"><span class="muted">Invested value</span><strong id="private-invested">—</strong></div></div><div class="section-title"><h3>Holdings</h3><button class="btn sm" data-private-tab="trade">Trade</button></div><div id="private-positions"></div></div>
       <div class="pane"><h3>Holdings by weight</h3><div id="private-concentration" class="tiny" style="margin-top:12px">Add virtual holdings to see allocation.</div></div>
     </section>
-    <section class="private-view" data-private-view="decision" hidden>
+    <section class="private-view" data-private-view="decision">
+      <div class="pane qf-v9-shell" id="private-decision-os-v90">
+        <span class="eyebrow">PRIVATE · AUTOMATED RESEARCH</span><h2>Investment Decision Center</h2>
+        <p>Choose the investments you want analyzed. QuantForge loads available observations, runs eligible models, checks your criteria and proposes an action with a full evidence trail. You can inspect all algorithms in Advanced Research Lab.</p>
+        <div class="qf-v9-fields">
+          <div class="field"><label for="private-v90-candidate">Investment to assess</label><select id="private-v90-candidate"><option value="">Choose an investment from your selection</option></select></div>
+          <div class="field"><label for="private-v90-risk">Risk approach</label><select id="private-v90-risk"><option value="conservative">Conservative</option><option selected value="balanced">Balanced</option><option value="growth">Growth-oriented</option></select></div>
+          <div class="field"><label for="private-v90-horizon">Investment horizon</label><select id="private-v90-horizon"><option value="short">Under 1 year</option><option selected value="medium">1–5 years</option><option value="long">5+ years</option></select></div>
+          <div class="field"><label for="private-v90-maxweight">Single-name portfolio ceiling</label><select id="private-v90-maxweight"><option value="0.10">10%</option><option selected value="0.20">20%</option><option value="0.35">35%</option></select></div>
+          <div class="field"><label for="private-v90-maxdrawdown">Historical drawdown screen</label><select id="private-v90-maxdrawdown"><option value="0.15">15%</option><option selected value="0.25">25%</option><option value="0.40">40%</option></select></div>
+          <div class="field"><label for="private-v90-days">Research history period</label><select id="private-v90-days"><option value="180">6 months</option><option selected value="365">1 year</option><option value="730">2 years</option></select></div>
+        </div>
+        <div class="controls"><button type="button" class="btn" id="private-v90-browse">Browse companies by name</button><button type="button" class="btn primary" id="private-v90-run">Run complete research</button><span class="tiny">No automatic trading · No external AI costs</span></div>
+        <p class="tiny" id="private-v90-selection" aria-live="polite">Choose 2–5 investments; historical comparisons require more than one security.</p>
+        <div id="private-v90-report" aria-live="polite" role="status"><p class="tiny">Start a research run to receive a conditional investment assessment, reasons, objections and a full audit of usable models.</p></div>
+      </div>
+      <details class="pane qf-v9-legacy"><summary>Previously completed research review (manual)</summary>
       <div class="pane" id="private-decision-center-v84">
         <span class="eyebrow">PRIVATE RESEARCH · INTEGRATED ASSESSMENT</span>
         <h2 style="margin:9px 0">Investment Decision Center</h2>
         <p class="qf-private-section-intro">Bring together the analyses already run in this session. See the covered investments, what the models agree or disagree about, which evidence is missing, and the next calculation to perform. Nothing here moves money or changes your virtual portfolio.</p>
         <div class="controls"><button class="btn primary" type="button" id="private-decision-run-v84">Assess current evidence</button><span class="tiny">Generated on demand · MFA-protected</span></div>
         <div id="private-decision-result-v84" aria-live="polite" style="margin-top:15px"><p class="tiny">Choose Assess current evidence to review your completed analyses.</p></div>
+      </div></details>
+    </section>
+    <section class="private-view" data-private-view="candidate" hidden>
+      <div class="pane"><span class="eyebrow">RESEARCH LAB · SINGLE COMPANY</span><h2>Company &amp; Factor Research</h2>
+      <p class="tiny">Expert methods and charts are collected here. The Decision Center uses eligible results automatically without requiring you to operate every model.</p>
         <section class="qf-v85-candidate" id="private-candidate-v85" aria-labelledby="private-candidate-title-v85">
           <span class="eyebrow">SINGLE-INVESTMENT RESEARCH</span><h3 id="private-candidate-title-v85">Candidate risk, valuation and portfolio scenarios</h3>
           <p class="tiny">Choose from the investments whose historical prices you actually loaded. Review SEC-derived company facts when available, observed-price valuation ratios, downside risk and a peer-relative return comparison. The selected peers are not a market-index factor model.</p>
@@ -2842,6 +2900,122 @@ if(typeof module==='object'&&module.exports)module.exports=api;
 root.QFPrivateFrenchFactorsV87=api;
 })(typeof window!=='undefined'?window:globalThis);
 
+/* QuantForge V9: deterministic and auditable research assessment. No IO, persistence or trading. */
+(function(root){
+'use strict';
+const finite=x=>typeof x==='number'&&Number.isFinite(x);
+const iso=x=>typeof x==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(x)&&!Number.isNaN(Date.parse(x));
+const pct=x=>(100*x).toFixed(1)+'%';
+function assess(raw){
+ const input=raw&&typeof raw==='object'?raw:{};
+ const now=Date.parse(input.asOf),d=input.dossier,portfolio=input.portfolio;
+ const risk=['conservative','balanced','growth'].includes(input.risk)?input.risk:'balanced';
+ const horizon=['short','medium','long'].includes(input.horizon)?input.horizon:'medium';
+ const maxWeight=finite(input.maxWeight)&&input.maxWeight>=.05&&input.maxWeight<=.5?input.maxWeight:.2;
+ const maxDrawdown=finite(input.maxDrawdown)&&input.maxDrawdown>=.1&&input.maxDrawdown<=.6?input.maxDrawdown:.25;
+ const symbols=Array.isArray(input.selection)?input.selection:[];
+ const evidence=[],gaps=[],pro=[],con=[],steps=[];
+ function record(key,title,state,detail,source){evidence.push({key,title,state,detail,source});}
+ function gap(text){if(!gaps.includes(text))gaps.push(text);}
+ const sym=typeof input.symbol==='string'?input.symbol:'';
+ const validHistory=!!d?.ready&&d.symbol===sym&&symbols.includes(sym)&&
+  Array.isArray(input.history?.symbols)&&input.history.symbols.length>=2&&
+  input.history.symbols.length<=5&&input.history.symbols.length===symbols.length&&
+  input.history.symbols.every(s=>symbols.includes(s))&&
+  d.history?.observations>=63&&iso(d.history?.end)&&Number.isFinite(now)&&
+  Date.parse(d.history.end)<=now&&now-Date.parse(d.history.end)<=7*86400000;
+ if(!validHistory)gap('Load fresh, matching historical prices for this candidate and the selected investments.');
+ record('history','Market evidence',validHistory?'available':'unavailable',validHistory?`${d.history.observations} aligned returns through ${d.history.end}`:'Selected investments and historical observations do not match or are older than seven days.','Candidate dossier · historical closes');
+ const fiscal=d?.fundamentals?.fiscalEnd;
+ const fundamentals=validHistory&&d.fundamentals?.available&&iso(fiscal)&&Date.parse(fiscal)<=now&&now-Date.parse(fiscal)<=800*86400000;
+ if(!fundamentals)gap('Refresh valid SEC statements for this issuer and confirm the fiscal period.');
+ let fundamentalState='unavailable';
+ if(fundamentals){
+  const f=d.fundamentals;
+  const positive=[f.revenueGrowth,f.operatingMargin,f.freeCashFlowMargin].filter(finite).filter(x=>x>0).length;
+  const negative=[f.revenueGrowth,f.operatingMargin,f.freeCashFlowMargin].filter(finite).filter(x=>x<0).length;
+  fundamentalState=negative>=2?'cautions':positive>=2?'supports':'mixed';
+  if(positive>=2)pro.push('At least two available annual growth/profitability/cash-generation indicators are positive.');
+  if(negative>0)con.push('At least one available SEC growth or profitability indicator is negative.');
+  if(!finite(f.freeCashFlowMargin))gap('Free-cash-flow comparability is missing for the latest SEC period.');
+ }
+ record('fundamentals','Company fundamentals',fundamentalState,fundamentals?`SEC fiscal ${fiscal}; revenue growth ${finite(d.fundamentals.revenueGrowth)?pct(d.fundamentals.revenueGrowth):'unavailable'}, operating margin ${finite(d.fundamentals.operatingMargin)?pct(d.fundamentals.operatingMargin):'unavailable'}, FCF margin ${finite(d.fundamentals.freeCashFlowMargin)?pct(d.fundamentals.freeCashFlowMargin):'unavailable'}.`:'No sufficiently recent, matched annual SEC figures.', 'Candidate dossier · reported SEC annual metrics');
+ const quoteTime=Date.parse(input.quote?.timestamp);
+ const validQuote=validHistory&&finite(input.quote?.price)&&input.quote.price>0&&Number.isFinite(quoteTime)&&quoteTime<=now&&now-quoteTime<=7*86400000&&input.quote.symbol===sym;
+ if(!validQuote)gap('Obtain a dated current market observation before considering a purchase or sale.');
+ const v=d?.valuation||{};
+ const validValuation=validQuote&&v.marketCapAvailable&&finite(v.pSales)&&v.pSales>=0&&finite(v.fcfYield);
+ let valState='unavailable';
+ if(validValuation){
+  valState=v.pSales>20||v.fcfYield<0?'cautions':v.fcfYield>0&&v.pSales<=10?'supports':'mixed';
+  if(valState==='supports')pro.push('Observed cash-flow yield is positive and price-to-sales is within the selected descriptive screening band.');
+  if(valState==='cautions')con.push('Price-to-sales exceeds 20 or observed free-cash-flow yield is negative; investigate business-specific valuation before adding exposure.');
+ }else gap('Match current quotes, shares and annual reporting periods to compute observed-price valuation ratios.');
+ record('valuation','Observed-price valuation',valState,validValuation?`P/S ${v.pSales.toFixed(2)}×; FCF yield ${pct(v.fcfYield)}. Descriptive thresholds, not intrinsic value.`:'Market-cap-based ratios missing or quote/filing context is incomplete.','V8.5 · observed-price valuation; no fair-value target');
+ const m=d?.metrics||{};
+ const validRisk=validHistory&&finite(m.maxDrawdown)&&m.maxDrawdown<=0&&finite(m.dailyES95)&&m.dailyES95>=0;
+ const breach=validRisk&&-m.maxDrawdown>maxDrawdown;
+ const esLimit=risk==='conservative'?.025:risk==='growth'?.06:.04;
+ const highTail=validRisk&&m.dailyES95>esLimit;
+ let riskState=validRisk?(breach||highTail?'cautions':'mixed'):'unavailable';
+ if(validRisk){
+  if(breach)con.push(`Observed maximum drawdown exceeded your selected ${pct(maxDrawdown)} tolerance.`);
+  if(highTail)con.push('Observed one-day expected shortfall exceeds the selected risk-screening limit.');
+  if(!breach&&!highTail)pro.push('Observed downside statistics were within the configured historical risk screens.');
+ }else gap('A complete aligned return sample is required for downside-risk evaluation.');
+ record('downside','Historical downside risk',riskState,validRisk?`Max drawdown ${pct(m.maxDrawdown)}, daily ES95 ${pct(m.dailyES95)}; tolerance ${pct(maxDrawdown)}.`:'Risk estimates unavailable.','V8.5 · historical drawdown and empirical tail loss');
+ const holdings=portfolio?.holdings;
+ const validPortfolio=validHistory&&portfolio&&finite(portfolio.cash)&&portfolio.cash>=0&&holdings&&typeof holdings==='object'&&!Array.isArray(holdings)&&d?.portfolioImpact&&finite(d.portfolioImpact.currentWeight);
+ const current=validPortfolio?d.portfolioImpact.currentWeight:null;
+ const concentrationBreach=validPortfolio&&current>maxWeight;
+ const addingBreach=validPortfolio&&current+.05>maxWeight;
+ const impactState=!validPortfolio?'unavailable':concentrationBreach||addingBreach?'cautions':'supports';
+ if(!validPortfolio)gap('Refresh virtual holdings and priced positions to assess portfolio concentration.');
+ if(validPortfolio){
+  if(concentrationBreach)con.push('Current candidate concentration exceeds your configured single-name limit.');
+  else if(addingBreach)con.push('An additional hypothetical 5% allocation would breach the single-name limit.');
+  else pro.push('A hypothetical 5% allocation does not breach the selected concentration limit.');
+ }
+ record('portfolio','Portfolio fit',impactState,validPortfolio?`Current weight ${pct(current)}; single-name limit ${pct(maxWeight)}. Illustration assumes cash-funded purchases.`:'Portfolio impact withheld because priced virtual positions are incomplete.','V8.5 · hypothetical portfolio impact');
+ const wf=input.walkforward,history=input.history;
+ const validWalk=validHistory&&wf&&Array.isArray(wf.symbols)&&wf.symbols.length===symbols.length&&wf.symbols.every(s=>symbols.includes(s))&&Array.isArray(wf.windows)&&wf.windows.length>=2&&finite(wf.optimized?.metrics?.change)&&finite(wf.benchmark?.metrics?.change)&&iso(wf.end)&&history.dates.includes(wf.end);
+ if(validWalk&&wf.optimized.metrics.change<wf.benchmark.metrics.change)con.push('The multi-asset allocation trailed its historical equal-weight benchmark in tested windows. This is not candidate-specific evidence.');
+ record('walkforward','Strategy robustness',validWalk?(wf.optimized.metrics.change>=wf.benchmark.metrics.change?'mixed':'cautions'):'unavailable',validWalk?`Multi-asset walk-forward: strategy ${pct(wf.optimized.metrics.change)} versus equal weight ${pct(wf.benchmark.metrics.change)}; not a single-company forecast.`:'Walk-forward results missing or not matched to the selected universe.','Research Lab · past-only walk-forward, portfolio scope');
+ const ff=input.french;
+ const validFF=validHistory&&ff?.ready&&ff.symbol===sym&&ff.aligned>=100;
+ record('factors','Independent factors',validFF?'mixed':'unavailable',validFF?'Imported independent FF3 sample is available; estimated exposures are descriptive, not expected returns.':'No eligible, imported official daily factor sample for this candidate.','V8.7 · independent FF3 (optional; user-supplied CSV)');
+ if(horizon==='short')con.push('Short investment horizon may be inconsistent with historical equity downside.');
+ const critical=validHistory&&fundamentals&&validQuote&&validRisk&&validPortfolio;
+ let decision='Insufficient evidence';let reason='A material required input is unavailable, stale or mismatched; the system will not infer a trade from incomplete data.';
+ if(critical){
+  if(concentrationBreach){decision='Review / consider reducing exposure';reason='The observed portfolio weight exceeds your stated concentration ceiling; reassess exposure before increasing it.';}
+  else if(breach||highTail||addingBreach){decision=current>0?'Hold / avoid increasing':'Avoid adding for now';reason='Historical downside or portfolio concentration exceeds at least one of your explicit constraints.';}
+  else if(fundamentalState==='cautions'||valState==='cautions'){decision='Research further before adding';reason='The available fundamental or valuation context raises meaningful objections even though the risk screens may pass.';}
+  else if(!validValuation){decision='Research further before adding';reason='Risk and fundamentals are available, but the observed-price valuation case is incomplete.';}
+  else if(current>0){decision='Hold / monitor';reason='Available evidence does not breach the specified screening limits; this is a monitoring assessment, not a return prediction.';}
+  else if(fundamentalState==='supports'&&valState==='supports'&&horizon!=='short'){
+   decision='Consider a small position (conditional)';reason='Positive fundamental screens, available valuation ratios and selected risk/weight limits are compatible; review assumptions before any transaction.';
+  }else{decision='Research further before adding';reason='Available evidence is mixed or does not establish a sufficiently clear case under the selected screens.';}
+ }
+ steps.push(...gaps);
+ if(validPortfolio&&addingBreach)steps.push('Compare a smaller hypothetical allocation under the configured concentration limit.');
+ if(validWalk&&wf.optimized.metrics.change<wf.benchmark.metrics.change)steps.push('Investigate the multi-asset strategy underperformance in Research Lab.');
+ if(!validFF)steps.push('Optional: import and validate daily FF3 factors for descriptive exposures.');
+ const checked=evidence.filter(x=>x.state!=='unavailable').length;
+ return {schema:'quantforge.research-os.v9.0',policy:'explicit-screens.v1',symbol:sym,asOf:input.asOf||null,decision,reason,
+  summary:`${checked} of ${evidence.length} evidence categories available. ${critical?'Required data gates passed.':'Required data gates not all satisfied.'}`,
+  evidence,pro,con,gaps,steps:steps.slice(0,9),constraints:{risk,horizon,maxWeight,maxDrawdown},
+  readiness:critical?'required-inputs-valid':'withheld',
+  limitations:['Screening cutoffs are configurable research assumptions, not learned return probabilities or calibrated predictions.',
+   'Financial-statement dates, observed market prices and historical return windows are different evidence types.',
+   'Portfolio walk-forward analysis is not candidate-specific proof. Correlated metrics are not counted as independent votes.',
+   'No virtual or live trade is initiated or authorized by this report.']};
+}
+const api=Object.freeze({assess});
+if(typeof module==='object'&&module.exports)module.exports=api;
+root.QFPrivateResearchOSV90=api;
+})(typeof window!=='undefined'?window:globalThis);
+
 /* QuantForge private research: pure in-sample portfolio analytics.
  * No external requests, synthetic data, brokerage orders, or portfolio mutations.
  * The public demo model is deliberately not imported here.
@@ -3668,6 +3842,90 @@ root.QFPrivateFrenchFactorsV87=api;
 const $=id=>document.getElementById(id);
 let guideReportV79=null;
 let privateDecisionCenterV84=null;
+let researchOSRunV90=0, researchOSInternalLoadV90=false;
+let candidateDossierV90=null,candidateQuoteV90=null;
+function clearResearchOSV90(){
+ researchOSRunV90++;
+ candidateDossierV90=null;candidateQuoteV90=null;
+ const report=$('private-v90-report');
+ if(report)report.textContent='Research inputs changed. Run complete research to rebuild an evidence-linked assessment.';
+}
+function refreshResearchOSChoicesV90(){
+ const picker=$('private-v90-candidate');if(!picker)return;
+ const prior=picker.value;
+ picker.innerHTML='<option value="">Select a candidate</option>'+researchSelection.map(s=>
+  '<option value="'+safe(s)+'">'+safe(assetNames[s]||s)+' ('+safe(s)+')</option>').join('');
+ if(researchSelection.includes(prior))picker.value=prior;
+ else if(researchSelection.length)picker.value=researchSelection[0];
+ const note=$('private-v90-selection');
+ if(note)note.textContent=researchSelection.length?
+  'Research universe: '+researchSelection.map(s=>assetNames[s]||s).join(' · ')+' · '+researchSelection.length+' selected. Company assessment uses the chosen candidate; portfolio strategies use the complete selection.':
+  'Choose 2–5 investments with Browse companies by name; select the candidate from the list.';
+}
+function renderResearchOSV90(result){
+ const out=$('private-v90-report');if(!out)return;
+ const list=(xs,empty)=>'<ul class="tiny">'+(xs.length?xs:[empty]).map(x=>'<li>'+safe(x)+'</li>').join('')+'</ul>';
+ const cells=result.evidence.map(e=>'<article class="qf-v9-evidence"><strong>'+safe(e.title)+'</strong><span class="tiny"> · '+safe(e.state)+'</span><p>'+safe(e.detail)+'</p><small class="tiny">Source: '+safe(e.source)+'</small></article>').join('');
+ out.innerHTML='<div class="qf-v9-result"><span class="eyebrow">AUTOMATED RESEARCH · '+safe(result.policy)+'</span><h3>'+safe(result.decision)+'</h3><p>'+safe(result.reason)+'</p><p class="tiny">'+safe(result.summary)+' · '+safe(result.symbol)+' · As of '+safe(result.asOf||'unavailable')+'</p></div>'+
+ '<div class="qf-v9-grid"><div><h3>Why this assessment?</h3>'+list(result.pro,'No supporting quantitative screens are currently verified.')+'</div><div><h3>Reasons for caution</h3>'+list(result.con,'No threshold breaches detected in completed checks; missing evidence can still change this assessment.')+'</div></div>'+
+ '<h3>Evidence from your research models</h3><div class="qf-v9-grid">'+cells+'</div>'+
+ '<details class="pane"><summary>Required data and follow-up research</summary>'+list(result.steps,'Review assumptions and refresh observations before making a financial decision.')+'</details>'+
+ '<details class="pane"><summary>Policy assumptions and important limitations</summary><p class="tiny">Risk approach: '+safe(result.constraints.risk)+' · Horizon: '+safe(result.constraints.horizon)+' · Single-name limit: '+(100*result.constraints.maxWeight).toFixed(0)+'% · Drawdown screen: '+(100*result.constraints.maxDrawdown).toFixed(0)+'%</p>'+list(result.limitations,'No additional limitations.')+'</details>'+
+ '<div class="controls"><button type="button" class="btn" data-private-tab="lab">Inspect models &amp; charts</button><button type="button" class="btn" data-private-tab="trade">Compare hypothetical portfolio impact</button></div>';
+}
+async function runResearchOSV90(){
+ if(!privateState){message('Sign in with MFA before running research.');return;}
+ const status=$('private-v90-report'),button=$('private-v90-run');
+ let selected=[...researchSelection];
+ if(selected.length<2){
+  const held=Object.entries(privateState.holdings||{}).filter(([,qty])=>finite(qty)&&qty>0).map(([sym])=>sym).slice(0,5);
+  if(held.length>=2){researchSelection=held;renderResearchSelection();selected=[...researchSelection];}
+ }
+ if(selected.length<2||selected.length>5){
+  status.textContent='Choose 2–5 investments to establish comparable history. Browse by name, then select which one to assess.';
+  return;
+ }
+ let sym=$('private-v90-candidate').value;
+ if(!selected.includes(sym))sym=selected[0];
+ $('private-v90-candidate').value=sym;
+ const id=++researchOSRunV90,session=privateState;
+ button.disabled=true;
+ status.textContent='Step 1/4: loading dated and matched market history…';
+ try{
+  // Always refresh the selected period; never reuse old hidden model outputs.
+  $('private-history-days').value=$('private-v90-days').value;
+  researchOSInternalLoadV90=true;
+  try{await loadHistory();}finally{researchOSInternalLoadV90=false;}
+  if(id!==researchOSRunV90||!privateState||privateState!==session||selected.join(',')!==researchSelection.join(','))return;
+  if(!historySeries||historySeries.symbols.length!==selected.length||!selected.every(s=>historySeries.symbols.includes(s)))
+   throw Error('Current selected investments have no matching valid historical observations. No decision was generated.');
+  status.textContent='Step 2/4: computing eligible portfolio and strategy models…';
+  runOptimization();
+  if(historySeries.dates.length>=110)runWalkforward();
+  if(walkforwardResult?.windows?.length>=3)runV68Robustness();
+  if(id!==researchOSRunV90||!privateState)return;
+  refreshCandidateChoicesV85();
+  $('private-candidate-select-v85').value=sym;
+  status.textContent='Step 3/4: retrieving company filings, dated quotes, and candidate-specific risk…';
+  await runCandidateDossierV85();
+  if(id!==researchOSRunV90||!privateState||privateState!==session||sym!==$('private-v90-candidate').value)return;
+  const ff=frenchFactorsV87?window.QFPrivateFrenchFactorsV87.assess({history:historySeries,selection:researchSelection,symbol:sym,factors:frenchFactorsV87}):null;
+  status.textContent='Step 4/4: reconciling the evidence against your risk criteria…';
+  const assessment=window.QFPrivateResearchOSV90.assess({
+   asOf:new Date().toISOString(),symbol:sym,selection:researchSelection,history:historySeries,
+   dossier:candidateDossierV90,quote:candidateQuoteV90||quoted[sym]||null,
+   portfolio:privateState,optimizer:optimizerResult,walkforward:walkforwardResult,
+   robustness:robustnessResultV68,french:ff,
+   risk:$('private-v90-risk').value,horizon:$('private-v90-horizon').value,
+   maxWeight:Number($('private-v90-maxweight').value),maxDrawdown:Number($('private-v90-maxdrawdown').value)
+  });
+  if(id!==researchOSRunV90||!privateState)return;
+  renderResearchOSV90(assessment);
+  message('Automated research assessment completed; no trades or external AI services were used.');
+ }catch(e){if(id===researchOSRunV90&&privateState)status.textContent='Research incomplete: '+String(e.message||e)+' You can inspect individual models in Research Lab.';}
+ finally{if(id===researchOSRunV90)button.disabled=false;}
+}
+
 function clearDecisionCenterV84(){
  privateDecisionCenterV84=null;
  const out=$('private-decision-result-v84');
@@ -3764,6 +4022,7 @@ function runFrenchV87(){
 let candidateRequestV85=0;
 function clearCandidateDossierV85(){
  candidateRequestV85++;
+ candidateDossierV90=null;candidateQuoteV90=null;
  const supplemental=$('private-v86-output');if(supplemental)supplemental.textContent='';
  const official=$('private-v87-factor-output');if(official)official.textContent='';
  const out=$('private-candidate-output-v85');
@@ -3934,6 +4193,7 @@ async function runCandidateDossierV85(){
  let value=null;
  if(company&&capital&&q){try{value=window.QFPrivateValueV73.build(company,capital,q,new Date().toISOString());}catch(_){/* Valuation withheld when issuer or dates disagree. */}}
  const dossier=window.QFPrivateCandidateV85.evaluate({symbol:sym,selection:researchSelection,history:h,company,value,portfolio:session,quotes:quoted,now:new Date().toISOString()});
+ candidateDossierV90=dossier;candidateQuoteV90=q||quoted[sym]||null;
  renderCandidateDossierV85(dossier);
  const proxyChoices=[$('private-v86-proxy1').value,$('private-v86-proxy2').value].filter(Boolean);
  const factorResult=window.QFPrivateFactorScenariosV86.assess({
@@ -4011,7 +4271,7 @@ function clearMFA(){
   $('private-mfa-setup-actions').hidden=true;
 }
 async function handleAuthState(state){
-  if(state.signed_in){clearMFA();showStep('ready');await loadState();privatePeers();return;}
+  if(state.signed_in){clearMFA();showStep('ready');await loadState();privateTab('decision');privatePeers();return;}
   if(!state.mfa_required){clearMFA();showStep('login');return;}
   showStep('mfa');
   if(state.mfa_setup){
@@ -4030,6 +4290,7 @@ async function handleAuthState(state){
 }
 async function loadState(){
   clearAllocationV74();
+  clearResearchOSV90();
   clearGuideV79();
   const d=await api('private/state');privateState=d.portfolio;version=d.version;
   quoted={}; // Never carry fictional quotes across a private session.
@@ -4091,6 +4352,7 @@ async function verifyMFA(){
   }catch(e){message(e.message);}
 }
 async function logout(){
+  clearResearchOSV90();
   try{await api('auth/logout',{});}catch(_){ /* Clear visible private content regardless */ }
   ideasRunSequence++;ideaData=[];ideaFundamentals={};$('ideas-results').textContent='';$('ideas-run').disabled=false;clearDecisionBrief();
   clearImportedFrenchV87();clearGuideV79();clearMFA();showStep('login');privateState=null;quoted={};historyLoadSequence++;historySeries=null;closeAssetBrowser();researchSelection=[];$('private-symbol').value='';$('private-selected-asset').textContent='No investment selected';renderResearchSelection();
@@ -4174,6 +4436,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-page],[dat
 /* Private asset directory: click-to-select. Name search is optional. */
 function renderResearchSelection(){
  const target=$('private-history-selection');
+ refreshResearchOSChoicesV90();
  $('private-history-symbols').value=researchSelection.join(',');
  if(!researchSelection.length){target.textContent='Choose investments to compare.';return;}
  target.innerHTML=researchSelection.map(symbol=>'<button type="button" class="asset-chip" data-research-remove="'+safe(symbol)+'" aria-label="Remove '+safe(symbol)+'">'+safe(assetNames[symbol]||symbol)+' ('+safe(symbol)+') ×</button>').join('');
@@ -4419,6 +4682,7 @@ function refreshResearchContext(){
  }
 }
 function invalidateResearchHistory(reason){
+ if(!researchOSInternalLoadV90)clearResearchOSV90();
  clearGuideV79();
  historyLoadSequence++;
  historySeries=null;optimizerResult=null;walkforwardResult=null;clearV66Walkforward();
@@ -4439,6 +4703,7 @@ function displayTable(headers,rows){return '<div class="table-wrap"><table><thea
 function privateTab(tab){
  if(tab==='decision')clearDecisionCenterV84();
  if(tab==='decision')refreshCandidateChoicesV85();
+ if(tab==='decision')refreshResearchOSChoicesV90();
  const shared=$('private-research-dataset');if(shared)shared.hidden=!['research','optimization','backtest','walkforward'].includes(tab);
  refreshResearchContext();
  document.querySelectorAll('[data-private-view]').forEach(p=>p.hidden=p.dataset.privateView!==tab);
@@ -4980,6 +5245,12 @@ for(const id of ['private-fc-years','private-fc-growth','private-fc-margin','pri
 }
 
 document.querySelectorAll('[data-private-tab]').forEach(b=>b.addEventListener('click',()=>privateTab(b.dataset.privateTab)));
+$('private-v90-browse').addEventListener('click',()=>openAssetBrowser('research'));
+$('private-v90-run').addEventListener('click',runResearchOSV90);
+$('private-v90-report').addEventListener('click',e=>{const b=e.target.closest('[data-private-tab]');if(b&&privateState&&['lab','trade','research','candidate'].includes(b.dataset.privateTab))privateTab(b.dataset.privateTab);});
+for(const id of ['private-v90-candidate','private-v90-risk','private-v90-horizon','private-v90-maxweight','private-v90-maxdrawdown','private-v90-days'])
+ $(id).addEventListener('change',clearResearchOSV90);
+
 $('private-decision-run-v84').addEventListener('click',runDecisionCenterV84);
 $('private-candidate-run-v85').addEventListener('click',runCandidateDossierV85);
 $('private-v87-factor-file').addEventListener('change',importFrenchV87);
@@ -4996,7 +5267,7 @@ $('private-decision-result-v84').addEventListener('click',e=>{
  const b=e.target.closest('[data-v84-go]');
  if(!b||!privateState)return;
  const route=b.dataset.v84Go;
- if(['home','trade','ideas','research','optimization','walkforward','valuation'].includes(route))privateTab(route);
+ if(['home','trade','ideas','research','optimization','walkforward','valuation','candidate','lab'].includes(route))privateTab(route);
 });
 $('private-guide-run-v79').addEventListener('click',runGuideV79);
 $('private-guide-export-v79').addEventListener('click',()=>{
