@@ -39,6 +39,7 @@ function runDecisionCenterV84(){
 let candidateRequestV85=0;
 function clearCandidateDossierV85(){
  candidateRequestV85++;
+ const supplemental=$('private-v86-output');if(supplemental)supplemental.textContent='';
  const out=$('private-candidate-output-v85');
  if(out)out.textContent='Research inputs may have changed. Run the candidate analysis again.';
  const button=$('private-candidate-run-v85');if(button)button.disabled=false;
@@ -53,6 +54,75 @@ function refreshCandidateChoicesV85(){
  picker.innerHTML='<option value="">'+(matched?'Choose a loaded investment':'Load matching market history first')+'</option>'+
   choices.map(sym=>'<option value="'+safe(sym)+'">'+safe(assetNames[sym]||sym)+' ('+safe(sym)+')</option>').join('');
  if(choices.includes(prev))picker.value=prev;
+ refreshFactorChoicesV86();
+}
+const MARKET_ETFS_V86=['SPY','VTI','VOO','IVV'];
+const PROXY_ETFS_V86=['IWM','IWD','IVE','IWF','IWO','QQQ','VTV','VUG','VB','VBR'];
+function refreshFactorChoicesV86(){
+ const symbols=historySeries?.symbols||[];
+ const candidate=$('private-candidate-select-v85')?.value||'';
+ for(const [id,allowed,empty] of [
+  ['private-v86-benchmark',MARKET_ETFS_V86,'No loaded market ETF'],
+  ['private-v86-proxy1',PROXY_ETFS_V86,'None'],
+  ['private-v86-proxy2',PROXY_ETFS_V86,'None']]){
+  const select=$(id);if(!select)continue;
+  const old=select.value;
+  const found=symbols.filter(s=>s!==candidate&&allowed.includes(s));
+  select.innerHTML='<option value="">'+safe(empty)+'</option>'+found.map(s=>
+   '<option value="'+safe(s)+'">'+safe(assetNames[s]||s)+' ('+safe(s)+')</option>').join('');
+  if(found.includes(old))select.value=old;
+ }
+}
+function renderFactorScenariosV86(r){
+ const out=$('private-v86-output');if(!out)return;
+ if(!r.ready){out.textContent=r.reason;return;}
+ const pct=n=>finite(n)?(n*100).toFixed(2)+'%':'Unavailable';
+ const num=n=>finite(n)?n.toFixed(3):'Unavailable';
+ const money=n=>finite(n)?'$'+n.toFixed(2):'Unavailable';
+ const m=r.market,d=r.risk,v=r.valuation;
+ const note=txt=>'<p class="tiny">'+safe(txt)+'</p>';
+ const labels=(m.ready?'<p>'+safe(m.benchmark)+' benchmark · '+safe(m.observations)+' shared daily returns · '+safe(m.from)+' to '+safe(m.to)+'</p>'+displayTable(
+   ['Market comparison','Observed measure'],[
+    ['Broad-market ETF beta',num(m.singleBeta)],['Return correlation',num(m.marketCorrelation)],
+    ['Single-benchmark R²',pct(m.singleR2)],['Candidate period price change',pct(m.candidatePeriodReturn)],
+    ['Market ETF period price change',pct(m.marketPeriodReturn)]
+   ])+(m.multi.ready?'<h4>Additional ETF proxy regression</h4>'+displayTable(['Regressor','Estimated return sensitivity'],
+    m.multi.predictorLabels.map((x,i)=>[x,num(m.multi.coefficients[i])]))+
+    displayTable(['Model diagnostic','Result'],[['Adjusted R²',pct(m.multi.adjustedR2)],
+    ['Annualized residual volatility',pct(m.multi.residualAnnualVolatility)],
+    ['Raw-return daily intercept (not CAPM alpha)',pct(m.multi.rawDailyIntercept)]]):note(m.multi.reason)):
+   '<p class="notice">'+safe(m.reason)+'</p>');
+ let risk='';
+ if(d.ready){
+  const points=d.rollingPoints;
+  let graph='';
+  if(points.length>=2){
+   const top=Math.max(.001,...points.map(p=>p.value));
+   const poly=points.map((p,i)=>(32+i*500/(points.length-1)).toFixed(1)+','+(149-p.value/top*120).toFixed(1)).join(' ');
+   graph='<figure><svg class="qf-v86-risk-chart" viewBox="0 0 570 184" role="img" aria-label="Rolling 63-session annualized historical volatility in chronological order"><line x1="32" y1="149" x2="532" y2="149" stroke="#bacfc2"/><polyline points="'+poly+'" fill="none" stroke="#1b7462" stroke-width="3"/><text x="32" y="173" font-size="12">'+safe(points[0].date)+'</text><text x="532" y="173" text-anchor="end" font-size="12">'+safe(points.at(-1).date)+'</text></svg><figcaption class="tiny">Sampled 63-session rolling annualized volatility, 252 equity sessions per year; not a volatility forecast.</figcaption></figure>';
+  }
+  risk=displayTable(['Observed historical downside','Result'],[
+   ['Maximum peak-to-trough drawdown',pct(d.maxDrawdown)],
+   ['Drawdown peak → trough',d.drawdownPeak+' → '+d.drawdownTrough],
+   ['Longest underwater spell (sessions)',String(d.longestUnderwaterSessions)],
+   ['Current underwater spell (sessions)',String(d.underwaterNow)],
+   ['Latest rolling 63-session volatility',pct(d.latestRolling63Volatility)],
+   ['Highest rolling 63-session volatility',pct(d.highestRolling63Volatility)],
+   ['Worst observed 20-session change',pct(d.worst20?.change)],
+   ['Worst 20-session window',d.worst20?d.worst20.from+' → '+d.worst20.to:'Unavailable']
+  ])+graph;
+ }else risk='<p class="notice">'+safe(d.reason)+'</p>';
+ let valuation='';
+ if(v.ready){
+  valuation=note('Observed quote '+v.quoteTime+' · observed P/S '+num(v.observedPS)+'× · scenario horizon '+v.years+' year(s). Multipliers below are percentages of the current P/S multiple, not assumed absolute P/S values.')+
+   displayTable(['Annual revenue growth','Terminal P/S / current P/S','Conditional price change','Conditional implied price'],
+   v.scenarios.map(x=>[pct(x.growth),num(x.multipleRatio)+'×',pct(x.priceChange),money(x.impliedPrice)]))+
+   note(v.assumptions);
+ }else valuation='<p class="notice">'+safe(v.reason)+'</p>';
+ out.innerHTML='<div class="qf-v86-report"><span class="eyebrow">DEEPER CANDIDATE RESEARCH · V8.6</span><h3>Market exposures, rolling downside and valuation sensitivity</h3>'+note('All figures below are descriptive, session-local, and use the currently loaded candidate; no model here places or proposes a trade.')+
+  '<h4>Explicit broad-market ETF comparison</h4>'+labels+'<h4>Historical downside diagnostics</h4>'+risk+
+  '<h4>Observed-price valuation sensitivity (not fair value)</h4>'+valuation+
+  '<h4>Methods and limitations</h4><ul class="tiny">'+r.limitations.map(x=>'<li>'+safe(x)+'</li>').join('')+'</ul></div>';
 }
 function candidateChartV85(d){
  const data=d.graph;if(!data||!data.candidate?.length)return '';
@@ -139,6 +209,12 @@ async function runCandidateDossierV85(){
  if(company&&capital&&q){try{value=window.QFPrivateValueV73.build(company,capital,q,new Date().toISOString());}catch(_){/* Valuation withheld when issuer or dates disagree. */}}
  const dossier=window.QFPrivateCandidateV85.evaluate({symbol:sym,selection:researchSelection,history:h,company,value,portfolio:session,quotes:quoted,now:new Date().toISOString()});
  renderCandidateDossierV85(dossier);
+ const proxyChoices=[$('private-v86-proxy1').value,$('private-v86-proxy2').value].filter(Boolean);
+ const factorResult=window.QFPrivateFactorScenariosV86.assess({
+  history:h,selection:researchSelection,symbol:sym,benchmark:$('private-v86-benchmark').value,
+  proxies:proxyChoices,value,years:Number($('private-v86-years').value)
+ });
+ renderFactorScenariosV86(factorResult);
  $('private-candidate-run-v85').disabled=false;
  message('Private candidate analysis calculated. No portfolio changes or broker orders.');
 }
@@ -1180,7 +1256,9 @@ for(const id of ['private-fc-years','private-fc-growth','private-fc-margin','pri
 document.querySelectorAll('[data-private-tab]').forEach(b=>b.addEventListener('click',()=>privateTab(b.dataset.privateTab)));
 $('private-decision-run-v84').addEventListener('click',runDecisionCenterV84);
 $('private-candidate-run-v85').addEventListener('click',runCandidateDossierV85);
-$('private-candidate-select-v85').addEventListener('change',clearCandidateDossierV85);
+$('private-candidate-select-v85').addEventListener('change',()=>{refreshFactorChoicesV86();clearCandidateDossierV85();});
+for(const id of ['private-v86-benchmark','private-v86-proxy1','private-v86-proxy2','private-v86-years'])
+ $(id).addEventListener('change',clearCandidateDossierV85);
 $('private-candidate-output-v85').addEventListener('click',e=>{
  const b=e.target.closest('[data-v85-go]');
  if(b&&privateState&&['valuation','trade'].includes(b.dataset.v85Go))privateTab(b.dataset.v85Go);
