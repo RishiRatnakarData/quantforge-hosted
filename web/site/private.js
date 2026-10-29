@@ -2,13 +2,13 @@
 (function () {
 'use strict';
 const $=id=>document.getElementById(id);
-let guideReportV79=null, linkedResearchBriefV93=null, linkedResearchIntelligenceV94=null, linkedResearchDiagnosticsV95=null;
+let guideReportV79=null, linkedResearchBriefV93=null, linkedResearchIntelligenceV94=null, linkedResearchDiagnosticsV95=null,linkedResearchProtocolV96=null;
 let researchSessionJournalV95=[];
 let privateDecisionCenterV84=null;
 let researchOSRunV90=0, researchOSInternalLoadV90=false;
 let candidateDossierV90=null,candidateQuoteV90=null,candidateFactorV91=null;
 function clearResearchOSV90(){
- linkedResearchBriefV93=null;linkedResearchIntelligenceV94=null;linkedResearchDiagnosticsV95=null;
+ linkedResearchBriefV93=null;linkedResearchIntelligenceV94=null;linkedResearchDiagnosticsV95=null;linkedResearchProtocolV96=null;
  if(typeof refreshConnectedResearchV93==='function')refreshConnectedResearchV93();
  researchOSRunV90++;
  candidateDossierV90=null;candidateQuoteV90=null;candidateFactorV91=null;
@@ -47,6 +47,12 @@ function renderResearchOSV90(result,variants){
    maxWeight:review.constraints.maxWeight
   });
  }catch(err){console.warn('Portfolio diagnostics unavailable:',String(err.message||err).slice(0,100));}
+ linkedResearchProtocolV96=null;
+ try{linkedResearchProtocolV96=window.QFPrivateResearchIntelligenceV96.build({
+  portfolio:privateState,quotes:quoted,history:historySeries,selection:researchSelection,
+  snapshot:window.QFPublishedSEC,symbol:linkedResearchBriefV93.symbol,
+  asOf:review.asOf||new Date().toISOString(),limit:review.constraints.maxDrawdown,feeBps:10
+ });}catch(err){console.warn('V9.6 additional research unavailable:',String(err.message||err).slice(0,100));}
  researchSessionJournalV95.unshift({
   date:String(review.asOf||'').slice(0,10),symbol:String(review.symbol||'').slice(0,20),
   action:String(review.action||'').slice(0,120),readiness:String(review.readiness||'').slice(0,50),
@@ -140,9 +146,75 @@ function renderResearchDiagnosticsV95(){
   '<p class="tiny">No completed assessment stored in this browser session. Session history is cleared when you sign out or reload; download an evidence briefing to keep a record.</p>';
  }
 }
+function renderResearchProtocolV96(){
+ const data=linkedResearchProtocolV96;
+ const pct=x=>typeof x==='number'&&Number.isFinite(x)?(100*x).toFixed(2)+'%':'Unavailable';
+ const num=x=>typeof x==='number'&&Number.isFinite(x)?String(x):'Unavailable';
+ const table=(heads,rows)=>'<div class="table-wrap"><table class="qf-v95-table"><thead><tr>'+heads.map(x=>'<th scope="col">'+safe(x)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+row.map(x=>'<td>'+safe(x)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
+ for(const id of ['qf-v96-hub','qf-v96-brief']){
+  const target=$(id);if(!target)continue;
+  if(!data){target.textContent='';continue;}
+  const h=data.historical,f=data.financial,a=data.allocation;
+  const policy=h.ready?'<p>'+safe(h.period.windows)+' disjoint later evaluation windows, '+safe(h.summary.blockedWindows)+' in cash under the drawdown screen; '+safe(h.summary.feeBps)+' bps transaction costs.</p>'+
+   table(['Past-only risk screen','Model (after costs)','Buy-and-hold (after entry fee)'],[
+    ['Total observed return',pct(h.summary.netScreenReturn),pct(h.summary.netPassiveReturn)],
+    ['Window-end maximum drawdown',pct(h.summary.screenMaxDrawdown),pct(h.summary.passiveMaxDrawdown)]])+table(['Training ends','Later test ends','Risk gate','Observed model result'],h.windows.map(w=>[w.trainThrough,w.outOfSampleThrough,w.riskScreenPassed?'Invested':'Held cash',pct(w.netModelReturn)])):
+   '<p>'+safe(h.reason)+'</p>';
+  const flow=f.ready?table(['SEC issuer','FY ended','FCF margin','Annual FCF change','Capex/revenue','Operating cash/net income'],
+   f.rows.map(w=>[assetNames[w.symbol]||w.symbol,w.fiscalEnd||'Unavailable',pct(w.fcfMargin),pct(w.fcfGrowth),pct(w.capexIntensity),w.cfoCoverage===null?'Unavailable':num(w.cfoCoverage.toFixed(2))])):
+   '<p>'+safe(f.reason)+'</p>';
+  const allocation=a.ready?'<p>Baseline annualized volatility: '+pct(a.base.annualVolatility)+'; historical daily ES (95%): '+pct(a.base.dailyES95)+'.</p>'+table(['Cash-funded scenario','Candidate weight','Cash weight','Annual volatility','Change vs current','Daily ES 95%'],a.rows.map(w=>[
+   '+'+w.additionalCashPercent+'%',w.ready?pct(w.newCandidateWeight):w.reason,w.ready?pct(w.newCashWeight):'Unavailable',w.ready?pct(w.annualVolatility):'Unavailable',w.ready?pct(w.deltaVolatility):'Unavailable',w.ready?pct(w.dailyES95):'Unavailable'])):
+   '<p>'+safe(a.reason)+'</p>';
+  target.innerHTML='<section class="qf-v95-shell qf-v96-shell" aria-label="V9.6 connected decision research">'+
+   '<div class="qf-v95-heading"><span class="eyebrow">V9.6 · CONNECTED INVESTMENT RESEARCH</span><h3>Historical validation, company cash flow and portfolio scenarios</h3><p>All three analyses share the current assessment and cannot override required evidence constraints or execute an order.</p></div>'+
+   '<div class="qf-v95-grid"><section class="qf-v95-panel"><h4>Past-only risk rule versus passive holding</h4>'+policy+'<p class="tiny">'+safe(h.limitations?.join(' ')||h.reason)+'</p></section>'+
+   '<section class="qf-v95-panel"><h4>Reported-company cash-flow quality</h4>'+flow+'<p class="tiny">'+safe(f.note||f.reason)+'</p></section>'+
+   '<section class="qf-v95-panel"><h4>Portfolio-weighted cash-funded scenarios</h4>'+allocation+'<p class="tiny">'+safe(a.note||a.reason)+'</p></section>'+
+   '<section class="qf-v95-panel"><h4>What these models establish</h4><p>A transaction-cost-aware historical risk screen, comparisons of actual SEC cash flows, and hypothetical allocations using a fully covered virtual portfolio.</p><p>They do not reconstruct historical SEC publication dates, prove predictive skill, price a stock, or determine suitability.</p><div class="controls"><button class="btn sm" type="button" data-private-tab="walkforward">Walk-forward methods</button><button class="btn sm" type="button" data-private-tab="valuation">Valuation Lab</button></div></section></div></section>';
+ }
+ renderSavedResearchV96();
+ const lab=$('qf-v96-lab-insight');
+ if(lab)lab.textContent=data?'V9.6: historical transaction-cost evaluation '+(data.historical.ready?'ready':'unavailable')+'; SEC cash-flow coverage '+(data.financial.ready?data.financial.coverage:0)+'; full-portfolio scenarios '+(data.allocation.ready?'ready':'withheld')+'.':'V9.6 research validation connects after a completed Research Hub assessment.';
+}
+function renderSavedResearchV96(){
+ const list=$('qf-v96-saved-list'),save=$('qf-v96-save'),archive=$('qf-v96-archive-status');
+ if(save)save.disabled=!privateState||!linkedResearchBriefV93;
+ if(!list||!archive)return;
+ if(!privateState){list.textContent='Sign in with MFA to access saved research.';archive.textContent='Owner-only archive';return;}
+ const notes=Array.isArray(privateState.notes)?privateState.notes:[];
+ const saved=notes.map((n,i)=>({record:window.QFPrivateResearchIntelligenceV96.readArchive(n),i})).filter(x=>x.record);
+ archive.textContent=saved.length+' saved assessments in your authenticated private notes. These remain available across browser sessions.';
+ list.innerHTML=saved.length?saved.map(({record:x,i})=>
+  '<div class="qf-v95-journal-row"><strong>'+safe(assetNames[x.symbol]||x.symbol)+'</strong> · '+safe(x.date)+' · '+safe(x.action)+'<p class="tiny">'+safe(x.readiness)+' · '+safe(x.covered)+' methods · '+safe(x.universe.join(', '))+'</p><button type="button" class="btn sm" data-v96-delete="'+i+'">Delete saved assessment</button></div>').join(''):
+  '<p class="tiny">No saved assessment yet. Complete a new assessment, then choose Save assessment. Only a short evidence summary is retained.</p>';
+}
+async function saveResearchV96(){
+ if(!privateState||!linkedResearchBriefV93){message('Run a current assessment before saving.');return;}
+ const notes=Array.isArray(privateState.notes)?privateState.notes:[];
+ if(notes.length>=100){message('The private notes archive is full; remove an old entry before saving.');return;}
+ const record=window.QFPrivateResearchIntelligenceV96.archiveRecord(linkedResearchBriefV93,new Date().toISOString());
+ const was=version,session=privateState;
+ try{const d=await api('private/notes',{expected_version:was,watchlist:privateState.watchlist||[],notes:[record,...notes]});
+  if(privateState!==session||version!==was)return;
+  privateState=d.portfolio;version=d.version;render();renderSavedResearchV96();message('Assessment saved to your authenticated research archive.');
+ }catch(err){message('Assessment not saved: '+String(err.message||err));}
+}
+async function deleteSavedResearchV96(index){
+ if(!privateState||!Number.isInteger(index))return;
+ const notes=privateState.notes||[];
+ if(!window.QFPrivateResearchIntelligenceV96.readArchive(notes[index]))return;
+ if(!window.confirm('Permanently delete this saved assessment?'))return;
+ const was=version,session=privateState;
+ try{const d=await api('private/notes',{expected_version:was,watchlist:privateState.watchlist||[],notes:notes.filter((_,i)=>i!==index)});
+  if(privateState!==session||version!==was)return;
+  privateState=d.portfolio;version=d.version;render();renderSavedResearchV96();message('Saved assessment deleted.');
+ }catch(err){message('Could not delete assessment: '+String(err.message||err));}
+}
 function refreshConnectedResearchV93(){
  renderInvestmentIntelligenceV94();
  renderResearchDiagnosticsV95();
+ renderResearchProtocolV96();
  const packet=linkedResearchBriefV93;
  const title=$('qf-v93-ribbon-title'),detail=$('qf-v93-ribbon-detail'),brief=$('qf-v93-ribbon-brief');
  if(title)title.textContent=packet?'Completed research · '+packet.candidate+' ('+packet.symbol+')':'Research workflow · No current assessment';
@@ -647,8 +719,9 @@ function clearMFA(){
 }
 async function handleAuthState(state){
   if(state.signed_in){clearMFA();showStep('ready');await loadState();privateTab('decision');privatePeers();return;}
-  if(!state.mfa_required){clearMFA();showStep('login');return;}
+  if(!state.mfa_required){clearMFA();showStep('login');privateState=null;clearResearchOSV90();renderSavedResearchV96();return;}
   showStep('mfa');
+  privateState=null;clearResearchOSV90();renderSavedResearchV96();
   if(state.mfa_setup){
     $('private-mfa-title').textContent='Set up your authenticator';
     $('private-mfa-instructions').textContent='Scan this private QR code in an authenticator app, then enter its six-digit code.';
@@ -695,7 +768,8 @@ function render(){
   $('private-watchlist').textContent=(privateState.watchlist||[]).join(', ')||'None';
   const entries=Object.entries(holdings),worth=privateState.cash+valued;
   $('private-concentration').innerHTML=entries.length?entries.map(([symbol,units])=>{const weight=quoted[symbol]?units*quoted[symbol].price/worth:null;return '<div class="row"><span>'+safe(symbol)+'</span><strong>'+(weight===null?'Quote unavailable':percent(weight))+'</strong></div>';}).join(''):'No virtual holdings yet. Open Virtual trades to add one.';
-  $('private-notes').innerHTML=(privateState.notes||[]).map((n,i)=>'<div class="saved-note"><div class="saved-note-body"><p>'+safe(n.text)+'</p><span class="tiny">'+safe(n.at||'Saved note')+'</span></div><button class="btn sm" type="button" data-note-delete="'+i+'" aria-label="Delete note '+(i+1)+'">Delete</button></div>').join('')||'<p class="tiny">No notes saved.</p>';
+  renderSavedResearchV96();
+  $('private-notes').innerHTML=(privateState.notes||[]).map((n,i)=>({n,i})).filter(({n})=>!window.QFPrivateResearchIntelligenceV96.readArchive(n)).map(({n,i})=>'<div class="saved-note"><div class="saved-note-body"><p>'+safe(n.text)+'</p><span class="tiny">'+safe(n.at||'Saved note')+'</span></div><button class="btn sm" type="button" data-note-delete="'+i+'" aria-label="Delete note '+(i+1)+'">Delete</button></div>').join('')||'<p class="tiny">No notes saved.</p>';
 }
 async function login(){
   message('Signing in…');
@@ -727,10 +801,10 @@ async function verifyMFA(){
   }catch(e){message(e.message);}
 }
 async function logout(){
-  researchSessionJournalV95=[];clearResearchOSV90();
+  researchSessionJournalV95=[];clearResearchOSV90();renderSavedResearchV96();
   try{await api('auth/logout',{});}catch(_){ /* Clear visible private content regardless */ }
   ideasRunSequence++;ideaData=[];ideaFundamentals={};$('ideas-results').textContent='';$('ideas-run').disabled=false;clearDecisionBrief();
-  clearImportedFrenchV87();clearGuideV79();clearMFA();showStep('login');privateState=null;quoted={};historyLoadSequence++;historySeries=null;closeAssetBrowser();researchSelection=[];$('private-symbol').value='';$('private-selected-asset').textContent='No investment selected';renderResearchSelection();
+  clearImportedFrenchV87();clearGuideV79();clearMFA();showStep('login');privateState=null;renderSavedResearchV96();quoted={};historyLoadSequence++;historySeries=null;closeAssetBrowser();researchSelection=[];$('private-symbol').value='';$('private-selected-asset').textContent='No investment selected';renderResearchSelection();
   optimizerResult=null;$('private-opt-export').disabled=true;$('private-opt-output').textContent='Load market history to begin.';$('private-opt-risk').textContent='';
   $('private-history-chart').textContent='Load a historical series to begin.';$('private-risk-results').textContent='';$('private-backtest-output').textContent='';$('private-valuation-output').textContent='';$('private-peers').textContent='';$('private-concentration').textContent='';$('private-positions').textContent='';
   $('private-wf-output').textContent='Load price history in Market data to begin.';$('private-wf-export').disabled=true;walkforwardResult=null;clearV66Walkforward();clearV66Forecast();
@@ -1627,7 +1701,8 @@ $('qf-v93-ribbon-brief').addEventListener('click',()=>privateTab('settings'));
 $('qf-v93-brief-refresh').addEventListener('click',renderConnectedBriefV93);
 $('qf-v93-brief-export').addEventListener('click',()=>{
  if(!privateState||!linkedResearchBriefV93)return;
- downloadResearchJSON('quantforge-v95-linked-research-briefing.json',{...linkedResearchBriefV93,comparativeIntelligence:linkedResearchIntelligenceV94,portfolioValidation:linkedResearchDiagnosticsV95?window.QFPrivatePortfolioValidationV95.exportSafe(linkedResearchDiagnosticsV95):null});
+ downloadResearchJSON('quantforge-v95-linked-research-briefing.json',{...linkedResearchBriefV93,comparativeIntelligence:linkedResearchIntelligenceV94,portfolioValidation:linkedResearchDiagnosticsV95?window.QFPrivatePortfolioValidationV95.exportSafe(linkedResearchDiagnosticsV95):null,
+  researchValidationV96:linkedResearchProtocolV96?window.QFPrivateResearchIntelligenceV96.safeSummary(linkedResearchProtocolV96):null});
 });
 for(const id of ['qf-v93-briefing','qf-v93-lab-status'])$(id).addEventListener('click',e=>{
  const b=e.target.closest('[data-v93-method]');
@@ -1636,6 +1711,9 @@ for(const id of ['qf-v93-briefing','qf-v93-lab-status'])$(id).addEventListener('
 $('private-v90-browse').addEventListener('click',()=>openAssetBrowser('research'));
 $('private-v90-run').addEventListener('click',runResearchOSV90);
 $('qf-v95-journal-clear').addEventListener('click',()=>{researchSessionJournalV95=[];renderResearchDiagnosticsV95();});
+$('qf-v96-save').addEventListener('click',saveResearchV96);
+$('qf-v96-saved-list').addEventListener('click',e=>{const b=e.target.closest('[data-v96-delete]');if(b&&privateState)deleteSavedResearchV96(Number(b.dataset.v96Delete));});
+for(const id of ['qf-v96-hub','qf-v96-brief'])$(id).addEventListener('click',e=>{const b=e.target.closest('[data-private-tab]');if(b&&privateState&&['valuation','walkforward'].includes(b.dataset.privateTab))privateTab(b.dataset.privateTab);});
 $('private-v90-report').addEventListener('click',e=>{const b=e.target.closest('[data-private-tab]');if(b&&privateState&&['lab','trade','research','candidate','settings'].includes(b.dataset.privateTab))privateTab(b.dataset.privateTab);});
 for(const id of ['private-v90-candidate','private-v90-risk','private-v90-horizon','private-v90-maxweight','private-v90-maxdrawdown','private-v90-days'])
  $(id).addEventListener('change',clearResearchOSV90);
