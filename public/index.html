@@ -402,6 +402,11 @@ main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
 #private-decision-center-v84 .qf-v86-report h3{font-size:20px;margin:8px 0 16px}
 #private-decision-center-v84 .qf-v86-report h4{font-size:16px;margin:25px 0 11px}
 #private-decision-center-v84 .qf-v86-risk-chart{width:100%;height:auto;max-height:250px;border:1px solid #dce9e3;border-radius:9px;background:#f8faf9}
+#private-decision-center-v84 .qf-v87-study{margin-top:26px;padding-top:22px;border-top:2px solid #dce9e3}
+#private-decision-center-v84 .qf-v87-study h3{margin:8px 0 12px}
+#private-decision-center-v84 .qf-v87-results h4{margin:22px 0 10px}
+#private-decision-center-v84 #private-v87-factor-file{width:100%;max-width:100%;padding:9px}
+#private-decision-center-v84 #private-v87-factor-output{margin-top:12px}
 
 /* V8.4.1: attribution that never divides the full name; article-first methods flow. */
 .qf-v83-owner{display:flex;flex-direction:column;align-items:flex-start;gap:2px;margin:8px 6px 2px;line-height:1.4}
@@ -851,6 +856,15 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
           <div class="controls"><button type="button" class="btn primary" id="private-candidate-run-v85">Analyze this investment</button><span class="tiny">On demand · private session · no trade</span></div>
           <div id="private-candidate-output-v85" aria-live="polite" role="status" class="qf-v85-output"><p class="tiny">Load market history, then choose a candidate to examine.</p></div>
           <div id="private-v86-output" aria-live="polite" class="qf-v86-output"></div>
+          <section class="qf-v87-study" aria-labelledby="private-v87-title">
+            <span class="eyebrow">INDEPENDENT RESEARCH FACTORS · V8.7</span>
+            <h3 id="private-v87-title">Fama–French three-factor model validation</h3>
+            <p class="tiny">Import the official <strong>daily</strong> three-factor CSV (not monthly) from the <a href="https://mba.tuck.dartmouth.edu/pages/faculty/Ken.French/data_library.html" target="_blank" rel="noopener noreferrer">Kenneth French Data Library</a>. Download the daily CSV ZIP, extract the CSV, then choose it here. The file is read inside this authenticated browser session only; it is not uploaded or stored. Source authenticity is not automatically verified.</p>
+            <div class="formgrid"><div class="field"><label for="private-v87-factor-file">Extracted daily FF3 research-factor CSV</label><input type="file" id="private-v87-factor-file" accept=".csv,.txt,text/csv,text/plain" /></div></div>
+            <p class="tiny" id="private-v87-factor-status" role="status" aria-live="polite">No independently sourced factor file imported.</p>
+            <div class="controls"><button type="button" class="btn primary" id="private-v87-factor-run">Estimate and validate factor exposures</button><button type="button" class="btn sm" id="private-v87-factor-clear">Clear imported factors</button></div>
+            <div id="private-v87-factor-output" role="status" aria-live="polite"></div>
+          </section>
         </section>
       </div>
     </section>
@@ -2673,6 +2687,161 @@ if(typeof module==='object'&&module.exports)module.exports=api;
 root.QFPrivateFactorScenariosV86=api;
 })(typeof window!=='undefined'?window:globalThis);
 
+/* QuantForge V8.7 — independently sourced Fama–French three-factor research.
+ * No API, provider, storage, account, or trading mutations. Research-only pure module.
+ * Imported daily factor observations are user supplied, not automatically authenticated. */
+(function(root){
+'use strict';
+const finite = x => typeof x === 'number' && Number.isFinite(x);
+const average = a => a.reduce((s,x)=>s+x,0)/a.length;
+const validDate = s => /^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(Date.parse(s)) && new Date(s).toISOString().slice(0,10)===s;
+function invertSolve(matrix, vector) {
+ const n=vector.length,a=matrix.map((row,i)=>[...row,vector[i]]);
+ for(let j=0;j<n;j++){
+  let pivot=j;for(let i=j+1;i<n;i++)if(Math.abs(a[i][j])>Math.abs(a[pivot][j]))pivot=i;
+  if(!finite(a[pivot][j])||Math.abs(a[pivot][j])<1e-10)return null;
+  [a[j],a[pivot]]=[a[pivot],a[j]];
+  const value=a[j][j];for(let k=j;k<=n;k++)a[j][k]/=value;
+  for(let i=0;i<n;i++)if(i!==j){const factor=a[i][j];for(let k=j;k<=n;k++)a[i][k]-=factor*a[j][k];}
+ }
+ return a.map(row=>row[n]);
+}
+function parseDateCompact(str){
+ if(!/^\d{8}$/.test(str))return null;
+ const date=str.slice(0,4)+'-'+str.slice(4,6)+'-'+str.slice(6,8);
+ return validDate(date)?date:null;
+}
+function parseDailyCsv(csv){
+ if(typeof csv!=='string'||!csv.trim()||csv.length>3_000_000)throw new Error('Choose an extracted daily factor CSV smaller than 3 MB.');
+ const lines=csv.replace(/^\uFEFF/,'').split(/\r?\n/);
+ const headerIndex=lines.findIndex(s=>/\bMkt-RF\s*,\s*SMB\s*,\s*HML\s*,\s*RF\b/i.test(s));
+ if(headerIndex<0)throw new Error('The file lacks the expected daily Fama–French 3-factor columns: Mkt-RF, SMB, HML, RF.');
+ const rows=[],seen=new Set();let missing=0,dated=0;
+ for(const line of lines.slice(headerIndex+1)){
+  const cols=line.trim().replace(/^"|"$/g,'').split(',').map(x=>x.trim());
+  if(!/^\d{8}$/.test(cols[0]))continue; // footnotes and monthly/annual blocks are not observations
+  const day=parseDateCompact(cols[0]);if(!day)throw new Error('Invalid YYYYMMDD factor date.');
+  if(seen.has(day))throw new Error('Duplicate daily factor date: '+day);
+  seen.add(day);dated++;
+  if(cols.length!==5)throw new Error('Expected four numeric factor fields on '+day+'.');
+  const vals=cols.slice(1).map(Number);
+  if(cols.slice(1).some(x=>x==='')||vals.some(x=>!finite(x)))throw new Error('Nonnumeric factor return on '+day+'.');
+  if(vals.some(x=>x===-99.99||x===-999)){missing++;continue;}
+  if(vals.slice(0,3).some(x=>Math.abs(x)>50)||Math.abs(vals[3])>5)
+   throw new Error('Factor values are outside a plausible daily percentage range on '+day+'. Check file frequency and units.');
+  rows.push({date:day,mkt:vals[0]/100,smb:vals[1]/100,hml:vals[2]/100,rf:vals[3]/100});
+ }
+ if(rows.length<200)throw new Error('At least 200 valid daily factor rows are required. Do not use the monthly factor file.');
+ if(rows.some((v,i)=>i>0&&rows[i-1].date>=v.date))throw new Error('Factor dates must be strictly ascending.');
+ return {source:'User-imported Kenneth French daily FF3-format CSV (source not authenticated)',rows,available:rows.length,missing,
+  from:rows[0].date,to:rows.at(-1).date,dated};
+}
+function fit(rows){
+ const n=rows.length,k=4;
+ const xraw=rows.map(r=>[r.mkt,r.smb,r.hml]);
+ const means=[0,1,2].map(j=>average(xraw.map(x=>x[j])));
+ const sd=[0,1,2].map(j=>Math.sqrt(xraw.reduce((s,x)=>s+(x[j]-means[j])**2,0)/(n-1)));
+ if(sd.some(x=>!finite(x)||x<1e-8))return {ready:false,reason:'A factor has insufficient variation for a stable regression.'};
+ const X=xraw.map(x=>[1,...x.map((v,j)=>(v-means[j])/sd[j])]);
+ const y=rows.map(r=>r.excess);
+ const xtx=Array.from({length:k},(_,i)=>Array.from({length:k},(_,j)=>X.reduce((s,x)=>s+x[i]*x[j],0)));
+ const xty=Array.from({length:k},(_,i)=>X.reduce((s,x,j)=>s+x[i]*y[j],0));
+ const b=invertSolve(xtx,xty);
+ if(!b)return {ready:false,reason:'The factor series are collinear; model withheld.'};
+ const predicted=X.map(x=>x.reduce((s,v,j)=>s+v*b[j],0));
+ const residual=y.map((v,i)=>v-predicted[i]);
+ const total=y.reduce((s,v)=>s+(v-average(y))**2,0);
+ const sse=residual.reduce((s,v)=>s+v*v,0);
+ if(total<1e-15)return {ready:false,reason:'The candidate has essentially zero excess-return variation.'};
+ const coeff=b.slice(1).map((v,j)=>v/sd[j]);
+ const intercept=b[0]-coeff.reduce((s,v,j)=>s+v*means[j],0);
+ // Newey–West/Bartlett lag 5 heteroskedasticity and autocorrelation-consistent covariance.
+ const meat=Array.from({length:k},()=>Array(k).fill(0));
+ function add(i,j,weight){
+  const cross=residual[i]*residual[j]*weight;
+  for(let a=0;a<k;a++)for(let c=0;c<k;c++)meat[a][c]+=cross*X[i][a]*X[j][c];
+ }
+ for(let t=0;t<n;t++)add(t,t,1);
+ for(let lag=1;lag<=5;lag++){
+  const w=1-lag/6;
+  for(let t=lag;t<n;t++){add(t,t-lag,w);add(t-lag,t,w);}
+ }
+ const inverse=Array.from({length:k},(_,j)=>invertSolve(xtx,Array.from({length:k},(_,i)=>i===j?1:0)));
+ if(inverse.some(x=>!x))return {ready:false,reason:'Regression covariance could not be estimated.'};
+ const inv=Array.from({length:k},(_,i)=>Array.from({length:k},(_,j)=>inverse[j][i]));
+ const variance=Array.from({length:k},(_,i)=>Array.from({length:k},(_,j)=>{
+  let v=0;for(let a=0;a<k;a++)for(let c=0;c<k;c++)v+=inv[i][a]*meat[a][c]*inv[j][c];
+  return v;
+ }));
+ // Transform standardized regression coefficients to alpha and raw factor coefficients.
+ const transform=[ [1,...means.map((m,j)=>-m/sd[j])], [0,1/sd[0],0,0],[0,0,1/sd[1],0],[0,0,0,1/sd[2]] ];
+ const se=transform.map(T=>{
+  let v=0;for(let i=0;i<k;i++)for(let j=0;j<k;j++)v+=T[i]*variance[i][j]*T[j];
+  return Math.sqrt(Math.max(0,v));
+ });
+ const r2=1-sse/total;
+ const result={ready:true,alphaDaily:intercept,alphaAnnualApprox:intercept*252,
+  alphaAnnualCi95:[(intercept-1.96*se[0])*252,(intercept+1.96*se[0])*252],
+  factorBetas:coeff,factorHacSe:se.slice(1),alphaHacSeDaily:se[0],
+  r2,adjustedR2:1-(1-r2)*(n-1)/(n-k),observations:n,
+  residualAnnualVolatility:Math.sqrt(sse/(n-k))*Math.sqrt(252),hacLag:5};
+ if([result.alphaDaily,...coeff,...se,...result.alphaAnnualCi95,result.r2,result.adjustedR2].some(x=>!finite(x)))
+  return {ready:false,reason:'Unstable regression diagnostics withheld.'};
+ return result;
+}
+function assess({history,selection,symbol,factors}={}){
+ const h=history;
+ if(!h||!Array.isArray(h.symbols)||!Array.isArray(h.dates)||!h.closes||
+  !Array.isArray(selection)||selection.length!==h.symbols.length||new Set(selection).size!==selection.length||
+  !h.symbols.every(s=>selection.includes(s))||typeof symbol!=='string'||!h.symbols.includes(symbol)||
+  !Array.isArray(h.closes[symbol])||h.closes[symbol].length!==h.dates.length||
+  h.dates.length<201||h.dates.length>2500||
+  h.dates.some((d,i)=>!validDate(d)||(i>0&&h.dates[i-1]>=d))||
+  h.closes[symbol].some(v=>!finite(v)||v<=0))return {ready:false,reason:'Reload valid matching historical prices and select an investment.'};
+ if(h.sessions_per_year===365||/crypto|mixed/i.test(String(h.calendar||'')))
+  return {ready:false,reason:'Daily U.S. equity factors cannot be fitted to crypto or mixed-calendar observations.'};
+ if(!factors||!Array.isArray(factors.rows)||factors.rows.length<200)
+  return {ready:false,reason:'Import an extracted Fama–French daily three-factor CSV first.'};
+ const map=new Map(factors.rows.map(r=>[r.date,r]));
+ if(map.size!==factors.rows.length)return {ready:false,reason:'Duplicate imported factor dates.'};
+ const records=[];
+ for(let i=1;i<h.dates.length;i++){
+  const f=map.get(h.dates[i]);if(!f)continue; // exact-date join, never forward fill
+  const ret=h.closes[symbol][i]/h.closes[symbol][i-1]-1;
+  if(!finite(ret)||ret<=-1)return {ready:false,reason:'Invalid observed candidate price return.'};
+  records.push({...f,excess:ret-f.rf});
+ }
+ if(records.length<200)return {ready:false,reason:'Only '+records.length+' matching daily factor/price dates. Load at least one year of equity history with 200 aligned returns.'};
+ const split=Math.floor(records.length*.7);
+ if(split<126||records.length-split<60)return {ready:false,reason:'Insufficient chronological train/holdout sample.'};
+ const model=fit(records);
+ const train=fit(records.slice(0,split));
+ if(!model.ready||!train.ready)return {ready:false,reason:model.ready?train.reason:model.reason};
+ const test=records.slice(split);
+ const predictions=test.map(r=>train.alphaDaily+train.factorBetas[0]*r.mkt+train.factorBetas[1]*r.smb+train.factorBetas[2]*r.hml);
+ const sse=test.reduce((s,r,i)=>s+(r.excess-predictions[i])**2,0);
+ const trainMean=average(records.slice(0,split).map(r=>r.excess));
+ const baselineSse=test.reduce((s,r)=>s+(r.excess-trainMean)**2,0);
+ if(baselineSse<1e-14)return {ready:false,reason:'Holdout excess returns have insufficient variation for validation.'};
+ const rmse=Math.sqrt(sse/test.length);
+ const baselineRmse=Math.sqrt(baselineSse/test.length);
+ return {ready:true,symbol,source:factors.source||'User-imported daily FF3-format CSV (unverified)',
+  factorRange:[factors.from,factors.to],aligned:records.length,from:records[0].date,to:records.at(-1).date,
+  excludedPrices:h.dates.length-1-records.length,model,
+  holdout:{train:split,test:test.length,trainThrough:records[split-1].date,testFrom:records[split].date,
+   testThrough:records.at(-1).date,rmse,baselineRmse,r2:1-sse/baselineSse,
+   interpretation:'Coefficient stability with realized contemporaneous factors; NOT an executable return forecast.'},
+  limitations:['Source CSV was imported by the user; its identity and release version have not been cryptographically verified.',
+   'Excess candidate price returns use the dataset RF; this is not dividend-adjusted unless the loaded series includes distributions.',
+   'FF3 factors represent U.S. equity research portfolios; not suitable for crypto, international or mixed trading calendars.',
+   'Alpha and betas describe historical linear co-movement, not a guaranteed return or causal relationship.',
+   'Newey–West lag-5 intervals are approximate. The chronological holdout uses realized factor values after the fact, so it tests stability, not investable forecasting.']};
+}
+const api=Object.freeze({parseDailyCsv,assess});
+if(typeof module==='object'&&module.exports)module.exports=api;
+root.QFPrivateFrenchFactorsV87=api;
+})(typeof window!=='undefined'?window:globalThis);
+
 /* QuantForge private research: pure in-sample portfolio analytics.
  * No external requests, synthetic data, brokerage orders, or portfolio mutations.
  * The public demo model is deliberately not imported here.
@@ -3530,11 +3699,73 @@ function runDecisionCenterV84(){
  message('Decision Center updated from current local research results. No trades or external AI calls.');
 }
 
+/* V8.7 official research-factor file stays in this browser's MFA session only. */
+let frenchFactorsV87=null,frenchImportSequenceV87=0;
+function clearImportedFrenchV87(){
+ frenchImportSequenceV87++;
+ frenchFactorsV87=null;
+ const input=$('private-v87-factor-file');if(input)input.value='';
+ const status=$('private-v87-factor-status');if(status)status.textContent='No independently sourced factor file imported.';
+ const out=$('private-v87-factor-output');if(out)out.textContent='';
+}
+async function importFrenchV87(){
+ const file=$('private-v87-factor-file')?.files?.[0];
+ const seq=++frenchImportSequenceV87,session=privateState;
+ frenchFactorsV87=null;
+ const status=$('private-v87-factor-status');
+ const out=$('private-v87-factor-output');if(out)out.textContent='';
+ if(!session){status.textContent='Sign in with MFA before importing factors.';return;}
+ if(!file){status.textContent='Choose an extracted CSV first.';return;}
+ if(file.size>3000000||file.size===0||!(/\.(csv|txt)$/i.test(file.name))){status.textContent='Choose an extracted CSV/TXT file smaller than 3 MB.';return;}
+ try{
+  const csv=await file.text();
+  if(seq!==frenchImportSequenceV87||session!==privateState||!privateState)return;
+  const parsed=window.QFPrivateFrenchFactorsV87.parseDailyCsv(csv);
+  frenchFactorsV87=parsed;
+  status.textContent='Local factor file loaded: '+parsed.available+' daily observations, '+parsed.from+' through '+parsed.to+'. '+parsed.missing+' missing rows excluded. Imported source is not independently authenticated.';
+ }catch(err){if(seq===frenchImportSequenceV87&&session===privateState)status.textContent='Import rejected: '+String(err.message||err);}
+}
+function renderFrenchV87(r){
+ const out=$('private-v87-factor-output');if(!out)return;
+ if(!r.ready){out.innerHTML='<p class="notice">'+safe(r.reason)+'</p>';return;}
+ const pct=x=>finite(x)?(100*x).toFixed(2)+'%':'Unavailable';
+ const num=x=>finite(x)?x.toFixed(3):'Unavailable';
+ const m=r.model,o=r.holdout;
+ out.innerHTML='<div class="qf-v87-results"><h4>Observed excess-return factor exposures</h4>'+
+  '<p class="tiny">'+safe(r.symbol)+' · '+safe(r.aligned)+' matched daily returns · '+safe(r.from)+' to '+safe(r.to)+'. Exact-date join; '+safe(r.excludedPrices)+' unmatched price-return dates omitted. Source: '+safe(r.source)+'</p>'+
+  displayTable(['Daily FF3 regression','Estimated coefficient / result'],[
+   ['Alpha, approximate annualized (252 × daily)',pct(m.alphaAnnualApprox)],
+   ['Alpha approximate 95% HAC interval',pct(m.alphaAnnualCi95[0])+' to '+pct(m.alphaAnnualCi95[1])],
+   ['Market excess-return loading',num(m.factorBetas[0])],
+   ['Small-minus-big loading',num(m.factorBetas[1])],
+   ['High-minus-low loading',num(m.factorBetas[2])],
+   ['Market / SMB / HML HAC standard errors',m.factorHacSe.map(num).join(' / ')],
+   ['In-sample R²',pct(m.r2)],['Adjusted R²',pct(m.adjustedR2)],
+   ['Annualized regression residual volatility',pct(m.residualAnnualVolatility)]])+
+  '<h4>Chronological coefficient-stability check</h4>'+
+  displayTable(['Held-out observations','Result'],[
+   ['Training observations',String(o.train)+' through '+safe(o.trainThrough)],
+   ['Later holdout dates',safe(o.testFrom)+' to '+safe(o.testThrough)+' ('+o.test+' observations)'],
+   ['Holdout excess-return fit R² versus training-mean baseline',pct(o.r2)],
+   ['Holdout error (RMSE, daily returns)',pct(o.rmse)],
+   ['Training-mean baseline error (RMSE)',pct(o.baselineRmse)]])+
+  '<p class="tiny"><strong>Interpretation:</strong> '+safe(o.interpretation)+' R² may be negative. Full-sample coefficients and confidence intervals are descriptive; holdout metrics use coefficients fitted only on earlier observations.</p>'+
+  '<h4>Methods and limitations</h4><ul class="tiny">'+r.limitations.map(x=>'<li>'+safe(x)+'</li>').join('')+'</ul></div>';
+}
+function runFrenchV87(){
+ if(!privateState){message('Sign in with MFA first.');return;}
+ const symbol=$('private-candidate-select-v85').value;
+ const result=window.QFPrivateFrenchFactorsV87.assess({history:historySeries,selection:researchSelection,symbol,factors:frenchFactorsV87});
+ renderFrenchV87(result);
+ if(result.ready)message('Research factor study computed locally; no trade or account changes.');
+}
+
 /* V8.5 single-candidate dossier, explicitly invoked after MFA sign-in. */
 let candidateRequestV85=0;
 function clearCandidateDossierV85(){
  candidateRequestV85++;
  const supplemental=$('private-v86-output');if(supplemental)supplemental.textContent='';
+ const official=$('private-v87-factor-output');if(official)official.textContent='';
  const out=$('private-candidate-output-v85');
  if(out)out.textContent='Research inputs may have changed. Run the candidate analysis again.';
  const button=$('private-candidate-run-v85');if(button)button.disabled=false;
@@ -3862,7 +4093,7 @@ async function verifyMFA(){
 async function logout(){
   try{await api('auth/logout',{});}catch(_){ /* Clear visible private content regardless */ }
   ideasRunSequence++;ideaData=[];ideaFundamentals={};$('ideas-results').textContent='';$('ideas-run').disabled=false;clearDecisionBrief();
-  clearGuideV79();clearMFA();showStep('login');privateState=null;quoted={};historyLoadSequence++;historySeries=null;closeAssetBrowser();researchSelection=[];$('private-symbol').value='';$('private-selected-asset').textContent='No investment selected';renderResearchSelection();
+  clearImportedFrenchV87();clearGuideV79();clearMFA();showStep('login');privateState=null;quoted={};historyLoadSequence++;historySeries=null;closeAssetBrowser();researchSelection=[];$('private-symbol').value='';$('private-selected-asset').textContent='No investment selected';renderResearchSelection();
   optimizerResult=null;$('private-opt-export').disabled=true;$('private-opt-output').textContent='Load market history to begin.';$('private-opt-risk').textContent='';
   $('private-history-chart').textContent='Load a historical series to begin.';$('private-risk-results').textContent='';$('private-backtest-output').textContent='';$('private-valuation-output').textContent='';$('private-peers').textContent='';$('private-concentration').textContent='';$('private-positions').textContent='';
   $('private-wf-output').textContent='Load price history in Market data to begin.';$('private-wf-export').disabled=true;walkforwardResult=null;clearV66Walkforward();clearV66Forecast();
@@ -4751,6 +4982,9 @@ for(const id of ['private-fc-years','private-fc-growth','private-fc-margin','pri
 document.querySelectorAll('[data-private-tab]').forEach(b=>b.addEventListener('click',()=>privateTab(b.dataset.privateTab)));
 $('private-decision-run-v84').addEventListener('click',runDecisionCenterV84);
 $('private-candidate-run-v85').addEventListener('click',runCandidateDossierV85);
+$('private-v87-factor-file').addEventListener('change',importFrenchV87);
+$('private-v87-factor-run').addEventListener('click',runFrenchV87);
+$('private-v87-factor-clear').addEventListener('click',clearImportedFrenchV87);
 $('private-candidate-select-v85').addEventListener('change',()=>{refreshFactorChoicesV86();clearCandidateDossierV85();});
 for(const id of ['private-v86-benchmark','private-v86-proxy1','private-v86-proxy2','private-v86-years'])
  $(id).addEventListener('change',clearCandidateDossierV85);

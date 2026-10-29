@@ -35,11 +35,73 @@ function runDecisionCenterV84(){
  message('Decision Center updated from current local research results. No trades or external AI calls.');
 }
 
+/* V8.7 official research-factor file stays in this browser's MFA session only. */
+let frenchFactorsV87=null,frenchImportSequenceV87=0;
+function clearImportedFrenchV87(){
+ frenchImportSequenceV87++;
+ frenchFactorsV87=null;
+ const input=$('private-v87-factor-file');if(input)input.value='';
+ const status=$('private-v87-factor-status');if(status)status.textContent='No independently sourced factor file imported.';
+ const out=$('private-v87-factor-output');if(out)out.textContent='';
+}
+async function importFrenchV87(){
+ const file=$('private-v87-factor-file')?.files?.[0];
+ const seq=++frenchImportSequenceV87,session=privateState;
+ frenchFactorsV87=null;
+ const status=$('private-v87-factor-status');
+ const out=$('private-v87-factor-output');if(out)out.textContent='';
+ if(!session){status.textContent='Sign in with MFA before importing factors.';return;}
+ if(!file){status.textContent='Choose an extracted CSV first.';return;}
+ if(file.size>3000000||file.size===0||!(/\.(csv|txt)$/i.test(file.name))){status.textContent='Choose an extracted CSV/TXT file smaller than 3 MB.';return;}
+ try{
+  const csv=await file.text();
+  if(seq!==frenchImportSequenceV87||session!==privateState||!privateState)return;
+  const parsed=window.QFPrivateFrenchFactorsV87.parseDailyCsv(csv);
+  frenchFactorsV87=parsed;
+  status.textContent='Local factor file loaded: '+parsed.available+' daily observations, '+parsed.from+' through '+parsed.to+'. '+parsed.missing+' missing rows excluded. Imported source is not independently authenticated.';
+ }catch(err){if(seq===frenchImportSequenceV87&&session===privateState)status.textContent='Import rejected: '+String(err.message||err);}
+}
+function renderFrenchV87(r){
+ const out=$('private-v87-factor-output');if(!out)return;
+ if(!r.ready){out.innerHTML='<p class="notice">'+safe(r.reason)+'</p>';return;}
+ const pct=x=>finite(x)?(100*x).toFixed(2)+'%':'Unavailable';
+ const num=x=>finite(x)?x.toFixed(3):'Unavailable';
+ const m=r.model,o=r.holdout;
+ out.innerHTML='<div class="qf-v87-results"><h4>Observed excess-return factor exposures</h4>'+
+  '<p class="tiny">'+safe(r.symbol)+' · '+safe(r.aligned)+' matched daily returns · '+safe(r.from)+' to '+safe(r.to)+'. Exact-date join; '+safe(r.excludedPrices)+' unmatched price-return dates omitted. Source: '+safe(r.source)+'</p>'+
+  displayTable(['Daily FF3 regression','Estimated coefficient / result'],[
+   ['Alpha, approximate annualized (252 × daily)',pct(m.alphaAnnualApprox)],
+   ['Alpha approximate 95% HAC interval',pct(m.alphaAnnualCi95[0])+' to '+pct(m.alphaAnnualCi95[1])],
+   ['Market excess-return loading',num(m.factorBetas[0])],
+   ['Small-minus-big loading',num(m.factorBetas[1])],
+   ['High-minus-low loading',num(m.factorBetas[2])],
+   ['Market / SMB / HML HAC standard errors',m.factorHacSe.map(num).join(' / ')],
+   ['In-sample R²',pct(m.r2)],['Adjusted R²',pct(m.adjustedR2)],
+   ['Annualized regression residual volatility',pct(m.residualAnnualVolatility)]])+
+  '<h4>Chronological coefficient-stability check</h4>'+
+  displayTable(['Held-out observations','Result'],[
+   ['Training observations',String(o.train)+' through '+safe(o.trainThrough)],
+   ['Later holdout dates',safe(o.testFrom)+' to '+safe(o.testThrough)+' ('+o.test+' observations)'],
+   ['Holdout excess-return fit R² versus training-mean baseline',pct(o.r2)],
+   ['Holdout error (RMSE, daily returns)',pct(o.rmse)],
+   ['Training-mean baseline error (RMSE)',pct(o.baselineRmse)]])+
+  '<p class="tiny"><strong>Interpretation:</strong> '+safe(o.interpretation)+' R² may be negative. Full-sample coefficients and confidence intervals are descriptive; holdout metrics use coefficients fitted only on earlier observations.</p>'+
+  '<h4>Methods and limitations</h4><ul class="tiny">'+r.limitations.map(x=>'<li>'+safe(x)+'</li>').join('')+'</ul></div>';
+}
+function runFrenchV87(){
+ if(!privateState){message('Sign in with MFA first.');return;}
+ const symbol=$('private-candidate-select-v85').value;
+ const result=window.QFPrivateFrenchFactorsV87.assess({history:historySeries,selection:researchSelection,symbol,factors:frenchFactorsV87});
+ renderFrenchV87(result);
+ if(result.ready)message('Research factor study computed locally; no trade or account changes.');
+}
+
 /* V8.5 single-candidate dossier, explicitly invoked after MFA sign-in. */
 let candidateRequestV85=0;
 function clearCandidateDossierV85(){
  candidateRequestV85++;
  const supplemental=$('private-v86-output');if(supplemental)supplemental.textContent='';
+ const official=$('private-v87-factor-output');if(official)official.textContent='';
  const out=$('private-candidate-output-v85');
  if(out)out.textContent='Research inputs may have changed. Run the candidate analysis again.';
  const button=$('private-candidate-run-v85');if(button)button.disabled=false;
@@ -367,7 +429,7 @@ async function verifyMFA(){
 async function logout(){
   try{await api('auth/logout',{});}catch(_){ /* Clear visible private content regardless */ }
   ideasRunSequence++;ideaData=[];ideaFundamentals={};$('ideas-results').textContent='';$('ideas-run').disabled=false;clearDecisionBrief();
-  clearGuideV79();clearMFA();showStep('login');privateState=null;quoted={};historyLoadSequence++;historySeries=null;closeAssetBrowser();researchSelection=[];$('private-symbol').value='';$('private-selected-asset').textContent='No investment selected';renderResearchSelection();
+  clearImportedFrenchV87();clearGuideV79();clearMFA();showStep('login');privateState=null;quoted={};historyLoadSequence++;historySeries=null;closeAssetBrowser();researchSelection=[];$('private-symbol').value='';$('private-selected-asset').textContent='No investment selected';renderResearchSelection();
   optimizerResult=null;$('private-opt-export').disabled=true;$('private-opt-output').textContent='Load market history to begin.';$('private-opt-risk').textContent='';
   $('private-history-chart').textContent='Load a historical series to begin.';$('private-risk-results').textContent='';$('private-backtest-output').textContent='';$('private-valuation-output').textContent='';$('private-peers').textContent='';$('private-concentration').textContent='';$('private-positions').textContent='';
   $('private-wf-output').textContent='Load price history in Market data to begin.';$('private-wf-export').disabled=true;walkforwardResult=null;clearV66Walkforward();clearV66Forecast();
@@ -1256,6 +1318,9 @@ for(const id of ['private-fc-years','private-fc-growth','private-fc-margin','pri
 document.querySelectorAll('[data-private-tab]').forEach(b=>b.addEventListener('click',()=>privateTab(b.dataset.privateTab)));
 $('private-decision-run-v84').addEventListener('click',runDecisionCenterV84);
 $('private-candidate-run-v85').addEventListener('click',runCandidateDossierV85);
+$('private-v87-factor-file').addEventListener('change',importFrenchV87);
+$('private-v87-factor-run').addEventListener('click',runFrenchV87);
+$('private-v87-factor-clear').addEventListener('click',clearImportedFrenchV87);
 $('private-candidate-select-v85').addEventListener('change',()=>{refreshFactorChoicesV86();clearCandidateDossierV85();});
 for(const id of ['private-v86-benchmark','private-v86-proxy1','private-v86-proxy2','private-v86-years'])
  $(id).addEventListener('change',clearCandidateDossierV85);
