@@ -52,4 +52,4 @@ def test_prior_v93_manual_panel_still_hidden_and_lab_navigable():
 def test_export_contains_only_bounded_comparative_packet():
     s=read("web/site/private.js")
     assert "comparativeIntelligence:linkedResearchIntelligenceV94" in s
-    assert "quantforge-v94-linked-research-briefing.json" in s
+    assert "quantforge-v95-linked-research-briefing.json" in s

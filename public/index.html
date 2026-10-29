@@ -519,6 +519,18 @@ main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
 #private-signed .qf-v93-related .controls{margin:7px 0 0}
 @media(max-width:750px){#private-signed .qf-v93-brief-grid{grid-template-columns:1fr}#private-signed .qf-v93-ribbon{align-items:stretch}#private-signed .qf-v93-ribbon .controls{flex-wrap:wrap}}
 /* V9.4 cross-security evidence and policy stability; same shared research run */
+#private-signed .qf-v95-host{max-width:1200px;margin:20px auto}
+#private-signed .qf-v95-shell{border:1px solid #ccdcd6;background:#f7faf8;border-radius:14px;padding:18px}
+#private-signed .qf-v95-heading h3{margin:7px 0;font-size:20px;color:#174f43}
+#private-signed .qf-v95-heading p{font-size:12px;line-height:1.55;color:#486458}
+#private-signed .qf-v95-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:15px}
+#private-signed .qf-v95-panel{min-width:0;background:#fff;border:1px solid #d5e3dc;border-radius:12px;padding:16px}
+#private-signed .qf-v95-panel h4{font-size:15px;color:#174f43;margin:0 0 12px}
+#private-signed .qf-v95-panel p{font-size:12px;line-height:1.65;color:#435c50}
+#private-signed .qf-v95-table{width:100%;font-size:11px;white-space:normal}
+#private-signed .qf-v95-table th,#private-signed .qf-v95-table td{padding:7px;vertical-align:top;font-variant-numeric:tabular-nums}
+#private-signed .qf-v95-journal-row{padding:9px 6px;border-bottom:1px solid #dbe6e0;font-size:12px}
+@media(max-width:850px){#private-signed .qf-v95-grid{grid-template-columns:1fr}}
 #private-signed .qf-v94-intelligence{max-width:1200px;margin:18px auto}
 #private-signed .qf-v94-head{display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:12px;margin-bottom:12px}
 #private-signed .qf-v94-head h3{font-size:21px;margin:4px 0 5px;color:#16463b}
@@ -998,6 +1010,7 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
         <div class="qf-v92-runbar"><div><strong>03 · Run your assessment</strong><p class="tiny">Models run only when their data are eligible. Your portfolio and brokerage remain unchanged.</p></div><button type="button" class="btn primary" id="private-v90-run">Analyze selected investments</button></div>
         <div id="private-v90-report" aria-live="polite" role="status"><p class="tiny">Your assessment will appear here: proposed action, evidence quality, key risks, investment comparison and expandable model audit.</p></div>
         <div id="qf-v94-intelligence-hub" class="qf-v94-intelligence" aria-live="polite"></div>
+      <div id="qf-v95-hub" class="qf-v95-host" aria-live="polite"></div>
       </div>
       <div id="qf-v93-legacy-compat" hidden aria-hidden="true">
       <div class="pane" id="private-decision-center-v84">
@@ -1163,6 +1176,9 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
       <section class="pane qf-v93-brief-intro" aria-label="Connected research report"><div class="qf-v93-row"><div><span class="eyebrow">CONNECTED WORKFLOW</span><h3>Investment research briefing</h3><p class="tiny" id="qf-v93-brief-status">No current linked assessment. Run an automated assessment first.</p></div><button class="btn" type="button" data-private-tab="decision">Return to Research Hub</button></div>
       <div id="qf-v93-briefing" aria-live="polite"><p class="tiny">Once an assessment is complete, the executive findings, conflicts, data coverage, method record, and next research actions will be available here.</p></div>
       <div id="qf-v94-intelligence-brief" class="qf-v94-intelligence" aria-live="polite"></div>
+      <div id="qf-v95-brief" class="qf-v95-host" aria-live="polite"></div>
+      <div class="pane" id="qf-v95-journal"><div class="section-title"><h3>Session research history</h3><button type="button" class="btn sm" id="qf-v95-journal-clear">Clear session list</button></div>
+        <p class="tiny">Last eight completed assessment summaries in this authenticated browser session. No account values, holdings, or raw market prices are saved. This list is not a cloud archive and resets on refresh or logout.</p><div id="qf-v95-session-history" aria-live="polite"></div></div>
       <div class="controls"><button class="btn primary" type="button" id="qf-v93-brief-refresh" disabled>Refresh linked briefing</button><button class="btn" type="button" id="qf-v93-brief-export" disabled>Export evidence briefing (JSON)</button></div></section>
       <div class="pane" id="private-guide-card-v79">
         <div class="section-title"><h3>Optional session overview</h3><span class="mini">Private · educational decision support</span></div>
@@ -3464,6 +3480,150 @@ if(typeof module==='object'&&module.exports)module.exports=api;
 root.QFPrivateInvestmentIntelligenceV94=api;
 })(typeof window!=='undefined'?window:globalThis);
 
+/* V9.5: pure, owner-only portfolio diagnostics, past-only risk-screen audit,
+ * and hypothetical cash-flow scenarios. No I/O, storage, execution, or trading. */
+(function(root){
+'use strict';
+const num=x=>typeof x==='number'&&Number.isFinite(x);
+const date=s=>typeof s==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(s)&&!Number.isNaN(Date.parse(s))&&new Date(s).toISOString().slice(0,10)===s;
+const round=(x,d=4)=>num(x)?Number(x.toFixed(d)):null;
+function validHistory(history){
+ return !!history&&Array.isArray(history.symbols)&&history.symbols.length>=2&&history.symbols.length<=5&&
+  new Set(history.symbols).size===history.symbols.length&&Array.isArray(history.dates)&&
+  history.dates.length>=64&&history.dates.length<=2500&&history.dates.every((x,i)=>date(x)&&(!i||x>history.dates[i-1]))&&
+  history.symbols.every(s=>Array.isArray(history.closes?.[s])&&history.closes[s].length===history.dates.length&&
+   history.closes[s].every(p=>num(p)&&p>0));
+}
+function risk(returns,annual){
+ if(!Array.isArray(returns)||returns.length<63||returns.some(r=>!num(r)||r<=-1))return null;
+ const mean=returns.reduce((s,r)=>s+r,0)/returns.length;
+ const sd=Math.sqrt(returns.reduce((s,r)=>s+(r-mean)**2,0)/(returns.length-1));
+ const sorted=[...returns].sort((a,b)=>a-b),q=sorted[Math.floor(.05*(sorted.length-1))];
+ const tail=sorted.filter(x=>x<=q);
+ let wealth=1,peak=1,drawdown=0;
+ for(const x of returns){wealth*=1+x;if(!num(wealth)||wealth<=0)return null;peak=Math.max(peak,wealth);drawdown=Math.min(drawdown,wealth/peak-1);}
+ return {annualVolatility:round(sd*Math.sqrt(annual)),dailyVaR95:round(Math.max(0,-q)),
+  dailyES95:round(Math.max(0,-tail.reduce((s,x)=>s+x,0)/tail.length)),
+  maxDrawdown:round(drawdown),observations:returns.length};
+}
+function portfolioRisk({portfolio,quotes,history,asOf,symbol,maxWeight}={}){
+ const fail=(reason,allocation=null)=>({ready:false,reason,allocation,baseline:null,hypothetical:null});
+ if(!portfolio||!num(portfolio.cash)||portfolio.cash<0||!portfolio.holdings||
+  typeof portfolio.holdings!=='object'||Array.isArray(portfolio.holdings))return fail('An authenticated portfolio with valid cash and holdings is required.');
+ const holdings=Object.entries(portfolio.holdings).filter(([,q])=>q!==0);
+ if(holdings.length>100||holdings.some(([s,q])=>!s||!num(q)||q<=0))return fail('Portfolio holdings contain unsupported quantities.');
+ const now=String(asOf||'').slice(0,10);
+ if(!date(now))return fail('The research date is invalid.');
+ let total=portfolio.cash;
+ const values={};
+ for(const [s,q] of holdings){
+  const quote=quotes?.[s],stamp=String(quote?.timestamp||'').slice(0,10);
+  if(!num(quote?.price)||quote.price<=0||!date(stamp)||stamp>now||
+   (Date.parse(now)-Date.parse(stamp))/86400000>7)return fail('A holding has no valid, recent quote; all weighted portfolio calculations are withheld.');
+  values[s]=q*quote.price;
+  if(!num(values[s])||values[s]<0)return fail('An invalid priced position prevents a reliable allocation.');
+  total+=values[s];
+ }
+ if(!num(total)||total<=0)return fail('Portfolio total value is unavailable.');
+ const allocation={cashWeight:round(portfolio.cash/total),positions:holdings.map(([s])=>({symbol:String(s).slice(0,20),weight:round(values[s]/total)}))};
+ const weights=Object.fromEntries(holdings.map(([s])=>[s,values[s]/total]));
+ const positions=Object.keys(weights);
+ const maxObserved=positions.length?Math.max(...Object.values(weights)):0;
+ allocation.largestWeight=round(maxObserved);
+ allocation.concentrationFlag=num(maxWeight)&&maxWeight>0&&maxObserved>maxWeight+1e-9;
+ if(!positions.length)return {ready:true,reason:'All-cash portfolio; historical invested risk is zero.',allocation,
+  baseline:{annualVolatility:0,dailyVaR95:0,dailyES95:0,maxDrawdown:0,observations:0},hypothetical:null,
+  note:'All cash has no equity price-risk exposure. Cash purchasing-power and counterparty risks are not modeled.'};
+ if(!validHistory(history)||positions.some(s=>!history.symbols.includes(s)))return fail(
+  'Full portfolio risk withheld: load matching aligned history for EVERY held investment; a selected subset is insufficient.',allocation);
+ const end=history.dates.at(-1);
+ if(end>now||(Date.parse(now)-Date.parse(end))/86400000>7)return fail('Loaded market history is stale or dated after this assessment.',allocation);
+ const annual=history.sessions_per_year===365?365:252;
+ const n=history.dates.length,series={};
+ for(const s of positions)series[s]=history.closes[s].slice(1).map((p,i)=>p/history.closes[s][i]-1);
+ const combine=w=>Array.from({length:n-1},(_,i)=>Object.keys(w).reduce((sum,s)=>sum+w[s]*series[s][i],0));
+ const baseline=risk(combine(weights),annual);
+ if(!baseline)return fail('Current-weight daily returns could not be validated.',allocation);
+ let hypothetical=null;
+ if(symbol&&history.symbols.includes(symbol)&&portfolio.cash/total>=.05&&positions.length<6){
+  const scenario={...weights};
+  scenario[symbol]=(scenario[symbol]||0)+.05;
+  if(!series[symbol])series[symbol]=history.closes[symbol].slice(1).map((p,i)=>p/history.closes[symbol][i]-1);
+  const after=risk(combine(scenario),annual);
+  if(after)hypothetical={fundedFromCashPercent:5,annualVolatility:after.annualVolatility,dailyES95:after.dailyES95,
+   maxDrawdown:after.maxDrawdown,concentrationFlag:num(maxWeight)&&scenario[symbol]>maxWeight};
+ }
+ return {ready:true,reason:null,allocation,baseline,hypothetical,period:{start:history.dates[0],end,sessions:n,annualization:annual},
+  note:'Historical daily-risk approximation holds TODAY\'S weights constant over the earlier price window. It is not actual realized account performance, does not include dividends, fees, financing, or cash interest, and cannot predict future risk.'};
+}
+function riskGateAudit({history,symbol,maxDrawdown,train=126,test=21}={}){
+ const unavailable=reason=>({ready:false,reason,windows:[],summary:null});
+ if(!validHistory(history)||!history.symbols.includes(symbol))return unavailable('Past-only policy audit requires a fully aligned candidate price series.');
+ if(!num(maxDrawdown)||maxDrawdown<=0||maxDrawdown>=1)return unavailable('Choose a valid historical drawdown screen.');
+ if(!Number.isInteger(train)||train<63||train>504||!Number.isInteger(test)||test<5||test>126)return unavailable('Invalid chronological evaluation windows.');
+ const ps=history.closes[symbol];if(ps.length<train+test*2)return unavailable('Insufficient samples for two disjoint test windows.');
+ const windows=[];
+ for(let end=train-1;end+test<ps.length&&windows.length<80;end+=test){
+  let peak=ps[end-train+1],mdd=0;
+  for(let k=end-train+1;k<=end;k++){peak=Math.max(peak,ps[k]);mdd=Math.min(mdd,ps[k]/peak-1);}
+  const observed=ps[end+test]/ps[end]-1;
+  windows.push({trainThrough:history.dates[end],testFrom:history.dates[end+1],testThrough:history.dates[end+test],
+   trailingDrawdown:round(mdd),gatePassed:mdd>=-maxDrawdown,observedForwardReturn:round(observed)});
+ }
+ if(windows.length<2)return unavailable('Fewer than two complete disjoint later observation windows.');
+ const allowed=windows.filter(w=>w.gatePassed),blocked=windows.filter(w=>!w.gatePassed);
+ const average=xs=>xs.length?round(xs.reduce((sum,w)=>sum+w.observedForwardReturn,0)/xs.length):null;
+ return {ready:true,reason:null,windows:windows.slice(-8),summary:{count:windows.length,allowed:allowed.length,blocked:blocked.length,
+  allowedObservedAverage:average(allowed),blockedObservedAverage:average(blocked)},
+  methodology:{train,test,screen:maxDrawdown,firstTrainThrough:windows[0].trainThrough,lastTestThrough:windows.at(-1).testThrough},
+  note:'A chronological retrospective test of the price-drawdown gate ONLY. Every decision uses its preceding training history, then observes later non-overlapping prices. It does not reconstruct SEC filings, quotes, portfolio actions, transaction costs, or the full investment decision policy and cannot validate predictive accuracy.'};
+}
+function cashFlowScenarios({snapshot,selection,asOf}={}){
+ const stale=reason=>({ready:false,reason,rows:[]});
+ if(!Array.isArray(selection)||selection.length<2||selection.length>5||new Set(selection).size!==selection.length)
+  return stale('Select two to five different companies.');
+ const cutoff=String(asOf||'').slice(0,10),stamp=snapshot?.as_of;
+ if(!date(cutoff)||!date(stamp)||stamp>cutoff||(Date.parse(cutoff)-Date.parse(stamp))/86400000>730||!Array.isArray(snapshot?.companies))
+  return stale('SEC snapshot is missing, outdated, or inconsistent with this research date.');
+ const index=new Map(snapshot.companies.map(c=>[c.symbol,c]));
+ const rows=selection.map(symbol=>{
+  const item=index.get(symbol),cur=item?.annual?.[0],prev=item?.annual?.[1];
+  const fiscal=cur?.fiscal_end,prior=prev?.fiscal_end;
+  const valid=date(fiscal)&&date(prior)&&prior<fiscal&&fiscal<=cutoff&&
+   (Date.parse(cutoff)-Date.parse(fiscal))/86400000<=800&&
+   (Date.parse(fiscal)-Date.parse(prior))/86400000>=300&&
+   (Date.parse(fiscal)-Date.parse(prior))/86400000<=430;
+  const revenue=valid?cur.metrics?.revenue_usd:null,fcf=valid?cur.metrics?.free_cash_flow_usd:null;
+  const ni=valid?cur.metrics?.net_income_usd:null;
+  const comparable=num(fcf)&&fcf>0&&num(revenue)&&revenue>0;
+  return {symbol:String(symbol).slice(0,20),fiscalEnd:valid?fiscal:null,
+   fcfToRevenue:comparable?round(fcf/revenue):null,
+   cashConversion:num(fcf)&&num(ni)&&ni>0?round(fcf/ni):null,
+   aggregateFcfScenarios:comparable?[10,15,20].map(m=>round(fcf*m/1e9,2)):null,
+   source:valid?String(item?.source_url||'').slice(0,180):null};
+ });
+ return {ready:true,reason:null,asOf:stamp,rows,
+  note:'Illustrative 10x/15x/20x annual free-cash-flow capitalization in USD billions, BEFORE debt, cash and share-count adjustments. These are not enterprise valuations, equity values, market multiples, fair prices or stock-price targets. Negative/missing FCF is withheld; fiscal years can differ.'};
+}
+function build(input={}){
+ const portfolio=portfolioRisk(input);
+ const gate=riskGateAudit(input);
+ const valuation=cashFlowScenarios(input);
+ return {schema:'quantforge.portfolio-validation.v9.5',symbol:String(input.symbol||'').slice(0,20),
+  portfolio,gate,valuation,asOf:String(input.asOf||'').slice(0,10)};
+}
+function exportSafe(packet){
+ if(packet?.schema!=='quantforge.portfolio-validation.v9.5')throw Error('Invalid diagnostics.');
+ return {schema:'quantforge.portfolio-validation-summary.v9.5',asOf:packet.asOf,
+  portfolioRiskAvailable:packet.portfolio.ready,policyAuditAvailable:packet.gate.ready,
+  valuationScenarioCoverage:packet.valuation.rows.filter(r=>r.aggregateFcfScenarios).length,
+  note:'Actual holdings, allocation weights, account values, raw prices and portfolio risk metrics are intentionally excluded. The on-screen private assessment can contain account-sensitive information.'};
+}
+const api=Object.freeze({build,portfolioRisk,riskGateAudit,cashFlowScenarios,exportSafe});
+if(typeof module==='object'&&module.exports)module.exports=api;
+root.QFPrivatePortfolioValidationV95=api;
+})(typeof window!=='undefined'?window:globalThis);
+
 /* QuantForge private research: pure in-sample portfolio analytics.
  * No external requests, synthetic data, brokerage orders, or portfolio mutations.
  * The public demo model is deliberately not imported here.
@@ -4288,12 +4448,13 @@ root.QFPrivateInvestmentIntelligenceV94=api;
 (function () {
 'use strict';
 const $=id=>document.getElementById(id);
-let guideReportV79=null, linkedResearchBriefV93=null, linkedResearchIntelligenceV94=null;
+let guideReportV79=null, linkedResearchBriefV93=null, linkedResearchIntelligenceV94=null, linkedResearchDiagnosticsV95=null;
+let researchSessionJournalV95=[];
 let privateDecisionCenterV84=null;
 let researchOSRunV90=0, researchOSInternalLoadV90=false;
 let candidateDossierV90=null,candidateQuoteV90=null,candidateFactorV91=null;
 function clearResearchOSV90(){
- linkedResearchBriefV93=null;linkedResearchIntelligenceV94=null;
+ linkedResearchBriefV93=null;linkedResearchIntelligenceV94=null;linkedResearchDiagnosticsV95=null;
  if(typeof refreshConnectedResearchV93==='function')refreshConnectedResearchV93();
  researchOSRunV90++;
  candidateDossierV90=null;candidateQuoteV90=null;candidateFactorV91=null;
@@ -4323,6 +4484,22 @@ function renderResearchOSV90(result,variants){
   brief:linkedResearchBriefV93,snapshot:window.QFPublishedSEC,selection:researchSelection,
   history:historySeries,variants,asOf:review.asOf||new Date().toISOString()});
  }catch(err){console.warn('Additional comparative evidence unavailable:',String(err.message||err).slice(0,100));}
+ linkedResearchDiagnosticsV95=null;
+ try{
+  linkedResearchDiagnosticsV95=window.QFPrivatePortfolioValidationV95.build({
+   portfolio:privateState,quotes:quoted,history:historySeries,selection:researchSelection,
+   snapshot:window.QFPublishedSEC,symbol:linkedResearchBriefV93.symbol,
+   asOf:review.asOf||new Date().toISOString(),maxDrawdown:review.constraints.maxDrawdown,
+   maxWeight:review.constraints.maxWeight
+  });
+ }catch(err){console.warn('Portfolio diagnostics unavailable:',String(err.message||err).slice(0,100));}
+ researchSessionJournalV95.unshift({
+  date:String(review.asOf||'').slice(0,10),symbol:String(review.symbol||'').slice(0,20),
+  action:String(review.action||'').slice(0,120),readiness:String(review.readiness||'').slice(0,50),
+  modelCount:result.orchestration?.completed||0,
+  portfolioRiskAvailable:linkedResearchDiagnosticsV95?.portfolio?.ready===true
+ });
+ researchSessionJournalV95=researchSessionJournalV95.slice(0,8);
  refreshConnectedResearchV93();
  const list=(xs,empty)=>'<ul class="qf-v92-list">'+(xs.length?xs:[empty]).map(x=>'<li>'+safe(x)+'</li>').join('')+'</ul>';
  const label=s=>({supports:'Supports',cautions:'Caution',mixed:'Mixed',available:'Available',unavailable:'Unavailable'})[s]||'Unavailable';
@@ -4370,8 +4547,48 @@ function renderInvestmentIntelligenceV94(){
  for(const id of targets){const el=$(id);if(el)el.innerHTML=content;}
  if(lab)lab.textContent='V9.4 cross-investment evidence is linked: '+intel.coverage.issuersWithMetrics+'/'+intel.coverage.selected+' SEC issuer records; historical co-movement '+(movement.ready?'available':'unavailable')+'; three risk-policy checks completed. Review the Research Hub or Briefing for interpretation.';
 }
+function renderResearchDiagnosticsV95(){
+ const data=linkedResearchDiagnosticsV95;
+ for(const id of ['qf-v95-hub','qf-v95-brief']){
+  const box=$(id);if(!box)continue;
+  if(!data){box.textContent='';continue;}
+  const p=data.portfolio,g=data.gate,v=data.valuation;
+  const ratio=x=>typeof x==='number'&&Number.isFinite(x)?(x*100).toFixed(2)+'%':'Unavailable';
+  const val=x=>typeof x==='number'&&Number.isFinite(x)?'$'+x.toFixed(2)+'B':'Unavailable';
+  const grid=(heads,rows)=>'<div class="table-wrap"><table class="qf-v95-table"><thead><tr>'+heads.map(h=>'<th scope="col">'+safe(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+row.map(c=>'<td>'+safe(c)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
+  const weights=p.allocation?.positions||[];
+  const alloc=p.allocation?grid(['Current virtual investment','Portfolio weight'],weights.map(x=>[assetNames[x.symbol]||x.symbol,ratio(x.weight)]).concat([['Cash',ratio(p.allocation.cashWeight)]])):
+   '<p class="tiny">No complete, fresh account valuation. Allocation withheld.</p>';
+  const riskRows=p.ready&&p.baseline?[['Annualized volatility',ratio(p.baseline.annualVolatility),ratio(p.hypothetical?.annualVolatility)],
+   ['Daily 95% expected shortfall',ratio(p.baseline.dailyES95),ratio(p.hypothetical?.dailyES95)],
+   ['Maximum observed drawdown',ratio(p.baseline.maxDrawdown),ratio(p.hypothetical?.maxDrawdown)]]:[];
+  const portfolioRisk=p.ready?grid(['Historical risk estimate','Current weights','Illustrative +5% from cash'],riskRows):'<p class="tiny">'+safe(p.reason)+'</p>';
+  const policy=g.ready?'<p>'+safe(g.summary.count)+' past-only test windows · '+safe(g.summary.allowed)+' risk-screen passes · '+safe(g.summary.blocked)+' blocked. Observed later average change on passed windows: '+ratio(g.summary.allowedObservedAverage)+'. On blocked windows: '+ratio(g.summary.blockedObservedAverage)+'.</p>'+grid(['Training through','Later test through','Gate','Observed later change'],g.windows.map(w=>[w.trainThrough,w.testThrough,w.gatePassed?'Passed':'Blocked',ratio(w.observedForwardReturn)])):
+   '<p class="tiny">'+safe(g.reason)+'</p>';
+  const scenario=v.ready?grid(['Company','Fiscal period','FCF/revenue','FCF/net income','10× FCF','15× FCF','20× FCF'],v.rows.map(r=>[
+   assetNames[r.symbol]||r.symbol,r.fiscalEnd||'Unavailable',ratio(r.fcfToRevenue),ratio(r.cashConversion),
+   val(r.aggregateFcfScenarios?.[0]),val(r.aggregateFcfScenarios?.[1]),val(r.aggregateFcfScenarios?.[2])])):
+   '<p class="tiny">'+safe(v.reason)+'</p>';
+  box.innerHTML='<section class="qf-v95-shell" aria-label="Integrated portfolio, validation and valuation research">'+
+   '<div class="qf-v95-heading"><span class="eyebrow">INTEGRATED DECISION EVIDENCE · V9.5</span><h3>Portfolio exposure, past-only policy checks &amp; valuation context</h3><p>These diagnostics share the same selected market history, account context and Research Hub assessment; none can execute a trade or override a missing-data constraint.</p></div>'+
+   '<div class="qf-v95-grid"><section class="qf-v95-panel"><h4>Actual virtual portfolio weights</h4>'+alloc+
+   '<p class="tiny">'+safe(p.note||p.reason||'')+' '+(p.allocation?.concentrationFlag?'The largest position exceeds the selected single-name limit.':'')+'</p></section>'+
+   '<section class="qf-v95-panel"><h4>Historical portfolio risk and cash-funded scenario</h4>'+portfolioRisk+
+   '<p class="tiny">Hypothetical figures use a 5% total-portfolio allocation transferred from cash when eligible; otherwise they remain unavailable. They are not actual account returns or forecasts.</p></section>'+
+   '<section class="qf-v95-panel"><h4>Past-only policy screen diagnostic</h4>'+policy+
+   '<p class="tiny">'+safe(g.note||'Only past observed prices are used to fit the drawdown screen; this does not validate the full investment decision policy.')+'</p></section>'+
+   '<section class="qf-v95-panel"><h4>Comparative SEC cash-flow scenarios</h4>'+scenario+
+   '<p class="tiny">'+safe(v.note||'Reported annual free cash flow is required; missing observations do not become zero.')+'</p></section></div></section>';
+ }
+ const history=$('qf-v95-session-history');
+ if(history){history.innerHTML=researchSessionJournalV95.length?researchSessionJournalV95.map((entry,i)=>
+  '<div class="qf-v95-journal-row"><strong>'+safe(assetNames[entry.symbol]||entry.symbol)+'</strong> · '+safe(entry.date||'Undated')+' · '+safe(entry.action)+' <span class="tiny">'+safe(entry.readiness)+' · '+safe(entry.modelCount)+' models completed</span></div>').join(''):
+  '<p class="tiny">No completed assessment stored in this browser session. Session history is cleared when you sign out or reload; download an evidence briefing to keep a record.</p>';
+ }
+}
 function refreshConnectedResearchV93(){
  renderInvestmentIntelligenceV94();
+ renderResearchDiagnosticsV95();
  const packet=linkedResearchBriefV93;
  const title=$('qf-v93-ribbon-title'),detail=$('qf-v93-ribbon-detail'),brief=$('qf-v93-ribbon-brief');
  if(title)title.textContent=packet?'Completed research · '+packet.candidate+' ('+packet.symbol+')':'Research workflow · No current assessment';
@@ -4956,7 +5173,7 @@ async function verifyMFA(){
   }catch(e){message(e.message);}
 }
 async function logout(){
-  clearResearchOSV90();
+  researchSessionJournalV95=[];clearResearchOSV90();
   try{await api('auth/logout',{});}catch(_){ /* Clear visible private content regardless */ }
   ideasRunSequence++;ideaData=[];ideaFundamentals={};$('ideas-results').textContent='';$('ideas-run').disabled=false;clearDecisionBrief();
   clearImportedFrenchV87();clearGuideV79();clearMFA();showStep('login');privateState=null;quoted={};historyLoadSequence++;historySeries=null;closeAssetBrowser();researchSelection=[];$('private-symbol').value='';$('private-selected-asset').textContent='No investment selected';renderResearchSelection();
@@ -4973,7 +5190,7 @@ async function currentQuote(){
   if(!symbol){message('Choose an investment with Browse investments first.');return;}
   try{
     const r=await api('private/quotes?symbols='+encodeURIComponent(symbol));
-    const q=r.quotes[0];quoted[symbol]=q;
+    const q=r.quotes[0];quoted[symbol]=q;clearResearchOSV90();
     $('private-quote').textContent=usd(q.price)+' · '+q.venue+' · '+q.timestamp+' (last trade, not executable price)';
     message('Quote loaded.');if(privateState)render();
   }catch(e){$('private-quote').textContent='Unavailable';message(e.message);}
@@ -5856,7 +6073,7 @@ $('qf-v93-ribbon-brief').addEventListener('click',()=>privateTab('settings'));
 $('qf-v93-brief-refresh').addEventListener('click',renderConnectedBriefV93);
 $('qf-v93-brief-export').addEventListener('click',()=>{
  if(!privateState||!linkedResearchBriefV93)return;
- downloadResearchJSON('quantforge-v94-linked-research-briefing.json',{...linkedResearchBriefV93,comparativeIntelligence:linkedResearchIntelligenceV94});
+ downloadResearchJSON('quantforge-v95-linked-research-briefing.json',{...linkedResearchBriefV93,comparativeIntelligence:linkedResearchIntelligenceV94,portfolioValidation:linkedResearchDiagnosticsV95?window.QFPrivatePortfolioValidationV95.exportSafe(linkedResearchDiagnosticsV95):null});
 });
 for(const id of ['qf-v93-briefing','qf-v93-lab-status'])$(id).addEventListener('click',e=>{
  const b=e.target.closest('[data-v93-method]');
@@ -5864,6 +6081,7 @@ for(const id of ['qf-v93-briefing','qf-v93-lab-status'])$(id).addEventListener('
 });
 $('private-v90-browse').addEventListener('click',()=>openAssetBrowser('research'));
 $('private-v90-run').addEventListener('click',runResearchOSV90);
+$('qf-v95-journal-clear').addEventListener('click',()=>{researchSessionJournalV95=[];renderResearchDiagnosticsV95();});
 $('private-v90-report').addEventListener('click',e=>{const b=e.target.closest('[data-private-tab]');if(b&&privateState&&['lab','trade','research','candidate','settings'].includes(b.dataset.privateTab))privateTab(b.dataset.privateTab);});
 for(const id of ['private-v90-candidate','private-v90-risk','private-v90-horizon','private-v90-maxweight','private-v90-maxdrawdown','private-v90-days'])
  $(id).addEventListener('change',clearResearchOSV90);

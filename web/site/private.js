@@ -2,12 +2,13 @@
 (function () {
 'use strict';
 const $=id=>document.getElementById(id);
-let guideReportV79=null, linkedResearchBriefV93=null, linkedResearchIntelligenceV94=null;
+let guideReportV79=null, linkedResearchBriefV93=null, linkedResearchIntelligenceV94=null, linkedResearchDiagnosticsV95=null;
+let researchSessionJournalV95=[];
 let privateDecisionCenterV84=null;
 let researchOSRunV90=0, researchOSInternalLoadV90=false;
 let candidateDossierV90=null,candidateQuoteV90=null,candidateFactorV91=null;
 function clearResearchOSV90(){
- linkedResearchBriefV93=null;linkedResearchIntelligenceV94=null;
+ linkedResearchBriefV93=null;linkedResearchIntelligenceV94=null;linkedResearchDiagnosticsV95=null;
  if(typeof refreshConnectedResearchV93==='function')refreshConnectedResearchV93();
  researchOSRunV90++;
  candidateDossierV90=null;candidateQuoteV90=null;candidateFactorV91=null;
@@ -37,6 +38,22 @@ function renderResearchOSV90(result,variants){
   brief:linkedResearchBriefV93,snapshot:window.QFPublishedSEC,selection:researchSelection,
   history:historySeries,variants,asOf:review.asOf||new Date().toISOString()});
  }catch(err){console.warn('Additional comparative evidence unavailable:',String(err.message||err).slice(0,100));}
+ linkedResearchDiagnosticsV95=null;
+ try{
+  linkedResearchDiagnosticsV95=window.QFPrivatePortfolioValidationV95.build({
+   portfolio:privateState,quotes:quoted,history:historySeries,selection:researchSelection,
+   snapshot:window.QFPublishedSEC,symbol:linkedResearchBriefV93.symbol,
+   asOf:review.asOf||new Date().toISOString(),maxDrawdown:review.constraints.maxDrawdown,
+   maxWeight:review.constraints.maxWeight
+  });
+ }catch(err){console.warn('Portfolio diagnostics unavailable:',String(err.message||err).slice(0,100));}
+ researchSessionJournalV95.unshift({
+  date:String(review.asOf||'').slice(0,10),symbol:String(review.symbol||'').slice(0,20),
+  action:String(review.action||'').slice(0,120),readiness:String(review.readiness||'').slice(0,50),
+  modelCount:result.orchestration?.completed||0,
+  portfolioRiskAvailable:linkedResearchDiagnosticsV95?.portfolio?.ready===true
+ });
+ researchSessionJournalV95=researchSessionJournalV95.slice(0,8);
  refreshConnectedResearchV93();
  const list=(xs,empty)=>'<ul class="qf-v92-list">'+(xs.length?xs:[empty]).map(x=>'<li>'+safe(x)+'</li>').join('')+'</ul>';
  const label=s=>({supports:'Supports',cautions:'Caution',mixed:'Mixed',available:'Available',unavailable:'Unavailable'})[s]||'Unavailable';
@@ -84,8 +101,48 @@ function renderInvestmentIntelligenceV94(){
  for(const id of targets){const el=$(id);if(el)el.innerHTML=content;}
  if(lab)lab.textContent='V9.4 cross-investment evidence is linked: '+intel.coverage.issuersWithMetrics+'/'+intel.coverage.selected+' SEC issuer records; historical co-movement '+(movement.ready?'available':'unavailable')+'; three risk-policy checks completed. Review the Research Hub or Briefing for interpretation.';
 }
+function renderResearchDiagnosticsV95(){
+ const data=linkedResearchDiagnosticsV95;
+ for(const id of ['qf-v95-hub','qf-v95-brief']){
+  const box=$(id);if(!box)continue;
+  if(!data){box.textContent='';continue;}
+  const p=data.portfolio,g=data.gate,v=data.valuation;
+  const ratio=x=>typeof x==='number'&&Number.isFinite(x)?(x*100).toFixed(2)+'%':'Unavailable';
+  const val=x=>typeof x==='number'&&Number.isFinite(x)?'$'+x.toFixed(2)+'B':'Unavailable';
+  const grid=(heads,rows)=>'<div class="table-wrap"><table class="qf-v95-table"><thead><tr>'+heads.map(h=>'<th scope="col">'+safe(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+row.map(c=>'<td>'+safe(c)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
+  const weights=p.allocation?.positions||[];
+  const alloc=p.allocation?grid(['Current virtual investment','Portfolio weight'],weights.map(x=>[assetNames[x.symbol]||x.symbol,ratio(x.weight)]).concat([['Cash',ratio(p.allocation.cashWeight)]])):
+   '<p class="tiny">No complete, fresh account valuation. Allocation withheld.</p>';
+  const riskRows=p.ready&&p.baseline?[['Annualized volatility',ratio(p.baseline.annualVolatility),ratio(p.hypothetical?.annualVolatility)],
+   ['Daily 95% expected shortfall',ratio(p.baseline.dailyES95),ratio(p.hypothetical?.dailyES95)],
+   ['Maximum observed drawdown',ratio(p.baseline.maxDrawdown),ratio(p.hypothetical?.maxDrawdown)]]:[];
+  const portfolioRisk=p.ready?grid(['Historical risk estimate','Current weights','Illustrative +5% from cash'],riskRows):'<p class="tiny">'+safe(p.reason)+'</p>';
+  const policy=g.ready?'<p>'+safe(g.summary.count)+' past-only test windows · '+safe(g.summary.allowed)+' risk-screen passes · '+safe(g.summary.blocked)+' blocked. Observed later average change on passed windows: '+ratio(g.summary.allowedObservedAverage)+'. On blocked windows: '+ratio(g.summary.blockedObservedAverage)+'.</p>'+grid(['Training through','Later test through','Gate','Observed later change'],g.windows.map(w=>[w.trainThrough,w.testThrough,w.gatePassed?'Passed':'Blocked',ratio(w.observedForwardReturn)])):
+   '<p class="tiny">'+safe(g.reason)+'</p>';
+  const scenario=v.ready?grid(['Company','Fiscal period','FCF/revenue','FCF/net income','10× FCF','15× FCF','20× FCF'],v.rows.map(r=>[
+   assetNames[r.symbol]||r.symbol,r.fiscalEnd||'Unavailable',ratio(r.fcfToRevenue),ratio(r.cashConversion),
+   val(r.aggregateFcfScenarios?.[0]),val(r.aggregateFcfScenarios?.[1]),val(r.aggregateFcfScenarios?.[2])])):
+   '<p class="tiny">'+safe(v.reason)+'</p>';
+  box.innerHTML='<section class="qf-v95-shell" aria-label="Integrated portfolio, validation and valuation research">'+
+   '<div class="qf-v95-heading"><span class="eyebrow">INTEGRATED DECISION EVIDENCE · V9.5</span><h3>Portfolio exposure, past-only policy checks &amp; valuation context</h3><p>These diagnostics share the same selected market history, account context and Research Hub assessment; none can execute a trade or override a missing-data constraint.</p></div>'+
+   '<div class="qf-v95-grid"><section class="qf-v95-panel"><h4>Actual virtual portfolio weights</h4>'+alloc+
+   '<p class="tiny">'+safe(p.note||p.reason||'')+' '+(p.allocation?.concentrationFlag?'The largest position exceeds the selected single-name limit.':'')+'</p></section>'+
+   '<section class="qf-v95-panel"><h4>Historical portfolio risk and cash-funded scenario</h4>'+portfolioRisk+
+   '<p class="tiny">Hypothetical figures use a 5% total-portfolio allocation transferred from cash when eligible; otherwise they remain unavailable. They are not actual account returns or forecasts.</p></section>'+
+   '<section class="qf-v95-panel"><h4>Past-only policy screen diagnostic</h4>'+policy+
+   '<p class="tiny">'+safe(g.note||'Only past observed prices are used to fit the drawdown screen; this does not validate the full investment decision policy.')+'</p></section>'+
+   '<section class="qf-v95-panel"><h4>Comparative SEC cash-flow scenarios</h4>'+scenario+
+   '<p class="tiny">'+safe(v.note||'Reported annual free cash flow is required; missing observations do not become zero.')+'</p></section></div></section>';
+ }
+ const history=$('qf-v95-session-history');
+ if(history){history.innerHTML=researchSessionJournalV95.length?researchSessionJournalV95.map((entry,i)=>
+  '<div class="qf-v95-journal-row"><strong>'+safe(assetNames[entry.symbol]||entry.symbol)+'</strong> · '+safe(entry.date||'Undated')+' · '+safe(entry.action)+' <span class="tiny">'+safe(entry.readiness)+' · '+safe(entry.modelCount)+' models completed</span></div>').join(''):
+  '<p class="tiny">No completed assessment stored in this browser session. Session history is cleared when you sign out or reload; download an evidence briefing to keep a record.</p>';
+ }
+}
 function refreshConnectedResearchV93(){
  renderInvestmentIntelligenceV94();
+ renderResearchDiagnosticsV95();
  const packet=linkedResearchBriefV93;
  const title=$('qf-v93-ribbon-title'),detail=$('qf-v93-ribbon-detail'),brief=$('qf-v93-ribbon-brief');
  if(title)title.textContent=packet?'Completed research · '+packet.candidate+' ('+packet.symbol+')':'Research workflow · No current assessment';
@@ -670,7 +727,7 @@ async function verifyMFA(){
   }catch(e){message(e.message);}
 }
 async function logout(){
-  clearResearchOSV90();
+  researchSessionJournalV95=[];clearResearchOSV90();
   try{await api('auth/logout',{});}catch(_){ /* Clear visible private content regardless */ }
   ideasRunSequence++;ideaData=[];ideaFundamentals={};$('ideas-results').textContent='';$('ideas-run').disabled=false;clearDecisionBrief();
   clearImportedFrenchV87();clearGuideV79();clearMFA();showStep('login');privateState=null;quoted={};historyLoadSequence++;historySeries=null;closeAssetBrowser();researchSelection=[];$('private-symbol').value='';$('private-selected-asset').textContent='No investment selected';renderResearchSelection();
@@ -687,7 +744,7 @@ async function currentQuote(){
   if(!symbol){message('Choose an investment with Browse investments first.');return;}
   try{
     const r=await api('private/quotes?symbols='+encodeURIComponent(symbol));
-    const q=r.quotes[0];quoted[symbol]=q;
+    const q=r.quotes[0];quoted[symbol]=q;clearResearchOSV90();
     $('private-quote').textContent=usd(q.price)+' · '+q.venue+' · '+q.timestamp+' (last trade, not executable price)';
     message('Quote loaded.');if(privateState)render();
   }catch(e){$('private-quote').textContent='Unavailable';message(e.message);}
@@ -1570,7 +1627,7 @@ $('qf-v93-ribbon-brief').addEventListener('click',()=>privateTab('settings'));
 $('qf-v93-brief-refresh').addEventListener('click',renderConnectedBriefV93);
 $('qf-v93-brief-export').addEventListener('click',()=>{
  if(!privateState||!linkedResearchBriefV93)return;
- downloadResearchJSON('quantforge-v94-linked-research-briefing.json',{...linkedResearchBriefV93,comparativeIntelligence:linkedResearchIntelligenceV94});
+ downloadResearchJSON('quantforge-v95-linked-research-briefing.json',{...linkedResearchBriefV93,comparativeIntelligence:linkedResearchIntelligenceV94,portfolioValidation:linkedResearchDiagnosticsV95?window.QFPrivatePortfolioValidationV95.exportSafe(linkedResearchDiagnosticsV95):null});
 });
 for(const id of ['qf-v93-briefing','qf-v93-lab-status'])$(id).addEventListener('click',e=>{
  const b=e.target.closest('[data-v93-method]');
@@ -1578,6 +1635,7 @@ for(const id of ['qf-v93-briefing','qf-v93-lab-status'])$(id).addEventListener('
 });
 $('private-v90-browse').addEventListener('click',()=>openAssetBrowser('research'));
 $('private-v90-run').addEventListener('click',runResearchOSV90);
+$('qf-v95-journal-clear').addEventListener('click',()=>{researchSessionJournalV95=[];renderResearchDiagnosticsV95();});
 $('private-v90-report').addEventListener('click',e=>{const b=e.target.closest('[data-private-tab]');if(b&&privateState&&['lab','trade','research','candidate','settings'].includes(b.dataset.privateTab))privateTab(b.dataset.privateTab);});
 for(const id of ['private-v90-candidate','private-v90-risk','private-v90-horizon','private-v90-maxweight','private-v90-maxdrawdown','private-v90-days'])
  $(id).addEventListener('change',clearResearchOSV90);
