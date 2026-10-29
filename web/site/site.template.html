@@ -382,6 +382,19 @@ main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
 #private-decision-center-v84 .qf-v84-yes{color:#215b41;background:#e4f2e8}
 #private-decision-center-v84 .qf-v84-no{color:#76552b;background:#f8efe0}
 @media(max-width:680px){#private-decision-center-v84 .qf-v84-evidence-grid{grid-template-columns:1fr}}
+/* V8.5: candidate dossier stays within private Decision Center. */
+#private-decision-center-v84 .qf-v85-candidate{margin-top:29px;padding-top:22px;border-top:2px solid #dce9e3}
+#private-decision-center-v84 .qf-v85-candidate h3{margin:8px 0 10px;font-size:19px}
+#private-decision-center-v84 .qf-v85-output{margin-top:17px;min-height:40px}
+#private-decision-center-v84 .qf-v85-metric-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+#private-decision-center-v84 .qf-v85-metric{border:1px solid #d9e7e0;border-radius:9px;padding:12px;min-width:0}
+#private-decision-center-v84 .qf-v85-metric strong{display:block;font-size:20px;margin-top:8px;color:#194d3e}
+#private-decision-center-v84 .qf-v85-chart{width:100%;height:auto;border:1px solid #d9e7e0;border-radius:10px;background:#f7faf9}
+#private-decision-center-v84 .qf-v85-key{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;margin:7px 0 15px}
+#private-decision-center-v84 .qf-v85-key .line{display:inline-block;width:20px;border-top:3px solid #146e5f;vertical-align:middle;margin-right:5px}
+#private-decision-center-v84 .qf-v85-key .line.peer{border-color:#a5672b}
+@media(max-width:780px){#private-decision-center-v84 .qf-v85-metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){#private-decision-center-v84 .qf-v85-metric-grid{grid-template-columns:1fr}}
 
 /* V8.4.1: attribution that never divides the full name; article-first methods flow. */
 .qf-v83-owner{display:flex;flex-direction:column;align-items:flex-start;gap:2px;margin:8px 6px 2px;line-height:1.4}

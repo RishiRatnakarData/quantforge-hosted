@@ -66,6 +66,15 @@ block='''<section class="tabpage" id="page-private">
         <p class="qf-private-section-intro">Bring together the analyses already run in this session. See the covered investments, what the models agree or disagree about, which evidence is missing, and the next calculation to perform. Nothing here moves money or changes your virtual portfolio.</p>
         <div class="controls"><button class="btn primary" type="button" id="private-decision-run-v84">Assess current evidence</button><span class="tiny">Generated on demand · MFA-protected</span></div>
         <div id="private-decision-result-v84" aria-live="polite" style="margin-top:15px"><p class="tiny">Choose Assess current evidence to review your completed analyses.</p></div>
+        <section class="qf-v85-candidate" id="private-candidate-v85" aria-labelledby="private-candidate-title-v85">
+          <span class="eyebrow">SINGLE-INVESTMENT RESEARCH</span><h3 id="private-candidate-title-v85">Candidate risk, valuation and portfolio scenarios</h3>
+          <p class="tiny">Choose from the investments whose historical prices you actually loaded. Review SEC-derived company facts when available, observed-price valuation ratios, downside risk and a peer-relative return comparison. The selected peers are not a market-index factor model.</p>
+          <div class="formgrid"><div class="field"><label for="private-candidate-select-v85">Investment to examine</label>
+            <select id="private-candidate-select-v85"><option value="">Load historical observations first</option></select>
+          </div></div>
+          <div class="controls"><button type="button" class="btn primary" id="private-candidate-run-v85">Analyze this investment</button><span class="tiny">On demand · private session · no trade</span></div>
+          <div id="private-candidate-output-v85" aria-live="polite" role="status" class="qf-v85-output"><p class="tiny">Load market history, then choose a candidate to examine.</p></div>
+        </section>
       </div>
     </section>
     <section class="private-view" data-private-view="trade" hidden>
@@ -249,7 +258,7 @@ for slot, file in [('/* QF_MODEL */','model.js'),('/* QF_APP */','app.js'),('/* 
  text=(src/'site'/file).read_text(encoding="utf-8")
  if file=='private.js':
   # Bundled alongside the existing private script: still only three CSP-protected scripts.
-  text=(src/'site/private_ideas_v70.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_allocation_v74.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_value_v73.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_v72.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_guide_v79.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_center_v84.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_multimarket.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_forecast_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_walkforward_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_diagnostics_v66.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_integrity_v67.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_robustness_v68.js').read_text(encoding='utf-8')+'\n'+text
+  text=(src/'site/private_ideas_v70.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_allocation_v74.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_value_v73.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_v72.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_guide_v79.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_center_v84.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_candidate_v85.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_multimarket.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_forecast_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_walkforward_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_diagnostics_v66.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_integrity_v67.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_robustness_v68.js').read_text(encoding='utf-8')+'\n'+text
  if file=='app.js':
   assert text.count('/* QF_SEC_DATA */ null')==1
   # Bundle pure SEC analytics in the existing public app script. CSP remains 3 hashes.

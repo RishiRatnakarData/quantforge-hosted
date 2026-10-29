@@ -35,9 +35,117 @@ function runDecisionCenterV84(){
  message('Decision Center updated from current local research results. No trades or external AI calls.');
 }
 
+/* V8.5 single-candidate dossier, explicitly invoked after MFA sign-in. */
+let candidateRequestV85=0;
+function clearCandidateDossierV85(){
+ candidateRequestV85++;
+ const out=$('private-candidate-output-v85');
+ if(out)out.textContent='Research inputs may have changed. Run the candidate analysis again.';
+ const button=$('private-candidate-run-v85');if(button)button.disabled=false;
+}
+function refreshCandidateChoicesV85(){
+ const picker=$('private-candidate-select-v85');if(!picker)return;
+ const prev=picker.value;
+ const matched=historySeries&&Array.isArray(historySeries.symbols)&&
+  researchSelection.length===historySeries.symbols.length&&
+  researchSelection.every(sym=>historySeries.symbols.includes(sym));
+ const choices=matched?historySeries.symbols:[];
+ picker.innerHTML='<option value="">'+(matched?'Choose a loaded investment':'Load matching market history first')+'</option>'+
+  choices.map(sym=>'<option value="'+safe(sym)+'">'+safe(assetNames[sym]||sym)+' ('+safe(sym)+')</option>').join('');
+ if(choices.includes(prev))picker.value=prev;
+}
+function candidateChartV85(d){
+ const data=d.graph;if(!data||!data.candidate?.length)return '';
+ const all=[...data.candidate,...data.peers];
+ if(all.some(x=>!finite(x)))return '';
+ const mn=Math.min(...all),mx=Math.max(...all),spread=mx-mn||1;
+ const path=series=>series.map((v,i)=>(i?'L':'M')+(48+i*510/(series.length-1)).toFixed(1)+' '+(181-(v-mn)/spread*144).toFixed(1)).join(' ');
+ const start=safe(data.dates[0]),end=safe(data.dates.at(-1));
+ return '<figure style="margin:15px 0"><svg class="qf-v85-chart" viewBox="0 0 600 220" role="img" aria-label="Indexed historical candidate and equal-weight peer basket price returns on the same dates">'+
+  '<line x1="48" y1="181" x2="558" y2="181" stroke="#b4c7bd"/>'+
+  '<line x1="48" y1="37" x2="48" y2="181" stroke="#b4c7bd"/>'+
+  '<path d="'+path(data.peers)+'" fill="none" stroke="#a5672b" stroke-width="2.3"/>'+
+  '<path d="'+path(data.candidate)+'" fill="none" stroke="#146e5f" stroke-width="2.6"/>'+
+  '<text x="48" y="203" fill="#425e50" font-size="12">'+start+'</text><text x="558" y="203" text-anchor="end" fill="#425e50" font-size="12">'+end+'</text></svg>'+
+  '<div class="qf-v85-key"><span><i class="line"></i>'+safe(d.symbol)+'</span><span><i class="line peer"></i>Equal-weight selected peers</span></div>'+
+  '<figcaption class="tiny">Recent aligned sessions; both series rebased to their common chart starting observation. Price-only. Read the numerical statistics below for full-period measures.</figcaption></figure>';
+}
+function renderCandidateDossierV85(d){
+ const out=$('private-candidate-output-v85');
+ if(!d.ready){out.innerHTML='<p class="notice">'+safe(d.reason)+'</p>';return;}
+ const pct=n=>finite(n)?(n*100).toFixed(2)+'%':'Unavailable';
+ const num=n=>finite(n)?n.toFixed(2)+'×':'Unavailable';
+ const coef=n=>finite(n)?n.toFixed(2):'Unavailable';
+ const metric=(name,value)=>'<div class="qf-v85-metric"><span class="tiny">'+safe(name)+'</span><strong>'+safe(value)+'</strong></div>';
+ const m=d.metrics,f=d.fundamentals,v=d.valuation,p=d.portfolioImpact;
+ const impacts=p?[
+  ['Existing position weight',pct(p.currentWeight)],
+  ['Candidate -20%: current portfolio effect',pct(p.existingCandidateShock20)],
+  ['Add 5% of portfolio from cash, then -20%',pct(p.additional5)],
+  ['Add 10% of portfolio from cash, then -20%',pct(p.additional10)],
+  ['Current virtual cash share',pct(p.cashWeight)]
+ ]:[];
+ const cautions=[...d.cautions,...v.warnings];
+ const list=items=>'<ul class="tiny">'+items.map(x=>'<li>'+safe(x)+'</li>').join('')+'</ul>';
+ out.innerHTML='<div class="qf-v84-summary"><span class="eyebrow">CANDIDATE DOSSIER</span><h3>'+safe(assetNames[d.symbol]||d.symbol)+' ('+safe(d.symbol)+')</h3>'+
+  '<p class="tiny">'+safe(d.history.observations)+' observed daily returns · '+safe(d.history.start)+' through '+safe(d.history.end)+' · '+safe(d.history.peerCount)+' other selected investments in peer comparison</p></div>'+
+  '<h3>Observed return and downside profile</h3><div class="qf-v85-metric-grid">'+
+  metric('Loaded-period price change',pct(m.periodReturn))+metric('Last 63-session price change',pct(m.trailing63Return))+
+  metric('Historical annualized volatility',pct(m.annualVolatility))+metric('Worst observed drawdown',pct(m.maxDrawdown))+
+  metric('One-day historical 95% VaR (loss)',pct(m.dailyVaR95))+metric('One-day historical 95% expected shortfall',pct(m.dailyES95))+'</div>'+
+  candidateChartV85(d)+'<h3>Peer-relative sensitivity (not broad-market beta)</h3>'+
+  displayTable(['Descriptive measure','Candidate / other selected investments'],[
+   ['Candidate period change',pct(m.periodReturn)],['Equal-weight peers period change',pct(m.peerPeriodReturn)],
+   ['Candidate annualized volatility',pct(m.annualVolatility)],['Peer annualized volatility',pct(m.peerAnnualVolatility)],
+   ['Candidate daily return correlation with peers',coef(m.peerCorrelation)],
+   ['Candidate regression sensitivity to peers',coef(m.peerBeta)],
+   ['In-sample explanatory R²',pct(m.peerR2)]])+
+  '<p class="tiny">Peer sensitivity = covariance(candidate daily returns, equal-weight daily returns of other selected investments) / variance(peer returns). The peer set is selected by the user, not an external market or economic factor benchmark. In-sample only.</p>'+
+  '<h3>SEC operating evidence and observed-price valuation</h3>'+
+  displayTable(['Measure','Reported / calculated'],[
+   ['Latest SEC annual period',f.fiscalEnd||'Not loaded / not applicable'],
+   ['Comparable annual revenue growth',pct(f.revenueGrowth)],['Operating profit margin',pct(f.operatingMargin)],
+   ['Free-cash-flow proxy / revenue',pct(f.freeCashFlowMargin)],
+   ['Observed quote timestamp',v.priceTime||'Unavailable'],['SEC share-count period',v.sharesTime||'Unavailable'],
+   ['Price / sales',num(v.pSales)],['Price / positive FCF proxy',num(v.pFcf)],
+   ['Annual FCF proxy yield',pct(v.fcfYield)]])+
+  '<p class="tiny">Negative cash flow is not converted to a positive P/FCF multiple. Missing or stale share counts, annual filings and quotes suppress market-cap-based ratios. These ratios are not a DCF, fair-value estimate, or price target.</p>'+
+  '<h3>Virtual portfolio impact — hypothetical downside</h3>'+
+  (p?displayTable(['Scenario','Portfolio result'],impacts):'<p class="notice">Incomplete priced holdings or missing virtual cash balance; current-account stress effects are withheld.</p>')+
+  '<p class="tiny">The assumed -20% isolated candidate shock applies to the position weight after each illustrated cash-funded allocation. It is not a return prediction; no trades or changes to virtual holdings take place.</p>'+
+  '<h3>Flags and limitations</h3>'+list(cautions.length?cautions:['No numerical review thresholds triggered; this does not mean risk is low.'])+
+  list([...d.valuation.limitations,...d.limitations])+
+  '<div class="controls"><button class="btn sm" type="button" data-v85-go="valuation">Open company valuation</button><button class="btn sm" type="button" data-v85-go="trade">Open purchase-impact calculator</button></div>';
+}
+async function runCandidateDossierV85(){
+ if(!privateState){message('Sign in with MFA before requesting candidate research.');return;}
+ const sym=$('private-candidate-select-v85').value;
+ if(!sym||!historySeries?.symbols?.includes(sym)){message('Choose an investment from the loaded market history.');return;}
+ clearCandidateDossierV85();
+ const id=candidateRequestV85,session=privateState,h=historySeries,selected=researchSelection.join(','),out=$('private-candidate-output-v85');
+ $('private-candidate-run-v85').disabled=true;
+ out.textContent='Combining observed historical data with available SEC filings and private observed-price context…';
+ const companyPromise=valuationCompanies[sym]?Promise.resolve(valuationCompanies[sym]):api('private/sec/company?symbol='+encodeURIComponent(sym));
+ const [companyResult,capitalResult,quoteResult]=await Promise.allSettled([
+  companyPromise,api('private/valuation-capital?symbol='+encodeURIComponent(sym)),
+  api('private/quotes?symbols='+encodeURIComponent(sym))
+ ]);
+ if(id!==candidateRequestV85||session!==privateState||h!==historySeries||selected!==researchSelection.join(',')||$('private-candidate-select-v85').value!==sym)return;
+ const company=companyResult.status==='fulfilled'&&companyResult.value?.symbol===sym?companyResult.value:null;
+ if(company)valuationCompanies[sym]=company;
+ const capital=capitalResult.status==='fulfilled'?capitalResult.value:null;
+ const q=quoteResult.status==='fulfilled'?(quoteResult.value?.quotes||[]).find(item=>item.symbol===sym):null;
+ let value=null;
+ if(company&&capital&&q){try{value=window.QFPrivateValueV73.build(company,capital,q,new Date().toISOString());}catch(_){/* Valuation withheld when issuer or dates disagree. */}}
+ const dossier=window.QFPrivateCandidateV85.evaluate({symbol:sym,selection:researchSelection,history:h,company,value,portfolio:session,quotes:quoted,now:new Date().toISOString()});
+ renderCandidateDossierV85(dossier);
+ $('private-candidate-run-v85').disabled=false;
+ message('Private candidate analysis calculated. No portfolio changes or broker orders.');
+}
 function clearGuideV79(){
  guideReportV79=null;
  clearDecisionCenterV84();
+ clearCandidateDossierV85();
  const out=$('private-guide-result-v79'),btn=$('private-guide-export-v79');
  if(out)out.textContent='Research changed. Generate a new summary to use the latest results.';
  if(btn)btn.disabled=true;
@@ -528,6 +636,7 @@ function maxDD(values){let high=0,deep=0;for(const v of values){high=Math.max(hi
 function displayTable(headers,rows){return '<div class="table-wrap"><table><thead><tr>'+headers.map(h=>'<th>'+safe(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+row.map(v=>'<td>'+safe(v)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';}
 function privateTab(tab){
  if(tab==='decision')clearDecisionCenterV84();
+ if(tab==='decision')refreshCandidateChoicesV85();
  const shared=$('private-research-dataset');if(shared)shared.hidden=!['research','optimization','backtest','walkforward'].includes(tab);
  refreshResearchContext();
  document.querySelectorAll('[data-private-view]').forEach(p=>p.hidden=p.dataset.privateView!==tab);
@@ -1070,6 +1179,12 @@ for(const id of ['private-fc-years','private-fc-growth','private-fc-margin','pri
 
 document.querySelectorAll('[data-private-tab]').forEach(b=>b.addEventListener('click',()=>privateTab(b.dataset.privateTab)));
 $('private-decision-run-v84').addEventListener('click',runDecisionCenterV84);
+$('private-candidate-run-v85').addEventListener('click',runCandidateDossierV85);
+$('private-candidate-select-v85').addEventListener('change',clearCandidateDossierV85);
+$('private-candidate-output-v85').addEventListener('click',e=>{
+ const b=e.target.closest('[data-v85-go]');
+ if(b&&privateState&&['valuation','trade'].includes(b.dataset.v85Go))privateTab(b.dataset.v85Go);
+});
 $('private-decision-result-v84').addEventListener('click',e=>{
  const b=e.target.closest('[data-v84-go]');
  if(!b||!privateState)return;
