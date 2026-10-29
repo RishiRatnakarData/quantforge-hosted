@@ -296,8 +296,79 @@ main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
 }
 @media(max-width:450px){.qf-nav-section{grid-template-columns:repeat(3,minmax(0,1fr))}.side .qf-nav-section .nav-btn{font-size:11px;padding:8px 5px}}
 
+
+/* QF V8.3: editorial financial research overview and explicit model scopes. */
+.qf-v83-owner{font-size:11px;color:#4d6f61;letter-spacing:.02em;margin:10px 6px 4px;line-height:1.5}
+.qf-v83-owner strong{color:#1a5444}
+.qf-v83-cover{padding:17px 20px;margin:17px 0 8px;border:1px solid #cfe2d8;border-radius:12px;background:linear-gradient(115deg,#f1f8f3,#fff)}
+.qf-v83-cover p{font-size:13px;color:#4a695a;line-height:1.65;margin:5px 0 9px}
+.qf-v83-pillstrip{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.qf-v83-pillstrip span{font-size:12px;border:1px solid #d0e1d5;color:#285b48;background:white;padding:7px 10px;border-radius:8px}
+.qf-v83-paths{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin:20px 0}
+.qf-v83-path{border:1px solid #d5e7dd;background:#fff;text-align:left;padding:16px;border-radius:11px;display:flex;flex-direction:column;gap:7px;min-height:125px;cursor:pointer;transition:border-color .14s,background .14s}
+.qf-v83-path:hover,.qf-v83-path:focus-visible{background:#f4faf5;border-color:#719c84}
+.qf-v83-path small{font-size:11px;line-height:1.55;color:#5a7668}
+.qf-v83-path strong{font-size:15px;color:#174d3b}
+.qf-v83-path>span{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#658170;font-weight:800}
+.qf-v83-scope{padding:12px 15px;background:#f4faf6;border:1px solid #d6e5db;border-radius:10px;margin:12px 0;font-size:13px;color:#355e4b;line-height:1.65}
+.qf-v83-current{color:#13523c;font-weight:750}
+.qf-v83-matrix{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:16px 0 26px}
+.qf-v83-method{border:1px solid #d4e5db;background:#fbfdfa;border-radius:12px;padding:18px;min-width:0}
+.qf-v83-method .qf-v83-index{font-size:10px;letter-spacing:.1em;color:#557b6c;font-weight:800;text-transform:uppercase}
+.qf-v83-method h4{margin:7px 0 8px;font-size:16px;color:#174b3b}
+.qf-v83-method p,.qf-v83-method li{font-size:12.5px;line-height:1.65;color:#4b6758}
+.qf-v83-method ul{margin:9px 0;padding-left:19px}
+.qf-v83-formula{font:12px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;color:#244f41;background:#edf5ef;border-radius:7px;padding:11px 12px;overflow-x:auto}
+.qf-v83-method a{font-size:12px;font-weight:700;text-underline-offset:3px;color:#155b44}
+.qf-v83-method .qf-v83-test{font-size:11px;border-top:1px solid #e0e9e2;margin-top:11px;padding-top:10px}
+.qf-v83-process{padding:17px;background:#f7faf8;border-left:3px solid #82ab95;border-radius:9px;margin:12px 0 22px}
+.qf-v83-process p{font-size:13px;line-height:1.7;color:#385949}
+#page-lab .qf-v83-scope{margin:10px 0 16px}
+#page-lab #lab-recalculate{display:none!important}
+@media(max-width:1050px){.qf-v83-paths{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.qf-v83-matrix,.qf-v83-paths{grid-template-columns:1fr}.qf-v83-path{min-height:0}}
+/* Four equal destination cards replace the three-item navigation grid. */
+#page-overview .qf-home-roadmap{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}
+#page-overview .qf-home-roadmap .qf-roadmap-card{min-width:0;min-height:143px}
+@media(max-width:1050px){#page-overview .qf-home-roadmap{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){#page-overview .qf-home-roadmap{grid-template-columns:1fr}#page-overview .qf-home-roadmap .qf-roadmap-card{min-height:0}}
+
+
+
+/* QF V8.3.1 / Case-study and readable SEC scatter */
+.qf-v831-paper{border:1px solid #bbdacf;border-radius:15px;background:linear-gradient(130deg,#f0f8f3,#fff);padding:23px 25px;margin:18px 0;box-shadow:0 2px 8px #123e2d0a}
+.qf-v831-paper h2{margin:5px 0 8px;line-height:1.25;font-size:clamp(18px,2vw,25px)}
+.qf-v831-paper p{font-size:13px;line-height:1.7;max-width:780px;color:#466858}
+.qf-v831-paper .qf-v831-links{display:flex;flex-wrap:wrap;gap:11px;margin-top:15px}
+.qf-v831-paper a{display:inline-flex;align-items:center;justify-content:center;min-height:39px;padding:9px 13px;border:1px solid #92b9a7;border-radius:9px;font-size:13px;font-weight:700;text-decoration:none;color:#185845;background:#fff}
+.qf-v831-paper a:first-child{background:#1a6955;color:#fff;border-color:#1a6955}
+.qf-v831-paper a:hover,.qf-v831-paper a:focus-visible{outline:2px solid #7eb59c;outline-offset:2px}
+.qf-v831-home-paper{margin:13px 0;padding:12px 15px;border-left:3px solid #548f72;background:#f4faf6;border-radius:8px;font-size:13px}.qf-v831-home-paper a{font-weight:700;color:#155943;text-underline-offset:3px}
+.qf-evidence-explorer{font-size:13px;line-height:1.55}
+.qf-evidence-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:11px;margin:4px 0 9px}
+.qf-evidence-switch{display:flex;gap:3px;border:1px solid #bdd7ca;padding:3px;border-radius:10px;background:#f4faf6}
+.qf-evidence-switch button{background:transparent;color:#345e4e;border:0;border-radius:7px;padding:9px 13px;cursor:pointer;font:inherit;font-weight:650}
+.qf-evidence-switch button[aria-pressed="true"]{background:#195d4c;color:#fff}
+.qf-evidence-toolbar label{font-weight:650;color:#365d4c}
+.qf-evidence-toolbar select{font:inherit;max-width:320px;min-width:195px;padding:9px;border:1px solid #adcbbd;border-radius:8px;background:#fff;color:#214c3b}
+.qf-evidence-explorer button:focus-visible,.qf-evidence-explorer select:focus-visible,.qf-evidence-explorer circle:focus-visible{outline:2px solid #eead6e;outline-offset:2px}
+.qf-evidence-context{background:#f1f7f3;border:1px solid #e0eae1;border-radius:8px;color:#36594a;margin:9px 0 14px;padding:8px 11px}
+.qf-evidence-layout{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:18px;align-items:start}
+.qf-evidence-layout .evidence-graph{min-width:0}
+.qf-evidence-layout .evidence-graph svg{display:block;width:100%;height:auto;min-height:300px}
+.qf-evidence-layout .evidence-graph circle{cursor:pointer;transition:opacity .1s}
+.qf-evidence-layout .evidence-graph circle:hover{opacity:1}
+.qf-evidence-layout .evidence-data{max-height:340px;overflow:auto;border:1px solid #d7e5dc;border-radius:9px;min-width:0}
+.qf-evidence-layout .evidence-data th{position:sticky;top:0;background:#edf5f1;z-index:1}
+.qf-evidence-layout .evidence-data button{cursor:pointer;font:inherit;font-weight:750;color:#155d48;border:0;background:transparent;text-decoration:underline;text-underline-offset:3px}
+.qf-evidence-layout .qf-evidence-active{background:#fff2e8}
+.qf-evidence-selection{background:#fffaf0;border-left:3px solid #c68b49;padding:12px;margin:13px 0;color:#354c42}
+.qf-evidence-footnote{color:#526c5c;margin:6px 0 0;font-size:12px}
+@media(max-width:950px){.qf-evidence-layout{grid-template-columns:1fr}.qf-evidence-layout .evidence-data{max-height:260px}}
+@media(max-width:550px){.qf-v831-paper{padding:17px}.qf-evidence-toolbar select{width:100%;max-width:none}}
+
 </style></head><body>
-<div class="app"><aside class="side"><div class="brand"><div class="mark">Q</div>quantforge</div><nav id="navigation" aria-label="Main navigation">
+<div class="app"><aside class="side"><div class="brand"><div class="mark">Q</div>quantforge</div><p class="qf-v83-owner">Designed and developed by <strong>Rishi Ratnakar</strong></p><nav id="navigation" aria-label="Main navigation">
   <div class="qf-nav-section" role="group" aria-label="Financial research pages">
     <span class="nav-caption">Financial research</span>
     <button class="nav-btn active" data-page="overview" aria-current="page">Overview</button>
@@ -319,16 +390,18 @@ main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
 </nav><div class="sidenote">Historical SEC data · reproducible models<br>Personal investment research requires sign-in</div></aside>
 <a class="skip-link" href="#main-content">Skip to content</a><main id="main-content"><div class="topbar"><span class="eyebrow">SEC filings · portfolio models · research methods</span><span class="badge">RESEARCH OVERVIEW</span></div>
 <section class="tabpage active" id="page-overview">
-<div class="intro-simple"><span class="eyebrow">FINANCIAL DATA &amp; QUANTITATIVE ANALYSIS</span><h1>Financial analysis grounded in reported company data.</h1><p>Explore annual company financials from SEC filings, compare calculated metrics, and test portfolio-model assumptions. Reported company data is identified separately from simulated returns and hypothetical forecasts.</p></div>
-<div class="qf-home-meta"><span><strong id="qf-company-count-v81">Available companies</strong> · historical SEC company facts</span><span>Original filings · explicit simulation labels · tested models</span></div>
-<nav class="qf-home-roadmap" aria-label="Choose an analysis">
- <button type="button" class="qf-roadmap-card" data-go="sec"><span>01 · REPORTED DATA</span><strong>Explore company financials</strong><small>Start with real SEC revenue, income, and cash-flow disclosures.</small></button>
- <button type="button" class="qf-roadmap-card" data-go="lab"><span>02 · CALCULATED MODELS</span><strong>Explore the analysis dashboard</strong><small>Compare reported financials and test simulated portfolio strategies.</small></button>
- <button type="button" class="qf-roadmap-card" data-go="systems"><span>03 · CODE &amp; EVIDENCE</span><strong>Explore research methods</strong><small>Inspect source lineage, model assumptions, engineering checks, and published code.</small></button>
+<div class="intro-simple"><span class="eyebrow">FINANCIAL DATA &amp; QUANTITATIVE ANALYSIS</span><h1>Financial research, portfolio analytics, and quantitative modeling.</h1><p>QuantForge integrates SEC company disclosures, financial-statement analysis, portfolio risk modeling, constrained optimization, valuation scenarios, and historical strategy evaluation. The research workflow connects source validation, statistical calculations, and reproducible model tests. Its public models distinguish SEC facts from simulated returns and hypothetical forecasts.</p></div>
+<div class="qf-home-meta"><span><strong id="qf-company-count-v81">Available companies</strong> · historical SEC company facts</span><span>Financial research · model validation · source-linked calculations</span></div>
+<nav class="qf-home-roadmap" aria-label="Explore financial research">
+ <button type="button" class="qf-roadmap-card" data-go="sec"><span>01 · FINANCIAL STATEMENTS</span><strong>Company financials</strong><small>Explore historical SEC revenue, profitability, cash flow, and cross-company comparisons.</small></button>
+ <button type="button" class="qf-roadmap-card" data-go="lab"><span>02 · COMPARATIVE ANALYSIS</span><strong>Analysis dashboard</strong><small>Inspect company trends and evaluate simulated allocation strategies with transparent settings.</small></button>
+ <button type="button" class="qf-roadmap-card" data-go="quant"><span>03 · QUANTITATIVE METHODS</span><strong>Risk and allocation</strong><small>Compare modeled covariance, downside risk, portfolio weights, and constraint effects.</small></button>
+ <button type="button" class="qf-roadmap-card" data-go="systems"><span>04 · CODE AND VALIDATION</span><strong>Research methods</strong><small>Inspect algorithms, numerical checks, provenance, source code, and regression tests.</small></button>
 </nav>
-<div class="pane"><div class="section-title"><h3>Company financials from SEC filings</h3><span class="mini">Historical company filings</span></div><div class="three" id="home-sec-highlights"></div><div class="controls"><button class="btn primary" data-go="sec">Explore SEC Financials</button><span class="tiny" id="home-sec-updated">Historical filings · not live stock prices</span></div></div>
+<div class="qf-v831-home-paper"><a href="research-case-study.html">Featured research: Growth, margins and cash generation — full SEC case study</a></div>
+<div hidden aria-hidden="true"><div id="home-sec-highlights"></div><span id="home-sec-updated"></span></div>
 
-<div class="qf-evidence-shortcut"><p><strong>How to interpret these results:</strong> Company statements are historical SEC figures. Portfolio examples and forward scenarios are hypothetical, not live prices or investment recommendations.</p><button class="btn" data-go="methods">Sources and methodology</button><a class="qf-source-link" href="https://github.com/RishiRatnakarData/quantforge-hosted" target="_blank" rel="noopener noreferrer">View GitHub source and tests</a></div>
+<div class="qf-evidence-shortcut"><p><strong>Research data:</strong> Historical SEC company financials, derived ratios, and clearly labeled simulated returns and hypothetical forecasts.</p><button class="btn" data-go="methods">Sources and methodology</button><a class="qf-source-link" href="https://github.com/RishiRatnakarData/quantforge-hosted" target="_blank" rel="noopener noreferrer">View GitHub source and tests</a></div>
 </section>
 <section class="tabpage" id="page-sec">
   <div class="pagehead"><h1>SEC company financials</h1><p>Explore reported annual revenue, operating income, growth, and cash flow from the reviewed SEC Company Facts snapshot. Filing dates and fiscal periods are shown alongside the figures.</p></div>
@@ -379,7 +452,7 @@ main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
 
 <section class="tabpage" id="page-lab">
  <div class="lab-lead"><span class="eyebrow">FINANCIAL FINDINGS &amp; QUANTITATIVE MODELS</span><h1>Analysis dashboard</h1>
-  <p>Explore three working analyses: SEC company trends, minimum-variance portfolio allocation, and rolling strategy evaluation. Each view displays calculated results, charts, and the assumptions needed to interpret them. SEC financials are historical facts; investment return examples are simulated.</p>
+  <p>An integrated view of SEC financial performance, covariance-based portfolio allocation, and walk-forward strategy evaluation. The financial exhibit uses historical company filings; the allocation and strategy exhibits use an independent, reproducible simulated return basket. Every model reports its inputs, assumptions, and calculated outputs; investment return examples are simulated.</p>
   <div class="lab-truth"><span>SEC: reported annual company figures</span><span>Portfolio: simulated return inputs</span><span>Walk-forward: simulated strategy results</span><span>Private data: sign-in required</span></div>
  </div>
  <div class="lab-skill-grid" aria-label="Technical disciplines demonstrated">
@@ -393,15 +466,16 @@ main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
  <section class="pane lab-exhibit" id="lab-sec">
   <div class="lab-section-heading"><strong>01 · Company performance</strong><span>Historical SEC data</span></div>
   <p class="evidence-intro">Select a company to compare revenue, year-over-year change, and operating margin across available fiscal years. Charts and figures come from the reviewed SEC snapshot; missing figures are labeled unavailable.</p>
+  <div class="qf-v83-scope">This company selection updates <strong>only the SEC performance exhibit</strong> immediately below. The portfolio allocation and walk-forward charts use a separate five-investment simulated dataset. <div>Current company: <span id="qf-v83-active-company" class="qf-v83-current" role="status" aria-live="polite">Loading…</span></div></div>
   <div class="lab-settings"><div class="field"><label for="lab-issuer">Company (SEC filings)</label><select id="lab-issuer"><option>Loading financial data…</option></select></div></div>
   <div id="lab-sec-results" aria-live="polite"></div>
   <div class="lab-evidence-links"><button class="text-link" data-go="sec">Full SEC company analysis →</button><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/site/sec_analytics.js" rel="noopener noreferrer" target="_blank">SEC metric calculations</a><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/tools/build_public_sec_snapshot.py" rel="noopener noreferrer" target="_blank">SEC source pipeline</a></div>
  </section>
  <section class="pane lab-exhibit" id="lab-optimization">
   <div class="lab-section-heading"><strong>02 · Portfolio allocation</strong><span>Simulated returns</span></div>
-  <p class="evidence-intro">Adjust the maximum position size to compare equal weighting with an estimated minimum-variance allocation. The model uses synthetic returns and a shrinkage-adjusted covariance estimate; results are fitted, not observed market performance.</p>
+  <p class="evidence-intro">Compare equal weights with minimum-variance optimization using a reproducible five-investment simulated return dataset. Changing the position cap, transaction costs, or training length automatically refreshes both this allocation and the walk-forward evaluation below; it does not change the company-financial exhibit.</p><div class="qf-v83-scope" id="qf-v83-model-settings" aria-live="polite">Model settings are loading…</div>
   <div class="lab-fields"><div class="field"><label for="lab-cap">Maximum weight per investment</label><select id="lab-cap"><option value="25">25%</option><option value="35">35%</option><option value="45">45%</option><option value="55" selected>55%</option><option value="75">75%</option><option value="100">100%</option></select></div><div class="field"><label for="lab-fee">Rebalance cost per traded dollar</label><select id="lab-fee"><option value="0">0 basis points</option><option value="10" selected>10 basis points</option><option value="25">25 basis points</option><option value="50">50 basis points</option></select></div><div class="field"><label for="lab-train">Rolling training window</label><select id="lab-train"><option value="80">80 sessions</option><option value="120" selected>120 sessions</option><option value="160">160 sessions</option></select></div></div>
-  <div class="controls"><button type="button" class="btn primary" id="lab-recalculate">Recalculate models</button><span class="tiny">Changing settings updates both quant exhibits below</span></div><p id="lab-error" class="error" role="alert"></p>
+  <div class="controls"><button type="button" class="btn primary" id="lab-recalculate" hidden tabindex="-1" aria-hidden="true">Recalculate models</button><span class="tiny">Model results update automatically when settings change.</span></div><p id="lab-error" class="error" role="alert"></p>
   <div id="lab-opt-results" aria-live="polite"></div>
  </section>
  <section class="pane lab-exhibit" id="lab-walkforward">
@@ -421,14 +495,6 @@ main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
 </section>
 
 <section class="tabpage" id="page-systems">
-<!-- QF V8.2 PUBLIC RESEARCH CASE STUDY -->
-<div class="pane" id="qf-v82-case-study" aria-labelledby="qf-v82-case-study-heading">
-  <span class="eyebrow">REPRODUCIBLE RESEARCH / SEC COMPANY FACTS</span>
-  <h2 id="qf-v82-case-study-heading">A financial research case study</h2>
-  <p>Compare reported annual revenue, operating margins, and a cash-flow proxy for four companies. Inspect charts, the metric-level SEC filing ledger, and the limits of cross-company comparisons. No market-price returns, personalized trading recommendations, or private holdings.</p>
-  <div class="controls"><a class="btn" href="research-case-study.html">Read the financial research case study</a><a class="btn" href="research-case-study.csv" download>Download the SEC source ledger</a></div>
-</div>
-
  <div class="tech-lead">
   <span class="eyebrow">RESEARCH SYSTEMS · PUBLIC TECHNICAL EXHIBIT</span>
   <h1>Research methods</h1>
@@ -436,6 +502,15 @@ main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
   <div class="tech-meta"><span class="tech-pill">Real SEC disclosures in public explorer</span><span class="tech-pill">Illustrative diagrams below</span><span class="tech-pill">Private datasets stay private</span></div>
   <div class="controls"><button class="btn primary" data-go="sec">Inspect real SEC data</button><button class="btn" data-go="lab">Run public research models</button><button class="btn" data-go="methods">Read engineering methods</button></div>
  </div>
+
+<!-- QF V8.2 PUBLIC RESEARCH CASE STUDY -->
+<!-- QF V8.3.1 featured case-study placement: full report lives on its own page -->
+<div class="qf-v831-paper" id="qf-v82-case-study">
+ <span class="eyebrow">FEATURED FINANCIAL RESEARCH · HISTORICAL SEC DATA</span>
+ <h2 id="qf-v82-case-study-heading">Does revenue growth tell the full financial story?</h2>
+ <p>A source-linked research paper comparing growth, operating profitability and cash generation across Microsoft, AMD, Adobe and Applied Materials. Read the research question, methods, computed findings, visual results, conclusion and filing-level evidence on one dedicated page.</p>
+ <div class="qf-v831-links"><a href="research-case-study.html">Read complete case study</a><a href="research-case-study.csv" download>Download source ledger</a></div>
+</div>
  <div class="pane"><div class="section-title"><h3>From source data to tested output</h3><span class="mini">Architecture at a glance</span></div>
  <div class="tech-stack" aria-label="Research flow: ingest market and SEC sources, validate and align data, model investment risk and valuation, evaluate then export">
   <div class="tech-step"><span class="eyebrow">01 / DATA ENGINEERING</span><strong>Ingest &amp; normalize</strong><small>SEC annual facts; Alpaca historical equity, ETF and supported crypto observations in the private workspace</small></div>
@@ -444,12 +519,59 @@ main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
   <div class="tech-step"><span class="eyebrow">04 / EVALUATION</span><strong>Challenge the result</strong><small>Past-only fitting, out-of-sample windows, fees, passive benchmarks, leave-one-window-out robustness and research reports</small></div>
  </div><p class="tech-note">The public deployment hosts static demonstrations and a reviewed SEC snapshot. Market observations and personal virtual accounts are only accessed in authenticated private workflows.</p></div>
  <nav class="research-jumps" aria-label="Research methods sections"><a href="#systems-public-evidence">Reported SEC comparison</a><a href="#systems-optimization">Optimization</a><a href="#systems-walkforward">Walk-forward</a><a href="#systems-valuation">Forecasting</a><a href="#systems-screening">Investment screening</a><a href="#systems-code-evidence">Code and tests</a></nav>
- <section class="pane" id="systems-public-evidence" aria-labelledby="systems-sec-evidence-title">
-  <div class="section-title"><h3 id="systems-sec-evidence-title">Observed financial relationships in SEC filings</h3><span class="mini">Reported annual facts · calculated comparisons</span></div>
-  <p class="evidence-intro">Annual revenue growth and operating margin are calculated from the public SEC Company Facts snapshot. Each point represents a company and its latest comparable fiscal periods. Unlike the illustrated strategy charts below, these values come from reported company filings.</p>
+ <!-- QF V8.3 verified methodology atlas: methods already implemented and tested -->
+<section class="pane" id="qf-v83-method-atlas" aria-labelledby="qf-v83-method-title">
+ <div class="section-title"><h3 id="qf-v83-method-title">Methods and mathematical implementation</h3><span class="mini">Algorithms · checks · source code</span></div>
+ <p class="evidence-intro">Each method connects an input, a calculation, and a validation check. Reported company disclosures and market-price observations are distinguished from assumptions and simulated public examples.</p>
+ <div class="qf-v83-matrix">
+  <article class="qf-v83-method"><span class="qf-v83-index">01 / FINANCIAL STATEMENT ANALYSIS</span><h4>Growth, profitability, and cash generation</h4>
+  <div class="qf-v83-formula">Revenue growth = Revenueₜ / Revenueₜ₋₁ − 1
+Operating margin = Operating income / Revenue
+FCF proxy = Cash from operations − PP&amp;E purchases</div>
+  <p>Annual company-facts records are selected by issuer, fiscal period, filing metadata and metric units. Calculated measures are displayed only when the required reported inputs exist.</p>
+  <div class="qf-v83-test"><strong>Checks:</strong> fiscal-year ordering, source lineage, negative cash flow, null values and mismatched filing periods.</div>
+  <p><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/site/sec_analytics.js" target="_blank" rel="noopener noreferrer">SEC calculation source</a> · <a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/tests/sec_analytics.test.cjs" target="_blank" rel="noopener noreferrer">Tests</a></p></article>
+  <article class="qf-v83-method"><span class="qf-v83-index">02 / PORTFOLIO STATISTICS</span><h4>Covariance and risk estimation</h4>
+  <div class="qf-v83-formula">rₜ = Pₜ / Pₜ₋₁ − 1
+Portfolio variance = wᵀΣw
+Annual volatility = sd(r) × √sessions/year</div>
+  <p>Price observations are aligned before return calculations. The optimizer applies covariance stabilization and evaluates portfolio variance under feasible investment-weight limits.</p>
+  <div class="qf-v83-test"><strong>Checks:</strong> price validity, matching dates, covariance symmetry, positive variance and valid annualization conventions.</div>
+  <p><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/site/private_optimizer.js" target="_blank" rel="noopener noreferrer">Optimizer source</a> · <a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/tests/private_optimizer.test.cjs" target="_blank" rel="noopener noreferrer">Tests</a></p></article>
+  <article class="qf-v83-method"><span class="qf-v83-index">03 / NUMERICAL OPTIMIZATION</span><h4>Constrained allocation</h4>
+  <div class="qf-v83-formula">Minimize wᵀΣw
+subject to Σwᵢ = 1 and 0 ≤ wᵢ ≤ cap</div>
+  <p>Optimized portfolios are compared against an equal-weight baseline. Cap constraints and objective feasibility are validated before reporting results.</p>
+  <div class="qf-v83-test"><strong>Checks:</strong> sum-to-one, cap compliance, infeasible constraints, objective-value reconciliation and comparison against the fitted baseline.</div>
+  <p><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/site/private_optimizer.js" target="_blank" rel="noopener noreferrer">Implementation</a> · <a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/tests/private_optimizer.test.cjs" target="_blank" rel="noopener noreferrer">Tests</a></p></article>
+  <article class="qf-v83-method"><span class="qf-v83-index">04 / OUT-OF-SAMPLE TIME SERIES</span><h4>Walk-forward strategy evaluation</h4>
+  <div class="qf-v83-formula">Fit on times 1…T → evaluate on T+1…T+h
+Net wealth = gross wealth − modeled trading costs</div>
+  <p>The evaluation separates past-only training windows from later test periods, compares allocation rules on matched windows, and tracks fees, drawdowns and sensitivity to modeling choices.</p>
+  <div class="qf-v83-test"><strong>Checks:</strong> no future-data leakage, nonoverlapping test periods, fee reconciliation, passive baseline and leave-one-window-out sensitivity.</div>
+  <p><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/site/private_robustness_v68.js" target="_blank" rel="noopener noreferrer">Robustness implementation</a> · <a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/tests/private_robustness_v68.test.cjs" target="_blank" rel="noopener noreferrer">Tests</a></p></article>
+  <article class="qf-v83-method"><span class="qf-v83-index">05 / DISCOUNTED CASH FLOW</span><h4>Scenario sensitivity and terminal-value exposure</h4>
+  <div class="qf-v83-formula">FCFₜ = Revenue₀ × (1 + g)ᵗ × assumed margin
+PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
+  <p>SEC financials define the observed baseline; growth, margin, terminal assumptions and discounting are explicit scenario inputs. Terminal-value share measures sensitivity of the modeled proxy.</p>
+  <div class="qf-v83-test"><strong>Checks:</strong> discount-rate bounds, missing cash-flow inputs, terminal share and changing growth/discount assumptions. This proxy is not a verified stock-price target.</div>
+  <p><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/site/private_integrity_v67.js" target="_blank" rel="noopener noreferrer">Input-integrity source</a> · <a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/tests/private_integrity_v67.test.cjs" target="_blank" rel="noopener noreferrer">Tests</a></p></article>
+  <article class="qf-v83-method"><span class="qf-v83-index">06 / REPRODUCIBILITY &amp; MODEL RISK</span><h4>Provenance, regression testing, and failure cases</h4>
+  <div class="qf-v83-formula">Evidence = {source, date range, settings, model version,
+            results, dataset fingerprint, checks}</div>
+  <p>Historical observation windows, configurable assumptions, source provenance and SHA-256 fingerprints support reproducible comparisons. Automated Python and JavaScript regression tests exercise expected results and reject invalid inputs.</p>
+  <div class="qf-v83-test"><strong>Checks:</strong> changed-data fingerprint, stale data, missing values, private-data exclusion, SEC period integrity and Python 3.11/3.12 CI. “Regression tests” here means software tests; it does not imply an implemented OLS return-prediction model.</div>
+  <p><a href="https://github.com/RishiRatnakarData/quantforge-hosted/tree/main/tests" target="_blank" rel="noopener noreferrer">Python tests</a> · <a href="https://github.com/RishiRatnakarData/quantforge-hosted/tree/main/web/tests" target="_blank" rel="noopener noreferrer">JavaScript tests</a></p></article>
+ </div>
+ <div class="qf-v83-process"><strong>From result to interpretation</strong><p>Models provide estimates conditional on data and assumptions. The research workflow compares independent evidence (company fundamentals, observed return history, diversification, out-of-sample behavior and scenario sensitivity), identifies disagreement, and documents what remains uncertain. Model fit or a high ranking is not sufficient evidence of an investable advantage.</p></div>
+</section>
+
+<section class="pane" id="systems-public-evidence" aria-labelledby="systems-sec-evidence-title">
+  <div class="section-title"><h3 id="systems-sec-evidence-title">Explore SEC revenue growth and operating margins</h3><span class="mini">Reported annual facts · calculated comparisons</span></div>
+  <p class="evidence-intro">Compare annual revenue growth with operating margin across the available SEC issuers. Select any company to inspect its exact figures, or switch between a focused axis range and the full distribution. Each point represents a latest eligible fiscal period; the company table always includes the complete comparable sample.</p>
   <div id="systems-sec-quant-v76" aria-live="polite"><p class="tiny">Reported financial comparisons are available when the verified SEC snapshot is present.</p></div>
-  <p class="tech-note">This is an exploratory comparison, not a factor-return model or a company ranking. Fiscal year-ends differ, and operating margin and revenue growth alone do not determine a stock's future performance.</p>
-  <div class="controls"><button class="btn" data-go="sec">SEC issuer details and filing tags</button></div>
+  <p class="tech-note">This is a descriptive cross-sectional comparison, not a regression estimate, factor-return model or company ranking. Fiscal year-ends differ, and operating margin and revenue growth alone do not determine a stock's future performance.</p>
+  <div class="controls"><button class="btn" data-go="sec">View underlying SEC filings</button><a class="btn" href="research-case-study.html">Read the complete research paper</a></div>
  </section>
  <div class="pane"><div class="section-title"><h3>Implementation and test references</h3><span class="mini">Algorithms · diagnostics · engineering judgment</span></div>
 
@@ -573,7 +695,7 @@ main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
  <div class="controls" style="margin-top:0"><button class="btn primary" data-go="lab">Explore the analysis</button><button class="btn" data-go="systems">Research methods</button><button class="btn" data-go="methods">Data &amp; engineering</button></div>
 </div>
 </details>
-  <div class="pagehead"><span class="eyebrow">METHODS</span><h1>Data and engineering</h1><p>Where the data comes from, how the models are checked, and how the public site is separated from private research.</p></div>
+  <div class="pagehead"><span class="eyebrow">METHODS</span><h1>Data and engineering</h1><p>The platform architecture, source-to-metric calculations, model diagnostics, statistical validation, and automated checks used to produce reproducible financial research.</p></div>
   <div class="pane" style="background:#f1f7f3;border-color:#bad5c7"><div class="section-title"><h3>Private models and public source code</h3><span class="mini">Implementation references</span></div><p class="explain-note" style="margin:0 0 13px">The private workspace supports historical market analysis, portfolio optimization, strategy evaluation, investment screening, and SEC-based valuation scenarios. The methods page explains the underlying calculations; the repository contains the implementations and tests.</p><button class="btn primary" data-go="systems">View research methods</button></div>
   <div class="method-intro"><div><strong>Source data</strong><span>SEC EDGAR Company Facts</span></div><div><strong>Demonstration calculations</strong><span>Simulated portfolio / DCF / quantitative returns</span></div><div><strong>Separate private workspace</strong><span>Owner-only authentication and observations</span></div></div>
   <div class="pane"><div class="section-title"><h3>Data lineage</h3><span class="mini" id="methods-asof">Historical SEC snapshot</span></div>
@@ -611,7 +733,7 @@ main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
   </tbody></table></div><p class="explain-note">CI runs Python 3.11 and 3.12 along with JavaScript checks. Passing tests provide scoped evidence, not investment performance claims or complete security assurance.</p></div>
   <div class="notice">Historical financial disclosures may be updated or restated. Model scenarios are not investment advice.</div>
 </section>
-<div class="footerline"><button class="text-link" data-go="methods">Data &amp; engineering</button> · SEC Financials uses historical filings. Public portfolio and model scenarios use illustrative inputs. Private account data and market feeds are not available in the public site. This project is not an investment recommendation.</div>
+<div class="footerline">QuantForge · Rishi Ratnakar · <button class="text-link" data-go="methods">Data &amp; engineering</button> · SEC Financials uses historical filings. Public portfolio and model scenarios use illustrative inputs. Private account data and market feeds are not available in the public site. This project is not an investment recommendation.</div>
 </main></div>
 <script>/* QF_MODEL */</script>
 <script>/* QF_APP */</script>

@@ -19,13 +19,13 @@ def test_public_sidebar_always_displays_every_route():
 def test_homepage_is_recruiter_accessible_and_source_linked():
     page=(ROOT/'web/site/site.template.html').read_text(encoding='utf-8')
     start=page.split('<section class="tabpage active" id="page-overview">',1)[1].split('</section>',1)[0]
-    assert start.count('class="qf-roadmap-card"') == 3
-    for route in ('sec','lab','systems'):
+    assert start.count('class="qf-roadmap-card"') == 4
+    for route in ('sec','lab','quant','systems'):
         assert f'data-go="{route}"' in start
     assert 'data-go="private"' not in start
     assert 'View GitHub source and tests' in start
     assert 'rel="noopener noreferrer"' in start
-    assert 'Financial analysis grounded in reported company data.' in start
+    assert 'Financial research, portfolio analytics, and quantitative modeling.' in start
     assert 'simulated returns and hypothetical forecasts' in start
 
 
@@ -46,5 +46,6 @@ def test_reliable_public_source_evidence_remains():
     assert '/* QF_SEC_DATA */' not in page
     assert 'Historical SEC data' in page
     assert 'Simulated returns' in page
-    assert 'not live stock prices' in page
+    assert '<strong>Research data:</strong> Historical SEC company financials' in page
+    assert 'simulated returns and hypothetical forecasts' in page
     assert 'Source lineage' in page or 'Data lineage' in page

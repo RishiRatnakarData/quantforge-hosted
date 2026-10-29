@@ -177,7 +177,7 @@ function mount(snapshot){
  const issuer=byId('lab-issuer');
  issuer.innerHTML=companies.map(c=>`<option value="${esc(c.symbol)}">${esc(c.name)} (${esc(c.symbol)})</option>`).join('');
  if(companies.some(c=>c.symbol==='MSFT'))issuer.value='MSFT';
- function refreshSec(){host.innerHTML=renderSec(snapshot,issuer.value);}
+ function refreshSec(){host.innerHTML=renderSec(snapshot,issuer.value);const selected=companies.find(c=>c.symbol===issuer.value);const label=byId('qf-v83-active-company');if(label)label.textContent=selected?selected.name+' ('+selected.symbol+')':'No company selected';}
  function refreshModels(){
   const cap=Number(byId('lab-cap').value)/100,fee=Number(byId('lab-fee').value),train=Number(byId('lab-train').value),error=byId('lab-error');
   try{
@@ -185,6 +185,7 @@ function mount(snapshot){
    const observations=synthetic();
    byId('lab-opt-results').innerHTML=renderOptimize(observations,cap);
    byId('lab-walk-results').innerHTML=renderWalk(observations,cap,fee,train);
+   const note=byId('qf-v83-model-settings');if(note)note.textContent='Simulated dataset · maximum investment weight '+Math.round(cap*100)+'% · trading cost '+fee+' basis points · training window '+train+' sessions. Both model exhibits refreshed.';
    error.textContent='';
   }catch(e){error.textContent=e.message;}
  }

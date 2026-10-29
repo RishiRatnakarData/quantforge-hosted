@@ -47,8 +47,8 @@ def audit(repo: Path):
     study = (repo / "public/research-case-study.html").read_text(encoding="utf-8")
     ledger = (repo / "public/research-case-study.csv").read_text(encoding="utf-8")
     assert template.count("QF V8.2 PUBLIC RESEARCH CASE STUDY") == 1
-    assert template.count('href="research-case-study.html"') == 1
-    assert built.count('href="research-case-study.html"') == 1
+    assert template.count('href="research-case-study.html"') >= 2, "Research paper navigation missing"
+    assert built.count('href="research-case-study.html"') == template.count('href="research-case-study.html"'), "Built site must preserve research paper links"
     assert study.count('href="./research-case-study.csv"') == 1
     assert "Historical disclosures only" in study and "different fiscal" in study.lower()
     assert "Source snapshot SHA-256: <code>" + canonical_snapshot_sha256(raw) in study

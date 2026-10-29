@@ -17,7 +17,8 @@ def test_limited_public_presentation_is_truthful():
     assert 'DCF ASSUMPTIONS' in app
     assert 'SIMULATED PEER MODEL' in app
     assert 'RESEARCH OVERVIEW' in app
-    assert 'not live stock prices' in html
+    assert '<strong>Research data:</strong> Historical SEC company financials' in html
+    assert 'simulated returns and hypothetical forecasts' in html
     assert 'not actual market results, valuations, or investment recommendations.' in html
     assert 'Private account data and market feeds' in html
     assert 'FICTIONAL DATA' not in html

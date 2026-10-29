@@ -18,7 +18,7 @@ def test_ideas_private_only_and_company_selection():
 
 def test_public_project_case_study_is_concrete():
     template = (ROOT / "web/site/site.template.html").read_text(encoding="utf-8")
-    assert "Financial analysis grounded in reported company data." in template
+    assert 'Financial research, portfolio analytics, and quantitative modeling.' in template
     assert "SEC data preparation" in template
     assert "Rolling evaluation and robustness" in template
     assert "System architecture" in template
