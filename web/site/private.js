@@ -2,12 +2,12 @@
 (function () {
 'use strict';
 const $=id=>document.getElementById(id);
-let guideReportV79=null, linkedResearchBriefV93=null;
+let guideReportV79=null, linkedResearchBriefV93=null, linkedResearchIntelligenceV94=null;
 let privateDecisionCenterV84=null;
 let researchOSRunV90=0, researchOSInternalLoadV90=false;
 let candidateDossierV90=null,candidateQuoteV90=null,candidateFactorV91=null;
 function clearResearchOSV90(){
- linkedResearchBriefV93=null;
+ linkedResearchBriefV93=null;linkedResearchIntelligenceV94=null;
  if(typeof refreshConnectedResearchV93==='function')refreshConnectedResearchV93();
  researchOSRunV90++;
  candidateDossierV90=null;candidateQuoteV90=null;candidateFactorV91=null;
@@ -27,10 +27,16 @@ function refreshResearchOSChoicesV90(){
   'Research universe: '+researchSelection.map(s=>assetNames[s]||s).join(' · ')+' · '+researchSelection.length+' selected. Company assessment uses the chosen candidate; portfolio strategies use the complete selection.':
   'Choose 2–5 investments with Browse companies by name; select the candidate from the list.';
 }
-function renderResearchOSV90(result){
+function renderResearchOSV90(result,variants){
  const out=$('private-v90-report');if(!out)return;
  const review=window.QFPrivateDecisionReviewV92.review(result,historySeries,researchSelection);
  linkedResearchBriefV93=window.QFPrivateResearchBriefV93.summarize(result,review,assetNames,researchSelection);
+ // Secondary comparative evidence uses the same finished assessment; failure never changes its decision.
+ linkedResearchIntelligenceV94=null;
+ try{linkedResearchIntelligenceV94=window.QFPrivateInvestmentIntelligenceV94.build({
+  brief:linkedResearchBriefV93,snapshot:window.QFPublishedSEC,selection:researchSelection,
+  history:historySeries,variants,asOf:review.asOf||new Date().toISOString()});
+ }catch(err){console.warn('Additional comparative evidence unavailable:',String(err.message||err).slice(0,100));}
  refreshConnectedResearchV93();
  const list=(xs,empty)=>'<ul class="qf-v92-list">'+(xs.length?xs:[empty]).map(x=>'<li>'+safe(x)+'</li>').join('')+'</ul>';
  const label=s=>({supports:'Supports',cautions:'Caution',mixed:'Mixed',available:'Available',unavailable:'Unavailable'})[s]||'Unavailable';
@@ -57,7 +63,29 @@ function renderResearchOSV90(result){
   '</section>';
 }
 
+function renderInvestmentIntelligenceV94(){
+ const intel=linkedResearchIntelligenceV94;
+ const format=(v,d=1)=>typeof v==='number'&&Number.isFinite(v)?v.toFixed(d)+'%':'Not reported';
+ const usd=v=>typeof v==='number'&&Number.isFinite(v)?'$'+(v/1e9).toFixed(2)+'B':'Not reported';
+ const table=(heads,rows)=>'<div class="table-wrap"><table class="qf-v94-table"><thead><tr>'+heads.map(h=>'<th scope="col">'+safe(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+row.map(c=>'<td>'+safe(c)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
+ const targets=['qf-v94-intelligence-hub','qf-v94-intelligence-brief'];
+ const lab=$('qf-v94-lab-insight');
+ if(!intel){for(const id of targets){const el=$(id);if(el)el.textContent='';}if(lab)lab.textContent='';return;}
+ const sec=intel.sec,movement=intel.comovement,policy=intel.policies;
+ const secRows=sec.rows.map(c=>[assetNames[c.symbol]||c.name,c.fiscalEnd||'Not available',usd(c.revenueUsd),
+  format(c.yearlyGrowthPercent),format(c.operatingMarginPercent),format(c.freeCashFlowMarginPercent)]);
+ const movementRows=movement.ready?movement.rows.map(r=>[assetNames[r.symbol]||r.symbol,format(r.averagePeerCorrelation*100,1)]):[];
+ const policyRows=policy.rows.map(r=>[r.risk,r.action,r.readiness]);
+ const content='<section class="qf-v94-card" aria-label="Cross-investment intelligence"><div class="qf-v94-head"><div><span class="eyebrow">V9.4 · CONNECTED INVESTMENT INTELLIGENCE</span><h3>Compare evidence across your selected investments</h3><p>Published SEC financials, historical co-movement and risk-policy sensitivity, linked to this same Research Hub assessment. These comparisons cannot override its safety constraints or trigger trades.</p></div><span class="qf-v92-readiness">'+sec.available+'/'+intel.coverage.selected+' issuers with reported metrics</span></div>'+
+  '<div class="qf-v94-grid"><section class="qf-v94-card"><h4>SEC company fundamentals</h4><p>Annual company filings from a separate dated public SEC snapshot; funds and unsupported securities remain unavailable.</p>'+table(['Investment','Fiscal year ended','Annual revenue','Revenue YoY','Operating margin','FCF margin'],secRows)+'<p class="qf-v94-neutral">Snapshot: '+safe(sec.asOf||'not available')+'. '+safe(sec.note)+'</p></section>'+
+  '<section class="qf-v94-card"><h4>Historical co-movement</h4>'+(movement.ready?'<p>Observed matched period: '+safe(movement.period.start)+' to '+safe(movement.period.end)+' · '+safe(movement.period.sessions)+' price sessions. Average selected-pair correlation: '+safe(movement.averagePairCorrelation.toFixed(2))+'.</p>'+table(['Investment','Mean correlation to selected peers'],movementRows):'<p>'+safe(movement.reason)+'</p>')+'<p class="qf-v94-neutral">Historical correlation is not a portfolio allocation recommendation or a forecast.</p></section>'+
+  '<section class="qf-v94-card"><h4>Does the policy choice change the outcome?</h4><p>Same data, three stated risk approaches; no forecast probabilities or optimized investment rankings.</p>'+table(['Risk approach','Conditional result','Evidence readiness'],policyRows)+'<p class="qf-v94-neutral">'+(policy.sameAction?'All three policy approaches return the same action.':'Changing the risk approach changes at least one action; examine the assumptions.')+' '+safe(policy.note)+'</p></section>'+
+  '<section class="qf-v94-card"><h4>Scope and limitations</h4><ul class="qf-v92-list">'+intel.boundaries.map(x=>'<li>'+safe(x)+'</li>').join('')+'</ul><p>Explore detailed source diagnostics in the Research Lab. The primary research decision still applies to '+safe(assetNames[intel.symbol]||intel.symbol)+'.</p></section></div></section>';
+ for(const id of targets){const el=$(id);if(el)el.innerHTML=content;}
+ if(lab)lab.textContent='V9.4 cross-investment evidence is linked: '+intel.coverage.issuersWithMetrics+'/'+intel.coverage.selected+' SEC issuer records; historical co-movement '+(movement.ready?'available':'unavailable')+'; three risk-policy checks completed. Review the Research Hub or Briefing for interpretation.';
+}
 function refreshConnectedResearchV93(){
+ renderInvestmentIntelligenceV94();
  const packet=linkedResearchBriefV93;
  const title=$('qf-v93-ribbon-title'),detail=$('qf-v93-ribbon-detail'),brief=$('qf-v93-ribbon-brief');
  if(title)title.textContent=packet?'Completed research · '+packet.candidate+' ('+packet.symbol+')':'Research workflow · No current assessment';
@@ -196,16 +224,19 @@ async function runResearchOSV90(){
   }
   if(!current())return;
   status.textContent='Stage 4/4: reconciling actual model outcomes and applying research policy…';
-  const assessment=window.QFPrivateResearchOSV90.assess({
+  const policyInputs={
    asOf:new Date().toISOString(),symbol:sym,selection:researchSelection,history:historySeries,
    dossier:candidateDossierV90,quote:candidateQuoteV90||quoted[sym]||null,
    portfolio:privateState,optimizer:optimizerResult,walkforward:walkforwardResult,
    robustness:robustnessResultV68,french:ff,
    risk:$('private-v90-risk').value,horizon:$('private-v90-horizon').value,
    maxWeight:Number($('private-v90-maxweight').value),maxDrawdown:Number($('private-v90-maxdrawdown').value)
-  });
+  };
+  const assessment=window.QFPrivateResearchOSV90.assess(policyInputs);
+  const variants=['conservative','balanced','growth'].map(risk=>
+   engine.reconcile(window.QFPrivateResearchOSV90.assess({...policyInputs,risk}),results));
   if(!current())return;
-  renderResearchOSV90(engine.reconcile(assessment,results));
+  renderResearchOSV90(engine.reconcile(assessment,results),variants);
   message('Automated evidence review completed. Partial failures are disclosed; no trade was placed.');
  }catch(e){
   if(current())status.textContent='Research stopped without a new decision: '+String(e.message||e).slice(0,240)+'. Please inspect the Research Lab.';
@@ -1539,7 +1570,7 @@ $('qf-v93-ribbon-brief').addEventListener('click',()=>privateTab('settings'));
 $('qf-v93-brief-refresh').addEventListener('click',renderConnectedBriefV93);
 $('qf-v93-brief-export').addEventListener('click',()=>{
  if(!privateState||!linkedResearchBriefV93)return;
- downloadResearchJSON('quantforge-v93-linked-research-briefing.json',linkedResearchBriefV93);
+ downloadResearchJSON('quantforge-v94-linked-research-briefing.json',{...linkedResearchBriefV93,comparativeIntelligence:linkedResearchIntelligenceV94});
 });
 for(const id of ['qf-v93-briefing','qf-v93-lab-status'])$(id).addEventListener('click',e=>{
  const b=e.target.closest('[data-v93-method]');
