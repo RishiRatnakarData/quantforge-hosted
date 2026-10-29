@@ -12,8 +12,8 @@ def read(path):
 def test_five_goal_first_private_nav_and_research_lab():
     s = read("tools/build_unified_site.py")
     assert s.count('class="private-nav-group"') == 5
-    expected = ["01 · Decision Center", "02 · Explore Investments", "03 · My Portfolio",
-                "04 · Advanced Research Lab", "05 · Research Settings &amp; History"]
+    expected = ["01 · Research Hub", "02 · Explore Investments", "03 · My Portfolio",
+                "04 · Advanced Research Lab", "05 · Research Briefing &amp; Notes"]
     assert [s.index(x) for x in expected] == sorted(s.index(x) for x in expected)
     for view in ("decision", "ideas", "home", "trade", "lab", "candidate", "research", "optimization",
                  "backtest", "walkforward", "valuation", "settings"):

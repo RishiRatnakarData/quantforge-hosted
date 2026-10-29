@@ -2,11 +2,13 @@
 (function () {
 'use strict';
 const $=id=>document.getElementById(id);
-let guideReportV79=null;
+let guideReportV79=null, linkedResearchBriefV93=null;
 let privateDecisionCenterV84=null;
 let researchOSRunV90=0, researchOSInternalLoadV90=false;
 let candidateDossierV90=null,candidateQuoteV90=null,candidateFactorV91=null;
 function clearResearchOSV90(){
+ linkedResearchBriefV93=null;
+ if(typeof refreshConnectedResearchV93==='function')refreshConnectedResearchV93();
  researchOSRunV90++;
  candidateDossierV90=null;candidateQuoteV90=null;candidateFactorV91=null;
  const button=$('private-v90-run');if(button)button.disabled=false;
@@ -28,6 +30,8 @@ function refreshResearchOSChoicesV90(){
 function renderResearchOSV90(result){
  const out=$('private-v90-report');if(!out)return;
  const review=window.QFPrivateDecisionReviewV92.review(result,historySeries,researchSelection);
+ linkedResearchBriefV93=window.QFPrivateResearchBriefV93.summarize(result,review,assetNames,researchSelection);
+ refreshConnectedResearchV93();
  const list=(xs,empty)=>'<ul class="qf-v92-list">'+(xs.length?xs:[empty]).map(x=>'<li>'+safe(x)+'</li>').join('')+'</ul>';
  const label=s=>({supports:'Supports',cautions:'Caution',mixed:'Mixed',available:'Available',unavailable:'Unavailable'})[s]||'Unavailable';
  const cells=review.coverage.map(e=>'<article class="qf-v92-evidence"><div class="qf-v92-row"><strong>'+safe(e.name)+'</strong><span class="qf-v92-tag qf-v92-state-'+safe(e.status)+'">'+safe(label(e.status))+'</span></div><div class="tiny">'+safe(e.scope)+'</div><p>'+safe(e.detail)+'</p><small class="tiny">Source: '+safe(e.source)+'</small></article>').join('');
@@ -40,7 +44,7 @@ function renderResearchOSV90(result){
   '<p class="tiny">'+safe(cmp.reason)+' This comparison is withheld rather than filled with estimates.</p>';
  const caution=review.con.length?review.con:review.flags;
  out.innerHTML='<section class="qf-v92-report" aria-label="Investment research assessment">'+
-  '<div class="qf-v92-hero"><div class="qf-v92-row"><span class="eyebrow">V9.2 · INVESTMENT ASSESSMENT</span><span class="qf-v92-readiness">'+safe(review.readiness)+'</span></div><h3>'+safe(review.action)+'</h3><p>'+safe(review.reason)+'</p><p class="tiny">'+safe(review.symbol)+' · Research as of '+safe(review.asOf||'unavailable')+' · '+safe(review.policy)+' · No automatic trades</p></div>'+
+  '<div class="qf-v92-hero"><div class="qf-v92-row"><span class="eyebrow">V9.3 · LINKED INVESTMENT RESEARCH</span><span class="qf-v92-readiness">'+safe(review.readiness)+'</span></div><h3>'+safe(review.action)+'</h3><p>'+safe(review.reason)+'</p><p class="tiny">'+safe(review.symbol)+' · Research as of '+safe(review.asOf||'unavailable')+' · '+safe(review.policy)+' · No automatic trades</p></div>'+
   '<div class="qf-v92-metrics" aria-label="Evidence summary"><div><strong>'+review.observed+' / '+review.total+'</strong><span>Evidence areas available</span></div><div><strong>'+safe(result.orchestration?.completed??0)+' / '+safe(result.orchestration?.total??0)+'</strong><span>Models completed</span></div><div><strong>'+review.dimensionConcerns+'</strong><span>Areas with cautions</span></div><div><strong>'+safe(result.orchestration?.failed??0)+'</strong><span>Model failures</span></div></div>'+
   '<div class="qf-v92-twin"><section class="qf-v92-panel"><h4>Evidence in favor</h4>'+list(review.pro,'No favorable company-specific research screens verified.')+'</section><section class="qf-v92-panel"><h4>Risks and objections</h4>'+list(caution,'No completed screen crossed its caution threshold; unmeasured risks remain.')+'</section></div>'+
   '<div class="qf-v92-core"><section><div class="qf-v92-heading"><h4>How the evidence lines up</h4><span class="tiny">Company vs portfolio sources are identified separately</span></div><div class="qf-v92-evidence-grid">'+cells+'</div></section>'+
@@ -49,8 +53,50 @@ function renderResearchOSV90(result){
   '<details class="qf-v92-more"><summary>Evidence conflicts and decision rules</summary>'+list(review.flags,'No specific detected conflict; this is not evidence of investment safety.')+'<p class="tiny">Hard constraints and unavailable required inputs can block action. Other evidence is interpreted by source and scope, never counted as independent votes or calibrated probabilities. Portfolio strategy results do not establish single-company returns.</p></details>'+
   '<details class="qf-v92-more"><summary>V9.1 model execution and data provenance</summary><p class="tiny">'+safe(result.orchestration?.completed??0)+' of '+safe(result.orchestration?.total??0)+' methods completed · '+safe(result.orchestration?.failed??0)+' failed · '+safe(result.orchestration?.unavailable??0)+' unavailable.</p><div class="qf-v9-grid">'+modelRows+'</div></details>'+
   '<details class="qf-v92-more"><summary>Policy assumptions and important limitations</summary><p class="tiny">Risk approach: '+safe(review.constraints.risk)+' · Horizon: '+safe(review.constraints.horizon)+' · Single-name limit: '+(100*review.constraints.maxWeight).toFixed(0)+'% · Drawdown screen: '+(100*review.constraints.maxDrawdown).toFixed(0)+'%</p>'+list(review.limitations,'No further limitations recorded.')+'</details>'+
-  '<div class="controls qf-v92-actions"><button type="button" class="btn" data-private-tab="lab">Inspect the Research Lab</button><button type="button" class="btn" data-private-tab="trade">View hypothetical portfolio impact</button></div>'+
+  '<div class="qf-v93-related"><strong>One assessment, connected research</strong><p>Open the linked briefing for a readable report, or inspect the original model calculations in the Research Lab. Both refer to this assessment and its dated input universe.</p><div class="controls"><button type="button" class="btn primary" data-private-tab="settings">Read linked research briefing</button><button type="button" class="btn" data-private-tab="lab">Explore completed models</button><button type="button" class="btn" data-private-tab="trade">Hypothetical portfolio impact</button></div></div>'+
   '</section>';
+}
+
+function refreshConnectedResearchV93(){
+ const packet=linkedResearchBriefV93;
+ const title=$('qf-v93-ribbon-title'),detail=$('qf-v93-ribbon-detail'),brief=$('qf-v93-ribbon-brief');
+ if(title)title.textContent=packet?'Completed research · '+packet.candidate+' ('+packet.symbol+')':'Research workflow · No current assessment';
+ if(detail)detail.textContent=packet?packet.universe.length+' investments · '+packet.modelCoverage.completed+'/'+packet.modelCoverage.total+' methods completed · '+packet.readiness:
+  'Select investments and run a new assessment. Previous results are not reused after inputs change.';
+ if(brief)brief.disabled=!packet;
+ const status=$('qf-v93-brief-status');if(status)status.textContent=packet?
+  'Connected to '+packet.candidate+' · '+packet.universe.map(s=>s.name).join(', ')+' · '+packet.modelCoverage.completed+' completed methods.':
+  'No current linked assessment. Run the Research Hub workflow first.';
+ for(const id of ['qf-v93-brief-refresh','qf-v93-brief-export']){const button=$(id);if(button)button.disabled=!packet;}
+ const report=$('qf-v93-briefing');if(report&&!packet)report.textContent='No current briefing. Run investment research to generate a linked report; changing its inputs invalidates the previous briefing.';
+ const lab=$('qf-v93-lab-status');
+ if(lab){
+  if(!packet){lab.innerHTML='<strong>Connected research methods</strong><p class="tiny">No current assessment. The Research Lab remains available independently, but a new Research Hub run is needed to link all eligible methods.</p>';}
+  else{
+   const relevant=packet.models.map(m=>'<div class="qf-v93-lab-tag"><strong>'+safe(m.name)+'</strong><small>'+safe(m.status)+' · '+safe(m.scope)+'</small><button class="text-link" type="button" data-v93-method="'+safe(m.route)+'">Open method</button></div>').join('');
+   lab.innerHTML='<strong>Methods from the current Research Hub assessment</strong><p class="tiny">'+safe(packet.candidate)+' · '+safe(packet.readiness)+' · '+packet.modelCoverage.completed+'/'+packet.modelCoverage.total+' completed. Open any method to review or revise its calculations.</p><div class="qf-v93-lab-tags">'+relevant+'</div>';
+  }
+ }
+}
+function renderConnectedBriefV93(){
+ const report=$('qf-v93-briefing'),packet=linkedResearchBriefV93;
+ if(!report||!packet)return;
+ const items=(arr,empty)=>'<ul>'+((arr&&arr.length?arr:[empty]).map(t=>'<li>'+safe(t)+'</li>').join(''))+'</ul>';
+ const section=(title,itemsList,empty)=>'<section class="qf-v93-brief-section"><h4>'+safe(title)+'</h4>'+items(itemsList,empty)+'</section>';
+ const methods=packet.models.map(m=>'<div class="qf-v93-method"><strong>'+safe(m.name)+'</strong> · '+safe(m.status)+
+  (m.required?' · Required':' · Optional')+'<small>'+safe(m.scope)+' · '+safe(m.source)+(m.period?' · '+safe(m.period.start)+' to '+safe(m.period.end):'')+'</small><button class="text-link" type="button" data-v93-method="'+safe(m.route)+'">Inspect method</button></div>').join('');
+ const evidence=packet.evidence.map(e=>'<div class="qf-v93-method"><strong>'+safe(e.name)+'</strong> · '+safe(e.status)+'<small>'+safe(e.detail)+' · '+safe(e.source)+'</small><button class="text-link" type="button" data-v93-method="'+safe(e.route)+'">Explore evidence</button></div>').join('');
+ const cmp=packet.comparison?'<p class="tiny">'+safe(packet.comparison.period.start)+' to '+safe(packet.comparison.period.end)+' · '+safe(packet.comparison.period.observations)+' matched sessions. Price-only, no dividends or forecasts.</p>'+displayTable(['Investment','Observed change','Worst drawdown'],packet.comparison.assets.map(a=>[a.name,a.priceChangePercent.toFixed(2)+'%',a.maxDrawdownPercent.toFixed(2)+'%'])):
+  '<p class="tiny">Comparable dated price history is unavailable. No values have been imputed.</p>';
+ report.innerHTML='<div class="qf-v93-report-top"><span class="eyebrow">VERIFIED SESSION · '+safe(packet.readiness)+'</span><h4>'+safe(packet.action)+'</h4><p>'+safe(packet.reason)+'</p><p class="tiny">'+safe(packet.candidate)+' ('+safe(packet.symbol)+') · '+safe(packet.asOf||'Research date unavailable')+' · '+safe(packet.policy)+' · No automatic trades</p></div>'+
+  '<div class="qf-v93-brief-grid">'+section('Evidence supporting the assessment',packet.favorable,'No favorable evidence was established.')+
+  section('Risks and objections',packet.cautions,'No threshold violation was measured; unobserved risks remain.')+
+  section('Conflicts and mandatory constraints',packet.conflicts.concat(packet.mandatoryMissing.map(m=>'Required method incomplete: '+m)), 'No specific model conflict was identified; missing evidence may still matter.')+
+  section('Important next research steps',packet.next,'Revalidate data dates and assumptions before acting.')+'</div>'+
+  '<section class="qf-v93-brief-section"><h4>Selected investments · matched historical context</h4>'+cmp+'</section>'+
+  '<div class="qf-v93-brief-grid"><section class="qf-v93-brief-section"><h4>Evidence coverage and sources</h4>'+evidence+'</section><section class="qf-v93-brief-section"><h4>Research method execution</h4><p class="tiny">'+packet.modelCoverage.completed+' completed · '+packet.modelCoverage.failed+' failed · '+packet.modelCoverage.ineligible+' ineligible · '+packet.modelCoverage.total+' total</p>'+methods+'</section></div>'+
+  section('Assumptions and limitations',packet.limitations,'Research depends on data quality, sample windows, scenario assumptions and personal risk tolerance.')+
+  '<p class="tiny">This briefing describes observed and simulated model output, not guaranteed investment performance, investment suitability or a brokerage instruction. It contains no account balance or raw provider price series.</p>';
 }
 
 async function runResearchOSV90(){
@@ -945,6 +991,8 @@ function privateTab(tab){
  if(tab==='decision')clearDecisionCenterV84();
  if(tab==='decision')refreshCandidateChoicesV85();
  if(tab==='decision')refreshResearchOSChoicesV90();
+ if(tab==='settings')renderConnectedBriefV93();
+ if(tab==='lab')refreshConnectedResearchV93();
  const shared=$('private-research-dataset');if(shared)shared.hidden=!['research','optimization','backtest','walkforward'].includes(tab);
  refreshResearchContext();
  document.querySelectorAll('[data-private-view]').forEach(p=>p.hidden=p.dataset.privateView!==tab);
@@ -1478,7 +1526,7 @@ $('private-fc-report').addEventListener('click',()=>{
  }catch(e){message('Research export unavailable: '+e.message);}
 });
 for(const id of ['private-wf-train','private-wf-step','private-wf-mode','private-wf-cap','private-wf-fee','private-wf-capital']){
- $(id).addEventListener('change',()=>{walkforwardResult=null;clearV66Walkforward();$('private-wf-export').disabled=true;
+ $(id).addEventListener('change',()=>{clearResearchOSV90();walkforwardResult=null;clearV66Walkforward();$('private-wf-export').disabled=true;
   $('private-wf-output').textContent='Settings changed. Re-run walk-forward evaluation.';});
 }
 for(const id of ['private-fc-years','private-fc-growth','private-fc-margin','private-fc-discount','private-fc-terminal']){
@@ -1486,9 +1534,20 @@ for(const id of ['private-fc-years','private-fc-growth','private-fc-margin','pri
 }
 
 document.querySelectorAll('[data-private-tab]').forEach(b=>b.addEventListener('click',()=>privateTab(b.dataset.privateTab)));
+$('qf-v93-ribbon-assess').addEventListener('click',()=>privateTab('decision'));
+$('qf-v93-ribbon-brief').addEventListener('click',()=>privateTab('settings'));
+$('qf-v93-brief-refresh').addEventListener('click',renderConnectedBriefV93);
+$('qf-v93-brief-export').addEventListener('click',()=>{
+ if(!privateState||!linkedResearchBriefV93)return;
+ downloadResearchJSON('quantforge-v93-linked-research-briefing.json',linkedResearchBriefV93);
+});
+for(const id of ['qf-v93-briefing','qf-v93-lab-status'])$(id).addEventListener('click',e=>{
+ const b=e.target.closest('[data-v93-method]');
+ if(b&&privateState&&['research','candidate','valuation','trade','walkforward','backtest','optimization','lab'].includes(b.dataset.v93Method))privateTab(b.dataset.v93Method);
+});
 $('private-v90-browse').addEventListener('click',()=>openAssetBrowser('research'));
 $('private-v90-run').addEventListener('click',runResearchOSV90);
-$('private-v90-report').addEventListener('click',e=>{const b=e.target.closest('[data-private-tab]');if(b&&privateState&&['lab','trade','research','candidate'].includes(b.dataset.privateTab))privateTab(b.dataset.privateTab);});
+$('private-v90-report').addEventListener('click',e=>{const b=e.target.closest('[data-private-tab]');if(b&&privateState&&['lab','trade','research','candidate','settings'].includes(b.dataset.privateTab))privateTab(b.dataset.privateTab);});
 for(const id of ['private-v90-candidate','private-v90-risk','private-v90-horizon','private-v90-maxweight','private-v90-maxdrawdown','private-v90-days'])
  $(id).addEventListener('change',clearResearchOSV90);
 

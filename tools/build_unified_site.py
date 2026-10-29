@@ -37,12 +37,16 @@ block='''<section class="tabpage" id="page-private">
   <div id="private-signed" hidden>
     <div class="controls"><span class="mini">Private portfolio · authenticated</span><button class="btn sm" id="private-logout">Sign out</button></div>
     <nav class="private-nav" aria-label="Private workspace sections">
-      <details class="private-nav-group" role="group" aria-label="Decision Center" open><summary class="private-nav-title">01 · Decision Center</summary><div class="private-nav-actions"><button class="active" data-private-tab="decision">Automated assessment</button></div></details>
+      <details class="private-nav-group" role="group" aria-label="Investment Research Hub" open><summary class="private-nav-title">01 · Research Hub</summary><div class="private-nav-actions"><button class="active" data-private-tab="decision">Analyze investments</button></div></details>
       <details class="private-nav-group" role="group" aria-label="Explore Investments"><summary class="private-nav-title">02 · Explore Investments</summary><div class="private-nav-actions"><button data-private-tab="ideas">Company discovery &amp; screening</button></div></details>
       <details class="private-nav-group" role="group" aria-label="My Portfolio"><summary class="private-nav-title">03 · My Portfolio</summary><div class="private-nav-actions"><button data-private-tab="home">Holdings overview</button><button data-private-tab="trade">Virtual trades &amp; scenarios</button></div></details>
       <details class="private-nav-group" role="group" aria-label="Advanced Research Lab"><summary class="private-nav-title">04 · Advanced Research Lab</summary><div class="private-nav-actions"><button data-private-tab="lab">Research Lab overview</button><button data-private-tab="research">Market data &amp; datasets</button><button data-private-tab="candidate">Individual company &amp; factors</button><button data-private-tab="valuation">Company valuation</button><button data-private-tab="optimization">Optimization &amp; risk</button><button data-private-tab="backtest">Historical backtests</button><button data-private-tab="walkforward">Walk-forward &amp; robustness</button></div></details>
-      <details class="private-nav-group" role="group" aria-label="Research Settings and History"><summary class="private-nav-title">05 · Research Settings &amp; History</summary><div class="private-nav-actions"><button data-private-tab="settings">Research preferences, guide &amp; notes</button></div></details>
+      <details class="private-nav-group" role="group" aria-label="Research Briefing and Notes"><summary class="private-nav-title">05 · Research Briefing &amp; Notes</summary><div class="private-nav-actions"><button data-private-tab="settings">Connected research briefing</button></div></details>
     </nav>
+    <div id="qf-v93-research-ribbon" class="qf-v93-ribbon" role="status" aria-live="polite">
+      <div class="qf-v93-ribbon-copy"><strong id="qf-v93-ribbon-title">Research workflow · No current assessment</strong><span class="tiny" id="qf-v93-ribbon-detail">Select investments and run an assessment to connect the Research Lab and briefing.</span></div>
+      <div class="controls"><button type="button" class="btn sm" id="qf-v93-ribbon-assess">Research Hub</button><button type="button" class="btn sm" id="qf-v93-ribbon-brief" disabled>Open briefing</button></div>
+    </div>
     <div id="private-research-dataset" class="pane" hidden aria-label="Research investments">
       <div class="section-title"><h3>Research investments</h3><span class="tiny">Used in Market data, Optimization, Backtests and Walk-forward</span></div>
       <p class="tiny">Choose 2–5 investments and a time period, then load their price history. Optimization, backtesting and walk-forward testing use the same loaded observations. Changing the selection or period requires reloading and recalculating.</p>
@@ -59,6 +63,8 @@ block='''<section class="tabpage" id="page-private">
       <div class="pane qf-v9-shell"><span class="eyebrow">ADVANCED RESEARCH · METHODS LIBRARY</span><h2>Advanced Research Lab</h2>
       <p>The Decision Center runs applicable research automatically. Use this lab to inspect algorithms, change assumptions, and investigate statistical findings in greater detail.</p>
       <p class="tiny">Investment analysis is organized by purpose. Models use dated, matched observations; they do not execute orders.</p>
+      <div class="qf-v93-lab-status" id="qf-v93-lab-status" aria-live="polite"><strong>Connected research methods</strong><p class="tiny">Run an assessment in Research Hub to see which specialist methods were completed, unavailable, or failed for the chosen investments.</p></div>
+      <div class="controls qf-v93-lab-tools"><button type="button" class="btn" data-private-tab="decision">Return to Research Hub</button><button type="button" class="btn" data-private-tab="settings">View research briefing</button></div>
       <div class="qf-v9-lab-grid">
         <button type="button" data-private-tab="candidate"><strong>Company &amp; factor research</strong><small>SEC fundamentals, downside risk, market ETF beta, independent FF3 regressions</small></button>
         <button type="button" data-private-tab="valuation"><strong>Valuation &amp; scenario modeling</strong><small>Cash-flow assumptions, financial statements and observed-price ratios</small></button>
@@ -69,15 +75,15 @@ block='''<section class="tabpage" id="page-private">
       </div></div>
     </section>
     <section class="private-view" data-private-view="home" hidden>
-      <div class="qf-private-start"><h2>Portfolio overview</h2><p class="qf-private-section-intro">Check your virtual holdings, then choose a research task. Detailed calculators and the plain-English guide live in their own sections.</p><div class="qf-private-paths"><button type="button" data-private-tab="ideas"><strong>Find investments</strong><small>Compare selected stocks and funds</small></button><button type="button" data-private-tab="research"><strong>Analyze market history</strong><small>Load prices for risk and strategy testing</small></button><button type="button" data-private-tab="decision"><strong>Assess current evidence</strong><small>Compare findings, gaps and next steps</small></button><button type="button" data-private-tab="settings"><strong>Read my research guide</strong><small>Explain completed analyses in plain language</small></button></div></div>
+      <div class="qf-private-start"><h2>Portfolio overview</h2><p class="qf-private-section-intro">Check your virtual holdings, then choose a research task. Detailed calculators and the plain-English guide live in their own sections.</p><div class="qf-private-paths"><button type="button" data-private-tab="ideas"><strong>Find investments</strong><small>Compare selected stocks and funds</small></button><button type="button" data-private-tab="research"><strong>Analyze market history</strong><small>Load prices for risk and strategy testing</small></button><button type="button" data-private-tab="decision"><strong>Run investment research</strong><small>Automated assessment and research brief</small></button><button type="button" data-private-tab="settings"><strong>Open research briefing</strong><small>Connected evidence, risks and methods</small></button></div></div>
       <p class="qf-private-nav-note">All holdings and transactions in this workspace are virtual. Prices are dated observations, not guarantees.</p>
       <div class="pane"><div class="three"><div class="metric"><span class="muted">Virtual portfolio value</span><strong id="private-total">—</strong></div><div class="metric"><span class="muted">Available cash</span><strong id="private-cash">—</strong></div><div class="metric"><span class="muted">Invested value</span><strong id="private-invested">—</strong></div></div><div class="section-title"><h3>Holdings</h3><button class="btn sm" data-private-tab="trade">Trade</button></div><div id="private-positions"></div></div>
       <div class="pane"><h3>Holdings by weight</h3><div id="private-concentration" class="tiny" style="margin-top:12px">Add virtual holdings to see allocation.</div></div>
     </section>
     <section class="private-view" data-private-view="decision">
       <div class="pane qf-v9-shell qf-v92-workspace" id="private-decision-os-v90">
-        <span class="eyebrow">PRIVATE RESEARCH · V9.2</span><h2>Investment Decision Center</h2>
-        <p>One research run, one coherent assessment. Select investments by name, choose your risk limits, and review both favorable and conflicting evidence. Full model detail remains available in the Research Lab.</p>
+        <span class="eyebrow">PRIVATE RESEARCH · V9.3</span><h2>Investment Research Hub</h2>
+        <p>One connected research workflow. Choose companies, set constraints, and run applicable models. Review the conclusion, compare the evidence, then open a linked briefing or any specialist method without starting from scratch.</p>
         <div class="qf-v92-setup">
           <section class="qf-v92-step" aria-labelledby="qf-v92-step-one"><div class="qf-v92-stephead"><span aria-hidden="true">01</span><h3 id="qf-v92-step-one">Select investments</h3></div>
             <p class="tiny">Choose 2–5 companies or funds for a matched historical comparison; pick one candidate for detailed company research.</p>
@@ -99,14 +105,14 @@ block='''<section class="tabpage" id="page-private">
         <div class="qf-v92-runbar"><div><strong>03 · Run your assessment</strong><p class="tiny">Models run only when their data are eligible. Your portfolio and brokerage remain unchanged.</p></div><button type="button" class="btn primary" id="private-v90-run">Analyze selected investments</button></div>
         <div id="private-v90-report" aria-live="polite" role="status"><p class="tiny">Your assessment will appear here: proposed action, evidence quality, key risks, investment comparison and expandable model audit.</p></div>
       </div>
-      <details class="pane qf-v9-legacy"><summary>Previously completed research review (manual)</summary>
+      <div id="qf-v93-legacy-compat" hidden aria-hidden="true">
       <div class="pane" id="private-decision-center-v84">
         <span class="eyebrow">PRIVATE RESEARCH · INTEGRATED ASSESSMENT</span>
         <h2 style="margin:9px 0">Investment Decision Center</h2>
         <p class="qf-private-section-intro">Bring together the analyses already run in this session. See the covered investments, what the models agree or disagree about, which evidence is missing, and the next calculation to perform. Nothing here moves money or changes your virtual portfolio.</p>
         <div class="controls"><button class="btn primary" type="button" id="private-decision-run-v84">Assess current evidence</button><span class="tiny">Generated on demand · MFA-protected</span></div>
         <div id="private-decision-result-v84" aria-live="polite" style="margin-top:15px"><p class="tiny">Choose Assess current evidence to review your completed analyses.</p></div>
-      </div></details>
+      </div></div>
     </section>
     <section class="private-view" data-private-view="candidate" hidden>
       <div class="pane"><span class="eyebrow">RESEARCH LAB · SINGLE COMPANY</span><h2>Company &amp; Factor Research</h2>
@@ -259,15 +265,18 @@ block='''<section class="tabpage" id="page-private">
       <div class="pane"><h3>Company comparison</h3><div id="private-peers"></div></div>
     </section>
     <section class="private-view" data-private-view="settings" hidden>
-      <h2>Research guide and notes</h2><p class="qf-private-section-intro">Generate an evidence-based explanation of the analyses you have actually run. The report separates observations, limitations and next research steps; it does not decide whether to buy or sell.</p>
+      <h2>Research Briefing &amp; Notes</h2><p class="qf-private-section-intro">The briefing uses the latest completed Research Hub assessment and the exact same research methods and sources. Nothing is recalculated or submitted to a brokerage when you open it.</p>
+      <section class="pane qf-v93-brief-intro" aria-label="Connected research report"><div class="qf-v93-row"><div><span class="eyebrow">CONNECTED WORKFLOW</span><h3>Investment research briefing</h3><p class="tiny" id="qf-v93-brief-status">No current linked assessment. Run an automated assessment first.</p></div><button class="btn" type="button" data-private-tab="decision">Return to Research Hub</button></div>
+      <div id="qf-v93-briefing" aria-live="polite"><p class="tiny">Once an assessment is complete, the executive findings, conflicts, data coverage, method record, and next research actions will be available here.</p></div>
+      <div class="controls"><button class="btn primary" type="button" id="qf-v93-brief-refresh" disabled>Refresh linked briefing</button><button class="btn" type="button" id="qf-v93-brief-export" disabled>Export evidence briefing (JSON)</button></div></section>
       <div class="pane" id="private-guide-card-v79">
-        <div class="section-title"><h3>Research guide: what the evidence says</h3><span class="mini">Private · educational decision support</span></div>
-        <p class="tiny">New to investing? Generate a plain-language review of your virtual portfolio, loaded market data, portfolio model, walk-forward results, and SEC company research. The guide uses only analyses currently available in this signed-in session. It never places trades or sends your information to an external AI provider.</p>
+        <div class="section-title"><h3>Optional session overview</h3><span class="mini">Private · educational decision support</span></div>
+        <p class="tiny">For an overview of available work that has not yet been included in an automated Research Hub assessment, use this secondary session summary. It is separate from the linked briefing and cannot issue a candidate recommendation.</p>
         <div class="formgrid" style="margin-top:12px">
           <div class="field"><label for="private-guide-horizon-v79">When could you need this money?</label><select id="private-guide-horizon-v79"><option value="unknown">Not sure yet</option><option value="short">Within 3 years</option><option value="medium">3–10 years</option><option value="long">More than 10 years</option></select></div>
           <div class="field"><label for="private-guide-comfort-v79">How would a large temporary loss affect you?</label><select id="private-guide-comfort-v79"><option value="unknown">Not sure yet</option><option value="low">I could not comfortably absorb it</option><option value="medium">I could tolerate some loss</option><option value="high">I understand substantial losses are possible</option></select></div>
         </div>
-        <div class="controls"><button class="btn primary" id="private-guide-run-v79" type="button">Explain my current research</button><button class="btn" id="private-guide-export-v79" type="button" disabled>Export private report (JSON)</button></div>
+        <div class="controls"><button class="btn primary" id="private-guide-run-v79" type="button">Summarize available session analyses</button><button class="btn" id="private-guide-export-v79" type="button" disabled>Export private report (JSON)</button></div>
         <div id="private-guide-result-v79" aria-live="polite" style="margin-top:14px"><p class="tiny">Click Explain my current research when signed in. Results stay in this browser session until cleared.</p></div>
         <details class="lab-details"><summary>Finance terms · plain-English reference</summary><div class="tiny" style="padding-top:10px"><p><strong>Volatility:</strong> how much prices moved up and down in the observed period.</p><p><strong>Drawdown:</strong> how far a portfolio fell from a prior high.</p><p><strong>Backtest:</strong> a calculation using past prices, not proof of future success.</p><p><strong>Walk-forward:</strong> a backtest that repeatedly fits on earlier data and checks later observations.</p><p><strong>Cash flow:</strong> money reported moving through a company; this is not the same as stock-price return.</p><p><strong>Concentration:</strong> how dependent your portfolio value is on one holding.</p><p><strong>SEC filing:</strong> a company disclosure filed with the US securities regulator.</p><p><strong>FCF proxy:</strong> operating cash flow minus cash spent on property and equipment; not a stock-price target.</p><p><strong>Discount rate:</strong> a model assumption about the value of future cash flow in today’s dollars.</p><p><strong>Correlation:</strong> how two observed return series moved together; historical correlation can change.</p></div></details>
         <details class="lab-details"><summary>Before acting: a research checklist</summary><div class="tiny" style="padding-top:10px"><ol><li>Can I explain what the company or fund owns and how it makes money?</li><li>Are my financial figures reported, current, and comparable across periods?</li><li>What do the historical risk and walk-forward results disagree about?</li><li>How would this change concentration or cash in my portfolio?</li><li>What information is still missing, and would a possible loss affect money I need soon?</li></ol><p>Use the analysis links in your generated report to answer each question. This is a review tool, not a buy/sell signal.</p></div></details>
@@ -368,6 +377,35 @@ qfv9_css="""
 @media(max-width:900px){#private-signed .qf-v92-setup{grid-template-columns:1fr}}
 @media(max-width:650px){#private-signed .qf-v92-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}#private-signed .qf-v92-twin,#private-signed .qf-v92-evidence-grid{grid-template-columns:1fr}#private-signed .qf-v92-runbar{flex-direction:column;align-items:stretch}}
 @media(max-width:430px){#private-signed .qf-v92-step .qf-v9-fields{grid-template-columns:1fr}}
+
+/* V9.3 connected private research hub, reusable briefing and small-screen navigation */
+#private-signed #qf-v93-legacy-compat[hidden]{display:none!important}
+#private-signed .qf-v93-ribbon{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin:12px 0 18px;padding:14px 17px;background:#eff6f2;border:1px solid #c9ded4;border-radius:12px}
+#private-signed .qf-v93-ribbon-copy{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+#private-signed .qf-v93-ribbon-copy strong{color:#16463b;font-size:13px}
+#private-signed .qf-v93-ribbon .controls{margin:0}
+#private-signed .qf-v93-lab-status{margin:16px 0;padding:16px;border:1px solid #c9ded4;background:#f6faf8;border-radius:12px}
+#private-signed .qf-v93-lab-status p{margin:7px 0 0}
+#private-signed .qf-v93-lab-tags{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:12px}
+#private-signed .qf-v93-lab-tag{background:white;border:1px solid #d3e4db;border-radius:9px;padding:10px;display:flex;flex-direction:column;gap:5px;font-size:12px}
+#private-signed .qf-v93-lab-tag small{color:#517064;line-height:1.4}
+#private-signed .qf-v93-brief-intro{max-width:1200px;margin-inline:auto;border-color:#cbded4}
+#private-signed .qf-v93-row{display:flex;align-items:start;justify-content:space-between;gap:14px;flex-wrap:wrap}
+#private-signed .qf-v93-report-top{border:1px solid #cfdfd6;border-radius:13px;background:#f5faf7;padding:21px;margin:16px 0}
+#private-signed .qf-v93-report-top h4{font-size:23px;margin:7px 0;color:#16493c}
+#private-signed .qf-v93-report-top p{line-height:1.65}
+#private-signed .qf-v93-brief-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:16px 0}
+#private-signed .qf-v93-brief-section{border:1px solid #d6e5dd;background:white;border-radius:12px;padding:17px;min-width:0}
+#private-signed .qf-v93-brief-section h4{margin:0 0 8px;font-size:16px;color:#1a4d40}
+#private-signed .qf-v93-brief-section ul{margin:8px 0;padding-left:17px;line-height:1.6;font-size:13px}
+#private-signed .qf-v93-method{padding:9px 0;border-bottom:1px solid #edf2ef;line-height:1.5;font-size:12px}
+#private-signed .qf-v93-method:last-child{border-bottom:0}
+#private-signed .qf-v93-method small{display:block;margin-top:4px;color:#526a5f}
+#private-signed .qf-v93-actions{margin:14px 0;display:flex;flex-wrap:wrap;gap:8px}
+#private-signed .qf-v93-related{margin:15px 0;border:1px solid #ccddd4;border-radius:12px;padding:14px;background:#fbfdfc}
+#private-signed .qf-v93-related p{font-size:12px;color:#416253}
+#private-signed .qf-v93-related .controls{margin:7px 0 0}
+@media(max-width:750px){#private-signed .qf-v93-brief-grid{grid-template-columns:1fr}#private-signed .qf-v93-ribbon{align-items:stretch}#private-signed .qf-v93-ribbon .controls{flex-wrap:wrap}}
 """
 html=html.replace('</style>',qfv9_css+'</style>',1)
 html=html.replace('.navtop{display:none}', '#private-research-dataset[hidden],#private-signed[hidden],#private-login[hidden],#private-mfa[hidden],#private-mfa-qr-wrap[hidden],#private-mfa-setup-actions[hidden]{display:none!important}#private-message{margin-top:8px}.navtop{display:none}')
@@ -395,7 +433,7 @@ for slot, file in [('/* QF_MODEL */','model.js'),('/* QF_APP */','app.js'),('/* 
  text=(src/'site'/file).read_text(encoding="utf-8")
  if file=='private.js':
   # Bundled alongside the existing private script: still only three CSP-protected scripts.
-  text=(src/'site/private_ideas_v70.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_allocation_v74.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_value_v73.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_v72.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_guide_v79.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_center_v84.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_candidate_v85.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_factor_scenarios_v86.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_french_factors_v87.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_orchestrator_v91.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_os_v90.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_review_v92.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_multimarket.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_forecast_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_walkforward_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_diagnostics_v66.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_integrity_v67.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_robustness_v68.js').read_text(encoding='utf-8')+'\n'+text
+  text=(src/'site/private_ideas_v70.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_allocation_v74.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_value_v73.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_v72.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_guide_v79.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_center_v84.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_candidate_v85.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_factor_scenarios_v86.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_french_factors_v87.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_orchestrator_v91.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_os_v90.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_review_v92.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_brief_v93.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_multimarket.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_forecast_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_walkforward_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_diagnostics_v66.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_integrity_v67.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_robustness_v68.js').read_text(encoding='utf-8')+'\n'+text
  if file=='app.js':
   assert text.count('/* QF_SEC_DATA */ null')==1
   # Bundle pure SEC analytics in the existing public app script. CSP remains 3 hashes.
