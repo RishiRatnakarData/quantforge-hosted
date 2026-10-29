@@ -17,7 +17,7 @@ def test_public_routes_and_disclosures_retained():
     assert 'investment return examples are simulated' in page
     assert page.index('id="home-sec-highlights"') < page.index('class="project-story pane"')
     assert page.count('class="qf-nav-section"') == 3
-    assert page.count('class="qf-secondary-details"') == 2
+    assert page.count('class="qf-secondary-details"') == 1
     assert 'SEC_DATA' not in page  # populated by CSP-protected build, not untrusted HTML.
 
 

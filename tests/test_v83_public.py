@@ -17,7 +17,7 @@ def test_public_home_research_breadth_and_owner():
     for route in ('sec', 'lab', 'quant', 'systems'):
         assert f'data-go="{route}"' in home
     assert '<div hidden aria-hidden="true"><div id="home-sec-highlights"' in home
-    assert 'Designed and developed by <strong>Rishi Ratnakar</strong>' in page
+    assert '<span>Designed and developed by</span><strong>Rishi&nbsp;Ratnakar</strong>' in page
 
 
 def test_dashboard_responds_to_the_correct_inputs():

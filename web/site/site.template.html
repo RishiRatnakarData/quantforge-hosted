@@ -382,8 +382,17 @@ main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
 #private-decision-center-v84 .qf-v84-yes{color:#215b41;background:#e4f2e8}
 #private-decision-center-v84 .qf-v84-no{color:#76552b;background:#f8efe0}
 @media(max-width:680px){#private-decision-center-v84 .qf-v84-evidence-grid{grid-template-columns:1fr}}
+
+/* V8.4.1: attribution that never divides the full name; article-first methods flow. */
+.qf-v83-owner{display:flex;flex-direction:column;align-items:flex-start;gap:2px;margin:8px 6px 2px;line-height:1.4}
+.qf-v83-owner span{font-size:10.5px;color:#5a7469;letter-spacing:0}
+.qf-v83-owner strong{display:block;white-space:nowrap;color:#174e3d;font-size:14px;font-weight:750;letter-spacing:0}
+#page-methods .qf-methods-guide{margin:0 0 25px}
+#page-methods .qf-methods-guide>h2{font-size:clamp(19px,2vw,23px);margin:0 0 15px;color:#1b4335}
+#page-methods .qf-methods-guide .pane{margin-bottom:16px}
+#page-methods .qf-methods-guide .project-story{margin-top:0}
 </style></head><body>
-<div class="app"><aside class="side"><div class="brand"><div class="mark">Q</div>quantforge</div><p class="qf-v83-owner">Designed and developed by <strong>Rishi Ratnakar</strong></p><nav id="navigation" aria-label="Main navigation">
+<div class="app"><aside class="side"><div class="brand"><div class="mark">Q</div>quantforge</div><p class="qf-v83-owner"><span>Designed and developed by</span><strong>Rishi&nbsp;Ratnakar</strong></p><nav id="navigation" aria-label="Main navigation">
   <div class="qf-nav-section" role="group" aria-label="Financial research pages">
     <span class="nav-caption">Financial research</span>
     <button class="nav-btn active" data-page="overview" aria-current="page">Overview</button>
@@ -690,7 +699,9 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
 </section>
 
 <section class="tabpage" id="page-methods">
-<details class="qf-secondary-details"><summary>How the research platform works</summary>
+  <div class="pagehead"><span class="eyebrow">METHODS</span><h1>Data and engineering</h1><p>The platform architecture, source-to-metric calculations, model diagnostics, statistical validation, and automated checks used to produce reproducible financial research.</p></div>
+<section class="qf-methods-guide" aria-labelledby="qf-methods-guide-title">
+  <h2 id="qf-methods-guide-title">How the research platform works</h2>
 <div class="project-story pane"><div class="section-title"><h3>What the project covers</h3><span class="mini">From filings to model evaluation</span></div><div class="story-grid">
 <div><span class="eyebrow">01 · DATA ENGINEERING</span><h3>SEC financial data</h3><p>Annual company facts with filing dates, fiscal-year selection, reported values, calculated margins, and missing-data checks.</p><button class="text-link" data-go="sec">Explore financials →</button></div>
 <div><span class="eyebrow">02 · QUANTITATIVE ANALYTICS</span><h3>Portfolio risk</h3><p>Estimate covariance, apply position limits, compare allocations, and inspect volatility and downside assumptions.</p><button class="text-link" data-go="quant">Quantitative model →</button></div>
@@ -709,8 +720,7 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
  </div>
  <div class="controls" style="margin-top:0"><button class="btn primary" data-go="lab">Explore the analysis</button><button class="btn" data-go="systems">Research methods</button><button class="btn" data-go="methods">Data &amp; engineering</button></div>
 </div>
-</details>
-  <div class="pagehead"><span class="eyebrow">METHODS</span><h1>Data and engineering</h1><p>The platform architecture, source-to-metric calculations, model diagnostics, statistical validation, and automated checks used to produce reproducible financial research.</p></div>
+</section>
   <div class="pane" style="background:#f1f7f3;border-color:#bad5c7"><div class="section-title"><h3>Private models and public source code</h3><span class="mini">Implementation references</span></div><p class="explain-note" style="margin:0 0 13px">The private workspace supports historical market analysis, portfolio optimization, strategy evaluation, investment screening, and SEC-based valuation scenarios. The methods page explains the underlying calculations; the repository contains the implementations and tests.</p><button class="btn primary" data-go="systems">View research methods</button></div>
   <div class="method-intro"><div><strong>Source data</strong><span>SEC EDGAR Company Facts</span></div><div><strong>Demonstration calculations</strong><span>Simulated portfolio / DCF / quantitative returns</span></div><div><strong>Separate private workspace</strong><span>Owner-only authentication and observations</span></div></div>
   <div class="pane"><div class="section-title"><h3>Data lineage</h3><span class="mini" id="methods-asof">Historical SEC snapshot</span></div>
