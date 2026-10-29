@@ -5,12 +5,11 @@ Does not claim live Cloudflare deployment, sign-in success, or live price correc
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 from html.parser import HTMLParser
 from pathlib import Path
 
-from build_v82_case_study import DATASET, SYMBOLS, load_companies
+from build_v82_case_study import DATASET, SYMBOLS, canonical_snapshot_sha256, load_companies
 
 PUBLIC_ROUTES = ("overview", "sec", "lab", "portfolio", "quant", "valuation", "ml", "systems", "methods")
 PRIVATE_ROUTES = ("home", "trade", "ideas", "research", "optimization", "backtest", "walkforward", "valuation", "settings")
@@ -52,7 +51,7 @@ def audit(repo: Path):
     assert built.count('href="research-case-study.html"') == 1
     assert study.count('href="./research-case-study.csv"') == 1
     assert "Historical disclosures only" in study and "different fiscal" in study.lower()
-    assert "Source snapshot SHA-256: <code>" + hashlib.sha256(raw).hexdigest() in study
+    assert "Source snapshot SHA-256: <code>" + canonical_snapshot_sha256(raw) in study
     assert "source_accession" in ledger and "issuer_as_of" in ledger and "sec_companyfacts_url" in ledger
     main = Analyzer()
     main.feed(built)
@@ -73,7 +72,7 @@ def audit(repo: Path):
     assert not any(count > 1 for count in main.ids.values()), "Compiled site has duplicate element ids"
     for token in ("ALPACA_API_SECRET_KEY", "SUPABASE_SERVICE_ROLE", "private_positions", "private-password"):
         assert token not in study and token not in ledger, f"Potential private marker in case study: {token}"
-    print(f"V8.2 static readiness PASS: {len(data['companies'])} SEC companies, {len(companies)}-company reproducible study, 9 public routes, 9 protected private views, three CSP scripts, 0 case-study scripts, snapshot SHA {hashlib.sha256(raw).hexdigest()[:16]}...")
+    print(f"V8.2 static readiness PASS: {len(data['companies'])} SEC companies, {len(companies)}-company reproducible study, 9 public routes, 9 protected private views, three CSP scripts, 0 case-study scripts, snapshot SHA {canonical_snapshot_sha256(raw)[:16]}...")
     print("Not tested by this audit: live Cloudflare deployment, authenticated API access, MFA, or real broker/provider availability.")
 
 

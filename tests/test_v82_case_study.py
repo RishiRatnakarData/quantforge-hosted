@@ -206,13 +206,12 @@ def test_actual_public_snapshot_when_installed():
 
 
 def test_committed_public_case_study_matches_exact_sec_snapshot_bytes():
-    import hashlib
 
     path = ROOT / "web/site/sec_snapshot.json"
     raw = path.read_bytes()
     data = json.loads(raw.decode("utf-8"))
     companies = CASE.load_companies(data)
-    digest = hashlib.sha256(raw).hexdigest()
+    digest = CASE.canonical_snapshot_sha256(raw)
     assert (ROOT / "public/research-case-study.html").read_text(encoding="utf-8") == CASE.render_html(data, companies, digest)
     assert (ROOT / "public/research-case-study.csv").read_text(encoding="utf-8") == CASE.csv_report(companies)
 

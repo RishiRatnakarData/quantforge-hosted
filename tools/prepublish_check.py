@@ -96,7 +96,6 @@ def main() -> int:
 # This exception is granted only when the public CSV and standalone HTML exactly
 # match a deterministic regeneration from the already-public SEC snapshot.
 def _qf82_verified_public_case_study(root):
-    import hashlib
     import importlib.util
     import json
     from pathlib import Path
@@ -121,8 +120,12 @@ def _qf82_verified_public_case_study(root):
         snapshot = json.loads(snapshot_bytes.decode("utf-8"))
         companies = mod.load_companies(snapshot)
         expected_csv = mod.csv_report(companies).encode("utf-8")
-        expected_html = mod.render_html(snapshot, companies, hashlib.sha256(snapshot_bytes).hexdigest()).encode("utf-8")
-        return ledger.read_bytes() == expected_csv and study.read_bytes() == expected_html
+        expected_html = mod.render_html(snapshot, companies, mod.canonical_snapshot_sha256(snapshot_bytes)).encode("utf-8")
+        # Git may materialize tracked text as CRLF on Windows and LF on Linux.
+        # Normalize *only* newline representation, not data or numeric values.
+        actual_csv = ledger.read_bytes().replace(b"\r\n", b"\n")
+        actual_html = study.read_bytes().replace(b"\r\n", b"\n")
+        return actual_csv == expected_csv and actual_html == expected_html
     except Exception:
         return False
 
