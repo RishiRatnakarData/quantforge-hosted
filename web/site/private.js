@@ -3,8 +3,41 @@
 'use strict';
 const $=id=>document.getElementById(id);
 let guideReportV79=null;
+let privateDecisionCenterV84=null;
+function clearDecisionCenterV84(){
+ privateDecisionCenterV84=null;
+ const out=$('private-decision-result-v84');
+ if(out)out.textContent='Inputs or analysis may have changed. Assess current evidence to generate a new summary.';
+}
+function runDecisionCenterV84(){
+ if(!privateState){message('Complete sign-in and MFA before reviewing private research.');return;}
+ const symbol=$('private-valuation-company').value;
+ const result=window.QFPrivateDecisionCenterV84.evaluate({
+  portfolio:privateState,quotes:quoted,selection:researchSelection,history:historySeries,
+  optimizer:optimizerResult,walkforward:walkforwardResult,robustness:robustnessResultV68,
+  screening:ideaDecisionBrief,company:valuationCompanies[symbol]||null,
+  purchaseImpact:allocationResultV74,horizon:$('private-guide-horizon-v79').value,
+  comfort:$('private-guide-comfort-v79').value,now:new Date().toISOString()
+ });
+ privateDecisionCenterV84=result;
+ const list=(items)=>'<ul class="tiny">'+items.map(x=>'<li>'+safe(x)+'</li>').join('')+'</ul>';
+ const evidence=result.details.map(d=>'<div class="qf-v84-evidence"><strong>'+safe(d.label)+'</strong><span class="'+(d.available?'qf-v84-yes':'qf-v84-no')+'">'+(d.available?'Completed':'Needs work')+'</span><p class="tiny">'+safe(d.detail)+'</p><button class="text-link" type="button" data-v84-go="'+safe(d.route)+'">Open analysis</button></div>').join('');
+ const next=result.steps.map(x=>'<li>'+safe(x.text)+' <button class="text-link" type="button" data-v84-go="'+safe(x.route)+'">Open</button></li>').join('');
+ $('private-decision-result-v84').innerHTML='<div class="qf-v84-summary"><span class="eyebrow">EVIDENCE REVIEW</span><h3>'+safe(result.status)+'</h3><p>'+result.coverage.available+' of '+result.coverage.total+' analysis areas have usable results.</p>'+
+  '<p class="tiny">'+(result.dataset?'Loaded investments: '+safe(result.dataset.symbols.map(x=>assetNames[x]||x).join(' · '))+' · '+safe(result.dataset.start)+' to '+safe(result.dataset.end):'No validated shared investment history is loaded.')+'</p></div>'+
+  '<div class="qf-v84-next"><strong>Most useful next step</strong><p>'+safe(result.nextAction.text)+'</p><button class="btn sm" type="button" data-v84-go="'+safe(result.nextAction.route)+'">Open this research step</button></div>'+
+  '<h3>What the calculations show</h3>'+list(result.findings.length?result.findings:['No completed calculations are currently available for comparison.'])+
+  '<h3>Contradictions and cautions</h3>'+list(result.conflicts.length?result.conflicts:['No conflicting evidence identified in the completed checks. Missing analyses can still change the conclusion.'])+
+  '<h3>Evidence coverage</h3><div class="qf-v84-evidence-grid">'+evidence+'</div>'+
+  '<h3>Next research steps</h3><ol class="tiny">'+(next||'<li>Review research assumptions and data dates before considering any transaction.</li>')+'</ol>'+
+  '<h3>Options to examine</h3>'+list(result.alternatives.map(x=>x.title+': '+x.text))+
+  '<p class="tiny">'+safe(result.limits.join(' '))+'</p>';
+ message('Decision Center updated from current local research results. No trades or external AI calls.');
+}
+
 function clearGuideV79(){
  guideReportV79=null;
+ clearDecisionCenterV84();
  const out=$('private-guide-result-v79'),btn=$('private-guide-export-v79');
  if(out)out.textContent='Research changed. Generate a new summary to use the latest results.';
  if(btn)btn.disabled=true;
@@ -353,6 +386,7 @@ function clearDecisionBrief(){
  $('ideas-brief-export').disabled=true;
 }
 function renderDecisionBrief(){
+ clearDecisionCenterV84();
  if(!privateState||!ideaData.length){clearDecisionBrief();return;}
  const model=window.QFPrivateDecision;
  const brief=model.build(ideaData,$('ideas-lens').value,ideaFundamentals,privateState.holdings||{},quoted,privateState.cash);
@@ -493,6 +527,7 @@ function sampleStdev(a){if(a.length<2)return 0;const m=mean(a);return Math.sqrt(
 function maxDD(values){let high=0,deep=0;for(const v of values){high=Math.max(high,v);if(high)deep=Math.min(deep,v/high-1);}return deep;}
 function displayTable(headers,rows){return '<div class="table-wrap"><table><thead><tr>'+headers.map(h=>'<th>'+safe(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+row.map(v=>'<td>'+safe(v)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';}
 function privateTab(tab){
+ if(tab==='decision')clearDecisionCenterV84();
  const shared=$('private-research-dataset');if(shared)shared.hidden=!['research','optimization','backtest','walkforward'].includes(tab);
  refreshResearchContext();
  document.querySelectorAll('[data-private-view]').forEach(p=>p.hidden=p.dataset.privateView!==tab);
@@ -1034,6 +1069,13 @@ for(const id of ['private-fc-years','private-fc-growth','private-fc-margin','pri
 }
 
 document.querySelectorAll('[data-private-tab]').forEach(b=>b.addEventListener('click',()=>privateTab(b.dataset.privateTab)));
+$('private-decision-run-v84').addEventListener('click',runDecisionCenterV84);
+$('private-decision-result-v84').addEventListener('click',e=>{
+ const b=e.target.closest('[data-v84-go]');
+ if(!b||!privateState)return;
+ const route=b.dataset.v84Go;
+ if(['home','trade','ideas','research','optimization','walkforward','valuation'].includes(route))privateTab(route);
+});
 $('private-guide-run-v79').addEventListener('click',runGuideV79);
 $('private-guide-export-v79').addEventListener('click',()=>{
  if(!privateState||!guideReportV79)return;

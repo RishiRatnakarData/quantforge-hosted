@@ -367,6 +367,21 @@ main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
 @media(max-width:950px){.qf-evidence-layout{grid-template-columns:1fr}.qf-evidence-layout .evidence-data{max-height:260px}}
 @media(max-width:550px){.qf-v831-paper{padding:17px}.qf-evidence-toolbar select{width:100%;max-width:none}}
 
+
+/* V8.4 private evidence center; all visible content remains under signed-in MFA view. */
+#private-decision-center-v84 .qf-v84-summary{border:1px solid #d0e5dc;border-radius:12px;padding:18px;background:#f2faf5}
+#private-decision-center-v84 .qf-v84-next{border-left:3px solid #2e795d;padding:14px 18px;margin:16px 0;background:#f8fbf8;border-radius:0 8px 8px 0}
+#private-decision-center-v84 .qf-v84-next p{margin:8px 0 13px}
+#private-decision-center-v84 .qf-v84-summary h3{margin:7px 0 8px;font-size:19px}
+#private-decision-center-v84 h3{margin:24px 0 10px;font-size:16px}
+#private-decision-center-v84 .qf-v84-evidence-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+#private-decision-center-v84 .qf-v84-evidence{border:1px solid #dbe8e1;border-radius:10px;padding:15px;min-width:0}
+#private-decision-center-v84 .qf-v84-evidence strong{font-size:13px}
+#private-decision-center-v84 .qf-v84-evidence p{margin:8px 0;line-height:1.55}
+#private-decision-center-v84 .qf-v84-yes,#private-decision-center-v84 .qf-v84-no{display:inline-block;margin-left:7px;padding:3px 7px;border-radius:5px;font-size:10px;font-weight:750}
+#private-decision-center-v84 .qf-v84-yes{color:#215b41;background:#e4f2e8}
+#private-decision-center-v84 .qf-v84-no{color:#76552b;background:#f8efe0}
+@media(max-width:680px){#private-decision-center-v84 .qf-v84-evidence-grid{grid-template-columns:1fr}}
 </style></head><body>
 <div class="app"><aside class="side"><div class="brand"><div class="mark">Q</div>quantforge</div><p class="qf-v83-owner">Designed and developed by <strong>Rishi Ratnakar</strong></p><nav id="navigation" aria-label="Main navigation">
   <div class="qf-nav-section" role="group" aria-label="Financial research pages">
