@@ -438,6 +438,57 @@ main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
 @media(max-width:1200px){#private-signed .private-nav{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:700px){#private-signed .private-nav{grid-template-columns:1fr 1fr}#private-signed .qf-v9-fields,#private-signed .qf-v9-grid,#private-signed .qf-v9-lab-grid{grid-template-columns:1fr}}
 @media(max-width:450px){#private-signed .private-nav{grid-template-columns:1fr}}
+
+/* V9.2 private Decision Center: clear visual hierarchy and responsive readable comparison. */
+#private-signed .qf-v92-workspace{max-width:1200px;margin-inline:auto}
+#private-signed .qf-v92-setup{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:15px;margin-top:20px}
+#private-signed .qf-v92-step{border:1px solid #d6e3df;border-radius:13px;background:#fbfdfc;padding:18px;min-width:0}
+#private-signed .qf-v92-stephead{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+#private-signed .qf-v92-stephead span{background:#164f46;color:white;border-radius:9px;min-width:36px;height:36px;display:grid;place-items:center;font-weight:700}
+#private-signed .qf-v92-stephead h3{font-size:17px;margin:0;color:#193d36}
+#private-signed .qf-v92-step>.field{margin:15px 0}
+#private-signed .qf-v92-step .qf-v9-fields{grid-template-columns:repeat(2,minmax(0,1fr));margin:12px 0 0;gap:11px}
+#private-signed .qf-v92-step .qf-v9-fields label{font-size:12px}
+#private-signed .qf-v92-runbar{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:17px 19px;margin:14px 0;border-radius:12px;background:#eaf3ef;border:1px solid #b9d4c8}
+#private-signed .qf-v92-runbar p{margin:5px 0 0}
+#private-signed .qf-v92-report{margin-top:21px}
+#private-signed .qf-v92-hero{background:#f3f8f6;border:1px solid #bed8ce;border-left:5px solid #145b4c;border-radius:13px;padding:21px 24px}
+#private-signed .qf-v92-hero h3{font-size:clamp(19px,2.1vw,27px);margin:14px 0 9px;line-height:1.25;color:#143b32}
+#private-signed .qf-v92-hero p{max-width:850px;line-height:1.65}
+#private-signed .qf-v92-row{display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap}
+#private-signed .qf-v92-readiness{display:inline-block;border:1px solid #b4ccc3;background:white;border-radius:50px;padding:5px 10px;font-size:11px;font-weight:650;color:#234f43}
+#private-signed .qf-v92-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0 21px}
+#private-signed .qf-v92-metrics>div{background:white;border:1px solid #d4e3dd;border-radius:11px;padding:14px;display:flex;flex-direction:column;gap:5px;min-width:0}
+#private-signed .qf-v92-metrics strong{font-size:24px;color:#153f36;font-variant-numeric:tabular-nums}
+#private-signed .qf-v92-metrics span{font-size:11px;color:#526a60;line-height:1.5}
+#private-signed .qf-v92-twin{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:0 0 23px}
+#private-signed .qf-v92-panel{background:white;border:1px solid #d5e4de;border-radius:12px;padding:17px}
+#private-signed .qf-v92-panel h4,#private-signed .qf-v92-heading h4{margin:0;color:#183e33;font-size:17px}
+#private-signed .qf-v92-panel .qf-v92-list{margin:12px 0 0}
+#private-signed .qf-v92-list{padding-left:18px;font-size:13px;line-height:1.7}
+#private-signed .qf-v92-list li+li{margin-top:7px}
+#private-signed .qf-v92-core>section{margin-top:20px}
+#private-signed .qf-v92-heading{display:flex;align-items:baseline;justify-content:space-between;gap:15px;flex-wrap:wrap;margin-bottom:11px}
+#private-signed .qf-v92-evidence-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#private-signed .qf-v92-evidence{border:1px solid #d5e4de;background:#fff;border-radius:11px;padding:14px;min-width:0}
+#private-signed .qf-v92-evidence p{font-size:12px;line-height:1.6;color:#3a564c;margin:10px 0}
+#private-signed .qf-v92-evidence strong{font-size:13px}
+#private-signed .qf-v92-tag{font-size:10px;border-radius:30px;padding:4px 7px;background:#eff3f1;color:#3b5049;border:1px solid #d5e2dc;white-space:nowrap}
+#private-signed .qf-v92-state-supports,#private-signed .qf-v92-state-available{background:#e7f5ee;color:#225b41;border-color:#c4dfcd}
+#private-signed .qf-v92-state-cautions{background:#fff3e3;color:#8a4a14;border-color:#eed4a7}
+#private-signed .qf-v92-table{width:100%;font-size:12px;table-layout:auto}
+#private-signed .qf-v92-table caption{text-align:left;font-size:11px;color:#4b675a;margin:0 0 8px}
+#private-signed .qf-v92-table th,#private-signed .qf-v92-table td{vertical-align:middle}
+#private-signed .qf-v92-bar{display:inline-block;width:90px;max-width:48%;height:9px;background:#e7eae8;border-radius:10px;overflow:hidden;vertical-align:middle;margin-right:8px}
+#private-signed .qf-v92-bar>span{display:block;height:100%;background:#ad7c41;border-radius:10px}
+#private-signed .qf-v92-barvalue{font-variant-numeric:tabular-nums;white-space:nowrap}
+#private-signed .qf-v92-more{border:1px solid #d5e4de;border-radius:11px;margin-top:10px;padding:13px 17px;background:#fff}
+#private-signed .qf-v92-more summary{cursor:pointer;font-weight:650;color:#235a49}
+#private-signed .qf-v92-more[open] summary{margin-bottom:12px}
+#private-signed .qf-v92-actions{margin-top:20px}
+@media(max-width:900px){#private-signed .qf-v92-setup{grid-template-columns:1fr}}
+@media(max-width:650px){#private-signed .qf-v92-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}#private-signed .qf-v92-twin,#private-signed .qf-v92-evidence-grid{grid-template-columns:1fr}#private-signed .qf-v92-runbar{flex-direction:column;align-items:stretch}}
+@media(max-width:430px){#private-signed .qf-v92-step .qf-v9-fields{grid-template-columns:1fr}}
 </style></head><body>
 <div class="app"><aside class="side"><div class="brand"><div class="mark">Q</div>quantforge</div><p class="qf-v83-owner"><span>Designed and developed by</span><strong>Rishi&nbsp;Ratnakar</strong></p><nav id="navigation" aria-label="Main navigation">
   <div class="qf-nav-section" role="group" aria-label="Financial research pages">
@@ -871,20 +922,29 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
       <div class="pane"><h3>Holdings by weight</h3><div id="private-concentration" class="tiny" style="margin-top:12px">Add virtual holdings to see allocation.</div></div>
     </section>
     <section class="private-view" data-private-view="decision">
-      <div class="pane qf-v9-shell" id="private-decision-os-v90">
-        <span class="eyebrow">PRIVATE · AUTOMATED RESEARCH</span><h2>Investment Decision Center</h2>
-        <p>Choose the investments you want analyzed. QuantForge loads available observations, runs eligible models, checks your criteria and proposes an action with a full evidence trail. You can inspect all algorithms in Advanced Research Lab.</p>
-        <div class="qf-v9-fields">
-          <div class="field"><label for="private-v90-candidate">Investment to assess</label><select id="private-v90-candidate"><option value="">Choose an investment from your selection</option></select></div>
-          <div class="field"><label for="private-v90-risk">Risk approach</label><select id="private-v90-risk"><option value="conservative">Conservative</option><option selected value="balanced">Balanced</option><option value="growth">Growth-oriented</option></select></div>
-          <div class="field"><label for="private-v90-horizon">Investment horizon</label><select id="private-v90-horizon"><option value="short">Under 1 year</option><option selected value="medium">1–5 years</option><option value="long">5+ years</option></select></div>
-          <div class="field"><label for="private-v90-maxweight">Single-name portfolio ceiling</label><select id="private-v90-maxweight"><option value="0.10">10%</option><option selected value="0.20">20%</option><option value="0.35">35%</option></select></div>
-          <div class="field"><label for="private-v90-maxdrawdown">Historical drawdown screen</label><select id="private-v90-maxdrawdown"><option value="0.15">15%</option><option selected value="0.25">25%</option><option value="0.40">40%</option></select></div>
-          <div class="field"><label for="private-v90-days">Research history period</label><select id="private-v90-days"><option value="180">6 months</option><option selected value="365">1 year</option><option value="730">2 years</option></select></div>
+      <div class="pane qf-v9-shell qf-v92-workspace" id="private-decision-os-v90">
+        <span class="eyebrow">PRIVATE RESEARCH · V9.2</span><h2>Investment Decision Center</h2>
+        <p>One research run, one coherent assessment. Select investments by name, choose your risk limits, and review both favorable and conflicting evidence. Full model detail remains available in the Research Lab.</p>
+        <div class="qf-v92-setup">
+          <section class="qf-v92-step" aria-labelledby="qf-v92-step-one"><div class="qf-v92-stephead"><span aria-hidden="true">01</span><h3 id="qf-v92-step-one">Select investments</h3></div>
+            <p class="tiny">Choose 2–5 companies or funds for a matched historical comparison; pick one candidate for detailed company research.</p>
+            <div class="field"><label for="private-v90-candidate">Company to evaluate in depth</label><select id="private-v90-candidate"><option value="">Choose an investment from your selection</option></select></div>
+            <button type="button" class="btn" id="private-v90-browse">Browse companies by name</button>
+            <p class="tiny" id="private-v90-selection" aria-live="polite">Choose 2–5 investments; historical comparisons require more than one security.</p>
+          </section>
+          <section class="qf-v92-step" aria-labelledby="qf-v92-step-two"><div class="qf-v92-stephead"><span aria-hidden="true">02</span><h3 id="qf-v92-step-two">Set your research constraints</h3></div>
+            <p class="tiny">These are transparent screening assumptions, not predicted returns or individualized suitability advice.</p>
+            <div class="qf-v9-fields">
+              <div class="field"><label for="private-v90-risk">Risk approach</label><select id="private-v90-risk"><option value="conservative">Conservative</option><option selected value="balanced">Balanced</option><option value="growth">Growth-oriented</option></select></div>
+              <div class="field"><label for="private-v90-horizon">Investment horizon</label><select id="private-v90-horizon"><option value="short">Under 1 year</option><option selected value="medium">1–5 years</option><option value="long">5+ years</option></select></div>
+              <div class="field"><label for="private-v90-maxweight">Single-name portfolio ceiling</label><select id="private-v90-maxweight"><option value="0.10">10%</option><option selected value="0.20">20%</option><option value="0.35">35%</option></select></div>
+              <div class="field"><label for="private-v90-maxdrawdown">Historical drawdown screen</label><select id="private-v90-maxdrawdown"><option value="0.15">15%</option><option selected value="0.25">25%</option><option value="0.40">40%</option></select></div>
+              <div class="field"><label for="private-v90-days">Research history</label><select id="private-v90-days"><option value="180">6 months</option><option selected value="365">1 year</option><option value="730">2 years</option></select></div>
+            </div>
+          </section>
         </div>
-        <div class="controls"><button type="button" class="btn" id="private-v90-browse">Browse companies by name</button><button type="button" class="btn primary" id="private-v90-run">Run complete research</button><span class="tiny">No automatic trading · No external AI costs</span></div>
-        <p class="tiny" id="private-v90-selection" aria-live="polite">Choose 2–5 investments; historical comparisons require more than one security.</p>
-        <div id="private-v90-report" aria-live="polite" role="status"><p class="tiny">Start a research run to receive a conditional investment assessment, reasons, objections and a full audit of usable models.</p></div>
+        <div class="qf-v92-runbar"><div><strong>03 · Run your assessment</strong><p class="tiny">Models run only when their data are eligible. Your portfolio and brokerage remain unchanged.</p></div><button type="button" class="btn primary" id="private-v90-run">Analyze selected investments</button></div>
+        <div id="private-v90-report" aria-live="polite" role="status"><p class="tiny">Your assessment will appear here: proposed action, evidence quality, key risks, investment comparison and expandable model audit.</p></div>
       </div>
       <details class="pane qf-v9-legacy"><summary>Previously completed research review (manual)</summary>
       <div class="pane" id="private-decision-center-v84">
@@ -3105,6 +3165,91 @@ if(typeof module==='object'&&module.exports)module.exports=api;
 root.QFPrivateResearchOSV90=api;
 })(typeof window!=='undefined'?window:globalThis);
 
+/* QuantForge V9.2: pure investment evidence review and same-window historical comparison.
+ * Descriptive, not expected returns, probability estimates, suitability or order execution. */
+(function(root){
+'use strict';
+const finite=x=>typeof x==='number'&&Number.isFinite(x);
+const date=s=>typeof s==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(s)&&!Number.isNaN(Date.parse(s))&&new Date(s).toISOString().slice(0,10)===s;
+const required=['history','fundamentals','downside','portfolio'];
+const groups=Object.freeze([
+ {key:'fundamentals',name:'Business health',scope:'Company filings'},
+ {key:'valuation',name:'Valuation',scope:'Observed quotes and statements'},
+ {key:'downside',name:'Downside risk',scope:'Candidate price history'},
+ {key:'portfolio',name:'Portfolio fit',scope:'Hypothetical exposure'},
+ {key:'walkforward',name:'Strategy validation',scope:'Multi-asset backtest'},
+ {key:'factors',name:'Factor exposure',scope:'Independent factors (optional)'},
+ {key:'history',name:'Market observations',scope:'Aligned dated history'}
+]);
+function historicalComparison(history,selection){
+ const failure=(reason)=>({ready:false,reason,rows:[],period:null});
+ if(!Array.isArray(selection)||selection.length<2||selection.length>5||new Set(selection).size!==selection.length||
+  selection.some(s=>typeof s!=='string'||!s))return failure('Choose two to five distinct investments.');
+ if(!history||!Array.isArray(history.symbols)||history.symbols.length!==selection.length||
+  new Set(history.symbols).size!==selection.length||!history.symbols.every(s=>selection.includes(s))||
+  !Array.isArray(history.dates)||history.dates.length<64||history.dates.length>2500||
+  history.dates.some((d,i)=>!date(d)||(i>0&&history.dates[i-1]>=d)))
+  return failure('The selected investments do not share a validated chronological price sample.');
+ const n=history.dates.length;
+ if(!history.closes||history.symbols.some(s=>!Array.isArray(history.closes[s])||history.closes[s].length!==n||
+  history.closes[s].some(p=>!finite(p)||p<=0)))return failure('One or more investments has missing or invalid observed closing prices.');
+ const rows=selection.map(symbol=>{
+  const prices=history.closes[symbol];let peak=prices[0],maxDrawdown=0;
+  for(const price of prices){peak=Math.max(peak,price);maxDrawdown=Math.min(maxDrawdown,price/peak-1);}
+  const totalChange=prices[n-1]/prices[0]-1;
+  return {symbol,totalChange,maxDrawdown,observations:n};
+ });
+ if(rows.some(r=>!finite(r.totalChange)||!finite(r.maxDrawdown)))return failure('Historical price changes could not be calculated safely.');
+ return {ready:true,reason:null,rows,period:{start:history.dates[0],end:history.dates[n-1],observations:n,
+  source:String(history.source||'Authenticated historical market observations').slice(0,120)}};
+}
+function review(assessment,history,selection){
+ if(!assessment||typeof assessment!=='object'||!Array.isArray(assessment.evidence)||
+  !Array.isArray(assessment.pro)||!Array.isArray(assessment.con)||!Array.isArray(assessment.gaps)||
+  !Array.isArray(assessment.steps)||!Array.isArray(assessment.limitations)||!assessment.constraints||
+  typeof assessment.decision!=='string')throw Error('V9.2 requires a complete reconciled research assessment.');
+ const lookup=new Map(assessment.evidence.map(e=>[e.key,e]));
+ const coverage=groups.map(g=>{
+  const e=lookup.get(g.key);
+  const status=e&&['supports','mixed','cautions','available','unavailable'].includes(e.state)?e.state:'unavailable';
+  return {...g,status,detail:typeof e?.detail==='string'?e.detail:'Analysis not available.',source:typeof e?.source==='string'?e.source:'No verified source.'};
+ });
+ const missingRequired=required.filter(key=>lookup.get(key)?.state==='unavailable'||!lookup.has(key));
+ const mandatoryModels=Array.isArray(assessment.orchestration?.models)?assessment.orchestration.models.filter(m=>m.required&&m.status!=='completed'):[];
+ const blocked=assessment.readiness==='withheld'||assessment.decision==='Insufficient evidence'||missingRequired.length>0||mandatoryModels.length>0;
+ const positive=/^Consider a small position/.test(assessment.decision);
+ const blockedOrPositiveInconsistent=blocked&&positive;
+ let action=blockedOrPositiveInconsistent?'Insufficient evidence':assessment.decision;
+ const flags=[];
+ if(missingRequired.length)flags.push('Required evidence is incomplete: '+missingRequired.join(', ')+'.');
+ if(mandatoryModels.length)flags.push('Required model execution was incomplete.');
+ if(assessment.con.length&&assessment.pro.length)flags.push('Supporting and cautionary evidence coexist; do not treat the assessment as a unanimous model vote.');
+ if(assessment.orchestration?.failed>0)flags.push('One or more research methods failed; the missing results were not imputed.');
+ const drawdown=lookup.get('downside');
+ const portfolio=lookup.get('portfolio');
+ if(drawdown?.state==='cautions')flags.push('Observed downside risk breaches at least one chosen screen.');
+ if(portfolio?.state==='cautions')flags.push('Portfolio concentration or hypothetical allocation breaches a chosen limit.');
+ if(lookup.get('valuation')?.state==='unavailable')flags.push('Valuation evidence is incomplete; an attractive price cannot be established.');
+ if(lookup.get('walkforward')?.state==='cautions')flags.push('Multi-asset historical evaluation underperformed its comparator; this is not a candidate forecast.');
+ const readiness=blocked?'Evidence blocked':flags.length?'Conditional / caution':'Screening inputs available';
+ const comparison=historicalComparison(history,selection);
+ const observed=coverage.filter(e=>e.status!=='unavailable').length;
+ const dimensionConcerns=coverage.filter(e=>e.status==='cautions').length;
+ const next=[...assessment.steps].filter(x=>typeof x==='string'&&x.trim()).slice(0,6);
+ if(!comparison.ready)next.push('Reload matching observed price history before comparing investments.');
+ return {schema:'quantforge.decision-review.v9.2',action,readiness,blocked,
+  reason:blockedOrPositiveInconsistent?'Required data is incomplete, so a positive assessment is withheld.':assessment.reason,
+  asOf:assessment.asOf||null,symbol:assessment.symbol||'',coverage,observed,total:coverage.length,
+  dimensionConcerns,flags,pro:[...assessment.pro],con:[...assessment.con],next,
+  comparison,orchestration:assessment.orchestration||null,limitations:[...assessment.limitations],
+  constraints:{...assessment.constraints},policy:assessment.policy||'explicit-screens.v1',
+  summary:assessment.summary||''};
+}
+const api=Object.freeze({historicalComparison,review});
+if(typeof module==='object'&&module.exports)module.exports=api;
+root.QFPrivateDecisionReviewV92=api;
+})(typeof window!=='undefined'?window:globalThis);
+
 /* QuantForge private research: pure in-sample portfolio analytics.
  * No external requests, synthetic data, brokerage orders, or portfolio mutations.
  * The public demo model is deliberately not imported here.
@@ -3954,16 +4099,32 @@ function refreshResearchOSChoicesV90(){
 }
 function renderResearchOSV90(result){
  const out=$('private-v90-report');if(!out)return;
- const list=(xs,empty)=>'<ul class="tiny">'+(xs.length?xs:[empty]).map(x=>'<li>'+safe(x)+'</li>').join('')+'</ul>';
- const cells=result.evidence.map(e=>'<article class="qf-v9-evidence"><strong>'+safe(e.title)+'</strong><span class="tiny"> · '+safe(e.state)+'</span><p>'+safe(e.detail)+'</p><small class="tiny">Source: '+safe(e.source)+'</small></article>').join('');
- out.innerHTML='<div class="qf-v9-result"><span class="eyebrow">AUTOMATED RESEARCH · '+safe(result.policy)+'</span><h3>'+safe(result.decision)+'</h3><p>'+safe(result.reason)+'</p><p class="tiny">'+safe(result.summary)+' · '+safe(result.symbol)+' · As of '+safe(result.asOf||'unavailable')+'</p></div>'+
- '<div class="qf-v9-grid"><div><h3>Why this assessment?</h3>'+list(result.pro,'No supporting quantitative screens are currently verified.')+'</div><div><h3>Reasons for caution</h3>'+list(result.con,'No threshold breaches detected in completed checks; missing evidence can still change this assessment.')+'</div></div>'+
- '<h3>Evidence from your research models</h3><div class="qf-v9-grid">'+cells+'</div>'+
- '<details class="pane"><summary>Required data and follow-up research</summary>'+list(result.steps,'Review assumptions and refresh observations before making a financial decision.')+'</details>'+
- '<details class="pane"><summary>Policy assumptions and important limitations</summary><p class="tiny">Risk approach: '+safe(result.constraints.risk)+' · Horizon: '+safe(result.constraints.horizon)+' · Single-name limit: '+(100*result.constraints.maxWeight).toFixed(0)+'% · Drawdown screen: '+(100*result.constraints.maxDrawdown).toFixed(0)+'%</p>'+list(result.limitations,'No additional limitations.')+'</details>'+
- '<details class="pane"><summary>V9.1 model execution and data provenance</summary><p class="tiny">'+safe(result.orchestration?.completed??0)+' of '+safe(result.orchestration?.total??0)+' methods completed · '+safe(result.orchestration?.failed??0)+' failed · '+safe(result.orchestration?.unavailable??0)+' unavailable.</p><div class="qf-v9-grid">'+(result.orchestration?.models||[]).map(m=>'<article class="qf-v9-evidence"><strong>'+safe(m.title)+'</strong><span class="tiny"> · '+safe(m.status)+' · '+safe(m.scope)+'</span><p>'+safe(m.detail)+'</p><small class="tiny">'+safe(m.source)+(m.period?' · '+safe(m.period.start)+' to '+safe(m.period.end)+' · '+safe(m.period.sessions)+' observations':'')+'</small></article>').join('')+'</div></details>'+
- '<div class="controls"><button type="button" class="btn" data-private-tab="lab">Inspect models &amp; charts</button><button type="button" class="btn" data-private-tab="trade">Compare hypothetical portfolio impact</button></div>';
+ const review=window.QFPrivateDecisionReviewV92.review(result,historySeries,researchSelection);
+ const list=(xs,empty)=>'<ul class="qf-v92-list">'+(xs.length?xs:[empty]).map(x=>'<li>'+safe(x)+'</li>').join('')+'</ul>';
+ const label=s=>({supports:'Supports',cautions:'Caution',mixed:'Mixed',available:'Available',unavailable:'Unavailable'})[s]||'Unavailable';
+ const cells=review.coverage.map(e=>'<article class="qf-v92-evidence"><div class="qf-v92-row"><strong>'+safe(e.name)+'</strong><span class="qf-v92-tag qf-v92-state-'+safe(e.status)+'">'+safe(label(e.status))+'</span></div><div class="tiny">'+safe(e.scope)+'</div><p>'+safe(e.detail)+'</p><small class="tiny">Source: '+safe(e.source)+'</small></article>').join('');
+ const models=result.orchestration?.models||[];
+ const modelRows=models.map(m=>'<article class="qf-v9-evidence"><strong>'+safe(m.title)+'</strong><span class="tiny"> · '+safe(m.status)+' · '+safe(m.scope)+'</span><p>'+safe(m.detail)+'</p><small class="tiny">'+safe(m.source)+(m.period?' · '+safe(m.period.start)+' to '+safe(m.period.end)+' · '+safe(m.period.sessions)+' observations':'')+'</small></article>').join('');
+ const cmp=review.comparison;
+ const table=cmp.ready?'<div class="table-wrap"><table class="qf-v92-table"><caption>Matched-window observed price change and worst peak-to-trough decline; no dividends, forecast or overall investment ranking.</caption><thead><tr><th scope="col">Investment</th><th scope="col">Price change</th><th scope="col">Maximum drawdown (0–60% scale)</th></tr></thead><tbody>'+
+  cmp.rows.map(r=>{const dd=Math.abs(100*r.maxDrawdown);const bar=(Math.min(60,dd)/60*100).toFixed(1);
+   return '<tr><th scope="row">'+safe(assetNames[r.symbol]||r.symbol)+' <span class="tiny">('+safe(r.symbol)+')</span></th><td>'+safe((100*r.totalChange).toFixed(1))+'%</td><td><span class="qf-v92-bar"><span style="width:'+bar+'%"></span></span><span class="qf-v92-barvalue">'+safe(dd.toFixed(1))+'%</span></td></tr>';}).join('')+'</tbody></table></div><p class="tiny">'+safe(cmp.period.start)+' to '+safe(cmp.period.end)+' · '+safe(cmp.period.observations)+' shared sessions · '+safe(cmp.period.source)+'. Bars are capped at 60% visually; printed values are exact to one decimal place. These are past price-only observations, not fair-value estimates.</p>':
+  '<p class="tiny">'+safe(cmp.reason)+' This comparison is withheld rather than filled with estimates.</p>';
+ const caution=review.con.length?review.con:review.flags;
+ out.innerHTML='<section class="qf-v92-report" aria-label="Investment research assessment">'+
+  '<div class="qf-v92-hero"><div class="qf-v92-row"><span class="eyebrow">V9.2 · INVESTMENT ASSESSMENT</span><span class="qf-v92-readiness">'+safe(review.readiness)+'</span></div><h3>'+safe(review.action)+'</h3><p>'+safe(review.reason)+'</p><p class="tiny">'+safe(review.symbol)+' · Research as of '+safe(review.asOf||'unavailable')+' · '+safe(review.policy)+' · No automatic trades</p></div>'+
+  '<div class="qf-v92-metrics" aria-label="Evidence summary"><div><strong>'+review.observed+' / '+review.total+'</strong><span>Evidence areas available</span></div><div><strong>'+safe(result.orchestration?.completed??0)+' / '+safe(result.orchestration?.total??0)+'</strong><span>Models completed</span></div><div><strong>'+review.dimensionConcerns+'</strong><span>Areas with cautions</span></div><div><strong>'+safe(result.orchestration?.failed??0)+'</strong><span>Model failures</span></div></div>'+
+  '<div class="qf-v92-twin"><section class="qf-v92-panel"><h4>Evidence in favor</h4>'+list(review.pro,'No favorable company-specific research screens verified.')+'</section><section class="qf-v92-panel"><h4>Risks and objections</h4>'+list(caution,'No completed screen crossed its caution threshold; unmeasured risks remain.')+'</section></div>'+
+  '<div class="qf-v92-core"><section><div class="qf-v92-heading"><h4>How the evidence lines up</h4><span class="tiny">Company vs portfolio sources are identified separately</span></div><div class="qf-v92-evidence-grid">'+cells+'</div></section>'+
+  '<section><div class="qf-v92-heading"><h4>Compare the investments you selected</h4><span class="tiny">Identical observed sample · historical risk only</span></div>'+table+'</section></div>'+
+  '<details class="qf-v92-more"><summary>What might change this assessment?</summary>'+list(review.next,'Reassess price and filing freshness, concentration limits and business-specific valuation assumptions.')+'</details>'+
+  '<details class="qf-v92-more"><summary>Evidence conflicts and decision rules</summary>'+list(review.flags,'No specific detected conflict; this is not evidence of investment safety.')+'<p class="tiny">Hard constraints and unavailable required inputs can block action. Other evidence is interpreted by source and scope, never counted as independent votes or calibrated probabilities. Portfolio strategy results do not establish single-company returns.</p></details>'+
+  '<details class="qf-v92-more"><summary>V9.1 model execution and data provenance</summary><p class="tiny">'+safe(result.orchestration?.completed??0)+' of '+safe(result.orchestration?.total??0)+' methods completed · '+safe(result.orchestration?.failed??0)+' failed · '+safe(result.orchestration?.unavailable??0)+' unavailable.</p><div class="qf-v9-grid">'+modelRows+'</div></details>'+
+  '<details class="qf-v92-more"><summary>Policy assumptions and important limitations</summary><p class="tiny">Risk approach: '+safe(review.constraints.risk)+' · Horizon: '+safe(review.constraints.horizon)+' · Single-name limit: '+(100*review.constraints.maxWeight).toFixed(0)+'% · Drawdown screen: '+(100*review.constraints.maxDrawdown).toFixed(0)+'%</p>'+list(review.limitations,'No further limitations recorded.')+'</details>'+
+  '<div class="controls qf-v92-actions"><button type="button" class="btn" data-private-tab="lab">Inspect the Research Lab</button><button type="button" class="btn" data-private-tab="trade">View hypothetical portfolio impact</button></div>'+
+  '</section>';
 }
+
 async function runResearchOSV90(){
  if(!privateState){message('Sign in with MFA before running research.');return;}
  const status=$('private-v90-report'),button=$('private-v90-run');

@@ -75,20 +75,29 @@ block='''<section class="tabpage" id="page-private">
       <div class="pane"><h3>Holdings by weight</h3><div id="private-concentration" class="tiny" style="margin-top:12px">Add virtual holdings to see allocation.</div></div>
     </section>
     <section class="private-view" data-private-view="decision">
-      <div class="pane qf-v9-shell" id="private-decision-os-v90">
-        <span class="eyebrow">PRIVATE · AUTOMATED RESEARCH</span><h2>Investment Decision Center</h2>
-        <p>Choose the investments you want analyzed. QuantForge loads available observations, runs eligible models, checks your criteria and proposes an action with a full evidence trail. You can inspect all algorithms in Advanced Research Lab.</p>
-        <div class="qf-v9-fields">
-          <div class="field"><label for="private-v90-candidate">Investment to assess</label><select id="private-v90-candidate"><option value="">Choose an investment from your selection</option></select></div>
-          <div class="field"><label for="private-v90-risk">Risk approach</label><select id="private-v90-risk"><option value="conservative">Conservative</option><option selected value="balanced">Balanced</option><option value="growth">Growth-oriented</option></select></div>
-          <div class="field"><label for="private-v90-horizon">Investment horizon</label><select id="private-v90-horizon"><option value="short">Under 1 year</option><option selected value="medium">1–5 years</option><option value="long">5+ years</option></select></div>
-          <div class="field"><label for="private-v90-maxweight">Single-name portfolio ceiling</label><select id="private-v90-maxweight"><option value="0.10">10%</option><option selected value="0.20">20%</option><option value="0.35">35%</option></select></div>
-          <div class="field"><label for="private-v90-maxdrawdown">Historical drawdown screen</label><select id="private-v90-maxdrawdown"><option value="0.15">15%</option><option selected value="0.25">25%</option><option value="0.40">40%</option></select></div>
-          <div class="field"><label for="private-v90-days">Research history period</label><select id="private-v90-days"><option value="180">6 months</option><option selected value="365">1 year</option><option value="730">2 years</option></select></div>
+      <div class="pane qf-v9-shell qf-v92-workspace" id="private-decision-os-v90">
+        <span class="eyebrow">PRIVATE RESEARCH · V9.2</span><h2>Investment Decision Center</h2>
+        <p>One research run, one coherent assessment. Select investments by name, choose your risk limits, and review both favorable and conflicting evidence. Full model detail remains available in the Research Lab.</p>
+        <div class="qf-v92-setup">
+          <section class="qf-v92-step" aria-labelledby="qf-v92-step-one"><div class="qf-v92-stephead"><span aria-hidden="true">01</span><h3 id="qf-v92-step-one">Select investments</h3></div>
+            <p class="tiny">Choose 2–5 companies or funds for a matched historical comparison; pick one candidate for detailed company research.</p>
+            <div class="field"><label for="private-v90-candidate">Company to evaluate in depth</label><select id="private-v90-candidate"><option value="">Choose an investment from your selection</option></select></div>
+            <button type="button" class="btn" id="private-v90-browse">Browse companies by name</button>
+            <p class="tiny" id="private-v90-selection" aria-live="polite">Choose 2–5 investments; historical comparisons require more than one security.</p>
+          </section>
+          <section class="qf-v92-step" aria-labelledby="qf-v92-step-two"><div class="qf-v92-stephead"><span aria-hidden="true">02</span><h3 id="qf-v92-step-two">Set your research constraints</h3></div>
+            <p class="tiny">These are transparent screening assumptions, not predicted returns or individualized suitability advice.</p>
+            <div class="qf-v9-fields">
+              <div class="field"><label for="private-v90-risk">Risk approach</label><select id="private-v90-risk"><option value="conservative">Conservative</option><option selected value="balanced">Balanced</option><option value="growth">Growth-oriented</option></select></div>
+              <div class="field"><label for="private-v90-horizon">Investment horizon</label><select id="private-v90-horizon"><option value="short">Under 1 year</option><option selected value="medium">1–5 years</option><option value="long">5+ years</option></select></div>
+              <div class="field"><label for="private-v90-maxweight">Single-name portfolio ceiling</label><select id="private-v90-maxweight"><option value="0.10">10%</option><option selected value="0.20">20%</option><option value="0.35">35%</option></select></div>
+              <div class="field"><label for="private-v90-maxdrawdown">Historical drawdown screen</label><select id="private-v90-maxdrawdown"><option value="0.15">15%</option><option selected value="0.25">25%</option><option value="0.40">40%</option></select></div>
+              <div class="field"><label for="private-v90-days">Research history</label><select id="private-v90-days"><option value="180">6 months</option><option selected value="365">1 year</option><option value="730">2 years</option></select></div>
+            </div>
+          </section>
         </div>
-        <div class="controls"><button type="button" class="btn" id="private-v90-browse">Browse companies by name</button><button type="button" class="btn primary" id="private-v90-run">Run complete research</button><span class="tiny">No automatic trading · No external AI costs</span></div>
-        <p class="tiny" id="private-v90-selection" aria-live="polite">Choose 2–5 investments; historical comparisons require more than one security.</p>
-        <div id="private-v90-report" aria-live="polite" role="status"><p class="tiny">Start a research run to receive a conditional investment assessment, reasons, objections and a full audit of usable models.</p></div>
+        <div class="qf-v92-runbar"><div><strong>03 · Run your assessment</strong><p class="tiny">Models run only when their data are eligible. Your portfolio and brokerage remain unchanged.</p></div><button type="button" class="btn primary" id="private-v90-run">Analyze selected investments</button></div>
+        <div id="private-v90-report" aria-live="polite" role="status"><p class="tiny">Your assessment will appear here: proposed action, evidence quality, key risks, investment comparison and expandable model audit.</p></div>
       </div>
       <details class="pane qf-v9-legacy"><summary>Previously completed research review (manual)</summary>
       <div class="pane" id="private-decision-center-v84">
@@ -308,6 +317,57 @@ qfv9_css="""
 @media(max-width:1200px){#private-signed .private-nav{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:700px){#private-signed .private-nav{grid-template-columns:1fr 1fr}#private-signed .qf-v9-fields,#private-signed .qf-v9-grid,#private-signed .qf-v9-lab-grid{grid-template-columns:1fr}}
 @media(max-width:450px){#private-signed .private-nav{grid-template-columns:1fr}}
+
+/* V9.2 private Decision Center: clear visual hierarchy and responsive readable comparison. */
+#private-signed .qf-v92-workspace{max-width:1200px;margin-inline:auto}
+#private-signed .qf-v92-setup{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:15px;margin-top:20px}
+#private-signed .qf-v92-step{border:1px solid #d6e3df;border-radius:13px;background:#fbfdfc;padding:18px;min-width:0}
+#private-signed .qf-v92-stephead{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+#private-signed .qf-v92-stephead span{background:#164f46;color:white;border-radius:9px;min-width:36px;height:36px;display:grid;place-items:center;font-weight:700}
+#private-signed .qf-v92-stephead h3{font-size:17px;margin:0;color:#193d36}
+#private-signed .qf-v92-step>.field{margin:15px 0}
+#private-signed .qf-v92-step .qf-v9-fields{grid-template-columns:repeat(2,minmax(0,1fr));margin:12px 0 0;gap:11px}
+#private-signed .qf-v92-step .qf-v9-fields label{font-size:12px}
+#private-signed .qf-v92-runbar{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:17px 19px;margin:14px 0;border-radius:12px;background:#eaf3ef;border:1px solid #b9d4c8}
+#private-signed .qf-v92-runbar p{margin:5px 0 0}
+#private-signed .qf-v92-report{margin-top:21px}
+#private-signed .qf-v92-hero{background:#f3f8f6;border:1px solid #bed8ce;border-left:5px solid #145b4c;border-radius:13px;padding:21px 24px}
+#private-signed .qf-v92-hero h3{font-size:clamp(19px,2.1vw,27px);margin:14px 0 9px;line-height:1.25;color:#143b32}
+#private-signed .qf-v92-hero p{max-width:850px;line-height:1.65}
+#private-signed .qf-v92-row{display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap}
+#private-signed .qf-v92-readiness{display:inline-block;border:1px solid #b4ccc3;background:white;border-radius:50px;padding:5px 10px;font-size:11px;font-weight:650;color:#234f43}
+#private-signed .qf-v92-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0 21px}
+#private-signed .qf-v92-metrics>div{background:white;border:1px solid #d4e3dd;border-radius:11px;padding:14px;display:flex;flex-direction:column;gap:5px;min-width:0}
+#private-signed .qf-v92-metrics strong{font-size:24px;color:#153f36;font-variant-numeric:tabular-nums}
+#private-signed .qf-v92-metrics span{font-size:11px;color:#526a60;line-height:1.5}
+#private-signed .qf-v92-twin{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:0 0 23px}
+#private-signed .qf-v92-panel{background:white;border:1px solid #d5e4de;border-radius:12px;padding:17px}
+#private-signed .qf-v92-panel h4,#private-signed .qf-v92-heading h4{margin:0;color:#183e33;font-size:17px}
+#private-signed .qf-v92-panel .qf-v92-list{margin:12px 0 0}
+#private-signed .qf-v92-list{padding-left:18px;font-size:13px;line-height:1.7}
+#private-signed .qf-v92-list li+li{margin-top:7px}
+#private-signed .qf-v92-core>section{margin-top:20px}
+#private-signed .qf-v92-heading{display:flex;align-items:baseline;justify-content:space-between;gap:15px;flex-wrap:wrap;margin-bottom:11px}
+#private-signed .qf-v92-evidence-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#private-signed .qf-v92-evidence{border:1px solid #d5e4de;background:#fff;border-radius:11px;padding:14px;min-width:0}
+#private-signed .qf-v92-evidence p{font-size:12px;line-height:1.6;color:#3a564c;margin:10px 0}
+#private-signed .qf-v92-evidence strong{font-size:13px}
+#private-signed .qf-v92-tag{font-size:10px;border-radius:30px;padding:4px 7px;background:#eff3f1;color:#3b5049;border:1px solid #d5e2dc;white-space:nowrap}
+#private-signed .qf-v92-state-supports,#private-signed .qf-v92-state-available{background:#e7f5ee;color:#225b41;border-color:#c4dfcd}
+#private-signed .qf-v92-state-cautions{background:#fff3e3;color:#8a4a14;border-color:#eed4a7}
+#private-signed .qf-v92-table{width:100%;font-size:12px;table-layout:auto}
+#private-signed .qf-v92-table caption{text-align:left;font-size:11px;color:#4b675a;margin:0 0 8px}
+#private-signed .qf-v92-table th,#private-signed .qf-v92-table td{vertical-align:middle}
+#private-signed .qf-v92-bar{display:inline-block;width:90px;max-width:48%;height:9px;background:#e7eae8;border-radius:10px;overflow:hidden;vertical-align:middle;margin-right:8px}
+#private-signed .qf-v92-bar>span{display:block;height:100%;background:#ad7c41;border-radius:10px}
+#private-signed .qf-v92-barvalue{font-variant-numeric:tabular-nums;white-space:nowrap}
+#private-signed .qf-v92-more{border:1px solid #d5e4de;border-radius:11px;margin-top:10px;padding:13px 17px;background:#fff}
+#private-signed .qf-v92-more summary{cursor:pointer;font-weight:650;color:#235a49}
+#private-signed .qf-v92-more[open] summary{margin-bottom:12px}
+#private-signed .qf-v92-actions{margin-top:20px}
+@media(max-width:900px){#private-signed .qf-v92-setup{grid-template-columns:1fr}}
+@media(max-width:650px){#private-signed .qf-v92-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}#private-signed .qf-v92-twin,#private-signed .qf-v92-evidence-grid{grid-template-columns:1fr}#private-signed .qf-v92-runbar{flex-direction:column;align-items:stretch}}
+@media(max-width:430px){#private-signed .qf-v92-step .qf-v9-fields{grid-template-columns:1fr}}
 """
 html=html.replace('</style>',qfv9_css+'</style>',1)
 html=html.replace('.navtop{display:none}', '#private-research-dataset[hidden],#private-signed[hidden],#private-login[hidden],#private-mfa[hidden],#private-mfa-qr-wrap[hidden],#private-mfa-setup-actions[hidden]{display:none!important}#private-message{margin-top:8px}.navtop{display:none}')
@@ -335,7 +395,7 @@ for slot, file in [('/* QF_MODEL */','model.js'),('/* QF_APP */','app.js'),('/* 
  text=(src/'site'/file).read_text(encoding="utf-8")
  if file=='private.js':
   # Bundled alongside the existing private script: still only three CSP-protected scripts.
-  text=(src/'site/private_ideas_v70.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_allocation_v74.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_value_v73.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_v72.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_guide_v79.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_center_v84.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_candidate_v85.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_factor_scenarios_v86.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_french_factors_v87.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_orchestrator_v91.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_os_v90.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_multimarket.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_forecast_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_walkforward_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_diagnostics_v66.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_integrity_v67.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_robustness_v68.js').read_text(encoding='utf-8')+'\n'+text
+  text=(src/'site/private_ideas_v70.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_allocation_v74.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_value_v73.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_v72.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_guide_v79.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_center_v84.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_candidate_v85.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_factor_scenarios_v86.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_french_factors_v87.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_orchestrator_v91.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_os_v90.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_review_v92.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_multimarket.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_forecast_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_walkforward_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_diagnostics_v66.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_integrity_v67.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_robustness_v68.js').read_text(encoding='utf-8')+'\n'+text
  if file=='app.js':
   assert text.count('/* QF_SEC_DATA */ null')==1
   # Bundle pure SEC analytics in the existing public app script. CSP remains 3 hashes.
