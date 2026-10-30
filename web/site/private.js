@@ -5,12 +5,14 @@ const $=id=>document.getElementById(id);
 let guideReportV79=null, linkedResearchBriefV93=null, linkedResearchIntelligenceV94=null, linkedResearchDiagnosticsV95=null,linkedResearchProtocolV96=null,linkedPointInTimeV97=null,linkedSECCoverageV98=null,linkedArchivedSECV99=null,linkedArchiveQualityV100=null,linkedHistoricalPanelV110=null,linkedHistoricalRobustnessV120=null,linkedHistoricalAttributionV130=null,linkedDecisionIntegrityV130=null;
 let researchSessionJournalV95=[];
 let linkedWorkflowV140=null;
+let linkedUnifiedDecisionV160=null;
 let manualAcceptanceV150={};
 let importedSECArchiveV99=null,archiveFilenameV99='',archiveReadTokenV99=0;
 let privateDecisionCenterV84=null;
 let researchOSRunV90=0, researchOSInternalLoadV90=false;
 let candidateDossierV90=null,candidateQuoteV90=null,candidateFactorV91=null;
 function clearResearchOSV90(){
+ linkedUnifiedDecisionV160=null;
  linkedResearchBriefV93=null;linkedResearchIntelligenceV94=null;linkedResearchDiagnosticsV95=null;linkedResearchProtocolV96=null;linkedPointInTimeV97=null;linkedSECCoverageV98=null;linkedArchivedSECV99=null;linkedArchiveQualityV100=null;linkedHistoricalPanelV110=null;linkedHistoricalRobustnessV120=null;linkedHistoricalAttributionV130=null;linkedDecisionIntegrityV130=null;
  if(!privateState){importedSECArchiveV99=null;archiveFilenameV99='';archiveReadTokenV99++;
   const file=$('qf-v99-file');if(file)file.value='';}
@@ -484,6 +486,49 @@ function compactResearchDetailsV140(){
   }
  }
 }
+function renderUnifiedDecisionV160(){
+ const slot=$('qf-v160-decision-center');
+ if(!slot||!window.QFPrivateUnifiedDecisionV160)return;
+ const data=window.QFPrivateUnifiedDecisionV160.summarize({brief:linkedResearchBriefV93,
+  integrity:linkedDecisionIntegrityV130,workflow:linkedWorkflowV140});
+ linkedUnifiedDecisionV160=data;
+ if(!privateState||!data.ready){
+  slot.innerHTML='<div class="qf-v160-hero"><div class="qf-v160-title"><div><span class="eyebrow">YOUR DECISION CENTER</span><h3>Everything important, one place</h3><p>Choose 2–5 companies, set your risk limits, and run the complete assessment.</p></div><span class="qf-v160-light">Not assessed</span></div><p class="tiny">No rating or recommendation is displayed until current source data and required research checks are available. Standard analysis uses the built-in SEC snapshot and authenticated market data; no upload is required.</p><div class="controls"><button class="btn sm" type="button" data-v160-route="ideas">Explore companies</button><button class="btn sm" type="button" data-v160-route="lab">Explore research methods</button></div></div>';
+  return;
+ }
+ const light={green:'Supportive screening signals',amber:'Mixed or limited evidence',red:'Risk caution / blocked'}[data.signal];
+ const score=data.alignment===null?'—':String(data.alignment);
+ const rows=data.domains.map(d=>{
+  const tone=d.status==='supports'?'green':d.status==='cautions'?'red':'amber';
+  return '<article class="qf-v160-signal"><strong>'+safe(d.name)+'</strong><span class="qf-v160-light qf-v160-'+tone+'">'+safe(d.label)+'</span><p>'+safe(d.description)+'</p><details><summary class="tiny">Why this signal?</summary><p>'+safe(d.detail)+'</p><small>Method: '+safe(d.source)+'</small></details></article>';
+ }).join('');
+ const comparison=data.comparison.length?'<div class="qf-v160-compare"><h4>Selected investments · same-period historical context</h4>'+data.comparison.map(a=>{
+  const amount=Math.min(100,Math.max(0,Math.abs(a.drawdown)));return '<div class="qf-v160-compare-row"><strong>'+safe(a.name)+'</strong><div><div class="qf-v160-bar"><span style="width:'+amount.toFixed(1)+'%"></span></div><small class="tiny">Peak-to-trough decline</small></div><span>'+safe(a.drawdown.toFixed(1))+'% decline</span></div>';
+ }).join('')+'<p class="tiny">Observed price-only histories; samples can differ by period and do not predict future returns. Not a cross-company investment ranking.</p></div>':'';
+ const list=(arr,none)=>'<ul>'+(arr.length?arr:[none]).map(x=>'<li>'+safe(x)+'</li>').join('')+'</ul>';
+ slot.innerHTML='<div class="qf-v160-hero"><div class="qf-v160-title"><div><span class="eyebrow">YOUR DECISION CENTER · '+safe(data.asOf)+'</span><h3>'+safe(data.candidateName)+' ('+safe(data.candidate)+')</h3><p>'+data.universe+' selected investments · Screening assessment · No orders placed</p></div><span class="qf-v160-light qf-v160-'+data.signal+'">'+safe(light)+'</span></div>'+
+  '<div class="qf-v160-topline"><div class="qf-v160-dial" style="--score:'+(data.alignment===null?0:data.alignment)+'"><span>'+score+(data.alignment===null?'':'/100')+'</span><small>Evidence alignment'+(data.alignment===null?' withheld':' index')+'</small></div><div class="qf-v160-action"><span class="eyebrow">EXISTING RESEARCH ENGINE CONCLUSION</span><strong>'+safe(data.action)+'</strong><p>'+safe(data.reason)+'</p><p class="tiny"><strong style="display:inline;font-size:12px">Research methods completed: '+data.completed+'/'+data.total+'</strong> · '+(data.coverage===null?'Not measured':data.coverage+'%')+' execution coverage (not accuracy)</p><div class="qf-v160-meter" aria-label="Research method completion"><span style="width:'+(data.coverage||0)+'%"></span></div><p class="tiny">'+safe(data.classification.replace(/-/g,' '))+' · A green signal is a screening result, not a recommendation to trade.</p></div></div></div>'+
+  '<div class="qf-v160-grid">'+rows+'</div>'+comparison+
+  '<div class="qf-v160-findings"><section class="qf-v160-compare"><h4>Key risks and disagreements</h4>'+list(data.reasons,'No specific objection was recorded; unknown risks remain.')+'</section><section class="qf-v160-compare"><h4>What to investigate next</h4>'+list(data.next,'Check evidence dates and assumptions before acting independently.')+'</section></div>'+
+  '<details class="qf-v160-method-trace"><summary>How these colors and percentages are calculated</summary><p class="tiny">'+safe(data.methodology)+'</p>'+list(data.notes,'')+'</details><div class="controls"><button type="button" class="btn sm" data-v160-route="lab">Open advanced models</button><button type="button" class="btn sm" data-v160-route="ideas">Screen other companies</button><button type="button" class="btn sm" data-v160-route="settings">View full report</button></div>';
+}
+function arrangePrivateResearchV160(){
+ if(typeof document.createElement!=='function'||!document.querySelector)return;
+ const lab=document.querySelector('[data-private-view=lab]');
+ if(!lab)return;
+ const launch=document.querySelector('.qf-v140-launch');
+ if(launch)lab.appendChild(launch);
+ const archive=document.querySelector('.qf-v99-import');
+ if(archive){
+  const folder=document.createElement('details');folder.className='qf-v160-archive-details';
+  const summary=document.createElement('summary');summary.textContent='Optional expert evidence: historical SEC filing revisions';
+  const note=document.createElement('p');note.className='tiny';
+  note.textContent='Normal company screening uses the built-in SEC snapshot. Importing a local archival revision file is only needed for deeper point-in-time filing studies; this website cannot access files on your computer automatically.';
+  folder.appendChild(summary);folder.appendChild(note);folder.appendChild(archive);lab.appendChild(folder);
+ }
+ const oldDetails=document.querySelector('[data-private-view=decision] .qf-v140-details');
+ if(oldDetails)lab.appendChild(oldDetails);
+}
 function refreshConnectedResearchV93(){
  renderHistoricalPanelV110();
  renderHistoricalRobustnessV120();
@@ -496,6 +541,7 @@ function refreshConnectedResearchV93(){
  renderSECCoverageV98();
  renderArchivedSECV99();
  renderWorkflowV140();
+ renderUnifiedDecisionV160();
  const packet=linkedResearchBriefV93;
  const title=$('qf-v93-ribbon-title'),detail=$('qf-v93-ribbon-detail'),brief=$('qf-v93-ribbon-brief');
  if(title)title.textContent=packet?'Completed research · '+packet.candidate+' ('+packet.symbol+')':'Research workflow · No current assessment';
@@ -1439,7 +1485,7 @@ function privateTab(tab){
  if(tab==='settings')renderConnectedBriefV93();
  if(tab==='lab')refreshConnectedResearchV93();
  const shared=$('private-research-dataset');if(shared)shared.hidden=!['research','optimization','backtest','walkforward'].includes(tab);
- const launch=document.querySelector('.qf-v140-launch');if(launch)launch.hidden=tab!=='decision';
+ const launch=document.querySelector('.qf-v140-launch');if(launch)launch.hidden=tab!=='lab';
  refreshResearchContext();
  document.querySelectorAll('[data-private-view]').forEach(p=>p.hidden=p.dataset.privateView!==tab);
  document.querySelectorAll('.private-nav [data-private-tab]').forEach(b=>b.classList.toggle('active',b.dataset.privateTab===tab));
@@ -1995,6 +2041,7 @@ function renderManualAcceptanceV150(){
  const dl=$('qf-v150-download');if(dl)dl.disabled=!privateState;
 }
 compactResearchDetailsV140();
+arrangePrivateResearchV160();
 $('qf-v150-checks').addEventListener('change',event=>{
  const select=event.target.closest('select');
  const row=select?.closest('[data-v150-check]');
@@ -2030,6 +2077,7 @@ $('qf-v93-brief-export').addEventListener('click',()=>{
   historicalSensitivityV120:linkedHistoricalRobustnessV120?window.QFPrivateHistoricalRobustnessV120.exportSafe(linkedHistoricalRobustnessV120):null,
   historicalAttributionV130:linkedHistoricalAttributionV130?window.QFPrivateHistoricalAttributionV130.exportSafe(linkedHistoricalAttributionV130):null,
   researchIntegrityV130:linkedDecisionIntegrityV130?window.QFPrivateDecisionIntegrityV130.exportSafe(linkedDecisionIntegrityV130):null,
+  unifiedDecisionV160:linkedUnifiedDecisionV160?window.QFPrivateUnifiedDecisionV160.exportSafe(linkedUnifiedDecisionV160):null,
   workflowReadinessV140:linkedWorkflowV140?window.QFPrivateWorkflowV140.exportSafe(linkedWorkflowV140):null});
 });
 for(const id of ['qf-v93-briefing','qf-v93-lab-status'])$(id).addEventListener('click',e=>{
@@ -2039,6 +2087,7 @@ for(const id of ['qf-v93-briefing','qf-v93-lab-status'])$(id).addEventListener('
 $('qf-v99-file').addEventListener('change',importArchivedSECV99);
 $('qf-v99-clear').addEventListener('click',clearImportedSECV99);
 $('private-v90-browse').addEventListener('click',()=>openAssetBrowser('research'));
+$('qf-v160-decision-center').addEventListener('click',e=>{const b=e.target.closest('[data-v160-route]');if(b&&privateState&&['lab','ideas','settings'].includes(b.dataset.v160Route))privateTab(b.dataset.v160Route);});
 $('private-v90-run').addEventListener('click',runResearchOSV90);
 $('qf-v95-journal-clear').addEventListener('click',()=>{researchSessionJournalV95=[];renderResearchDiagnosticsV95();});
 $('qf-v96-save').addEventListener('click',saveResearchV96);

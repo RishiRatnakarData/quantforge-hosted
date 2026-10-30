@@ -9,11 +9,11 @@ def read(path):
     return (ROOT / path).read_text(encoding="utf-8")
 
 
-def test_five_goal_first_private_nav_and_research_lab():
+def test_consolidated_private_nav_and_research_lab():
     s = read("tools/build_unified_site.py")
-    assert s.count('class="private-nav-group"') == 5
-    expected = ["01 · Research Hub", "02 · Explore Investments", "03 · My Portfolio",
-                "04 · Advanced Research Lab", "05 · Research Briefing &amp; Notes"]
+    assert s.count('class="private-nav-group"') == 4
+    expected = ["01 · Decision Center", "02 · Discover &amp; Compare",
+                "03 · Advanced Research", "04 · Portfolio &amp; Reports"]
     assert [s.index(x) for x in expected] == sorted(s.index(x) for x in expected)
     for view in ("decision", "ideas", "home", "trade", "lab", "candidate", "research", "optimization",
                  "backtest", "walkforward", "valuation", "settings"):
