@@ -588,6 +588,21 @@ main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
 #private-signed .qf-v140-details .qf-v95-host{max-width:none}
 #private-signed #qf-v140-lab-insight,#private-signed #qf-v140-brief-insight{border-left:3px solid #437b68;padding:7px 12px;background:#f5faf7;margin:12px 0}
 @media(max-width:550px){#private-signed .qf-v140-steps{grid-template-columns:1fr}#private-signed .qf-v140-launch{padding:13px}}
+
+/* V15.0: clear research provenance and legible manual release acceptance */
+.qf-v150-data-scope{margin:14px 0 24px;padding:20px;border:1px solid var(--line);background:#f9fcfa;border-radius:13px}
+.qf-v150-data-scope h2{font-size:21px;margin:0}
+.qf-v150-scope-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin:15px 0}
+.qf-v150-scope-grid>div{background:white;border:1px solid #d0e2d8;border-radius:9px;padding:15px;min-width:0}
+.qf-v150-scope-grid strong{font-size:13px;color:#204e40}
+.qf-v150-scope-grid p{font-size:12px;color:#52695f;line-height:1.55;margin:8px 0 0}
+#private-signed .qf-v150-acceptance{margin-top:15px;padding:12px;border:1px solid #d0e2d8;border-radius:10px;background:#fff}
+#private-signed .qf-v150-acceptance h4{margin:0 0 8px;font-size:15px}
+#private-signed .qf-v150-manual-grid{margin:11px 0;padding-left:22px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#private-signed .qf-v150-manual-grid li{font-size:12px;min-width:0;padding-right:6px}
+#private-signed .qf-v150-manual-grid label{display:block;margin-bottom:5px;color:#315549}
+#private-signed .qf-v150-manual-grid select{width:100%;padding:8px;border:1px solid #bcd4c8;border-radius:7px;background:#fff;color:#264d40}
+@media(max-width:760px){.qf-v150-scope-grid,#private-signed .qf-v150-manual-grid{grid-template-columns:1fr}}
 </style></head><body>
 <div class="app"><aside class="side"><div class="brand"><div class="mark">Q</div>quantforge</div><p class="qf-v83-owner"><span>Designed and developed by</span><strong>Rishi&nbsp;Ratnakar</strong></p><nav id="navigation" aria-label="Main navigation">
   <div class="qf-nav-section" role="group" aria-label="Financial research pages">
@@ -622,7 +637,15 @@ main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
 <div class="qf-v831-home-paper"><a href="research-case-study.html">Featured research: Growth, margins and cash generation — full SEC case study</a></div>
 <div hidden aria-hidden="true"><div id="home-sec-highlights"></div><span id="home-sec-updated"></span></div>
 
-<div class="qf-evidence-shortcut"><p><strong>Research data:</strong> Historical SEC company financials, derived ratios, and clearly labeled simulated returns and hypothetical forecasts.</p><button class="btn" data-go="methods">Sources and methodology</button><a class="qf-source-link" href="https://github.com/RishiRatnakarData/quantforge-hosted" target="_blank" rel="noopener noreferrer">View GitHub source and tests</a></div>
+<section class="qf-v150-data-scope" aria-labelledby="qf-v150-data-scope-title">
+ <div class="section-title"><h2 id="qf-v150-data-scope-title">Research scope and evidence</h2><span class="mini">Observed · modeled · private</span></div>
+ <div class="qf-v150-scope-grid">
+  <div><strong>SEC-reported fundamentals</strong><p>Historical annual company facts from SEC EDGAR. Filing dates, fiscal periods and missing values are retained for source-aware comparisons.</p></div>
+  <div><strong>Illustrative quantitative models</strong><p>Public portfolio returns, scenario forecasts, Monte Carlo paths and company-similarity features are modeled examples, not live market observations.</p></div>
+  <div><strong>Owner-only research</strong><p>Authenticated historical prices and virtual holdings support deeper private analysis. The local multi-year SEC revision archive is not part of this public site.</p></div>
+ </div>
+ <p class="tiny">Historical strategy comparisons describe selected past periods, may exclude delisted issuers and distributions, and do not establish predictive investment performance.</p>
+ </section><div class="qf-evidence-shortcut"><p><strong>Research data:</strong> Historical SEC company financials, derived ratios, and clearly labeled simulated returns and hypothetical forecasts.</p><button class="btn" data-go="methods">Sources and methodology</button><a class="qf-source-link" href="https://github.com/RishiRatnakarData/quantforge-hosted" target="_blank" rel="noopener noreferrer">View GitHub source and tests</a></div>
 </section>
 <section class="tabpage" id="page-sec">
   <div class="pagehead"><h1>SEC company financials</h1><p>Explore reported annual revenue, operating income, growth, and cash flow from the reviewed SEC Company Facts snapshot. Filing dates and fiscal periods are shown alongside the figures.</p></div>
@@ -1001,7 +1024,21 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
       <details class="qf-v140-acceptance"><summary>Live browser acceptance checklist (not yet independently verified)</summary>
       <p class="tiny">Automated tests and Cloudflare HTML verification cannot prove that authenticated provider workflows work. Complete these steps in a real browser, without sharing credentials or brokerage account data.</p>
       <ol class="tiny"><li>Sign in and complete MFA from a fresh private session.</li><li>Open Portfolio and confirm authorized holdings and market quotes load without an error.</li><li>Select 2–5 companies by name, load matching market data, and run one complete Research Hub assessment.</li><li>Import the locally validated SEC revision JSON, confirm issuer coverage, and inspect dates withheld by the historical study.</li><li>Open Research Lab and Briefing; confirm consistent candidate, model counts, and evidence status.</li><li>Save and delete a research archive note, then sign out and confirm protected data disappear. Test persistence after a separate sign-in.</li></ol>
-      <p class="tiny">These are manual tests; this checklist does not automatically mark them passed.</p></details>
+      <p class="tiny">These are manual tests; this checklist does not automatically mark them passed.</p>
+      <div class="qf-v150-acceptance" id="qf-v150-acceptance" aria-label="Owner-entered live acceptance results">
+        <h4>Record actual browser checks</h4>
+        <p class="tiny">Choose a result only after performing that action in this authenticated browser. These are self-attested checks, not automatic tests or proof of provider uptime. No passwords, tokens, holdings, or financial figures are recorded.</p>
+        <ol id="qf-v150-checks" class="qf-v150-manual-grid">
+          <li data-v150-check="mfa"><label for="qf-v150-mfa">Fresh sign-in and authenticator</label><select id="qf-v150-mfa" aria-label="MFA acceptance status"><option value="not-tested">Not tested</option><option value="passed">Passed manually</option><option value="failed">Failed / needs work</option></select></li>
+          <li data-v150-check="provider"><label for="qf-v150-provider">Authorized portfolio and quotes</label><select id="qf-v150-provider"><option value="not-tested">Not tested</option><option value="passed">Passed manually</option><option value="failed">Failed / needs work</option></select></li>
+          <li data-v150-check="research"><label for="qf-v150-research">Selection, prices and full research</label><select id="qf-v150-research"><option value="not-tested">Not tested</option><option value="passed">Passed manually</option><option value="failed">Failed / needs work</option></select></li>
+          <li data-v150-check="sec"><label for="qf-v150-sec">Local SEC archive and unavailable periods</label><select id="qf-v150-sec"><option value="not-tested">Not tested</option><option value="passed">Passed manually</option><option value="failed">Failed / needs work</option></select></li>
+          <li data-v150-check="briefing"><label for="qf-v150-briefing">Hub / Lab / Briefing agreement</label><select id="qf-v150-briefing"><option value="not-tested">Not tested</option><option value="passed">Passed manually</option><option value="failed">Failed / needs work</option></select></li>
+          <li data-v150-check="archive"><label for="qf-v150-archive">Saved-note persistence and sign-out</label><select id="qf-v150-archive"><option value="not-tested">Not tested</option><option value="passed">Passed manually</option><option value="failed">Failed / needs work</option></select></li>
+        </ol>
+        <p class="tiny" id="qf-v150-status" role="status" aria-live="polite">Manual verification not recorded.</p>
+        <div class="controls"><button class="btn sm" id="qf-v150-download" type="button" disabled>Export redacted acceptance JSON</button><button class="btn sm" id="qf-v150-reset" type="button">Reset results</button></div>
+      </div></details>
     </section>
     <div id="private-research-dataset" class="pane" hidden aria-label="Research investments">
       <div class="section-title"><h3>Research investments</h3><span class="tiny">Used in Market data, Optimization, Backtests and Walk-forward</span></div>
@@ -4747,6 +4784,49 @@ if(typeof module==='object'&&module.exports)module.exports=api;
 root.QFPrivateWorkflowV140=api;
 })(typeof window!=='undefined'?window:globalThis);
 
+/* V15.0: user-attested release acceptance, with no account or market data. */
+(function(root){
+'use strict';
+const KEYS=Object.freeze(['mfa','provider','research','sec','briefing','archive']);
+const LABELS=Object.freeze({
+ mfa:'Fresh sign-in and authenticator challenge',
+ provider:'Authorized virtual holdings and live provider quotes',
+ research:'Selected company prices and current full assessment',
+ sec:'Local SEC archive import and withheld-date review',
+ briefing:'Research Hub, Lab and Briefing evidence consistency',
+ archive:'Saved research persistence, deletion and signed-out privacy'
+});
+const ALLOWED=Object.freeze(['not-tested','passed','failed']);
+function normalize(value){
+ const src=value&&typeof value==='object'&&!Array.isArray(value)?value:{};
+ const checks={};for(const key of KEYS){
+  const state=src[key];checks[key]=ALLOWED.includes(state)?state:'not-tested';
+ }
+ return Object.freeze(checks);
+}
+function assess(value){
+ const checks=normalize(value);const counts={passed:0,failed:0,notTested:0};
+ for(const key of KEYS){if(checks[key]==='passed')counts.passed++;
+  else if(checks[key]==='failed')counts.failed++;else counts.notTested++;}
+ const status=counts.failed?'attention-required':counts.notTested?'not-fully-tested':'self-attested-complete';
+ return Object.freeze({schema:'quantforge.manual-acceptance.v15.0',status,counts,checks,
+  independentlyVerified:false,
+  limitation:'Owner-reported browser checks, not independent MFA or provider verification. No investment-performance claims.'});
+}
+function update(value,key,state){
+ if(!KEYS.includes(key)||!ALLOWED.includes(state))throw Error('Unknown acceptance check or status.');
+ return normalize({...normalize(value),[key]:state});
+}
+function exportSafe(value){
+ const result=assess(value);
+ return {schema:result.schema,status:result.status,counts:{...result.counts},checks:{...result.checks},
+  independentlyVerified:false,limitation:result.limitation};
+}
+const api=Object.freeze({keys:KEYS,labels:LABELS,assess,update,exportSafe});
+if(typeof module==='object'&&module.exports)module.exports=api;
+root.QFPrivateReleaseAcceptanceV150=api;
+})(typeof window!=='undefined'?window:globalThis);
+
 /* QuantForge private research: pure in-sample portfolio analytics.
  * No external requests, synthetic data, brokerage orders, or portfolio mutations.
  * The public demo model is deliberately not imported here.
@@ -5574,6 +5654,7 @@ const $=id=>document.getElementById(id);
 let guideReportV79=null, linkedResearchBriefV93=null, linkedResearchIntelligenceV94=null, linkedResearchDiagnosticsV95=null,linkedResearchProtocolV96=null,linkedPointInTimeV97=null,linkedSECCoverageV98=null,linkedArchivedSECV99=null,linkedArchiveQualityV100=null,linkedHistoricalPanelV110=null,linkedHistoricalRobustnessV120=null,linkedHistoricalAttributionV130=null,linkedDecisionIntegrityV130=null;
 let researchSessionJournalV95=[];
 let linkedWorkflowV140=null;
+let manualAcceptanceV150={};
 let importedSECArchiveV99=null,archiveFilenameV99='',archiveReadTokenV99=0;
 let privateDecisionCenterV84=null;
 let researchOSRunV90=0, researchOSInternalLoadV90=false;
@@ -7547,7 +7628,40 @@ for(const id of ['private-fc-years','private-fc-growth','private-fc-margin','pri
  $(id).addEventListener('change',()=>{clearV66Forecast();$('private-fc-output').textContent='Assumptions changed. Re-run company forecast.';});
 }
 
+function renderManualAcceptanceV150(){
+ if(!window.QFPrivateReleaseAcceptanceV150)return;
+ const report=window.QFPrivateReleaseAcceptanceV150.assess(manualAcceptanceV150);
+ const list=$('qf-v150-checks');if(list){
+  list.querySelectorAll('[data-v150-check]').forEach(row=>{
+   const key=row.dataset.v150Check,select=row.querySelector('select');
+   if(select)select.value=report.checks[key]||'not-tested';
+  });
+ }
+ const status=$('qf-v150-status');if(status)status.textContent=
+  report.counts.passed+' of 6 self-reported passed; '+report.counts.failed+' failed; '+
+  report.counts.notTested+' untested. Status: '+report.status.replace(/-/g,' ')+
+  '. These entries are not independently verified.';
+ const dl=$('qf-v150-download');if(dl)dl.disabled=!privateState;
+}
 compactResearchDetailsV140();
+$('qf-v150-checks').addEventListener('change',event=>{
+ const select=event.target.closest('select');
+ const row=select?.closest('[data-v150-check]');
+ if(!privateState||!row)return;
+ try{
+  manualAcceptanceV150=window.QFPrivateReleaseAcceptanceV150.update(manualAcceptanceV150,row.dataset.v150Check,select.value);
+  renderManualAcceptanceV150();
+ }catch(err){message('Acceptance entry rejected.');renderManualAcceptanceV150();}
+});
+$('qf-v150-reset').addEventListener('click',()=>{if(!privateState)return;
+ manualAcceptanceV150={};renderManualAcceptanceV150();
+});
+$('qf-v150-download').addEventListener('click',()=>{
+ if(!privateState)return;
+ const report=window.QFPrivateReleaseAcceptanceV150.exportSafe(manualAcceptanceV150);
+ downloadResearchJSON('quantforge-v15-manual-browser-acceptance.json',report);
+});
+renderManualAcceptanceV150();
 $('qf-v140-next').addEventListener('click',()=>{if(privateState&&linkedWorkflowV140){const target=linkedWorkflowV140.next.route;if(['decision','research','settings'].includes(target))privateTab(target);}});
 document.querySelectorAll('[data-private-tab]').forEach(b=>b.addEventListener('click',()=>privateTab(b.dataset.privateTab)));
 $('qf-v93-ribbon-assess').addEventListener('click',()=>privateTab('decision'));

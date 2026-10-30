@@ -5,6 +5,7 @@ const $=id=>document.getElementById(id);
 let guideReportV79=null, linkedResearchBriefV93=null, linkedResearchIntelligenceV94=null, linkedResearchDiagnosticsV95=null,linkedResearchProtocolV96=null,linkedPointInTimeV97=null,linkedSECCoverageV98=null,linkedArchivedSECV99=null,linkedArchiveQualityV100=null,linkedHistoricalPanelV110=null,linkedHistoricalRobustnessV120=null,linkedHistoricalAttributionV130=null,linkedDecisionIntegrityV130=null;
 let researchSessionJournalV95=[];
 let linkedWorkflowV140=null;
+let manualAcceptanceV150={};
 let importedSECArchiveV99=null,archiveFilenameV99='',archiveReadTokenV99=0;
 let privateDecisionCenterV84=null;
 let researchOSRunV90=0, researchOSInternalLoadV90=false;
@@ -1978,7 +1979,40 @@ for(const id of ['private-fc-years','private-fc-growth','private-fc-margin','pri
  $(id).addEventListener('change',()=>{clearV66Forecast();$('private-fc-output').textContent='Assumptions changed. Re-run company forecast.';});
 }
 
+function renderManualAcceptanceV150(){
+ if(!window.QFPrivateReleaseAcceptanceV150)return;
+ const report=window.QFPrivateReleaseAcceptanceV150.assess(manualAcceptanceV150);
+ const list=$('qf-v150-checks');if(list){
+  list.querySelectorAll('[data-v150-check]').forEach(row=>{
+   const key=row.dataset.v150Check,select=row.querySelector('select');
+   if(select)select.value=report.checks[key]||'not-tested';
+  });
+ }
+ const status=$('qf-v150-status');if(status)status.textContent=
+  report.counts.passed+' of 6 self-reported passed; '+report.counts.failed+' failed; '+
+  report.counts.notTested+' untested. Status: '+report.status.replace(/-/g,' ')+
+  '. These entries are not independently verified.';
+ const dl=$('qf-v150-download');if(dl)dl.disabled=!privateState;
+}
 compactResearchDetailsV140();
+$('qf-v150-checks').addEventListener('change',event=>{
+ const select=event.target.closest('select');
+ const row=select?.closest('[data-v150-check]');
+ if(!privateState||!row)return;
+ try{
+  manualAcceptanceV150=window.QFPrivateReleaseAcceptanceV150.update(manualAcceptanceV150,row.dataset.v150Check,select.value);
+  renderManualAcceptanceV150();
+ }catch(err){message('Acceptance entry rejected.');renderManualAcceptanceV150();}
+});
+$('qf-v150-reset').addEventListener('click',()=>{if(!privateState)return;
+ manualAcceptanceV150={};renderManualAcceptanceV150();
+});
+$('qf-v150-download').addEventListener('click',()=>{
+ if(!privateState)return;
+ const report=window.QFPrivateReleaseAcceptanceV150.exportSafe(manualAcceptanceV150);
+ downloadResearchJSON('quantforge-v15-manual-browser-acceptance.json',report);
+});
+renderManualAcceptanceV150();
 $('qf-v140-next').addEventListener('click',()=>{if(privateState&&linkedWorkflowV140){const target=linkedWorkflowV140.next.route;if(['decision','research','settings'].includes(target))privateTab(target);}});
 document.querySelectorAll('[data-private-tab]').forEach(b=>b.addEventListener('click',()=>privateTab(b.dataset.privateTab)));
 $('qf-v93-ribbon-assess').addEventListener('click',()=>privateTab('decision'));
