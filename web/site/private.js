@@ -496,7 +496,7 @@ function renderUnifiedDecisionV160(){
   slot.innerHTML='<div class="qf-v160-hero"><div class="qf-v160-title"><div><span class="eyebrow">CURRENT RESEARCH ASSESSMENT</span><h3>Your research summary</h3><p>Choose 2–5 companies, set your risk limits, and run the complete assessment.</p></div><span class="qf-v160-light">Not assessed</span></div><p class="tiny">No rating or recommendation is displayed until current source data and required research checks are available. Standard analysis uses the built-in SEC snapshot and authenticated market data; no upload is required.</p><div class="controls"><button class="btn sm" type="button" data-v160-route="ideas">Explore companies</button><button class="btn sm" type="button" data-v160-route="lab">Inspect research methods</button></div></div>';
   return;
  }
- const light={green:'Supportive historical screens',amber:'Mixed or limited evidence',red:'Measured risk caution',gray:'Incomplete evidence'}[data.signal]||'Evidence not evaluated';
+ const light=data.riskVeto?'Risk limit breached':({green:'Eligible for further research',amber:'Mixed or limited evidence',red:'Measured risk caution',gray:'Insufficient reliable evidence'}[data.signal]||'Evidence not evaluated');
  const score=data.alignment===null?'—':String(data.alignment);
  const rows=data.domains.map(d=>{
   const tone=d.status==='supports'?'green':d.status==='cautions'?'red':d.status==='unavailable'?'gray':'amber';
@@ -507,7 +507,10 @@ function renderUnifiedDecisionV160(){
  }).join('')+'<p class="tiny">Observed price-only histories; samples can differ by period and do not predict future returns. Not a cross-company investment ranking.</p></div>':'';
  const list=(arr,none)=>'<ul>'+(arr.length?arr:[none]).map(x=>'<li>'+safe(x)+'</li>').join('')+'</ul>';
  slot.innerHTML='<div class="qf-v160-hero"><div class="qf-v160-title"><div><span class="eyebrow">CURRENT RESEARCH ASSESSMENT · '+safe(data.asOf)+'</span><h3>'+safe(data.candidateName)+' ('+safe(data.candidate)+')</h3><p>'+data.universe+' selected investments · Screening assessment · No orders placed</p></div><span class="qf-v160-light qf-v160-'+data.signal+'">'+safe(light)+'</span></div>'+
-  '<div class="qf-v160-topline"><div class="qf-v160-dial" style="--score:'+(data.alignment===null?0:data.alignment)+'"><span>'+score+(data.alignment===null?'':'/100')+'</span><small>Historical screen alignment'+(data.alignment===null?' withheld':' index')+'</small></div><div class="qf-v160-action"><span class="eyebrow">EXISTING RESEARCH ENGINE CONCLUSION</span><strong>'+safe(data.action)+'</strong><p>'+safe(data.reason)+'</p><p class="tiny"><strong style="display:inline;font-size:12px">Methods completed: '+data.completed+'/'+data.total+'</strong> · '+(data.coverage===null?'Not measured':data.coverage+'%')+' method completion (not accuracy)</p><div class="qf-v160-meter" aria-label="Research method completion"><span style="width:'+(data.coverage||0)+'%"></span></div><p class="tiny">'+safe(data.classification.replace(/-/g,' '))+' · Screening colors summarize observed evidence; none is a recommendation to trade.</p></div></div></div>'+
+  '<div class="qf-v160-topline"><div class="qf-v160-action qf-v160-decision-'+data.signal+'"><span class="eyebrow">RESEARCH DECISION UNDER CURRENT CONSTRAINTS</span><strong>'+safe(data.action)+'</strong><p>'+safe(data.reason)+'</p><p class="tiny"><strong style="display:inline;font-size:12px">Methods completed: '+data.completed+'/'+data.total+'</strong> · '+(data.coverage===null?'Not measured':data.coverage+'%')+' method completion (not accuracy)</p><div class="qf-v160-meter" aria-label="Research method completion"><span style="width:'+(data.coverage||0)+'%"></span></div><p class="tiny">'+safe(data.classification.replace(/-/g,' '))+' · Screening colors summarize observed evidence; none is a recommendation to trade.</p></div></div></div>'+
+  '<div class="qf-v160-scoreline"><strong>Evidence alignment: '+score+(data.alignment===null?' (not evaluated)':'/100')+'</strong><span>Descriptive weighted index, not probability of returns · '+(data.coverage===null?'Coverage unknown':data.coverage+'% method completion')+'</span></div>'+
+  (data.blockers.length?'<section class="qf-v160-blockers"><strong>Blocking constraints or required checks</strong>'+list(data.blockers,'')+'</section>':'')+
+  (data.favorable.length?'<section class="qf-v160-compare"><h4>What supports this assessment</h4>'+list(data.favorable,'')+'</section>':'')+
   '<div class="qf-v160-grid">'+rows+'</div>'+comparison+
   '<div class="qf-v160-findings"><section class="qf-v160-compare"><h4>Key risks and disagreements</h4>'+list(data.reasons,'No specific objection was recorded; unknown risks remain.')+'</section><section class="qf-v160-compare"><h4>What to investigate next</h4>'+list(data.next,'Check evidence dates and assumptions before acting independently.')+'</section></div>'+
   '<details class="qf-v160-method-trace"><summary>How these colors and percentages are calculated</summary><p class="tiny">'+safe(data.methodology)+'</p>'+list(data.notes,'')+'</details><div class="controls"><button type="button" class="btn sm" data-v160-route="lab">Inspect research methods</button><button type="button" class="btn sm" data-v160-route="ideas">Compare companies</button><button type="button" class="btn sm" data-v160-route="settings">View full report</button></div>';
@@ -1045,7 +1048,7 @@ function clearMFA(){
   $('private-mfa-setup-actions').hidden=true;
 }
 async function handleAuthState(state){
-  if(state.signed_in){clearMFA();showStep('ready');await loadState();privateTab('decision');privatePeers();return;}
+  if(state.signed_in){clearMFA();showStep('ready');await loadState();const requested=location.hash.match(/^#private\/([a-z]+)$/)?.[1];privateTab(requested&&document.querySelector('[data-private-view="'+requested+'"]')?requested:'decision',false);privatePeers();return;}
   if(!state.mfa_required){clearMFA();showStep('login');privateState=null;clearResearchOSV90();renderSavedResearchV96();return;}
   showStep('mfa');
   privateState=null;clearResearchOSV90();renderSavedResearchV96();
@@ -1199,6 +1202,13 @@ function updateMode(){
  const eyebrow=document.querySelector('.topbar .eyebrow');
  if(eyebrow)eyebrow.textContent='Your portfolio · Personal use';
 }
+window.addEventListener?.('qf:private-route',()=>{
+ const route=location.hash.match(/^#private\/([a-z]+)$/)?.[1];
+ if(!route||!document.querySelector('[data-private-view="'+route+'"]'))return;
+ if(privateState)privateTab(route,false);else checkSession();
+});
+// A bookmarked private route opens the login/MFA gate rather than exposing protected content.
+if(typeof location!=='undefined'&&location.hash.startsWith('#private/'))queueMicrotask(checkSession);
 $('private-login-submit').addEventListener('click',login);
 $('private-mfa-submit').addEventListener('click',verifyMFA);
 $('private-mfa-start').addEventListener('click',startMFASetup);
@@ -1478,7 +1488,8 @@ const mean=a=>a.reduce((x,y)=>x+y,0)/a.length;
 function sampleStdev(a){if(a.length<2)return 0;const m=mean(a);return Math.sqrt(a.reduce((x,y)=>x+(y-m)*(y-m),0)/(a.length-1));}
 function maxDD(values){let high=0,deep=0;for(const v of values){high=Math.max(high,v);if(high)deep=Math.min(deep,v/high-1);}return deep;}
 function displayTable(headers,rows){return '<div class="table-wrap"><table><thead><tr>'+headers.map(h=>'<th>'+safe(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+row.map(v=>'<td>'+safe(v)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';}
-function privateTab(tab){
+function privateTab(tab,updateRoute=true){
+ if(!document.querySelector('[data-private-view="'+tab+'"]'))return;
  if(tab==='decision')clearDecisionCenterV84();
  if(tab==='decision')refreshCandidateChoicesV85();
  if(tab==='decision')refreshResearchOSChoicesV90();
@@ -1489,8 +1500,17 @@ function privateTab(tab){
  refreshResearchContext();
  document.querySelectorAll('[data-private-view]').forEach(p=>p.hidden=p.dataset.privateView!==tab);
  document.querySelectorAll('.private-nav [data-private-tab]').forEach(b=>b.classList.toggle('active',b.dataset.privateTab===tab));
- const activeButton=document.querySelector('.private-nav [data-private-tab].active');const group=typeof activeButton?.closest==='function'?activeButton?.closest('details.private-nav-group'):null;if(group)group.open=true;
+ const activeButton=document.querySelector('.private-nav [data-private-tab].active');
+ const group=typeof activeButton?.closest==='function'?activeButton?.closest('details.private-nav-group'):null;
+ document.querySelectorAll('.private-nav-group').forEach(g=>{g.open=g===group;});
+ document.querySelectorAll('.private-nav [data-private-tab]').forEach(b=>{if(b.dataset.privateTab===tab)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
+ const heading=document.getElementById('qf-private-location');
+ if(heading)heading.textContent=group?.querySelector('summary')?.textContent?.replace(/^\d+\s*[·.]\s*/, '')+' / '+(activeButton?.textContent||tab);
+ if(updateRoute&&privateState&&typeof location!=='undefined'&&document.querySelector('#page-private.active')){
+  const route='#private/'+tab;if(location.hash!==route)history.pushState(null,'',route);
+ }
 }
+
 function normalizedSeries(series){
  const rows=series.symbols.map(s=>series.closes[s]);
  if(rows.some(a=>!Array.isArray(a)||a.length!==series.dates.length||a.some(x=>!finite(x)||x<=0)))throw Error('Incomplete historical price series.');

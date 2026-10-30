@@ -19,7 +19,7 @@ function nav(name,updateHash=true){
  const labels={overview:'RESEARCH OVERVIEW',sec:'HISTORICAL SEC DATA',portfolio:'SIMULATED PORTFOLIO',quant:'SIMULATED RISK MODEL',valuation:'DCF ASSUMPTIONS',ml:'SIMULATED PEER MODEL',methods:'DATA & ENGINEERING',systems:'RESEARCH METHODS',lab:'INTERACTIVE ANALYSIS',private:'PRIVATE WORKSPACE'};
  const badge=document.querySelector('.topbar .badge');if(badge)badge.textContent=labels[name];
  const eyebrow=document.querySelector('.topbar .eyebrow');if(eyebrow)eyebrow.textContent=name==='private'?'Your portfolio · Personal use':'Financial research · models and data';
- if(updateHash && PUBLIC_PAGES.has(name))history.replaceState(null,'','#'+name);
+ if(updateHash){const route=name==='private'?'#private/decision':'#'+name;if(location.hash!==route)history.pushState(null,'',route);}
  window.scrollTo({top:0,behavior:'instant'});
 }
 
@@ -78,11 +78,25 @@ function runDCF(){
  try{
   const r=M.dcf(s,opts);
   let sens=[];for(const dw of [-0.01,0,0.01])for(const dg of [-0.005,0,0.005]){const w=opts.wacc+dw,g=opts.terminal+dg;let v='—';if(w>g){v=fmt(M.dcf(s,{...opts,wacc:w,terminal:g}).value);}sens.push([(w*100).toFixed(1)+'%',(g*100).toFixed(2)+'%',v]);}
-  $('dcf-result').innerHTML='<div class="pane"><div class="three"><div class="metric"><span class="muted">Illustrative value per share</span><strong>'+fmt(r.value)+'</strong></div><div class="metric"><span class="muted">Terminal share of EV</span><strong>'+pct(r.terminalFraction)+'</strong></div><div class="metric"><span class="muted">Enterprise value</span><strong>'+fmt(r.enterprise)+'B</strong></div></div><h3 class="section-title">WACC / terminal-growth sensitivity</h3>'+table(['WACC','Terminal growth','Per share'],sens)+'<details class="subtle"><summary>Five-year forecast</summary>'+table(['Year','Revenue ($B)','FCF ($B)'],r.forecast.map(x=>[x.year,fmt(x.revenue),fmt(x.fcf)]))+'</details><p class="tiny" style="margin-top:13px">Illustrative revenue, reinvestment ratios, net debt and shares. 5-year unlevered FCF discounted by WACC; perpetuity terminal value. This is not a real-company valuation.</p></div>';
+  $('dcf-result').innerHTML='<div class="pane">'+(r.enterprise<0||r.value<0?'<div class="notice qf-dcf-warning" role="status"><strong>Adverse valuation scenario.</strong> Under these assumptions, discounted future cash flows imply a negative enterprise or per-share model value. This is not a possible quoted stock-price target or a prediction of a negative share price. Review cash generation, discount rate and terminal growth, then compare the sensitivity table; no result is silently clamped.</div>':'<p class="tiny" style="margin-bottom:14px">All amounts below are hypothetical outputs under selected assumptions, not market-price estimates.</p>')+'<div class="three"><div class="metric"><span class="muted">Illustrative value per share</span><strong>'+fmt(r.value)+'</strong></div><div class="metric"><span class="muted">Terminal share of EV</span><strong>'+pct(r.terminalFraction)+'</strong></div><div class="metric"><span class="muted">Enterprise value</span><strong>'+fmt(r.enterprise)+'B</strong></div></div><h3 class="section-title">WACC / terminal-growth sensitivity</h3>'+table(['WACC','Terminal growth','Per share'],sens)+'<details class="subtle"><summary>Five-year forecast</summary>'+table(['Year','Revenue ($B)','FCF ($B)'],r.forecast.map(x=>[x.year,fmt(x.revenue),fmt(x.fcf)]))+'</details><p class="tiny" style="margin-top:13px">Illustrative revenue, reinvestment ratios, net debt and shares. 5-year unlevered FCF discounted by WACC; perpetuity terminal value. This is not a real-company valuation.</p></div>';
  }catch(e){error('dcf-error',e.message);$('dcf-result').innerHTML='';}
 }
-function runPeers(){let s=$('ml-company').value;const p=M.peers(s),facts=M.COMPANY_FACTS[s];
- $('ml-result').innerHTML='<div class="pane"><div class="section-title"><h3>Nearest companies to '+M.COMPANY_NAMES[s]+'</h3><span class="mini">Simulated inputs</span></div>'+table(['Company','Ticker','Standardized distance'],p.ranking.slice(0,5).map(x=>[x.name,x.symbol,x.distance.toFixed(2)]))+'<p style="margin-top:18px">Sample-relative atypicality rank: <strong>'+p.unusualRank+' of '+p.total+'</strong> (1 = most distant from the feature mean).</p><div class="subtle"><h3>Features used</h3>'+table(['Metric','Illustrative value'],['Revenue growth','Operating margin','Net margin','Free cash flow / revenue','Debt / assets'].map((name,i)=>[name,pct(facts.features[i])]))+'</div><p class="tiny" style="margin-top:12px">Z-score feature standardization and Euclidean nearest-neighbors. Atypicality is standardized distance to the sample center, not an Isolation Forest or investment signal.</p></div>';
+function runPeers(){
+ const symbol=$('ml-company').value,sectorOnly=$('ml-sector-only').checked;
+ const model=window.QFPublicSECPeers?.compare(SEC_DATA,symbol,{sectorOnly});
+ if(!model?.ready){$('ml-result').innerHTML='<div class="pane notice">'+safeText(model?.reason||'SEC comparison is unavailable.')+'</div>';return;}
+ const rows=model.peers.slice(0,12).map((c,i)=>[
+  String(i+1),safeText(c.name)+' <span class="tiny">('+safeText(c.symbol)+')</span>',
+  safeText(c.sector),safeText(c.fiscalEnd),c.distance.toFixed(2),
+  '<button type="button" class="btn sm" data-sec-symbol="'+safeText(c.symbol)+'">View financials</button>'
+ ]);
+ const f=model.features.map((feature,i)=>[safeText(feature.label),model.selected.values[i].toFixed(1)+'%',safeText(feature.description)]);
+ $('ml-result').innerHTML='<div class="pane"><div class="section-title"><h3>Closest reported-SEC financial profiles</h3><span class="mini">Reported SEC facts · descriptive</span></div>'+
+  '<p><strong>'+safeText(model.selected.name)+'</strong> ('+safeText(symbol)+') · fiscal year ended '+safeText(model.selected.fiscalEnd)+'</p>'+
+  '<p class="tiny">'+model.eligible+' eligible of '+model.universe+' published companies; '+model.excluded+' excluded for missing accession-backed ratios or stale reporting. '+model.compared+' in this comparison. Source filing cutoff: '+safeText(model.cutoff)+'.</p>'+
+  table(['#','Similar company','Editorial sector','Fiscal year end','Distance','Financial data'],rows)+
+  '<div class="subtle"><h3>Selected issuer financial features</h3>'+table(['Ratio','SEC-derived value','Definition'],f)+'</div>'+
+  '<p class="tiny" style="margin-top:14px">'+safeText(model.message)+' This model does not use stock prices, expected returns, or market capitalization. <a href="'+safeText(model.selected.companyfacts)+'" target="_blank" rel="noopener noreferrer">Original SEC Company Facts</a>.</p></div>';
 }
 
 // SEC comparison uses a static, pre-reviewed companyfacts snapshot. No browser API calls.
@@ -221,7 +235,7 @@ function populate(){
  $('trade-symbol').innerHTML=options;
  $('assets-list').innerHTML=M.ASSETS.map(a=>'<button class="asset" data-symbol="'+a.symbol+'"><strong>'+a.name+'</strong><span>'+a.symbol+' · '+a.kind+' · '+fmt(a.price)+'</span></button>').join('');
  $('quant-assets').innerHTML=['MSFT','VOO','AAPL','QQQ','BND','BTC/USD','ETH/USD'].map(s=>'<label class="inline-checkbox"><input type="checkbox" name="quant-asset" value="'+s+'" '+(['MSFT','VOO','BND'].includes(s)?'checked':'')+'>'+M.bySymbol[s].name+'</label>').join('');
- $('ml-company').innerHTML=Object.keys(M.COMPANY_FACTS).map(s=>'<option value="'+s+'">'+M.COMPANY_NAMES[s]+'</option>').join('');
+ $('ml-company').innerHTML=(SEC_DATA?.companies||[]).map(c=>'<option value="'+safeText(c.symbol)+'">'+safeText(c.name)+' ('+safeText(c.symbol)+')</option>').join('');
  portfolio();runQuant();runDCF();runPeers();renderSEC();renderSECHighlights();
  if(window.QFPublicEvidence)window.QFPublicEvidence.render(SEC_DATA, document.getElementById("systems-sec-quant-v76"));
  if(window.QFResearchLab)window.QFResearchLab.mount(SEC_DATA);
@@ -241,6 +255,8 @@ $('rebalance-submit').addEventListener('click',rebalance);
 $('quant-run').addEventListener('click',runQuant);
 $('dcf-run').addEventListener('click',runDCF);
 $('ml-run').addEventListener('click',runPeers);
+$('ml-company').addEventListener('change',runPeers);
+$('ml-sector-only').addEventListener('change',runPeers);
 $('sec-company-search-v79').addEventListener('input',filterSECCompaniesV79);
 $('sec-company').addEventListener('change',renderSEC);
 $('qf-sec-metric-v81').addEventListener('change',refreshV81Chart);
@@ -248,9 +264,11 @@ $('qf-sec-project-v81').addEventListener('click',projectV81);
 $('sec-margin-shock').addEventListener('input',renderSEC);
 $('sec-rank-metric').addEventListener('change',renderSECRanking);
 $('sec-export').addEventListener('click',downloadSECCsv);
-window.addEventListener('hashchange',()=>{const target=window.location.hash.slice(1);if(PUBLIC_PAGES.has(target))nav(target,false);});
+function restorePublicRoute(){const target=location.hash.slice(1);if(PUBLIC_PAGES.has(target))nav(target,false);else if(target.startsWith('private/')){nav('private',false);window.dispatchEvent(new Event('qf:private-route'));}}
+window.addEventListener('popstate',restorePublicRoute);
+window.addEventListener('hashchange',restorePublicRoute);
 populate();
-const initial=window.location.hash.slice(1);if(PUBLIC_PAGES.has(initial))nav(initial,false);
+const initial=window.location.hash.slice(1);if(PUBLIC_PAGES.has(initial))nav(initial,false);else if(initial.startsWith('private/'))nav('private',false);
 const qfCountV81=$('qf-company-count-v81');if(qfCountV81)qfCountV81.textContent=SEC_DATA?.companies?.length?SEC_DATA.companies.length+' companies':'Company financials unavailable';
 const methodsAsOf=$('methods-asof');if(methodsAsOf && SEC_DATA && SEC_DATA.as_of)methodsAsOf.textContent='SEC filing cutoff · '+SEC_DATA.as_of;
 

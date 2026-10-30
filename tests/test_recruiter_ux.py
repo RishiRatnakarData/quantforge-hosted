@@ -39,7 +39,8 @@ def test_public_badge_stays_correct_after_navigation():
     assert "DATA & ENGINEERING" in app
     assert "PUBLIC_PAGES=new Set(" in app
     assert "aria-current" in app
-    assert "history.replaceState" in app
+    assert "history.pushState" in app
+    assert "popstate" in app
     assert "data-sec-symbol" in app
     assert "FICTIONAL DATA" not in private
     assert "if(!active)return;" in private

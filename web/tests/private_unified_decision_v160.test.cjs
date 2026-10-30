@@ -60,3 +60,17 @@ test('missing evidence is neutral and does not impersonate a measured loss',()=>
  assert.equal(r.signal,'gray');assert.equal(r.alignment,null);
  assert.equal(r.domains.find(x=>x.key==='downside').label,'Not evaluated');
 });
+
+test('hard risk veto is displayed as red despite a green-weight evidence index',()=>{
+ const b=brief();b.blocked=true;b.mandatoryMissing=[];b.reason='Drawdown exceeds limit';
+ const r=center.summarize({brief:b,integrity:integrity()});
+ assert.equal(r.signal,'red');assert.equal(r.riskVeto,true);
+ assert.match(r.blockers[0],/Drawdown exceeds limit/);
+ assert.equal(r.alignment,null);
+});
+test('mandatory missing evidence is neutral without a measured risk breach',()=>{
+ const b=brief();b.mandatoryMissing=['Independent valuation'];
+ const r=center.summarize({brief:b,integrity:integrity()});
+ assert.equal(r.signal,'gray');assert.equal(r.riskVeto,false);
+ assert.ok(r.blockers.includes('Independent valuation'));
+});

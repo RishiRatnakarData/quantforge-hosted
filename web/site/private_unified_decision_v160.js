@@ -37,8 +37,10 @@ function summarize({brief,integrity,workflow}={}){
  });
  const required=['history','fundamentals','downside','portfolio'];
  const requiredMissing=required.filter(k=>!unique.has(k)||unique.get(k).status==='unavailable');
- const mandatoryMissing=brief.mandatoryMissing.length>0||brief.blocked===true||integrity.classification==='blocked';
- const blocked=mandatoryMissing||requiredMissing.length>0;
+ const riskVeto=brief.blocked===true||integrity.classification==='blocked';
+ const mandatoryMissing=brief.mandatoryMissing.length>0;
+ const blocked=riskVeto||mandatoryMissing||requiredMissing.length>0;
+ const blockers=[...(riskVeto?[brief.reason||'One or more selected risk limits failed.']:[]),...brief.mandatoryMissing].map(v=>str(v)).filter(Boolean);
  const directional=results.filter(r=>['supports','mixed','cautions'].includes(r.status));
  const observedWeight=directional.reduce((s,r)=>s+r.weight,0);
  // This is a deterministic descriptive screening rubric, NOT empirical accuracy or predicted returns.
@@ -52,14 +54,16 @@ function summarize({brief,integrity,workflow}={}){
    symbol:a.symbol,name:str(a.name||a.symbol,70),change:a.priceChangePercent,drawdown:a.maxDrawdownPercent
   })):[];
  let signal='amber';
- if(requiredMissing.length>0)signal='gray';
- else if(blocked)signal='red';
+ if(riskVeto)signal='red';
+ else if(requiredMissing.length>0||mandatoryMissing)signal='gray';
  else if(alignment!==null&&alignment<35)signal='red';
  else if(alignment!==null&&alignment>=70&&integrity.classification==='evidence-complete'&&results.every(r=>['supports','mixed','cautions'].includes(r.status)))signal='green';
  const decision=str(brief.action,160);
  const reasons=[...(brief.cautions||[]),...(brief.conflicts||[])].filter(x=>typeof x==='string').slice(0,4).map(x=>str(x));
+ const favorable=(brief.favorable||[]).filter(x=>typeof x==='string').slice(0,3).map(x=>str(x));
  const next=[];
- if(blocked)next.push('Complete required, current financial and portfolio evidence before interpreting a recommendation.');
+ if(riskVeto)next.push('Review the breached risk limits and assess a smaller or no-change exposure scenario before proceeding.');
+ else if(blocked)next.push('Complete required, current financial and portfolio evidence before interpreting a recommendation.');
  if(integrity.classification!=='evidence-complete')next.push('Historical filing completeness or other checks are limited; treat results as preliminary.');
  for(const item of brief.next||[]){
   if(typeof item==='string'&&!/(upload|import|file|archive)/i.test(item)&&!next.includes(str(item)))next.push(str(item));
@@ -74,7 +78,7 @@ function summarize({brief,integrity,workflow}={}){
  return {schema:'quantforge.decision-center.v16.0',ready:true,signal,alignment,coverage,
   scoreLabel:'Historical screen alignment',candidate:brief.symbol,candidateName:str(brief.candidate||brief.symbol,80),
   asOf:str(brief.asOf||'Date unavailable',32),action:decision,reason:str(brief.reason,300),
-  blocked,classification:integrity.classification,universe:brief.universe.length,
+  blocked,riskVeto,blockers,favorable,classification:integrity.classification,universe:brief.universe.length,
   completed,total:count,domains:results,comparison,reasons,next,notes,
   requiredMissing,methodology:'Predeclared weights: fundamentals 25%, valuation 25%, downside 20%, portfolio fit 20%, multi-asset strategy 10%. Supports=100%, mixed=50%, cautions=0%; unavailable/available-only screens do not enter the directional denominator. Score withheld if core evidence is blocked or less than 40 weight-points are directional. Model coverage is completed/total, measured separately. A green screening light additionally requires evidence-complete integrity, no mandatory block, all five directional categories, and alignment >=70. Missing required evidence receives a neutral incomplete-evidence state rather than a measured-risk warning. Neither index measures forecast accuracy or suitability.'};
 }
