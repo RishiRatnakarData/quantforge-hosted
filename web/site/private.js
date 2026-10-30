@@ -2,13 +2,13 @@
 (function () {
 'use strict';
 const $=id=>document.getElementById(id);
-let guideReportV79=null, linkedResearchBriefV93=null, linkedResearchIntelligenceV94=null, linkedResearchDiagnosticsV95=null,linkedResearchProtocolV96=null,linkedPointInTimeV97=null;
+let guideReportV79=null, linkedResearchBriefV93=null, linkedResearchIntelligenceV94=null, linkedResearchDiagnosticsV95=null,linkedResearchProtocolV96=null,linkedPointInTimeV97=null,linkedSECCoverageV98=null;
 let researchSessionJournalV95=[];
 let privateDecisionCenterV84=null;
 let researchOSRunV90=0, researchOSInternalLoadV90=false;
 let candidateDossierV90=null,candidateQuoteV90=null,candidateFactorV91=null;
 function clearResearchOSV90(){
- linkedResearchBriefV93=null;linkedResearchIntelligenceV94=null;linkedResearchDiagnosticsV95=null;linkedResearchProtocolV96=null;linkedPointInTimeV97=null;
+ linkedResearchBriefV93=null;linkedResearchIntelligenceV94=null;linkedResearchDiagnosticsV95=null;linkedResearchProtocolV96=null;linkedPointInTimeV97=null;linkedSECCoverageV98=null;
  if(typeof refreshConnectedResearchV93==='function')refreshConnectedResearchV93();
  researchOSRunV90++;
  candidateDossierV90=null;candidateQuoteV90=null;candidateFactorV91=null;
@@ -58,6 +58,11 @@ function renderResearchOSV90(result,variants){
   snapshot:window.QFPublishedSEC,history:historySeries,selection:researchSelection,
   candidate:linkedResearchBriefV93.symbol,train:126,step:21,maxDrawdown:review.constraints.maxDrawdown,feeBps:10
  });}catch(err){console.warn('V9.7 filing-timeline validation unavailable:',String(err.message||err).slice(0,100));}
+ linkedSECCoverageV98=null;
+ try{linkedSECCoverageV98=window.QFPrivateSECCoverageV98.run({
+  snapshot:window.QFPublishedSEC,history:historySeries,selection:researchSelection,
+  candidate:linkedResearchBriefV93.symbol,train:126,step:21
+ });}catch(err){console.warn('V9.8 SEC issuer coverage unavailable:',String(err.message||err).slice(0,100));}
  researchSessionJournalV95.unshift({
   date:String(review.asOf||'').slice(0,10),symbol:String(review.symbol||'').slice(0,20),
   action:String(review.action||'').slice(0,120),readiness:String(review.readiness||'').slice(0,50),
@@ -241,11 +246,34 @@ function renderPointInTimeV97(){
  }
  const lab=$('qf-v97-lab-insight');if(lab)lab.textContent=analysis?'V9.7 historical SEC filing audit: '+analysis.counts.eligible+' / '+analysis.counts.planned+' dated decisions eligible; '+(analysis.ready?'full restricted-rule comparison available':'overall return deliberately withheld')+'.':'V9.7 audit awaits a completed assessment with matching market history.';
 }
+function renderSECCoverageV98(){
+ const item=linkedSECCoverageV98;
+ const fmt=n=>n==null?'Unavailable':String(n);
+ const header=['Investment','Dated windows eligible','Filing lag','Source cutoff','Main missing evidence'];
+ const table=rows=>'<div class="table-wrap"><table class="qf-v95-table"><thead><tr>'+header.map(x=>'<th scope="col">'+safe(x)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+[
+  String(assetNames[r.symbol]||r.symbol)+' ('+r.symbol+')',r.eligible+' / '+r.scheduled+' ('+r.coveragePct+'%)',
+  r.medianFilingLagDays==null?'Unavailable':r.medianFilingLagDays+' days',fmt(r.sourceCutoff),
+  r.gaps.length?r.gaps[0].reason+' ('+r.gaps[0].count+' windows)':'No missing dates in this sampled window'
+ ].map(x=>'<td>'+safe(x)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
+ for(const id of ['qf-v98-hub','qf-v98-brief']){
+  const node=$(id);if(!node)continue;
+  if(!item){node.textContent='';continue;}
+  node.innerHTML='<section class="qf-v95-shell qf-v98-shell" aria-label="SEC publication coverage across investments">'+
+   '<div class="qf-v95-heading"><span class="eyebrow">V9.8 · SEC EVIDENCE COVERAGE</span><h3>Which investments have historically verifiable filings?</h3><p>Analyze publication dates across every selected issuer using the same historical decision windows as the research audit. Missing evidence remains missing; partial coverage is never a historical performance ranking.</p></div>'+
+   (item.ready?'<p class="qf-v97-coverage"><strong>'+item.counts.eligible+' / '+item.counts.scheduled+'</strong> decision dates with complete cross-issuer evidence · '+item.counts.withheld+' dates withheld</p>'+table(item.rows):'<p><strong>Coverage unavailable.</strong> '+safe(item.reason)+'</p>')+
+   '<p class="tiny">Existing public SEC data is a limited dated snapshot, not a comprehensive original-filing archive. Later restatements, changing issuer coverage and reporting differences prevent unsupported historical conclusions. An offline filing-version archive builder is included in the source tooling for future provenance expansion.</p>'+
+   '<div class="controls"><button class="btn sm" type="button" data-private-tab="research">Review market dates</button><button class="btn sm" type="button" data-private-tab="lab">Research Lab</button></div></section>';
+ }
+ const lab=$('qf-v98-lab-insight');if(lab)lab.textContent=item&&item.ready?
+  'V9.8 SEC evidence completeness: '+item.counts.eligible+' / '+item.counts.scheduled+' decision windows support all '+item.rows.length+' selected issuers. Missing data is never filled.':
+  'V9.8 SEC coverage awaits a completed assessment and aligned historical prices.';
+}
 function refreshConnectedResearchV93(){
  renderInvestmentIntelligenceV94();
  renderResearchDiagnosticsV95();
  renderResearchProtocolV96();
  renderPointInTimeV97();
+ renderSECCoverageV98();
  const packet=linkedResearchBriefV93;
  const title=$('qf-v93-ribbon-title'),detail=$('qf-v93-ribbon-detail'),brief=$('qf-v93-ribbon-brief');
  if(title)title.textContent=packet?'Completed research · '+packet.candidate+' ('+packet.symbol+')':'Research workflow · No current assessment';
@@ -1734,7 +1762,8 @@ $('qf-v93-brief-export').addEventListener('click',()=>{
  if(!privateState||!linkedResearchBriefV93)return;
  downloadResearchJSON('quantforge-v95-linked-research-briefing.json',{...linkedResearchBriefV93,comparativeIntelligence:linkedResearchIntelligenceV94,portfolioValidation:linkedResearchDiagnosticsV95?window.QFPrivatePortfolioValidationV95.exportSafe(linkedResearchDiagnosticsV95):null,
   researchValidationV96:linkedResearchProtocolV96?window.QFPrivateResearchIntelligenceV96.safeSummary(linkedResearchProtocolV96):null,
-  filingTimelineV97:linkedPointInTimeV97?window.QFPrivatePointInTimeV97.safeSummary(linkedPointInTimeV97):null});
+  filingTimelineV97:linkedPointInTimeV97?window.QFPrivatePointInTimeV97.safeSummary(linkedPointInTimeV97):null,
+  secCoverageV98:linkedSECCoverageV98?window.QFPrivateSECCoverageV98.exportSafe(linkedSECCoverageV98):null});
 });
 for(const id of ['qf-v93-briefing','qf-v93-lab-status'])$(id).addEventListener('click',e=>{
  const b=e.target.closest('[data-v93-method]');
@@ -1745,6 +1774,7 @@ $('private-v90-run').addEventListener('click',runResearchOSV90);
 $('qf-v95-journal-clear').addEventListener('click',()=>{researchSessionJournalV95=[];renderResearchDiagnosticsV95();});
 $('qf-v96-save').addEventListener('click',saveResearchV96);
 $('qf-v96-saved-list').addEventListener('click',e=>{const b=e.target.closest('[data-v96-delete]');if(b&&privateState)deleteSavedResearchV96(Number(b.dataset.v96Delete));});
+for(const id of ['qf-v98-hub','qf-v98-brief'])$(id).addEventListener('click',e=>{const b=e.target.closest('[data-private-tab]');if(b&&privateState&&['research','lab'].includes(b.dataset.privateTab))privateTab(b.dataset.privateTab);});
 for(const id of ['qf-v97-hub','qf-v97-brief'])$(id).addEventListener('click',e=>{const b=e.target.closest('[data-private-tab]');if(b&&privateState&&['research','walkforward'].includes(b.dataset.privateTab))privateTab(b.dataset.privateTab);});
 for(const id of ['qf-v96-hub','qf-v96-brief'])$(id).addEventListener('click',e=>{const b=e.target.closest('[data-private-tab]');if(b&&privateState&&['valuation','walkforward'].includes(b.dataset.privateTab))privateTab(b.dataset.privateTab);});
 $('private-v90-report').addEventListener('click',e=>{const b=e.target.closest('[data-private-tab]');if(b&&privateState&&['lab','trade','research','candidate','settings'].includes(b.dataset.privateTab))privateTab(b.dataset.privateTab);});
