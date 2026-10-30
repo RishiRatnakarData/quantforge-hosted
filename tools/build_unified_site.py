@@ -70,6 +70,7 @@ block='''<section class="tabpage" id="page-private">
       <div id="qf-v98-lab-insight" class="tiny" aria-live="polite"></div>
       <div id="qf-v99-lab-insight" class="tiny" aria-live="polite"></div>
       <div id="qf-v100-lab-insight" class="tiny" aria-live="polite"></div>
+      <div id="qf-v110-lab-insight" class="tiny" aria-live="polite"></div>
       <div class="controls qf-v93-lab-tools"><button type="button" class="btn" data-private-tab="decision">Return to Research Hub</button><button type="button" class="btn" data-private-tab="settings">View research briefing</button></div>
       <div class="qf-v9-lab-grid">
         <button type="button" data-private-tab="candidate"><strong>Company &amp; factor research</strong><small>SEC fundamentals, downside risk, market ETF beta, independent FF3 regressions</small></button>
@@ -122,6 +123,7 @@ block='''<section class="tabpage" id="page-private">
         <p id="qf-v99-import-status" class="tiny" aria-live="polite">Sign in with MFA before importing local filing history.</p>
         <div id="qf-v99-hub-result" aria-live="polite"></div>
         <div id="qf-v100-hub-result" aria-live="polite"></div>
+        <div id="qf-v110-hub-result" aria-live="polite"></div>
       </section>
       </div>
       <div id="qf-v93-legacy-compat" hidden aria-hidden="true">
@@ -294,6 +296,7 @@ block='''<section class="tabpage" id="page-private">
       <div id="qf-v98-brief" class="qf-v95-host" aria-live="polite"></div>
       <div id="qf-v99-brief" class="qf-v95-host" aria-live="polite"></div>
       <div id="qf-v100-brief" class="qf-v95-host" aria-live="polite"></div>
+      <div id="qf-v110-brief" class="qf-v95-host" aria-live="polite"></div>
       <div class="pane" id="qf-v95-journal"><div class="section-title"><h3>Session research history</h3><button type="button" class="btn sm" id="qf-v95-journal-clear">Clear session list</button></div>
         <p class="tiny">Last eight completed assessment summaries in this authenticated browser session. No account values, holdings, or raw market prices are saved. This list is not a cloud archive and resets on refresh or logout.</p><div id="qf-v95-session-history" aria-live="polite"></div></div>
       <div class="pane qf-v96-saved" id="qf-v96-archive"><div class="section-title"><h3>Saved research archive</h3><button type="button" class="btn primary" id="qf-v96-save" disabled>Save current assessment</button></div><p class="tiny">Saved explicitly to existing MFA-protected private notes; persists across browser sessions. Stores a short conclusion and method count only—not holdings, account balances, market prices, or a full report. Deletion is permanent.</p><p class="tiny" id="qf-v96-archive-status">Owner-only archive</p><div id="qf-v96-saved-list" aria-live="polite"></div></div>
@@ -443,6 +446,10 @@ qfv9_css="""
 #private-signed .qf-v99-import input[type=file]{max-width:100%;min-width:200px}
 #private-signed .qf-v99-shell .table-wrap{overflow-x:auto}
 #private-signed .qf-v99-shell td{max-width:260px;overflow-wrap:anywhere}
+#private-signed .qf-v110-panel{margin-top:16px;border-left:4px solid #205e76;background:#fbfdfe}
+#private-signed .qf-v110-panel .table-wrap{overflow-x:auto;margin:12px 0}
+#private-signed .qf-v110-panel p{font-size:12px;line-height:1.6}
+#private-signed .qf-v110-panel th{white-space:normal}
 /* V9.4 cross-security evidence and policy stability; same shared research run */
 #private-signed .qf-v95-host{max-width:1200px;margin:20px auto}
 #private-signed .qf-v95-shell{border:1px solid #ccdcd6;background:#f7faf8;border-radius:14px;padding:18px}
@@ -498,7 +505,7 @@ for slot, file in [('/* QF_MODEL */','model.js'),('/* QF_APP */','app.js'),('/* 
  text=(src/'site'/file).read_text(encoding="utf-8")
  if file=='private.js':
   # Bundled alongside the existing private script: still only three CSP-protected scripts.
-  text=(src/'site/private_ideas_v70.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_allocation_v74.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_value_v73.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_v72.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_guide_v79.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_center_v84.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_candidate_v85.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_factor_scenarios_v86.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_french_factors_v87.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_orchestrator_v91.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_os_v90.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_review_v92.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_brief_v93.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_investment_intelligence_v94.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_portfolio_validation_v95.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_intelligence_v96.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_pit_validation_v97.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_sec_coverage_v98.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_archived_sec_v99.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_archive_quality_v100.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_multimarket.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_forecast_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_walkforward_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_diagnostics_v66.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_integrity_v67.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_robustness_v68.js').read_text(encoding='utf-8')+'\n'+text
+  text=(src/'site/private_ideas_v70.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_allocation_v74.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_value_v73.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_v72.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_guide_v79.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_center_v84.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_candidate_v85.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_factor_scenarios_v86.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_french_factors_v87.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_orchestrator_v91.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_os_v90.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_review_v92.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_brief_v93.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_investment_intelligence_v94.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_portfolio_validation_v95.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_intelligence_v96.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_pit_validation_v97.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_sec_coverage_v98.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_archived_sec_v99.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_archive_quality_v100.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_historical_panel_v110.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_multimarket.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_forecast_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_walkforward_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_diagnostics_v66.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_integrity_v67.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_robustness_v68.js').read_text(encoding='utf-8')+'\n'+text
  if file=='app.js':
   assert text.count('/* QF_SEC_DATA */ null')==1
   # Bundle pure SEC analytics in the existing public app script. CSP remains 3 hashes.
