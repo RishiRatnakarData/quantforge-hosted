@@ -2,14 +2,14 @@
 (function () {
 'use strict';
 const $=id=>document.getElementById(id);
-let guideReportV79=null, linkedResearchBriefV93=null, linkedResearchIntelligenceV94=null, linkedResearchDiagnosticsV95=null,linkedResearchProtocolV96=null,linkedPointInTimeV97=null,linkedSECCoverageV98=null,linkedArchivedSECV99=null,linkedArchiveQualityV100=null,linkedHistoricalPanelV110=null,linkedHistoricalRobustnessV120=null;
+let guideReportV79=null, linkedResearchBriefV93=null, linkedResearchIntelligenceV94=null, linkedResearchDiagnosticsV95=null,linkedResearchProtocolV96=null,linkedPointInTimeV97=null,linkedSECCoverageV98=null,linkedArchivedSECV99=null,linkedArchiveQualityV100=null,linkedHistoricalPanelV110=null,linkedHistoricalRobustnessV120=null,linkedHistoricalAttributionV130=null,linkedDecisionIntegrityV130=null;
 let researchSessionJournalV95=[];
 let importedSECArchiveV99=null,archiveFilenameV99='',archiveReadTokenV99=0;
 let privateDecisionCenterV84=null;
 let researchOSRunV90=0, researchOSInternalLoadV90=false;
 let candidateDossierV90=null,candidateQuoteV90=null,candidateFactorV91=null;
 function clearResearchOSV90(){
- linkedResearchBriefV93=null;linkedResearchIntelligenceV94=null;linkedResearchDiagnosticsV95=null;linkedResearchProtocolV96=null;linkedPointInTimeV97=null;linkedSECCoverageV98=null;linkedArchivedSECV99=null;linkedArchiveQualityV100=null;linkedHistoricalPanelV110=null;
+ linkedResearchBriefV93=null;linkedResearchIntelligenceV94=null;linkedResearchDiagnosticsV95=null;linkedResearchProtocolV96=null;linkedPointInTimeV97=null;linkedSECCoverageV98=null;linkedArchivedSECV99=null;linkedArchiveQualityV100=null;linkedHistoricalPanelV110=null;linkedHistoricalRobustnessV120=null;linkedHistoricalAttributionV130=null;linkedDecisionIntegrityV130=null;
  if(!privateState){importedSECArchiveV99=null;archiveFilenameV99='';archiveReadTokenV99++;
   const file=$('qf-v99-file');if(file)file.value='';}
  if(typeof refreshConnectedResearchV93==='function')refreshConnectedResearchV93();
@@ -403,9 +403,37 @@ function renderHistoricalRobustnessV120(){
  for(const id of ['qf-v120-hub-result','qf-v120-brief']){const node=$(id);if(node)node.innerHTML=html;}
  const lab=$('qf-v120-lab-insight');if(lab)lab.textContent='V12.0 historical sensitivity: '+status;
 }
+function renderDecisionIntegrityV130(){
+ let attribution=null,integrity=null;
+ if(privateState&&linkedResearchBriefV93){
+  try{
+   attribution=window.QFPrivateHistoricalAttributionV130.study(linkedHistoricalPanelV110);
+   integrity=window.QFPrivateDecisionIntegrityV130.assess({
+    brief:linkedResearchBriefV93,historical:linkedHistoricalPanelV110,
+    robustness:linkedHistoricalRobustnessV120,attribution,portfolio:linkedResearchDiagnosticsV95
+   });
+  }catch(err){integrity={ready:false,reason:String(err.message||err).slice(0,120)};}
+ }
+ linkedHistoricalAttributionV130=attribution;
+ linkedDecisionIntegrityV130=integrity;
+ const status=integrity?.ready?integrity.classification.replace(/-/g,' '):
+  integrity?'Integrity assessment unavailable: '+safe(integrity.reason):
+  'Run the Research Hub and import the SEC archive to inspect the connected evidence.';
+ const tags=integrity?.ready?integrity.gates.map(g=>'<div class="qf-v130-gate"><strong>'+safe(g.key.replace(/([A-Z])/g,' $1'))+'</strong><span class="qf-v130-state">'+safe(g.status)+'</span><p>'+safe(g.detail)+'</p></div>').join(''):'';
+ const attr=attribution?.ready?'<p><strong>Historical window attribution:</strong> '+safe(attribution.windowsEvaluated)+' complete windows; '+safe(attribution.outcomes.outperform)+' beat their same-period benchmark, '+safe(attribution.outcomes.underperform)+' underperformed, '+safe(attribution.outcomes.ties)+' matched. Sampled-window maximum drawdown: '+safe((100*attribution.outcomes.modelMaxDrawdown).toFixed(2))+'% (screen) versus '+safe((100*attribution.outcomes.benchmarkMaxDrawdown).toFixed(2))+'% (benchmark).</p>':
+  '<p>Historical outcome attribution withheld until every filing and price window is eligible.</p>';
+ const next=integrity?.ready?'<ul>'+integrity.followUps.map(x=>'<li>'+safe(x)+'</li>').join('')+'</ul>':'';
+ const content='<section class="qf-v95-shell qf-v130-console" aria-label="Consolidated investment research integrity">'+
+  '<div class="qf-v95-heading"><span class="eyebrow">V13.0 · INTEGRATED EVIDENCE REVIEW</span><h3>Research integrity and historical context</h3><p><strong>'+safe(status)+'</strong> · Readiness is an evidence-quality classification, not investment confidence.</p></div>'+
+  (integrity?.ready?'<div class="qf-v130-gates">'+tags+'</div>'+attr+'<details><summary>Research follow-ups and evaluation limits</summary>'+next+'<p class="tiny">'+safe(integrity.statement)+'</p></details>':'<p class="tiny">Historical results are never invented from missing data.</p>')+
+  '<p class="tiny">No trade requests are generated. All historical comparisons use the currently supported universe, omit delistings and distributions, and must not be interpreted as a predictive track record.</p></section>';
+ for(const id of ['qf-v130-hub-result','qf-v130-brief']){const node=$(id);if(node)node.innerHTML=content;}
+ const lab=$('qf-v130-lab-insight');if(lab)lab.textContent='V13.0 integrated evidence: '+status;
+}
 function refreshConnectedResearchV93(){
  renderHistoricalPanelV110();
  renderHistoricalRobustnessV120();
+ renderDecisionIntegrityV130();
  renderArchiveQualityV100();
  renderInvestmentIntelligenceV94();
  renderResearchDiagnosticsV95();
@@ -1907,7 +1935,9 @@ $('qf-v93-brief-export').addEventListener('click',()=>{
   archivedSECv99:linkedArchivedSECV99?window.QFPrivateArchivedSECValidationV99.exportSafe(linkedArchivedSECV99):null,
   secArchiveReadinessV100:linkedArchiveQualityV100?window.QFPrivateArchiveQualityV100.exportSafe(linkedArchiveQualityV100):null,
   historicalComparisonV110:linkedHistoricalPanelV110?window.QFPrivateHistoricalPanelV110.exportSafe(linkedHistoricalPanelV110):null,
-  historicalSensitivityV120:linkedHistoricalRobustnessV120?window.QFPrivateHistoricalRobustnessV120.exportSafe(linkedHistoricalRobustnessV120):null});
+  historicalSensitivityV120:linkedHistoricalRobustnessV120?window.QFPrivateHistoricalRobustnessV120.exportSafe(linkedHistoricalRobustnessV120):null,
+  historicalAttributionV130:linkedHistoricalAttributionV130?window.QFPrivateHistoricalAttributionV130.exportSafe(linkedHistoricalAttributionV130):null,
+  researchIntegrityV130:linkedDecisionIntegrityV130?window.QFPrivateDecisionIntegrityV130.exportSafe(linkedDecisionIntegrityV130):null});
 });
 for(const id of ['qf-v93-briefing','qf-v93-lab-status'])$(id).addEventListener('click',e=>{
  const b=e.target.closest('[data-v93-method]');
