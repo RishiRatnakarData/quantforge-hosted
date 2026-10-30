@@ -33,7 +33,7 @@ def test_v91_preserves_existing_models_and_authorization():
 
 def test_v91_provenance_visible_with_escaping_and_existing_policy_unchanged():
     app = source("web/site/private.js")
-    assert 'V9.1 model execution and data provenance' in app
+    assert 'Model execution and data provenance' in app
     assert "safe(m.detail)" in app and "safe(m.source)" in app
     assert "private-v90-run" in source("tools/build_unified_site.py")
     policy = source("web/site/private_research_os_v90.js")

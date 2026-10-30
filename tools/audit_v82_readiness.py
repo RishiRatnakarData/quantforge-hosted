@@ -20,6 +20,7 @@ class Analyzer(HTMLParser):
         super().__init__(convert_charrefs=True)
         self.ids = {}
         self.nav = {}
+        self.private_exits = []
         self.links = []
         self.scripts = 0
 
@@ -27,7 +28,11 @@ class Analyzer(HTMLParser):
         attr = dict(attrs)
         if "id" in attr:
             self.ids[attr["id"]] = self.ids.get(attr["id"], 0) + 1
-        if tag == "button" and attr.get("data-page"):
+        if tag == "button" and "qf-private-exit" in attr.get("class", "").split():
+            # The private workspace has its own route back to the public Overview.
+            # It is not a duplicate button in the public navigation menu.
+            self.private_exits.append(attr.get("data-page"))
+        elif tag == "button" and attr.get("data-page"):
             self.nav[attr["data-page"]] = self.nav.get(attr["data-page"], 0) + 1
         if tag == "a" and attr.get("href"):
             self.links.append(attr["href"])
@@ -60,6 +65,7 @@ def audit(repo: Path):
     for route in PUBLIC_ROUTES:
         assert main.ids.get("page-" + route) == 1, f"Public route {route} missing or duplicated"
         assert main.nav.get(route) == 1, f"Public nav {route} missing or duplicated"
+    assert main.private_exits == ["overview"], "One private-to-public exit to Overview is required"
     assert main.ids.get("qf-v82-case-study") == 1
     assert main.ids.get("private-mfa-code") == 1
     assert main.ids.get("private-signed") == 1

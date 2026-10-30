@@ -7,7 +7,7 @@ from pathlib import Path
 root=Path(__file__).resolve().parents[1]
 src=root/'web'
 html=(src/'site/site.template.html').read_text(encoding="utf-8")
-nav='<div class="qf-nav-section qf-private-nav-section" role="group" aria-label="Account access"><span class="nav-caption">Your account</span><button class="nav-btn" data-page="private">Private workspace</button></div>'
+nav='<div class="qf-nav-section qf-private-nav-section" role="group" aria-label="Account access"><span class="nav-caption">Your account</span><button class="nav-btn" data-page="private">Private workspace</button><button class="nav-btn qf-private-exit" data-page="overview">Public research</button></div>'
 html=html.replace('</nav>',nav+'</nav>',1)
 block='''<section class="tabpage" id="page-private">
   <div class="pagehead"><h1>Private workspace</h1><p id="private-status">Private · Sign in required</p><p class="tiny">Personal holdings, market-history analysis, and company valuation. Sign-in and authenticator verification required.</p></div>
@@ -37,14 +37,14 @@ block='''<section class="tabpage" id="page-private">
   <div id="private-signed" hidden>
     <div class="controls"><span class="mini">Private portfolio · authenticated</span><button class="btn sm" id="private-logout">Sign out</button></div>
     <nav class="private-nav" aria-label="Private workspace sections">
-      <details class="private-nav-group" role="group" aria-label="Decision Center" open><summary class="private-nav-title">01 · Decision Center</summary><div class="private-nav-actions"><button class="active" data-private-tab="decision">Research dashboard</button></div></details>
-      <details class="private-nav-group" role="group" aria-label="Discover and Compare"><summary class="private-nav-title">02 · Discover &amp; Compare</summary><div class="private-nav-actions"><button data-private-tab="ideas">Company screening</button><button data-private-tab="candidate">Company &amp; factor tests</button></div></details>
-      <details class="private-nav-group" role="group" aria-label="Research Lab"><summary class="private-nav-title">03 · Advanced Research</summary><div class="private-nav-actions"><button data-private-tab="lab">All methods &amp; audits</button><button data-private-tab="valuation">Valuation &amp; scenarios</button><button data-private-tab="research">Historical market data</button><button data-private-tab="optimization">Risk &amp; optimization</button><button data-private-tab="backtest">Backtesting</button><button data-private-tab="walkforward">Walk-forward &amp; robustness</button></div></details>
-      <details class="private-nav-group" role="group" aria-label="Portfolio and Saved Research"><summary class="private-nav-title">04 · Portfolio &amp; Reports</summary><div class="private-nav-actions"><button data-private-tab="home">Portfolio overview</button><button data-private-tab="trade">Virtual trade scenarios</button><button data-private-tab="settings">Briefings &amp; saved notes</button></div></details>
+      <details class="private-nav-group" role="group" aria-label="Decision Center" open><summary class="private-nav-title">01 · Decision Center</summary><div class="private-nav-actions"><button class="active" data-private-tab="decision">Research summary</button></div></details>
+      <details class="private-nav-group" role="group" aria-label="Discover and Compare"><summary class="private-nav-title">02 · Companies</summary><div class="private-nav-actions"><button data-private-tab="ideas">Find &amp; screen companies</button><button data-private-tab="candidate">Company &amp; factor analysis</button></div></details>
+      <details class="private-nav-group" role="group" aria-label="Research Methods"><summary class="private-nav-title">03 · Research Methods</summary><div class="private-nav-actions"><button data-private-tab="lab">Methods &amp; evidence audits</button><button data-private-tab="valuation">Valuation &amp; scenarios</button><button data-private-tab="research">Historical market data</button><button data-private-tab="optimization">Risk &amp; optimization</button><button data-private-tab="backtest">Backtesting</button><button data-private-tab="walkforward">Walk-forward &amp; robustness</button></div></details>
+      <details class="private-nav-group" role="group" aria-label="Portfolio and Saved Research"><summary class="private-nav-title">04 · Portfolio &amp; Reports</summary><div class="private-nav-actions"><button data-private-tab="home">Portfolio overview</button><button data-private-tab="trade">Portfolio scenarios</button><button data-private-tab="settings">Reports &amp; saved research</button></div></details>
     </nav>
     <div id="qf-v93-research-ribbon" class="qf-v93-ribbon" role="status" aria-live="polite">
-      <div class="qf-v93-ribbon-copy"><strong id="qf-v93-ribbon-title">Research workflow · No current assessment</strong><span class="tiny" id="qf-v93-ribbon-detail">Select investments and run an assessment to connect the Research Lab and briefing.</span></div>
-      <div class="controls"><button type="button" class="btn sm" id="qf-v93-ribbon-assess">Research Hub</button><button type="button" class="btn sm" id="qf-v93-ribbon-brief" disabled>Open briefing</button></div>
+      <div class="qf-v93-ribbon-copy"><strong id="qf-v93-ribbon-title">Research workflow · No current assessment</strong><span class="tiny" id="qf-v93-ribbon-detail">Select companies and run research to connect your findings and reports.</span></div>
+      <div class="controls"><button type="button" class="btn sm" id="qf-v93-ribbon-assess">Decision Center</button><button type="button" class="btn sm" id="qf-v93-ribbon-brief" disabled>Open briefing</button></div>
     </div>
     <section class="pane qf-v140-launch" aria-label="Private research workflow readiness">
       <div class="qf-v140-top"><div><span class="eyebrow">RESEARCH WORKFLOW</span><h3>What is ready, and what comes next?</h3></div><span id="qf-v140-progress" class="qf-v140-progress">0 / 5</span></div>
@@ -53,7 +53,7 @@ block='''<section class="tabpage" id="page-private">
       <div class="controls"><button type="button" class="btn primary" id="qf-v140-next" disabled>Open next research step</button><button type="button" class="btn sm" data-private-tab="settings">Research briefing</button></div>
       <details class="qf-v140-acceptance"><summary>Live browser acceptance checklist (not yet independently verified)</summary>
       <p class="tiny">Automated tests and Cloudflare HTML verification cannot prove that authenticated provider workflows work. Complete these steps in a real browser, without sharing credentials or brokerage account data.</p>
-      <ol class="tiny"><li>Sign in and complete MFA from a fresh private session.</li><li>Open Portfolio and confirm authorized holdings and market quotes load without an error.</li><li>Select 2–5 companies by name, load matching market data, and run one complete Research Hub assessment.</li><li>Confirm built-in SEC fundamentals work in standard research. If testing the optional local filing archive, inspect withheld dates in Advanced Research.</li><li>Open Research Lab and Briefing; confirm consistent candidate, model counts, and evidence status.</li><li>Save and delete a research archive note, then sign out and confirm protected data disappear. Test persistence after a separate sign-in.</li></ol>
+      <ol class="tiny"><li>Sign in and complete MFA from a fresh private session.</li><li>Open Portfolio and confirm authorized holdings and market quotes load without an error.</li><li>Select 2–5 companies by name, load matching market data, and run one complete Decision Center assessment.</li><li>Confirm built-in SEC fundamentals work in standard research. If testing the optional local filing archive, inspect withheld dates in Advanced Research.</li><li>Open Research Lab and Briefing; confirm consistent candidate, model counts, and evidence status.</li><li>Save and delete a research archive note, then sign out and confirm protected data disappear. Test persistence after a separate sign-in.</li></ol>
       <p class="tiny">These are manual tests; this checklist does not automatically mark them passed.</p>
       <div class="qf-v150-acceptance" id="qf-v150-acceptance" aria-label="Owner-entered live acceptance results">
         <h4>Record actual browser checks</h4>
@@ -97,7 +97,7 @@ block='''<section class="tabpage" id="page-private">
       <div id="qf-v120-lab-insight" class="tiny" aria-live="polite"></div>
       <div id="qf-v130-lab-insight" class="tiny" aria-live="polite"></div>
       <p id="qf-v140-lab-insight" class="tiny" aria-live="polite"></p>
-      <div class="controls qf-v93-lab-tools"><button type="button" class="btn" data-private-tab="decision">Return to Research Hub</button><button type="button" class="btn" data-private-tab="settings">View research briefing</button></div>
+      <div class="controls qf-v93-lab-tools"><button type="button" class="btn" data-private-tab="decision">Return to Decision Center</button><button type="button" class="btn" data-private-tab="settings">View research briefing</button></div>
       <div class="qf-v9-lab-grid">
         <button type="button" data-private-tab="candidate"><strong>Company &amp; factor research</strong><small>SEC fundamentals, downside risk, market ETF beta, independent FF3 regressions</small></button>
         <button type="button" data-private-tab="valuation"><strong>Valuation &amp; scenario modeling</strong><small>Cash-flow assumptions, financial statements and observed-price ratios</small></button>
@@ -115,7 +115,7 @@ block='''<section class="tabpage" id="page-private">
     </section>
     <section class="private-view" data-private-view="decision">
       <div class="pane qf-v9-shell qf-v92-workspace" id="private-decision-os-v90">
-        <span class="eyebrow">PRIVATE RESEARCH · UNIFIED DECISION CENTER</span><h2>Your investment decision dashboard</h2>
+        <span class="eyebrow">PRIVATE INVESTMENT RESEARCH</span><h2>Decision Center</h2>
         <p class="qf-v160-intro">A single visual view of company health, valuation, downside risk, portfolio fit and historical strategy evidence. The existing research engine runs the available tests together; open Advanced Research when you want the underlying methods.</p>
         <div id="qf-v160-decision-center" class="qf-v160-center" aria-label="Unified evidence-based investment dashboard" aria-live="polite"><p class="tiny">Choose your investments and run the complete assessment. The dashboard will compile the eligible research automatically.</p></div>
         <details id="qf-v160-setup" class="qf-v160-setup" open><summary>Choose investments and adjust research preferences</summary>
@@ -165,7 +165,7 @@ block='''<section class="tabpage" id="page-private">
       </div></div>
     </section>
     <section class="private-view" data-private-view="candidate" hidden>
-      <div class="pane"><span class="eyebrow">RESEARCH LAB · SINGLE COMPANY</span><h2>Company &amp; Factor Research</h2>
+      <div class="pane"><span class="eyebrow">RESEARCH METHODS · SINGLE COMPANY</span><h2>Company &amp; Factor Research</h2>
       <p class="tiny">Expert methods and charts are collected here. The Decision Center uses eligible results automatically without requiring you to operate every model.</p>
         <section class="qf-v85-candidate" id="private-candidate-v85" aria-labelledby="private-candidate-title-v85">
           <span class="eyebrow">SINGLE-INVESTMENT RESEARCH</span><h3 id="private-candidate-title-v85">Candidate risk, valuation and portfolio scenarios</h3>
@@ -184,7 +184,7 @@ block='''<section class="tabpage" id="page-private">
           <div id="private-candidate-output-v85" aria-live="polite" role="status" class="qf-v85-output"><p class="tiny">Load market history, then choose a candidate to examine.</p></div>
           <div id="private-v86-output" aria-live="polite" class="qf-v86-output"></div>
           <section class="qf-v87-study" aria-labelledby="private-v87-title">
-            <span class="eyebrow">INDEPENDENT RESEARCH FACTORS · V8.7</span>
+            <span class="eyebrow">INDEPENDENT RESEARCH FACTORS</span>
             <h3 id="private-v87-title">Fama–French three-factor model validation</h3>
             <p class="tiny">Import the official <strong>daily</strong> three-factor CSV (not monthly) from the <a href="https://mba.tuck.dartmouth.edu/pages/faculty/Ken.French/data_library.html" target="_blank" rel="noopener noreferrer">Kenneth French Data Library</a>. Download the daily CSV ZIP, extract the CSV, then choose it here. The file is read inside this authenticated browser session only; it is not uploaded or stored. Source authenticity is not automatically verified.</p>
             <div class="formgrid"><div class="field"><label for="private-v87-factor-file">Extracted daily FF3 research-factor CSV</label><input type="file" id="private-v87-factor-file" accept=".csv,.txt,text/csv,text/plain" /></div></div>
@@ -315,8 +315,8 @@ block='''<section class="tabpage" id="page-private">
       <div class="pane"><h3>Company comparison</h3><div id="private-peers"></div></div>
     </section>
     <section class="private-view" data-private-view="settings" hidden>
-      <h2>Research Briefing &amp; Notes</h2><p class="qf-private-section-intro">The briefing uses the latest completed Research Hub assessment and the exact same research methods and sources. Nothing is recalculated or submitted to a brokerage when you open it.</p>
-      <section class="pane qf-v93-brief-intro" aria-label="Connected research report"><div class="qf-v93-row"><div><span class="eyebrow">CONNECTED WORKFLOW</span><h3>Investment research briefing</h3><p class="tiny" id="qf-v93-brief-status">No current linked assessment. Run an automated assessment first.</p></div><button class="btn" type="button" data-private-tab="decision">Return to Research Hub</button></div>
+      <h2>Research Briefing &amp; Notes</h2><p class="qf-private-section-intro">The briefing uses the latest completed Decision Center assessment and the exact same research methods and sources. Nothing is recalculated or submitted to a brokerage when you open it.</p>
+      <section class="pane qf-v93-brief-intro" aria-label="Connected research report"><div class="qf-v93-row"><div><span class="eyebrow">CONNECTED WORKFLOW</span><h3>Investment research briefing</h3><p class="tiny" id="qf-v93-brief-status">No current linked assessment. Run an automated assessment first.</p></div><button class="btn" type="button" data-private-tab="decision">Return to Decision Center</button></div>
       <p id="qf-v140-brief-insight" class="tiny" aria-live="polite"></p>
       <div id="qf-v93-briefing" aria-live="polite"><p class="tiny">Once an assessment is complete, the executive findings, conflicts, data coverage, method record, and next research actions will be available here.</p></div>
       <div id="qf-v94-intelligence-brief" class="qf-v94-intelligence" aria-live="polite"></div>
@@ -333,7 +333,7 @@ block='''<section class="tabpage" id="page-private">
       <div class="controls"><button class="btn primary" type="button" id="qf-v93-brief-refresh" disabled>Refresh linked briefing</button><button class="btn" type="button" id="qf-v93-brief-export" disabled>Export evidence briefing (JSON)</button></div></section>
       <div class="pane" id="private-guide-card-v79">
         <div class="section-title"><h3>Optional session overview</h3><span class="mini">Private · educational decision support</span></div>
-        <p class="tiny">For an overview of available work that has not yet been included in an automated Research Hub assessment, use this secondary session summary. It is separate from the linked briefing and cannot issue a candidate recommendation.</p>
+        <p class="tiny">For an overview of available work that has not yet been included in an automated Decision Center assessment, use this secondary session summary. It is separate from the linked briefing and cannot issue a candidate recommendation.</p>
         <div class="formgrid" style="margin-top:12px">
           <div class="field"><label for="private-guide-horizon-v79">When could you need this money?</label><select id="private-guide-horizon-v79"><option value="unknown">Not sure yet</option><option value="short">Within 3 years</option><option value="medium">3–10 years</option><option value="long">More than 10 years</option></select></div>
           <div class="field"><label for="private-guide-comfort-v79">How would a large temporary loss affect you?</label><select id="private-guide-comfort-v79"><option value="unknown">Not sure yet</option><option value="low">I could not comfortably absorb it</option><option value="medium">I could tolerate some loss</option><option value="high">I understand substantial losses are possible</option></select></div>
@@ -394,6 +394,21 @@ qfv9_css="""
 #private-signed .qf-v9-legacy summary{cursor:pointer;font-weight:700;color:#1b5d45}
 #private-signed .private-nav{grid-template-columns:repeat(5,minmax(0,1fr))}
 #private-signed .private-nav-group{min-width:0}
+
+/* Consolidated private navigation and decision-center emphasis. */
+#private-signed>.private-nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;align-items:start;margin:15px 0 14px}
+#private-signed>.private-nav>.private-nav-group{min-width:0;width:auto;border:1px solid #d5e4de;border-radius:11px;background:#fbfdfb;padding:9px 11px}
+#private-signed .private-nav-title{cursor:pointer;font-weight:740;font-size:12px;line-height:1.5}
+#private-signed .private-nav-actions{display:grid;gap:4px;margin-top:8px}
+#private-signed .private-nav-actions button{width:100%;text-align:left;min-height:34px;border-radius:7px}
+#private-signed .qf-v160-center{margin-top:16px}
+#private-signed .qf-v160-gray{background:#edf1f2;color:#43535c;border-color:#cfd7db}
+#private-signed .qf-v160-signal .qf-v160-light{white-space:normal;text-align:center}
+#private-signed .qf-v160-hero p{max-width:70ch}
+#private-signed .qf-v140-launch{margin-top:13px}
+@media(max-width:1080px){#private-signed>.private-nav{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:580px){#private-signed>.private-nav{grid-template-columns:1fr}}
+
 #private-signed .private-nav .private-nav-group button{white-space:normal}
 @media(min-width:1220px){#private-signed>.private-nav{display:flex;flex-direction:column}#private-signed>.private-nav>.private-nav-group{width:100%}}
 @media(max-width:1200px){#private-signed .private-nav{grid-template-columns:repeat(3,minmax(0,1fr))}}

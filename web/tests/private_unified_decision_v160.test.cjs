@@ -17,12 +17,12 @@ test('full eligible and positive evidence yields a legible green screening signa
 test('a missing core method withholds score even when others look strong',()=>{
  const b=brief();b.evidence=b.evidence.filter(x=>x.key!=='fundamentals');
  const r=center.summarize({brief:b,integrity:integrity(),workflow:workflow()});
- assert.equal(r.signal,'red');assert.equal(r.alignment,null);assert.deepEqual(r.requiredMissing,['fundamentals']);
+ assert.equal(r.signal,'gray');assert.equal(r.alignment,null);assert.deepEqual(r.requiredMissing,['fundamentals']);
 });
 test('missing optional historical archive never becomes complete-green',()=>{
  const i=integrity();i.classification='evidence-limited';
  const r=center.summarize({brief:brief(),integrity:i,workflow:{...workflow(),state:'evidence-limited'}});
- assert.equal(r.ready,true);assert.equal(r.signal,'green');assert.equal(r.classification,'evidence-limited');assert.ok(r.notes.some(x=>/historical/i.test(x)));
+ assert.equal(r.ready,true);assert.equal(r.signal,'amber');assert.equal(r.classification,'evidence-limited');assert.ok(r.notes.some(x=>/historical/i.test(x)));
 });
 test('required model block dominates attractive support signals',()=>{
  const b=brief();b.blocked=true;b.mandatoryMissing=['Portfolio risk'];
@@ -52,4 +52,11 @@ test('safe export retains only aggregate method status, not personal or market d
 test('module is pure and cannot upload or submit orders',()=>{
  const src=fs.readFileSync(path.join(__dirname,'../site/private_unified_decision_v160.js'),'utf8');
  for(const forbidden of ['fetch(', 'localStorage', 'sessionStorage', 'XMLHttpRequest', 'private/trade', 'WebSocket('])assert.ok(!src.includes(forbidden),forbidden);
+});
+
+test('missing evidence is neutral and does not impersonate a measured loss',()=>{
+ const b=brief();b.evidence=b.evidence.filter(x=>x.key!=='downside');
+ const r=center.summarize({brief:b,integrity:integrity()});
+ assert.equal(r.signal,'gray');assert.equal(r.alignment,null);
+ assert.equal(r.domains.find(x=>x.key==='downside').label,'Not evaluated');
 });

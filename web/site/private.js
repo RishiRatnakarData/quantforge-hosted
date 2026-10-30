@@ -59,24 +59,24 @@ function renderResearchOSV90(result,variants){
   portfolio:privateState,quotes:quoted,history:historySeries,selection:researchSelection,
   snapshot:window.QFPublishedSEC,symbol:linkedResearchBriefV93.symbol,
   asOf:review.asOf||new Date().toISOString(),limit:review.constraints.maxDrawdown,feeBps:10
- });}catch(err){console.warn('V9.6 additional research unavailable:',String(err.message||err).slice(0,100));}
+ });}catch(err){console.warn('additional research unavailable:',String(err.message||err).slice(0,100));}
  linkedPointInTimeV97=null;
  try{linkedPointInTimeV97=window.QFPrivatePointInTimeV97.replay({
   snapshot:window.QFPublishedSEC,history:historySeries,selection:researchSelection,
   candidate:linkedResearchBriefV93.symbol,train:126,step:21,maxDrawdown:review.constraints.maxDrawdown,feeBps:10
- });}catch(err){console.warn('V9.7 filing-timeline validation unavailable:',String(err.message||err).slice(0,100));}
+ });}catch(err){console.warn('filing-timeline validation unavailable:',String(err.message||err).slice(0,100));}
  linkedSECCoverageV98=null;
  try{linkedSECCoverageV98=window.QFPrivateSECCoverageV98.run({
   snapshot:window.QFPublishedSEC,history:historySeries,selection:researchSelection,
   candidate:linkedResearchBriefV93.symbol,train:126,step:21
- });}catch(err){console.warn('V9.8 SEC issuer coverage unavailable:',String(err.message||err).slice(0,100));}
+ });}catch(err){console.warn('SEC issuer coverage unavailable:',String(err.message||err).slice(0,100));}
  linkedArchivedSECV99=null;
  if(importedSECArchiveV99){
   try{linkedArchivedSECV99=window.QFPrivateArchivedSECValidationV99.run({
     archive:importedSECArchiveV99,snapshot:window.QFPublishedSEC,
     history:historySeries,selection:researchSelection,candidate:linkedResearchBriefV93.symbol,
     train:126,step:21,maxDrawdown:review.constraints.maxDrawdown,feeBps:10
-  });}catch(err){console.warn('V9.9 local archive audit unavailable:',String(err.message||err).slice(0,100));}
+  });}catch(err){console.warn('local archive audit unavailable:',String(err.message||err).slice(0,100));}
  }
  researchSessionJournalV95.unshift({
   date:String(review.asOf||'').slice(0,10),symbol:String(review.symbol||'').slice(0,20),
@@ -98,16 +98,16 @@ function renderResearchOSV90(result,variants){
   '<p class="tiny">'+safe(cmp.reason)+' This comparison is withheld rather than filled with estimates.</p>';
  const caution=review.con.length?review.con:review.flags;
  out.innerHTML='<section class="qf-v92-report" aria-label="Investment research assessment">'+
-  '<div class="qf-v92-hero"><div class="qf-v92-row"><span class="eyebrow">V9.3 · LINKED INVESTMENT RESEARCH</span><span class="qf-v92-readiness">'+safe(review.readiness)+'</span></div><h3>'+safe(review.action)+'</h3><p>'+safe(review.reason)+'</p><p class="tiny">'+safe(review.symbol)+' · Research as of '+safe(review.asOf||'unavailable')+' · '+safe(review.policy)+' · No automatic trades</p></div>'+
+  '<div class="qf-v92-hero"><div class="qf-v92-row"><span class="eyebrow">LINKED INVESTMENT RESEARCH</span><span class="qf-v92-readiness">'+safe(review.readiness)+'</span></div><h3>'+safe(review.action)+'</h3><p>'+safe(review.reason)+'</p><p class="tiny">'+safe(review.symbol)+' · Research as of '+safe(review.asOf||'unavailable')+' · '+safe(review.policy)+' · No automatic trades</p></div>'+
   '<div class="qf-v92-metrics" aria-label="Evidence summary"><div><strong>'+review.observed+' / '+review.total+'</strong><span>Evidence areas available</span></div><div><strong>'+safe(result.orchestration?.completed??0)+' / '+safe(result.orchestration?.total??0)+'</strong><span>Models completed</span></div><div><strong>'+review.dimensionConcerns+'</strong><span>Areas with cautions</span></div><div><strong>'+safe(result.orchestration?.failed??0)+'</strong><span>Model failures</span></div></div>'+
   '<div class="qf-v92-twin"><section class="qf-v92-panel"><h4>Evidence in favor</h4>'+list(review.pro,'No favorable company-specific research screens verified.')+'</section><section class="qf-v92-panel"><h4>Risks and objections</h4>'+list(caution,'No completed screen crossed its caution threshold; unmeasured risks remain.')+'</section></div>'+
   '<div class="qf-v92-core"><section><div class="qf-v92-heading"><h4>How the evidence lines up</h4><span class="tiny">Company vs portfolio sources are identified separately</span></div><div class="qf-v92-evidence-grid">'+cells+'</div></section>'+
   '<section><div class="qf-v92-heading"><h4>Compare the investments you selected</h4><span class="tiny">Identical observed sample · historical risk only</span></div>'+table+'</section></div>'+
   '<details class="qf-v92-more"><summary>What might change this assessment?</summary>'+list(review.next,'Reassess price and filing freshness, concentration limits and business-specific valuation assumptions.')+'</details>'+
   '<details class="qf-v92-more"><summary>Evidence conflicts and decision rules</summary>'+list(review.flags,'No specific detected conflict; this is not evidence of investment safety.')+'<p class="tiny">Hard constraints and unavailable required inputs can block action. Other evidence is interpreted by source and scope, never counted as independent votes or calibrated probabilities. Portfolio strategy results do not establish single-company returns.</p></details>'+
-  '<details class="qf-v92-more"><summary>V9.1 model execution and data provenance</summary><p class="tiny">'+safe(result.orchestration?.completed??0)+' of '+safe(result.orchestration?.total??0)+' methods completed · '+safe(result.orchestration?.failed??0)+' failed · '+safe(result.orchestration?.unavailable??0)+' unavailable.</p><div class="qf-v9-grid">'+modelRows+'</div></details>'+
+  '<details class="qf-v92-more"><summary>Model execution and data provenance</summary><p class="tiny">'+safe(result.orchestration?.completed??0)+' of '+safe(result.orchestration?.total??0)+' methods completed · '+safe(result.orchestration?.failed??0)+' failed · '+safe(result.orchestration?.unavailable??0)+' unavailable.</p><div class="qf-v9-grid">'+modelRows+'</div></details>'+
   '<details class="qf-v92-more"><summary>Policy assumptions and important limitations</summary><p class="tiny">Risk approach: '+safe(review.constraints.risk)+' · Horizon: '+safe(review.constraints.horizon)+' · Single-name limit: '+(100*review.constraints.maxWeight).toFixed(0)+'% · Drawdown screen: '+(100*review.constraints.maxDrawdown).toFixed(0)+'%</p>'+list(review.limitations,'No further limitations recorded.')+'</details>'+
-  '<div class="qf-v93-related"><strong>One assessment, connected research</strong><p>Open the linked briefing for a readable report, or inspect the original model calculations in the Research Lab. Both refer to this assessment and its dated input universe.</p><div class="controls"><button type="button" class="btn primary" data-private-tab="settings">Read linked research briefing</button><button type="button" class="btn" data-private-tab="lab">Explore completed models</button><button type="button" class="btn" data-private-tab="trade">Hypothetical portfolio impact</button></div></div>'+
+  '<div class="qf-v93-related"><strong>One assessment, connected research</strong><p>Open the linked briefing for a readable report, or inspect the original model calculations in the Research Methods. Both refer to this assessment and its dated input universe.</p><div class="controls"><button type="button" class="btn primary" data-private-tab="settings">Read linked research briefing</button><button type="button" class="btn" data-private-tab="lab">Explore completed models</button><button type="button" class="btn" data-private-tab="trade">Hypothetical portfolio impact</button></div></div>'+
   '</section>';
 }
 
@@ -124,13 +124,13 @@ function renderInvestmentIntelligenceV94(){
   format(c.yearlyGrowthPercent),format(c.operatingMarginPercent),format(c.freeCashFlowMarginPercent)]);
  const movementRows=movement.ready?movement.rows.map(r=>[assetNames[r.symbol]||r.symbol,format(r.averagePeerCorrelation*100,1)]):[];
  const policyRows=policy.rows.map(r=>[r.risk,r.action,r.readiness]);
- const content='<section class="qf-v94-card" aria-label="Cross-investment intelligence"><div class="qf-v94-head"><div><span class="eyebrow">V9.4 · CONNECTED INVESTMENT INTELLIGENCE</span><h3>Compare evidence across your selected investments</h3><p>Published SEC financials, historical co-movement and risk-policy sensitivity, linked to this same Research Hub assessment. These comparisons cannot override its safety constraints or trigger trades.</p></div><span class="qf-v92-readiness">'+sec.available+'/'+intel.coverage.selected+' issuers with reported metrics</span></div>'+
+ const content='<section class="qf-v94-card" aria-label="Cross-investment intelligence"><div class="qf-v94-head"><div><span class="eyebrow">CONNECTED INVESTMENT INTELLIGENCE</span><h3>Compare evidence across your selected investments</h3><p>Published SEC financials, historical co-movement and risk-policy sensitivity, linked to this same Decision Center assessment. These comparisons cannot override its safety constraints or trigger trades.</p></div><span class="qf-v92-readiness">'+sec.available+'/'+intel.coverage.selected+' issuers with reported metrics</span></div>'+
   '<div class="qf-v94-grid"><section class="qf-v94-card"><h4>SEC company fundamentals</h4><p>Annual company filings from a separate dated public SEC snapshot; funds and unsupported securities remain unavailable.</p>'+table(['Investment','Fiscal year ended','Annual revenue','Revenue YoY','Operating margin','FCF margin'],secRows)+'<p class="qf-v94-neutral">Snapshot: '+safe(sec.asOf||'not available')+'. '+safe(sec.note)+'</p></section>'+
   '<section class="qf-v94-card"><h4>Historical co-movement</h4>'+(movement.ready?'<p>Observed matched period: '+safe(movement.period.start)+' to '+safe(movement.period.end)+' · '+safe(movement.period.sessions)+' price sessions. Average selected-pair correlation: '+safe(movement.averagePairCorrelation.toFixed(2))+'.</p>'+table(['Investment','Mean correlation to selected peers'],movementRows):'<p>'+safe(movement.reason)+'</p>')+'<p class="qf-v94-neutral">Historical correlation is not a portfolio allocation recommendation or a forecast.</p></section>'+
   '<section class="qf-v94-card"><h4>Does the policy choice change the outcome?</h4><p>Same data, three stated risk approaches; no forecast probabilities or optimized investment rankings.</p>'+table(['Risk approach','Conditional result','Evidence readiness'],policyRows)+'<p class="qf-v94-neutral">'+(policy.sameAction?'All three policy approaches return the same action.':'Changing the risk approach changes at least one action; examine the assumptions.')+' '+safe(policy.note)+'</p></section>'+
-  '<section class="qf-v94-card"><h4>Scope and limitations</h4><ul class="qf-v92-list">'+intel.boundaries.map(x=>'<li>'+safe(x)+'</li>').join('')+'</ul><p>Explore detailed source diagnostics in the Research Lab. The primary research decision still applies to '+safe(assetNames[intel.symbol]||intel.symbol)+'.</p></section></div></section>';
+  '<section class="qf-v94-card"><h4>Scope and limitations</h4><ul class="qf-v92-list">'+intel.boundaries.map(x=>'<li>'+safe(x)+'</li>').join('')+'</ul><p>Explore detailed source diagnostics in the Research Methods. The primary research decision still applies to '+safe(assetNames[intel.symbol]||intel.symbol)+'.</p></section></div></section>';
  for(const id of targets){const el=$(id);if(el)el.innerHTML=content;}
- if(lab)lab.textContent='V9.4 cross-investment evidence is linked: '+intel.coverage.issuersWithMetrics+'/'+intel.coverage.selected+' SEC issuer records; historical co-movement '+(movement.ready?'available':'unavailable')+'; three risk-policy checks completed. Review the Research Hub or Briefing for interpretation.';
+ if(lab)lab.textContent='cross-investment evidence is linked: '+intel.coverage.issuersWithMetrics+'/'+intel.coverage.selected+' SEC issuer records; historical co-movement '+(movement.ready?'available':'unavailable')+'; three risk-policy checks completed. Review the Decision Center or Briefing for interpretation.';
 }
 function renderResearchDiagnosticsV95(){
  const data=linkedResearchDiagnosticsV95;
@@ -155,7 +155,7 @@ function renderResearchDiagnosticsV95(){
    val(r.aggregateFcfScenarios?.[0]),val(r.aggregateFcfScenarios?.[1]),val(r.aggregateFcfScenarios?.[2])])):
    '<p class="tiny">'+safe(v.reason)+'</p>';
   box.innerHTML='<section class="qf-v95-shell" aria-label="Integrated portfolio, validation and valuation research">'+
-   '<div class="qf-v95-heading"><span class="eyebrow">INTEGRATED DECISION EVIDENCE · V9.5</span><h3>Portfolio exposure, past-only policy checks &amp; valuation context</h3><p>These diagnostics share the same selected market history, account context and Research Hub assessment; none can execute a trade or override a missing-data constraint.</p></div>'+
+   '<div class="qf-v95-heading"><span class="eyebrow">INTEGRATED DECISION EVIDENCE</span><h3>Portfolio exposure, past-only policy checks &amp; valuation context</h3><p>These diagnostics share the same selected market history, account context and Decision Center assessment; none can execute a trade or override a missing-data constraint.</p></div>'+
    '<div class="qf-v95-grid"><section class="qf-v95-panel"><h4>Actual virtual portfolio weights</h4>'+alloc+
    '<p class="tiny">'+safe(p.note||p.reason||'')+' '+(p.allocation?.concentrationFlag?'The largest position exceeds the selected single-name limit.':'')+'</p></section>'+
    '<section class="qf-v95-panel"><h4>Historical portfolio risk and cash-funded scenario</h4>'+portfolioRisk+
@@ -191,8 +191,8 @@ function renderResearchProtocolV96(){
   const allocation=a.ready?'<p>Baseline annualized volatility: '+pct(a.base.annualVolatility)+'; historical daily ES (95%): '+pct(a.base.dailyES95)+'.</p>'+table(['Cash-funded scenario','Candidate weight','Cash weight','Annual volatility','Change vs current','Daily ES 95%'],a.rows.map(w=>[
    '+'+w.additionalCashPercent+'%',w.ready?pct(w.newCandidateWeight):w.reason,w.ready?pct(w.newCashWeight):'Unavailable',w.ready?pct(w.annualVolatility):'Unavailable',w.ready?pct(w.deltaVolatility):'Unavailable',w.ready?pct(w.dailyES95):'Unavailable'])):
    '<p>'+safe(a.reason)+'</p>';
-  target.innerHTML='<section class="qf-v95-shell qf-v96-shell" aria-label="V9.6 connected decision research">'+
-   '<div class="qf-v95-heading"><span class="eyebrow">V9.6 · CONNECTED INVESTMENT RESEARCH</span><h3>Historical validation, company cash flow and portfolio scenarios</h3><p>All three analyses share the current assessment and cannot override required evidence constraints or execute an order.</p></div>'+
+  target.innerHTML='<section class="qf-v95-shell qf-v96-shell" aria-label="connected decision research">'+
+   '<div class="qf-v95-heading"><span class="eyebrow">CONNECTED INVESTMENT RESEARCH</span><h3>Historical validation, company cash flow and portfolio scenarios</h3><p>All three analyses share the current assessment and cannot override required evidence constraints or execute an order.</p></div>'+
    '<div class="qf-v95-grid"><section class="qf-v95-panel"><h4>Past-only risk rule versus passive holding</h4>'+policy+'<p class="tiny">'+safe(h.limitations?.join(' ')||h.reason)+'</p></section>'+
    '<section class="qf-v95-panel"><h4>Reported-company cash-flow quality</h4>'+flow+'<p class="tiny">'+safe(f.note||f.reason)+'</p></section>'+
    '<section class="qf-v95-panel"><h4>Portfolio-weighted cash-funded scenarios</h4>'+allocation+'<p class="tiny">'+safe(a.note||a.reason)+'</p></section>'+
@@ -200,7 +200,7 @@ function renderResearchProtocolV96(){
  }
  renderSavedResearchV96();
  const lab=$('qf-v96-lab-insight');
- if(lab)lab.textContent=data?'V9.6: historical transaction-cost evaluation '+(data.historical.ready?'ready':'unavailable')+'; SEC cash-flow coverage '+(data.financial.ready?data.financial.coverage:0)+'; full-portfolio scenarios '+(data.allocation.ready?'ready':'withheld')+'.':'V9.6 research validation connects after a completed Research Hub assessment.';
+ if(lab)lab.textContent=data?'historical transaction-cost evaluation '+(data.historical.ready?'ready':'unavailable')+'; SEC cash-flow coverage '+(data.financial.ready?data.financial.coverage:0)+'; full-portfolio scenarios '+(data.allocation.ready?'ready':'withheld')+'.':'research validation connects after a completed Decision Center assessment.';
 }
 function renderSavedResearchV96(){
  const list=$('qf-v96-saved-list'),save=$('qf-v96-save'),archive=$('qf-v96-archive-status');
@@ -253,13 +253,13 @@ function renderPointInTimeV97(){
   const outcome=analysis.ready?'<div class="qf-v92-metrics"><div><strong>'+pct(analysis.summary.netRuleReturn)+'</strong><span>Observed restricted-rule return, after fees</span></div><div><strong>'+pct(analysis.summary.netPassiveReturn)+'</strong><span>Observed passive comparison, after entry fee</span></div><div><strong>'+escape(analysis.summary.acceptedWindows)+'</strong><span>Invested evaluation windows</span></div><div><strong>'+escape(analysis.summary.cashWindows)+'</strong><span>Cash evaluation windows</span></div></div>':
    '<p class="tiny">Cumulative return and relative performance unavailable until every scheduled window has eligible, dated SEC facts.</p>';
   el.innerHTML='<section class="qf-v95-shell qf-v97-shell" aria-label="Historical SEC publication timeline and restricted decision audit">'+
-   '<div class="qf-v95-heading"><span class="eyebrow">V9.7 · HISTORICAL EVIDENCE CONTROL</span><h3>What could the model actually know then?</h3><p>Test a narrowly specified, filing-date-aware research rule. Reconstructed SEC facts are checked against the decision date; forward prices are used only to evaluate the result.</p></div>'+
+   '<div class="qf-v95-heading"><span class="eyebrow">HISTORICAL EVIDENCE CONTROL</span><h3>What could the model actually know then?</h3><p>Test a narrowly specified, filing-date-aware research rule. Reconstructed SEC facts are checked against the decision date; forward prices are used only to evaluate the result.</p></div>'+
    '<div class="qf-v97-coverage"><strong>'+escape(covered.eligible)+' / '+escape(covered.planned)+'</strong> eligible decision windows <span class="tiny">· '+escape(covered.withheld)+' withheld for insufficient historical filing evidence</span></div>'+status+outcome+
    (analysis.windows.length?'<details><summary>Inspect dated evaluation windows and SEC publication boundaries</summary>'+table(analysis.windows)+'<p class="tiny">Dates and accession identifiers are retained in the in-memory audit. The export is summary-only and contains no provider price series.</p></details>':'')+
-   '<p class="tiny">This is NOT a replay of the complete Investment Research Hub policy. Source snapshots retain limited recent filings; restatements and changing issuer coverage can restrict what is knowable. Does not establish predictive skill or suitability.</p>'+
+   '<p class="tiny">This is NOT a replay of the complete Investment Decision Center policy. Source snapshots retain limited recent filings; restatements and changing issuer coverage can restrict what is knowable. Does not establish predictive skill or suitability.</p>'+
    '<div class="controls"><button class="btn sm" type="button" data-private-tab="research">Check market data</button><button class="btn sm" type="button" data-private-tab="walkforward">Walk-forward methods</button></div></section>';
  }
- const lab=$('qf-v97-lab-insight');if(lab)lab.textContent=analysis?'V9.7 historical SEC filing audit: '+analysis.counts.eligible+' / '+analysis.counts.planned+' dated decisions eligible; '+(analysis.ready?'full restricted-rule comparison available':'overall return deliberately withheld')+'.':'V9.7 audit awaits a completed assessment with matching market history.';
+ const lab=$('qf-v97-lab-insight');if(lab)lab.textContent=analysis?'historical SEC filing audit: '+analysis.counts.eligible+' / '+analysis.counts.planned+' dated decisions eligible; '+(analysis.ready?'full restricted-rule comparison available':'overall return deliberately withheld')+'.':'audit awaits a completed assessment with matching market history.';
 }
 function renderSECCoverageV98(){
  const item=linkedSECCoverageV98;
@@ -274,14 +274,14 @@ function renderSECCoverageV98(){
   const node=$(id);if(!node)continue;
   if(!item){node.textContent='';continue;}
   node.innerHTML='<section class="qf-v95-shell qf-v98-shell" aria-label="SEC publication coverage across investments">'+
-   '<div class="qf-v95-heading"><span class="eyebrow">V9.8 · SEC EVIDENCE COVERAGE</span><h3>Which investments have historically verifiable filings?</h3><p>Analyze publication dates across every selected issuer using the same historical decision windows as the research audit. Missing evidence remains missing; partial coverage is never a historical performance ranking.</p></div>'+
+   '<div class="qf-v95-heading"><span class="eyebrow">SEC EVIDENCE COVERAGE</span><h3>Which investments have historically verifiable filings?</h3><p>Analyze publication dates across every selected issuer using the same historical decision windows as the research audit. Missing evidence remains missing; partial coverage is never a historical performance ranking.</p></div>'+
    (item.ready?'<p class="qf-v97-coverage"><strong>'+item.counts.eligible+' / '+item.counts.scheduled+'</strong> decision dates with complete cross-issuer evidence · '+item.counts.withheld+' dates withheld</p>'+table(item.rows):'<p><strong>Coverage unavailable.</strong> '+safe(item.reason)+'</p>')+
    '<p class="tiny">Existing public SEC data is a limited dated snapshot, not a comprehensive original-filing archive. Later restatements, changing issuer coverage and reporting differences prevent unsupported historical conclusions. An offline filing-version archive builder is included in the source tooling for future provenance expansion.</p>'+
-   '<div class="controls"><button class="btn sm" type="button" data-private-tab="research">Review market dates</button><button class="btn sm" type="button" data-private-tab="lab">Research Lab</button></div></section>';
+   '<div class="controls"><button class="btn sm" type="button" data-private-tab="research">Review market dates</button><button class="btn sm" type="button" data-private-tab="lab">Research Methods</button></div></section>';
  }
  const lab=$('qf-v98-lab-insight');if(lab)lab.textContent=item&&item.ready?
-  'V9.8 SEC evidence completeness: '+item.counts.eligible+' / '+item.counts.scheduled+' decision windows support all '+item.rows.length+' selected issuers. Missing data is never filled.':
-  'V9.8 SEC coverage awaits a completed assessment and aligned historical prices.';
+  'SEC evidence completeness: '+item.counts.eligible+' / '+item.counts.scheduled+' decision windows support all '+item.rows.length+' selected issuers. Missing data is never filled.':
+  'SEC coverage awaits a completed assessment and aligned historical prices.';
 }
 function renderArchivedSECV99(){
  const input=$('qf-v99-file');if(input)input.disabled=!privateState;
@@ -295,7 +295,7 @@ function renderArchivedSECV99(){
    String(r.laterRevisionWindows),r.primaryGap?r.primaryGap.reason+' · '+r.primaryGap.count:'No missing evidence'
   ].map(x=>'<td>'+safe(x)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
  const html=item?'<section class="qf-v95-shell qf-v99-shell" aria-label="Locally imported historical SEC revision evidence">'+
-  '<div class="qf-v95-heading"><span class="eyebrow">V9.9 · ARCHIVED FILING HISTORY</span><h3>Historical evidence from original filing versions</h3><p>Compare the imported, dated SEC history against the limited published snapshot using the same loaded investment universe and evaluation dates. No archive data is uploaded.</p></div>'+
+  '<div class="qf-v95-heading"><span class="eyebrow">ARCHIVED FILING HISTORY</span><h3>Historical evidence from original filing versions</h3><p>Compare the imported, dated SEC history against the limited published snapshot using the same loaded investment universe and evaluation dates. No archive data is uploaded.</p></div>'+
   (item.ready?'<p class="qf-v97-coverage"><strong>'+safe(item.counts.completeUniverse)+' / '+safe(item.counts.scheduled)+'</strong> dates with complete selected-issuer evidence · '+safe(item.counts.withheld)+' withheld</p>'+table(item.issuers)+
    '<p>'+ (item.performance.ready?'<strong>Restricted historical rule vs passive:</strong> '+safe((100*item.performance.ruleReturn).toFixed(1))+'% vs '+safe((100*item.performance.passiveReturn).toFixed(1))+'% (price-only, dated evaluation, stated fees).':
     '<strong>Historical comparison withheld:</strong> '+safe(item.performance.reason))+'</p>':
@@ -303,8 +303,8 @@ function renderArchivedSECV99(){
   '<p class="tiny">Revisions are selected using each decision date. SEC Company Facts may not contain every superseded original filing; the present-day company selection creates survivorship bias. This is not a full decision-engine backtest, forecast, or recommendation.</p></section>':'';
  for(const id of ['qf-v99-hub-result','qf-v99-brief']){const node=$(id);if(node)node.innerHTML=html;}
  const lab=$('qf-v99-lab-insight');if(lab)lab.textContent=item&&item.ready?
-  'V9.9 local archived filing evidence: '+item.counts.completeUniverse+' / '+item.counts.scheduled+' decision dates cover every selected issuer; '+(item.performance.ready?'restricted evaluation available.':'performance withheld.'):
-  'V9.9 archive audit: import a local SEC archive and run the Research Hub assessment to examine dated filing revisions.';
+  'local archived filing evidence: '+item.counts.completeUniverse+' / '+item.counts.scheduled+' decision dates cover every selected issuer; '+(item.performance.ready?'restricted evaluation available.':'performance withheld.'):
+  'archive audit: import a local SEC archive and run the Decision Center assessment to examine dated filing revisions.';
 }
 async function importArchivedSECV99(){
  const field=$('qf-v99-file'),file=field?.files?.[0];if(!file||!privateState)return;
@@ -346,10 +346,10 @@ function renderArchiveQualityV100(){
   item.selectedCount+' selected investments · '+item.archivedIssuers+' archived issuers.':
   item?'Archive coverage unavailable: '+item.reason:
   'Import a local SEC filing archive to inspect issuer and historical date coverage.';
- const lab=$('qf-v100-lab-insight');if(lab)lab.textContent='V10.0 filing history readiness: '+message;
+ const lab=$('qf-v100-lab-insight');if(lab)lab.textContent='filing history readiness: '+message;
  const table=item?.ready?'<div class="table-wrap"><table class="qf-v95-table"><thead><tr><th>Investment</th><th>Eligible checkpoints</th><th>First eligible</th><th>Most frequent gap</th></tr></thead><tbody>'+
   item.rows.map(r=>'<tr><td>'+safe(assetNames[r.symbol]||r.symbol)+' ('+safe(r.symbol)+')</td><td>'+r.eligible+' / '+r.scheduled+' ('+r.coveragePct+'%)</td><td>'+safe(r.firstEligible||'Not available')+'</td><td>'+safe(r.primaryGap?.reason||'None')+'</td></tr>').join('')+'</tbody></table></div>':'';
- const html=item?'<section class="qf-v95-shell qf-v99-shell" aria-label="Dated SEC archival data readiness"><div class="qf-v95-heading"><span class="eyebrow">V10.0 · HISTORICAL FILING COVERAGE</span><h3>How much historical SEC evidence is actually available?</h3><p>'+safe(message)+'</p></div>'+table+
+ const html=item?'<section class="qf-v95-shell qf-v99-shell" aria-label="Dated SEC archival data readiness"><div class="qf-v95-heading"><span class="eyebrow">HISTORICAL FILING COVERAGE</span><h3>How much historical SEC evidence is actually available?</h3><p>'+safe(message)+'</p></div>'+table+
   '<p class="tiny">January and July filing-date checkpoints only. Historical prices, dividends and delistings are not covered. Company Facts may omit superseded original filings; no point-in-time performance guarantee.</p></section>':'';
  for(const id of ['qf-v100-hub-result','qf-v100-brief']){const node=$(id);if(node)node.innerHTML=html;}
 }
@@ -378,10 +378,10 @@ function renderHistoricalPanelV110(){
  const recent=item?.ready&&item.performance.ready?columns(['Decision date','Next-close entry','Observed through','Selected company','After-fee period change'],item.performance.rows.map(x=>[
   x.decisionDate,x.executionDate,x.testThrough,x.selected?assetNames[x.selected]||x.selected:'Cash',pct(x.rulePeriodReturn)])):'';
  const html='<section class="qf-v95-shell qf-v110-panel" aria-label="Historical cross-company research validation">'+
-  '<div class="qf-v95-heading"><span class="eyebrow">V11.0 · POINT-IN-TIME COMPANY RESEARCH</span><h3>Did the filing-based research screen hold up historically?</h3><p>'+safe(status)+'</p></div>'+table+results+recent+
+  '<div class="qf-v95-heading"><span class="eyebrow">POINT-IN-TIME COMPANY RESEARCH</span><h3>Did the filing-based research screen hold up historically?</h3><p>'+safe(status)+'</p></div>'+table+results+recent+
   '<p class="tiny">Restricted historical rule: revenue growth and free-cash-flow margin must be positive, trailing drawdown must meet the selected limit, then the eligible company with highest FCF margin is selected. Only filings known by that date inform the choice. The benchmark rebalances equal weights every evaluated window. The study uses a present-day selected, surviving set; it is not the full automated decision policy, and no future performance is implied.</p></section>';
  for(const id of ['qf-v110-hub-result','qf-v110-brief']){const target=$(id);if(target)target.innerHTML=html;}
- const lab=$('qf-v110-lab-insight');if(lab)lab.textContent='V11.0 cross-company archival study: '+status+
+ const lab=$('qf-v110-lab-insight');if(lab)lab.textContent='cross-company archival study: '+status+
   (item?.ready?(item.performance.ready?' Observed strategy-versus-benchmark comparison available.':' Cumulative performance withheld.'):'');
 }
 function renderHistoricalRobustnessV120(){
@@ -395,17 +395,17 @@ function renderHistoricalRobustnessV120(){
  const status=result?.ready?result.eligibleScenarios+' / '+result.scenarioCount+
   ' predeclared evaluation settings have complete historical evidence.':
   result?'Historical robustness unavailable: '+safe(result.reason):
-  'Import the SEC archive and run a Research Hub assessment to test all 18 fixed sensitivity settings.';
+  'Import the SEC archive and run a Decision Center assessment to test all 18 fixed sensitivity settings.';
  const format=x=>typeof x==='number'&&Number.isFinite(x)?(100*x).toFixed(2)+'%':'Withheld';
  const table=result?.ready?'<div class="table-wrap"><table class="qf-v95-table"><thead><tr><th>Test sessions</th><th>Drawdown rule</th><th>Fee (bps/side)</th><th>Filing coverage</th><th>Observed model</th><th>Equal-weight</th></tr></thead><tbody>'+
   result.scenarios.map(r=>'<tr><td>'+safe(r.step)+'</td><td>'+safe(format(r.maxDrawdown))+'</td><td>'+safe(r.feeBps)+'</td><td>'+safe(r.covered)+' / '+safe(r.scheduled)+'</td><td>'+safe(format(r.ruleReturn))+'</td><td>'+safe(format(r.benchmarkReturn))+'</td></tr>').join('')+'</tbody></table></div>':'';
  const summary=result?.ready?'<p><strong>'+safe(result.eligibleScenarios)+' of '+safe(result.scenarioCount)+'</strong> scenarios available; '+safe(result.withheldScenarios)+' withheld. '+safe(result.interpretation)+'</p>':'';
  const html='<section class="qf-v95-shell qf-v120-sensitivity" aria-label="Point-in-time sensitivity and historical evidence reliability">'+
-  '<div class="qf-v95-heading"><span class="eyebrow">V12.0 · EVIDENCE RELIABILITY &amp; SENSITIVITY</span><h3>How sensitive are the historical findings to assumptions?</h3><p>'+safe(status)+'</p></div>'+summary+
+  '<div class="qf-v95-heading"><span class="eyebrow">EVIDENCE RELIABILITY &amp; SENSITIVITY</span><h3>How sensitive are the historical findings to assumptions?</h3><p>'+safe(status)+'</p></div>'+summary+
   (result?.ready?'<details><summary>Inspect all 18 predefined historical scenarios</summary>'+table+'</details>':'')+
   '<p class="tiny">Prespecified 10/21-session evaluation horizons, 15/25/35% historical drawdown screens and 0/10/30 bps per-side transaction fees. Compare results only within the same horizon. A present-day company universe and incomplete original filings limit inference. These results are descriptive and do not recommend a strategy or trigger trades.</p></section>';
  for(const id of ['qf-v120-hub-result','qf-v120-brief']){const node=$(id);if(node)node.innerHTML=html;}
- const lab=$('qf-v120-lab-insight');if(lab)lab.textContent='V12.0 historical sensitivity: '+status;
+ const lab=$('qf-v120-lab-insight');if(lab)lab.textContent='historical sensitivity: '+status;
 }
 function renderDecisionIntegrityV130(){
  let attribution=null,integrity=null;
@@ -422,17 +422,17 @@ function renderDecisionIntegrityV130(){
  linkedDecisionIntegrityV130=integrity;
  const status=integrity?.ready?integrity.classification.replace(/-/g,' '):
   integrity?'Integrity assessment unavailable: '+safe(integrity.reason):
-  'Run the Research Hub and import the SEC archive to inspect the connected evidence.';
+  'Run the Decision Center and import the SEC archive to inspect the connected evidence.';
  const tags=integrity?.ready?integrity.gates.map(g=>'<div class="qf-v130-gate"><strong>'+safe(g.key.replace(/([A-Z])/g,' $1'))+'</strong><span class="qf-v130-state">'+safe(g.status)+'</span><p>'+safe(g.detail)+'</p></div>').join(''):'';
  const attr=attribution?.ready?'<p><strong>Historical window attribution:</strong> '+safe(attribution.windowsEvaluated)+' complete windows; '+safe(attribution.outcomes.outperform)+' beat their same-period benchmark, '+safe(attribution.outcomes.underperform)+' underperformed, '+safe(attribution.outcomes.ties)+' matched. Sampled-window maximum drawdown: '+safe((100*attribution.outcomes.modelMaxDrawdown).toFixed(2))+'% (screen) versus '+safe((100*attribution.outcomes.benchmarkMaxDrawdown).toFixed(2))+'% (benchmark).</p>':
   '<p>Historical outcome attribution withheld until every filing and price window is eligible.</p>';
  const next=integrity?.ready?'<ul>'+integrity.followUps.map(x=>'<li>'+safe(x)+'</li>').join('')+'</ul>':'';
  const content='<section class="qf-v95-shell qf-v130-console" aria-label="Consolidated investment research integrity">'+
-  '<div class="qf-v95-heading"><span class="eyebrow">V13.0 · INTEGRATED EVIDENCE REVIEW</span><h3>Research integrity and historical context</h3><p><strong>'+safe(status)+'</strong> · Readiness is an evidence-quality classification, not investment confidence.</p></div>'+
+  '<div class="qf-v95-heading"><span class="eyebrow">INTEGRATED EVIDENCE REVIEW</span><h3>Research integrity and historical context</h3><p><strong>'+safe(status)+'</strong> · Readiness is an evidence-quality classification, not investment confidence.</p></div>'+
   (integrity?.ready?'<div class="qf-v130-gates">'+tags+'</div>'+attr+'<details><summary>Research follow-ups and evaluation limits</summary>'+next+'<p class="tiny">'+safe(integrity.statement)+'</p></details>':'<p class="tiny">Historical results are never invented from missing data.</p>')+
   '<p class="tiny">No trade requests are generated. All historical comparisons use the currently supported universe, omit delistings and distributions, and must not be interpreted as a predictive track record.</p></section>';
  for(const id of ['qf-v130-hub-result','qf-v130-brief']){const node=$(id);if(node)node.innerHTML=content;}
- const lab=$('qf-v130-lab-insight');if(lab)lab.textContent='V13.0 integrated evidence: '+status;
+ const lab=$('qf-v130-lab-insight');if(lab)lab.textContent='integrated evidence: '+status;
 }
 function renderWorkflowV140(){
  if(!window.QFPrivateWorkflowV140)return; // Legacy isolated DOM harness loads the main script without bundled helpers.
@@ -466,9 +466,9 @@ function compactResearchDetailsV140(){
  ];
  for(const spec of groups){
   const nodes=spec.ids.map(id=>$(id));
-  if(nodes.some(x=>!x))throw Error('V14.0 research detail container is missing.');
+  if(nodes.some(x=>!x))throw Error('research detail container is missing.');
   const host=document.querySelector('[data-private-view="'+spec.view+'"]');
-  if(!host)throw Error('V14.0 workspace view missing.');
+  if(!host)throw Error('workspace view missing.');
   const hubAnchor=spec.view==='decision'?$('qf-v99-hub-result').closest('.qf-v99-import'):null;
   const box=document.createElement('details');box.className='qf-v140-details';
   box.setAttribute('aria-label',spec.label);
@@ -493,24 +493,24 @@ function renderUnifiedDecisionV160(){
   integrity:linkedDecisionIntegrityV130,workflow:linkedWorkflowV140});
  linkedUnifiedDecisionV160=data;
  if(!privateState||!data.ready){
-  slot.innerHTML='<div class="qf-v160-hero"><div class="qf-v160-title"><div><span class="eyebrow">YOUR DECISION CENTER</span><h3>Everything important, one place</h3><p>Choose 2–5 companies, set your risk limits, and run the complete assessment.</p></div><span class="qf-v160-light">Not assessed</span></div><p class="tiny">No rating or recommendation is displayed until current source data and required research checks are available. Standard analysis uses the built-in SEC snapshot and authenticated market data; no upload is required.</p><div class="controls"><button class="btn sm" type="button" data-v160-route="ideas">Explore companies</button><button class="btn sm" type="button" data-v160-route="lab">Explore research methods</button></div></div>';
+  slot.innerHTML='<div class="qf-v160-hero"><div class="qf-v160-title"><div><span class="eyebrow">CURRENT RESEARCH ASSESSMENT</span><h3>Your research summary</h3><p>Choose 2–5 companies, set your risk limits, and run the complete assessment.</p></div><span class="qf-v160-light">Not assessed</span></div><p class="tiny">No rating or recommendation is displayed until current source data and required research checks are available. Standard analysis uses the built-in SEC snapshot and authenticated market data; no upload is required.</p><div class="controls"><button class="btn sm" type="button" data-v160-route="ideas">Explore companies</button><button class="btn sm" type="button" data-v160-route="lab">Inspect research methods</button></div></div>';
   return;
  }
- const light={green:'Supportive screening signals',amber:'Mixed or limited evidence',red:'Risk caution / blocked'}[data.signal];
+ const light={green:'Supportive historical screens',amber:'Mixed or limited evidence',red:'Measured risk caution',gray:'Incomplete evidence'}[data.signal]||'Evidence not evaluated';
  const score=data.alignment===null?'—':String(data.alignment);
  const rows=data.domains.map(d=>{
-  const tone=d.status==='supports'?'green':d.status==='cautions'?'red':'amber';
+  const tone=d.status==='supports'?'green':d.status==='cautions'?'red':d.status==='unavailable'?'gray':'amber';
   return '<article class="qf-v160-signal"><strong>'+safe(d.name)+'</strong><span class="qf-v160-light qf-v160-'+tone+'">'+safe(d.label)+'</span><p>'+safe(d.description)+'</p><details><summary class="tiny">Why this signal?</summary><p>'+safe(d.detail)+'</p><small>Method: '+safe(d.source)+'</small></details></article>';
  }).join('');
  const comparison=data.comparison.length?'<div class="qf-v160-compare"><h4>Selected investments · same-period historical context</h4>'+data.comparison.map(a=>{
   const amount=Math.min(100,Math.max(0,Math.abs(a.drawdown)));return '<div class="qf-v160-compare-row"><strong>'+safe(a.name)+'</strong><div><div class="qf-v160-bar"><span style="width:'+amount.toFixed(1)+'%"></span></div><small class="tiny">Peak-to-trough decline</small></div><span>'+safe(a.drawdown.toFixed(1))+'% decline</span></div>';
  }).join('')+'<p class="tiny">Observed price-only histories; samples can differ by period and do not predict future returns. Not a cross-company investment ranking.</p></div>':'';
  const list=(arr,none)=>'<ul>'+(arr.length?arr:[none]).map(x=>'<li>'+safe(x)+'</li>').join('')+'</ul>';
- slot.innerHTML='<div class="qf-v160-hero"><div class="qf-v160-title"><div><span class="eyebrow">YOUR DECISION CENTER · '+safe(data.asOf)+'</span><h3>'+safe(data.candidateName)+' ('+safe(data.candidate)+')</h3><p>'+data.universe+' selected investments · Screening assessment · No orders placed</p></div><span class="qf-v160-light qf-v160-'+data.signal+'">'+safe(light)+'</span></div>'+
-  '<div class="qf-v160-topline"><div class="qf-v160-dial" style="--score:'+(data.alignment===null?0:data.alignment)+'"><span>'+score+(data.alignment===null?'':'/100')+'</span><small>Evidence alignment'+(data.alignment===null?' withheld':' index')+'</small></div><div class="qf-v160-action"><span class="eyebrow">EXISTING RESEARCH ENGINE CONCLUSION</span><strong>'+safe(data.action)+'</strong><p>'+safe(data.reason)+'</p><p class="tiny"><strong style="display:inline;font-size:12px">Research methods completed: '+data.completed+'/'+data.total+'</strong> · '+(data.coverage===null?'Not measured':data.coverage+'%')+' execution coverage (not accuracy)</p><div class="qf-v160-meter" aria-label="Research method completion"><span style="width:'+(data.coverage||0)+'%"></span></div><p class="tiny">'+safe(data.classification.replace(/-/g,' '))+' · A green signal is a screening result, not a recommendation to trade.</p></div></div></div>'+
+ slot.innerHTML='<div class="qf-v160-hero"><div class="qf-v160-title"><div><span class="eyebrow">CURRENT RESEARCH ASSESSMENT · '+safe(data.asOf)+'</span><h3>'+safe(data.candidateName)+' ('+safe(data.candidate)+')</h3><p>'+data.universe+' selected investments · Screening assessment · No orders placed</p></div><span class="qf-v160-light qf-v160-'+data.signal+'">'+safe(light)+'</span></div>'+
+  '<div class="qf-v160-topline"><div class="qf-v160-dial" style="--score:'+(data.alignment===null?0:data.alignment)+'"><span>'+score+(data.alignment===null?'':'/100')+'</span><small>Historical screen alignment'+(data.alignment===null?' withheld':' index')+'</small></div><div class="qf-v160-action"><span class="eyebrow">EXISTING RESEARCH ENGINE CONCLUSION</span><strong>'+safe(data.action)+'</strong><p>'+safe(data.reason)+'</p><p class="tiny"><strong style="display:inline;font-size:12px">Methods completed: '+data.completed+'/'+data.total+'</strong> · '+(data.coverage===null?'Not measured':data.coverage+'%')+' method completion (not accuracy)</p><div class="qf-v160-meter" aria-label="Research method completion"><span style="width:'+(data.coverage||0)+'%"></span></div><p class="tiny">'+safe(data.classification.replace(/-/g,' '))+' · Screening colors summarize observed evidence; none is a recommendation to trade.</p></div></div></div>'+
   '<div class="qf-v160-grid">'+rows+'</div>'+comparison+
   '<div class="qf-v160-findings"><section class="qf-v160-compare"><h4>Key risks and disagreements</h4>'+list(data.reasons,'No specific objection was recorded; unknown risks remain.')+'</section><section class="qf-v160-compare"><h4>What to investigate next</h4>'+list(data.next,'Check evidence dates and assumptions before acting independently.')+'</section></div>'+
-  '<details class="qf-v160-method-trace"><summary>How these colors and percentages are calculated</summary><p class="tiny">'+safe(data.methodology)+'</p>'+list(data.notes,'')+'</details><div class="controls"><button type="button" class="btn sm" data-v160-route="lab">Open advanced models</button><button type="button" class="btn sm" data-v160-route="ideas">Screen other companies</button><button type="button" class="btn sm" data-v160-route="settings">View full report</button></div>';
+  '<details class="qf-v160-method-trace"><summary>How these colors and percentages are calculated</summary><p class="tiny">'+safe(data.methodology)+'</p>'+list(data.notes,'')+'</details><div class="controls"><button type="button" class="btn sm" data-v160-route="lab">Inspect research methods</button><button type="button" class="btn sm" data-v160-route="ideas">Compare companies</button><button type="button" class="btn sm" data-v160-route="settings">View full report</button></div>';
 }
 function arrangePrivateResearchV160(){
  if(typeof document.createElement!=='function'||!document.querySelector)return;
@@ -550,15 +550,15 @@ function refreshConnectedResearchV93(){
  if(brief)brief.disabled=!packet;
  const status=$('qf-v93-brief-status');if(status)status.textContent=packet?
   'Connected to '+packet.candidate+' · '+packet.universe.map(s=>s.name).join(', ')+' · '+packet.modelCoverage.completed+' completed methods.':
-  'No current linked assessment. Run the Research Hub workflow first.';
+  'No current linked assessment. Run the Decision Center workflow first.';
  for(const id of ['qf-v93-brief-refresh','qf-v93-brief-export']){const button=$(id);if(button)button.disabled=!packet;}
  const report=$('qf-v93-briefing');if(report&&!packet)report.textContent='No current briefing. Run investment research to generate a linked report; changing its inputs invalidates the previous briefing.';
  const lab=$('qf-v93-lab-status');
  if(lab){
-  if(!packet){lab.innerHTML='<strong>Connected research methods</strong><p class="tiny">No current assessment. The Research Lab remains available independently, but a new Research Hub run is needed to link all eligible methods.</p>';}
+  if(!packet){lab.innerHTML='<strong>Connected research methods</strong><p class="tiny">No current assessment. The Research Methods remains available independently, but a new Decision Center run is needed to link all eligible methods.</p>';}
   else{
    const relevant=packet.models.map(m=>'<div class="qf-v93-lab-tag"><strong>'+safe(m.name)+'</strong><small>'+safe(m.status)+' · '+safe(m.scope)+'</small><button class="text-link" type="button" data-v93-method="'+safe(m.route)+'">Open method</button></div>').join('');
-   lab.innerHTML='<strong>Methods from the current Research Hub assessment</strong><p class="tiny">'+safe(packet.candidate)+' · '+safe(packet.readiness)+' · '+packet.modelCoverage.completed+'/'+packet.modelCoverage.total+' completed. Open any method to review or revise its calculations.</p><div class="qf-v93-lab-tags">'+relevant+'</div>';
+   lab.innerHTML='<strong>Methods from the current Decision Center assessment</strong><p class="tiny">'+safe(packet.candidate)+' · '+safe(packet.readiness)+' · '+packet.modelCoverage.completed+'/'+packet.modelCoverage.total+' completed. Open any method to review or revise its calculations.</p><div class="qf-v93-lab-tags">'+relevant+'</div>';
   }
  }
 }
@@ -626,15 +626,15 @@ async function runResearchOSV90(){
    status.textContent='Stage 2/4: optimizing observed multi-asset allocations…';
    try{runOptimization();if(!current())return;
     record('optimization',optimizerResult?.symbols?.length===selected.length&&optimizerResult?.periodEnd===plan.period.end?'completed':'failed',
-     optimizerResult?.periodEnd===plan.period.end?'Computed constrained in-sample allocation; not an investment forecast.':'Optimizer did not produce a matching allocation. Inspect Research Lab.');
-   }catch(e){record('optimization','failed','Optimization was unavailable; review its settings in Research Lab.');}
+     optimizerResult?.periodEnd===plan.period.end?'Computed constrained in-sample allocation; not an investment forecast.':'Optimizer did not produce a matching allocation. Inspect Research Methods.');
+   }catch(e){record('optimization','failed','Optimization was unavailable; review its settings in Research Methods.');}
   }
   if(eligible('backtest')){
    status.textContent='Stage 2/4: comparing historical buy-and-hold and monthly rebalancing…';
    try{privateBacktest();if(!current())return;
     const success=!!$('private-backtest-output').querySelector('table');
     record('backtest',success?'completed':'failed',success?
-     'Historical equal-weight buy-and-hold and rebalancing comparison generated in Research Lab.':'Historical comparison did not complete; check capital and fee assumptions.');
+     'Historical equal-weight buy-and-hold and rebalancing comparison generated in Research Methods.':'Historical comparison did not complete; check capital and fee assumptions.');
    }catch(e){record('backtest','failed','Historical comparison could not be evaluated.');}
   }
   if(eligible('walkforward')){
@@ -642,7 +642,7 @@ async function runResearchOSV90(){
    try{runWalkforward();if(!current())return;
     record('walkforward',walkforwardResult?.end===plan.period.end&&walkforwardResult?.windows?.length>=2?'completed':'failed',
      walkforwardResult?.end===plan.period.end?`${walkforwardResult.windows.length} evaluated test windows; selected multi-asset universe.`:'Walk-forward did not produce eligible, matching test windows.');
-   }catch(e){record('walkforward','failed','Chronological evaluation failed; review Research Lab.');}
+   }catch(e){record('walkforward','failed','Chronological evaluation failed; review Research Methods.');}
   }
   if(walkforwardResult?.windows?.length>=3&&results.find(x=>x.key==='walkforward').status==='completed'){
    status.textContent='Stage 2/4: testing robustness and model sensitivities…';
@@ -666,7 +666,7 @@ async function runResearchOSV90(){
     }else record('proxy','failed','Candidate proxy and rolling-risk assessment were not produced.');
    }catch(e){
     if(!current())return;
-    record('candidate','failed','Company evidence acquisition or evaluation failed; review Research Lab.');
+    record('candidate','failed','Company evidence acquisition or evaluation failed; review Research Methods.');
     record('proxy','skipped','Candidate computation did not complete.');
     $('private-candidate-run-v85').disabled=false;
    }
@@ -695,7 +695,7 @@ async function runResearchOSV90(){
   renderResearchOSV90(engine.reconcile(assessment,results),variants);
   message('Automated evidence review completed. Partial failures are disclosed; no trade was placed.');
  }catch(e){
-  if(current())status.textContent='Research stopped without a new decision: '+String(e.message||e).slice(0,240)+'. Please inspect the Research Lab.';
+  if(current())status.textContent='Research stopped without a new decision: '+String(e.message||e).slice(0,240)+'. Please inspect the Research Methods.';
  }finally{if(current())button.disabled=false;}
 }
 
@@ -877,7 +877,7 @@ function renderFactorScenariosV86(r){
    v.scenarios.map(x=>[pct(x.growth),num(x.multipleRatio)+'×',pct(x.priceChange),money(x.impliedPrice)]))+
    note(v.assumptions);
  }else valuation='<p class="notice">'+safe(v.reason)+'</p>';
- out.innerHTML='<div class="qf-v86-report"><span class="eyebrow">DEEPER CANDIDATE RESEARCH · V8.6</span><h3>Market exposures, rolling downside and valuation sensitivity</h3>'+note('All figures below are descriptive, session-local, and use the currently loaded candidate; no model here places or proposes a trade.')+
+ out.innerHTML='<div class="qf-v86-report"><span class="eyebrow">DEEPER CANDIDATE RESEARCH</span><h3>Market exposures, rolling downside and valuation sensitivity</h3>'+note('All figures below are descriptive, session-local, and use the currently loaded candidate; no model here places or proposes a trade.')+
   '<h4>Explicit broad-market ETF comparison</h4>'+labels+'<h4>Historical downside diagnostics</h4>'+risk+
   '<h4>Observed-price valuation sensitivity (not fair value)</h4>'+valuation+
   '<h4>Methods and limitations</h4><ul class="tiny">'+r.limitations.map(x=>'<li>'+safe(x)+'</li>').join('')+'</ul></div>';
@@ -1660,7 +1660,7 @@ async function changeCapital(){
  }catch(e){message(e.message);}
 }
 
-/* V6.3: purely historical owner-only optimization; never invokes /trade or /capital. */
+/* purely historical owner-only optimization; never invokes /trade or /capital. */
 function optPct(x){return typeof x==='number'&&Number.isFinite(x)?(100*x).toFixed(2)+'%':'Unavailable';}
 function optSvgFrontier(points, equal, optimized){
  // A tight or degenerate volatility range is common when position caps bind.
@@ -1763,11 +1763,11 @@ $('private-opt-export').addEventListener('click',exportOptimization);
 for(const id of ['private-opt-objective','private-opt-cap'])$(id).addEventListener('change',()=>{optimizerResult=null;$('private-opt-export').disabled=true;$('private-opt-output').textContent='Settings changed. Calculate allocations to update the results.';$('private-opt-risk').textContent='';});
 
 
-/* V6.5: SEC scenario projections and past-only walk-forward evaluations. */
+/* SEC scenario projections and past-only walk-forward evaluations. */
 let walkforwardResult=null;
 /* V6.6: derived reports are ephemeral, not stored with virtual positions. */
 let forecastResultV66=null,forecastDiagnosticsV66=null,walkforwardDiagnosticsV66=null;
-/* V6.8: derived robustness scenarios are ephemeral and never alter saved portfolios. */
+/* derived robustness scenarios are ephemeral and never alter saved portfolios. */
 let robustnessResultV68=null;
 function clearV66Walkforward(){
  walkforwardDiagnosticsV66=null;
@@ -1860,7 +1860,7 @@ function runV66CostSensitivity(){
  }catch(e){$('private-wf-robustness-output').textContent=e.message;message(e.message);}
 }
 
-/* V6.8: comparative evaluation over identical dates, plus passive benchmark. */
+/* comparative evaluation over identical dates, plus passive benchmark. */
 function runV68Robustness(){
  if(!privateState||!walkforwardResult||!historySeries){message('Load investments and run Walk-forward before robustness checks.');return;}
  try{
@@ -2132,7 +2132,7 @@ $('private-guide-result-v79').addEventListener('click',e=>{
 $('private-history-load').addEventListener('click',loadHistory);
 $('private-history-days').addEventListener('change',()=>invalidateResearchHistory('Historical period changed. Load the new date range first.'));
 $('private-backtest-run').addEventListener('click',privateBacktest);
-/* V7.3: owner-only price/filing comparison; never calls brokerage order endpoints. */
+/* owner-only price/filing comparison; never calls brokerage order endpoints. */
 let valueBridgeRequestV73=0;
 async function loadValueBridgeV73(){
  const symbol=$('private-valuation-company').value;

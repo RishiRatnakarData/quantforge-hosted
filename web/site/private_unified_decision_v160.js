@@ -10,7 +10,7 @@ const domains=Object.freeze([
  {key:'portfolio',name:'Portfolio fit',weight:20,description:'Virtual exposure and chosen position-size limits'},
  {key:'walkforward',name:'Strategy resilience',weight:10,description:'Past-only strategy/benchmark evidence for the whole selection'}
 ]);
-const labels=Object.freeze({supports:'Supportive',mixed:'Mixed',cautions:'Caution',available:'Measured',unavailable:'Unavailable'});
+const labels=Object.freeze({supports:'Supportive',mixed:'Mixed',cautions:'Caution',available:'Measured',unavailable:'Not evaluated'});
 function empty(reason){return {schema:'quantforge.decision-center.v16.0',ready:false,signal:'unavailable',reason:str(reason),alignment:null,coverage:null,domains:[],comparison:[],next:[],notes:[],action:'Run a complete research assessment',methodology:'No score without eligible, matching evidence.'};}
 function summarize({brief,integrity,workflow}={}){
  if(!brief||brief.schema!=='quantforge.research-brief.v9.3'||!SYMBOL.test(brief.symbol)||
@@ -52,9 +52,10 @@ function summarize({brief,integrity,workflow}={}){
    symbol:a.symbol,name:str(a.name||a.symbol,70),change:a.priceChangePercent,drawdown:a.maxDrawdownPercent
   })):[];
  let signal='amber';
- if(blocked)signal='red';
+ if(requiredMissing.length>0)signal='gray';
+ else if(blocked)signal='red';
  else if(alignment!==null&&alignment<35)signal='red';
- else if(alignment!==null&&alignment>=70&&results.every(r=>['supports','mixed','cautions'].includes(r.status)))signal='green';
+ else if(alignment!==null&&alignment>=70&&integrity.classification==='evidence-complete'&&results.every(r=>['supports','mixed','cautions'].includes(r.status)))signal='green';
  const decision=str(brief.action,160);
  const reasons=[...(brief.cautions||[]),...(brief.conflicts||[])].filter(x=>typeof x==='string').slice(0,4).map(x=>str(x));
  const next=[];
@@ -71,11 +72,11 @@ function summarize({brief,integrity,workflow}={}){
  if(integrity.classification!=='evidence-complete')notes.push('Some extended historical SEC and robustness evidence is unavailable; this is not a green-light for investing.');
  notes.push('Company statements use SEC-derived data when present; market figures are observed-price studies, and scenario outputs are modeled.');
  return {schema:'quantforge.decision-center.v16.0',ready:true,signal,alignment,coverage,
-  scoreLabel:'Observed evidence alignment',candidate:brief.symbol,candidateName:str(brief.candidate||brief.symbol,80),
+  scoreLabel:'Historical screen alignment',candidate:brief.symbol,candidateName:str(brief.candidate||brief.symbol,80),
   asOf:str(brief.asOf||'Date unavailable',32),action:decision,reason:str(brief.reason,300),
   blocked,classification:integrity.classification,universe:brief.universe.length,
   completed,total:count,domains:results,comparison,reasons,next,notes,
-  requiredMissing,methodology:'Predeclared weights: fundamentals 25%, valuation 25%, downside 20%, portfolio fit 20%, multi-asset strategy 10%. Supports=100%, mixed=50%, cautions=0%; unavailable/available-only screens do not enter the directional denominator. Score withheld if core evidence is blocked or less than 40 weight-points are directional. Model coverage is completed/total, measured separately. A green screening light requires no mandatory block, all five directional categories, and alignment >=70; extended integrity is displayed separately and may still be limited. Neither index measures forecast accuracy or suitability.'};
+  requiredMissing,methodology:'Predeclared weights: fundamentals 25%, valuation 25%, downside 20%, portfolio fit 20%, multi-asset strategy 10%. Supports=100%, mixed=50%, cautions=0%; unavailable/available-only screens do not enter the directional denominator. Score withheld if core evidence is blocked or less than 40 weight-points are directional. Model coverage is completed/total, measured separately. A green screening light additionally requires evidence-complete integrity, no mandatory block, all five directional categories, and alignment >=70. Missing required evidence receives a neutral incomplete-evidence state rather than a measured-risk warning. Neither index measures forecast accuracy or suitability.'};
 }
 function exportSafe(r){
  if(!r?.ready)return {schema:'quantforge.decision-center-export.v16.0',ready:false};

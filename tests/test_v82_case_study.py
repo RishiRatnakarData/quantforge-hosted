@@ -220,6 +220,10 @@ def test_full_public_site_static_boundary_and_case_study_link():
     audit_script = ROOT / "tools/audit_v82_readiness.py"
     result = subprocess.run(
         [sys.executable, str(audit_script), "--repo", str(ROOT)],
-        capture_output=True, text=True, check=True,
+        capture_output=True, text=True, check=False,
+    )
+    assert result.returncode == 0, (
+        f"Static readiness audit exited {result.returncode}.\n"
+        f"STDOUT:\n{result.stdout}\nSTDERR:\n{result.stderr}"
     )
     assert "static readiness PASS" in result.stdout

@@ -416,6 +416,17 @@ main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
 #page-methods .qf-methods-guide>h2{font-size:clamp(19px,2vw,23px);margin:0 0 15px;color:#1b4335}
 #page-methods .qf-methods-guide .pane{margin-bottom:16px}
 #page-methods .qf-methods-guide .project-story{margin-top:0}
+
+/* Workspace focus: hide public research sections only while the private page is visible.
+   Account access and the explicit return-to-public action remain available. */
+.qf-private-exit{display:none!important}
+body:has(#page-private.active) .side .qf-nav-section:not(.qf-private-nav-section),
+body:has(#page-private.active) .side .qf-nav-fold,
+body:has(#page-private.active) .side .sidenote{display:none!important}
+body:has(#page-private.active) .side .qf-private-exit{display:flex!important}
+body:has(#page-private.active) .side{gap:12px}
+body:has(#page-private.active) .side .qf-private-nav-section{margin:0}
+@media(max-width:800px){body:has(#page-private.active) .side nav{display:flex;gap:7px;flex-wrap:wrap}}
 </style></head><body>
 <div class="app"><aside class="side"><div class="brand"><div class="mark">Q</div>quantforge</div><p class="qf-v83-owner"><span>Designed and developed by</span><strong>Rishi&nbsp;Ratnakar</strong></p><nav id="navigation" aria-label="Main navigation">
   <div class="qf-nav-section" role="group" aria-label="Financial research pages">
@@ -567,7 +578,7 @@ main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
   <div class="tech-step"><span class="eyebrow">03 / MODELS</span><strong>Quantify trade-offs</strong><small>Portfolio risk, constrained allocation, scenario DCF proxies, historical-momentum research and stress tests</small></div>
   <div class="tech-step"><span class="eyebrow">04 / EVALUATION</span><strong>Challenge the result</strong><small>Past-only fitting, out-of-sample windows, fees, passive benchmarks, leave-one-window-out robustness and research reports</small></div>
  </div><p class="tech-note">The public deployment hosts static demonstrations and a reviewed SEC snapshot. Market observations and personal virtual accounts are only accessed in authenticated private workflows.</p></div>
- <nav class="research-jumps" aria-label="Research methods sections"><a href="#systems-public-evidence">Reported SEC comparison</a><a href="#systems-optimization">Optimization</a><a href="#systems-walkforward">Walk-forward</a><a href="#systems-valuation">Forecasting</a><a href="#systems-screening">Investment screening</a><a href="#systems-code-evidence">Code and tests</a></nav>
+ <nav class="research-jumps" aria-label="Research methods sections"><a href="#systems-public-evidence">Reported SEC comparison</a><a href="#systems-optimization">Optimization</a><a href="#systems-validation">Walk-forward</a><a href="#systems-valuation">Forecasting</a><a href="#systems-ideas">Investment screening</a><a href="#systems-code-evidence">Code and tests</a></nav>
  <!-- QF V8.3 verified methodology atlas: methods already implemented and tested -->
 <section class="pane" id="qf-v83-method-atlas" aria-labelledby="qf-v83-method-title">
  <div class="section-title"><h3 id="qf-v83-method-title">Methods and mathematical implementation</h3><span class="mini">Algorithms · checks · source code</span></div>

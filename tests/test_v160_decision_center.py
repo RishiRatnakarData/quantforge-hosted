@@ -25,7 +25,7 @@ def test_advanced_analysis_keeps_all_existing_research_routes():
     ):
         assert f'data-private-tab="{route}"' in b
     assert b.count('class="private-nav-group"') == 4
-    for section in ("Decision Center", "Discover &amp; Compare", "Advanced Research", "Portfolio &amp; Reports"):
+    for section in ("Decision Center", "Companies", "Research Methods", "Portfolio &amp; Reports"):
         assert section in b
 
 
