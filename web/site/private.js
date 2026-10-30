@@ -2,7 +2,7 @@
 (function () {
 'use strict';
 const $=id=>document.getElementById(id);
-let guideReportV79=null, linkedResearchBriefV93=null, linkedResearchIntelligenceV94=null, linkedResearchDiagnosticsV95=null,linkedResearchProtocolV96=null,linkedPointInTimeV97=null,linkedSECCoverageV98=null,linkedArchivedSECV99=null,linkedArchiveQualityV100=null,linkedHistoricalPanelV110=null;
+let guideReportV79=null, linkedResearchBriefV93=null, linkedResearchIntelligenceV94=null, linkedResearchDiagnosticsV95=null,linkedResearchProtocolV96=null,linkedPointInTimeV97=null,linkedSECCoverageV98=null,linkedArchivedSECV99=null,linkedArchiveQualityV100=null,linkedHistoricalPanelV110=null,linkedHistoricalRobustnessV120=null;
 let researchSessionJournalV95=[];
 let importedSECArchiveV99=null,archiveFilenameV99='',archiveReadTokenV99=0;
 let privateDecisionCenterV84=null;
@@ -380,8 +380,32 @@ function renderHistoricalPanelV110(){
  const lab=$('qf-v110-lab-insight');if(lab)lab.textContent='V11.0 cross-company archival study: '+status+
   (item?.ready?(item.performance.ready?' Observed strategy-versus-benchmark comparison available.':' Cumulative performance withheld.'):'');
 }
+function renderHistoricalRobustnessV120(){
+ const active=!!(privateState&&importedSECArchiveV99&&linkedResearchBriefV93);
+ let result=null;
+ if(active){try{result=window.QFPrivateHistoricalRobustnessV120.analyze({
+  archive:importedSECArchiveV99,snapshot:window.QFPublishedSEC,
+  history:historySeries,selection:researchSelection
+ });}catch(err){result={ready:false,reason:String(err.message||err).slice(0,120)};}}
+ linkedHistoricalRobustnessV120=result;
+ const status=result?.ready?result.eligibleScenarios+' / '+result.scenarioCount+
+  ' predeclared evaluation settings have complete historical evidence.':
+  result?'Historical robustness unavailable: '+safe(result.reason):
+  'Import the SEC archive and run a Research Hub assessment to test all 18 fixed sensitivity settings.';
+ const format=x=>typeof x==='number'&&Number.isFinite(x)?(100*x).toFixed(2)+'%':'Withheld';
+ const table=result?.ready?'<div class="table-wrap"><table class="qf-v95-table"><thead><tr><th>Test sessions</th><th>Drawdown rule</th><th>Fee (bps/side)</th><th>Filing coverage</th><th>Observed model</th><th>Equal-weight</th></tr></thead><tbody>'+
+  result.scenarios.map(r=>'<tr><td>'+safe(r.step)+'</td><td>'+safe(format(r.maxDrawdown))+'</td><td>'+safe(r.feeBps)+'</td><td>'+safe(r.covered)+' / '+safe(r.scheduled)+'</td><td>'+safe(format(r.ruleReturn))+'</td><td>'+safe(format(r.benchmarkReturn))+'</td></tr>').join('')+'</tbody></table></div>':'';
+ const summary=result?.ready?'<p><strong>'+safe(result.eligibleScenarios)+' of '+safe(result.scenarioCount)+'</strong> scenarios available; '+safe(result.withheldScenarios)+' withheld. '+safe(result.interpretation)+'</p>':'';
+ const html='<section class="qf-v95-shell qf-v120-sensitivity" aria-label="Point-in-time sensitivity and historical evidence reliability">'+
+  '<div class="qf-v95-heading"><span class="eyebrow">V12.0 · EVIDENCE RELIABILITY &amp; SENSITIVITY</span><h3>How sensitive are the historical findings to assumptions?</h3><p>'+safe(status)+'</p></div>'+summary+
+  (result?.ready?'<details><summary>Inspect all 18 predefined historical scenarios</summary>'+table+'</details>':'')+
+  '<p class="tiny">Prespecified 10/21-session evaluation horizons, 15/25/35% historical drawdown screens and 0/10/30 bps per-side transaction fees. Compare results only within the same horizon. A present-day company universe and incomplete original filings limit inference. These results are descriptive and do not recommend a strategy or trigger trades.</p></section>';
+ for(const id of ['qf-v120-hub-result','qf-v120-brief']){const node=$(id);if(node)node.innerHTML=html;}
+ const lab=$('qf-v120-lab-insight');if(lab)lab.textContent='V12.0 historical sensitivity: '+status;
+}
 function refreshConnectedResearchV93(){
  renderHistoricalPanelV110();
+ renderHistoricalRobustnessV120();
  renderArchiveQualityV100();
  renderInvestmentIntelligenceV94();
  renderResearchDiagnosticsV95();
@@ -1882,7 +1906,8 @@ $('qf-v93-brief-export').addEventListener('click',()=>{
   secCoverageV98:linkedSECCoverageV98?window.QFPrivateSECCoverageV98.exportSafe(linkedSECCoverageV98):null,
   archivedSECv99:linkedArchivedSECV99?window.QFPrivateArchivedSECValidationV99.exportSafe(linkedArchivedSECV99):null,
   secArchiveReadinessV100:linkedArchiveQualityV100?window.QFPrivateArchiveQualityV100.exportSafe(linkedArchiveQualityV100):null,
-  historicalComparisonV110:linkedHistoricalPanelV110?window.QFPrivateHistoricalPanelV110.exportSafe(linkedHistoricalPanelV110):null});
+  historicalComparisonV110:linkedHistoricalPanelV110?window.QFPrivateHistoricalPanelV110.exportSafe(linkedHistoricalPanelV110):null,
+  historicalSensitivityV120:linkedHistoricalRobustnessV120?window.QFPrivateHistoricalRobustnessV120.exportSafe(linkedHistoricalRobustnessV120):null});
 });
 for(const id of ['qf-v93-briefing','qf-v93-lab-status'])$(id).addEventListener('click',e=>{
  const b=e.target.closest('[data-v93-method]');

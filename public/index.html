@@ -987,6 +987,7 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
       <div id="qf-v99-lab-insight" class="tiny" aria-live="polite"></div>
       <div id="qf-v100-lab-insight" class="tiny" aria-live="polite"></div>
       <div id="qf-v110-lab-insight" class="tiny" aria-live="polite"></div>
+      <div id="qf-v120-lab-insight" class="tiny" aria-live="polite"></div>
       <div class="controls qf-v93-lab-tools"><button type="button" class="btn" data-private-tab="decision">Return to Research Hub</button><button type="button" class="btn" data-private-tab="settings">View research briefing</button></div>
       <div class="qf-v9-lab-grid">
         <button type="button" data-private-tab="candidate"><strong>Company &amp; factor research</strong><small>SEC fundamentals, downside risk, market ETF beta, independent FF3 regressions</small></button>
@@ -1039,7 +1040,7 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
         <p id="qf-v99-import-status" class="tiny" aria-live="polite">Sign in with MFA before importing local filing history.</p>
         <div id="qf-v99-hub-result" aria-live="polite"></div>
         <div id="qf-v100-hub-result" aria-live="polite"></div>
-        <div id="qf-v110-hub-result" aria-live="polite"></div>
+        <div id="qf-v120-hub-result" class="qf-v120-slot"></div><div id="qf-v110-hub-result" aria-live="polite"></div>
       </section>
       </div>
       <div id="qf-v93-legacy-compat" hidden aria-hidden="true">
@@ -1212,7 +1213,7 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
       <div id="qf-v98-brief" class="qf-v95-host" aria-live="polite"></div>
       <div id="qf-v99-brief" class="qf-v95-host" aria-live="polite"></div>
       <div id="qf-v100-brief" class="qf-v95-host" aria-live="polite"></div>
-      <div id="qf-v110-brief" class="qf-v95-host" aria-live="polite"></div>
+      <div id="qf-v120-brief" class="qf-v120-slot"></div><div id="qf-v110-brief" class="qf-v95-host" aria-live="polite"></div>
       <div class="pane" id="qf-v95-journal"><div class="section-title"><h3>Session research history</h3><button type="button" class="btn sm" id="qf-v95-journal-clear">Clear session list</button></div>
         <p class="tiny">Last eight completed assessment summaries in this authenticated browser session. No account values, holdings, or raw market prices are saved. This list is not a cloud archive and resets on refresh or logout.</p><div id="qf-v95-session-history" aria-live="polite"></div></div>
       <div class="pane qf-v96-saved" id="qf-v96-archive"><div class="section-title"><h3>Saved research archive</h3><button type="button" class="btn primary" id="qf-v96-save" disabled>Save current assessment</button></div><p class="tiny">Saved explicitly to existing MFA-protected private notes; persists across browser sessions. Stores a short conclusion and method count only—not holdings, account balances, market prices, or a full report. Deletion is permanent.</p><p class="tiny" id="qf-v96-archive-status">Owner-only archive</p><div id="qf-v96-saved-list" aria-live="polite"></div></div>
@@ -4344,9 +4345,9 @@ function study({archive,snapshot,history,selection,train=126,step=21,maxDrawdown
  for(let end=train-1;end+step<dates.length&&boundaries.length<80;end+=step)boundaries.push(end);
  if(boundaries.length<2)return fail('At least two independent evaluation windows are required.');
  const issuerCoverage=new Map(selection.map(s=>[s,{symbol:s,complete:0,withheld:0,laterVersion:0,gaps:new Map()}]));
- let cash=0,complete=0,changes=0,selectedCount=0,ruleWealth=1,benchmarkWealth=1,prior=null;
+ let cash=0,complete=0,changes=0,selectedCount=0,ruleWealth=1,benchmarkWealth=1;
  const steps=[];
- let lastBenchmarkWeights=null,benchmarkTrades=0;
+ let benchmarkTrades=0;
  for(const end of boundaries){
   const date=dates[end],raw=[];
   for(const s of selection){
@@ -4370,16 +4371,19 @@ function study({archive,snapshot,history,selection,train=126,step=21,maxDrawdown
   const next=dates[end+1],last=dates[end+step];
   const returns=Object.fromEntries(selection.map(s=>[s,history.closes[s][end+step]/history.closes[s][end+1]-1]));
   if(selection.some(s=>!finite(returns[s])||returns[s]<=-1))return fail('Invalid observed next-close evaluation return.');
-  const nextSymbol=chosen?chosen.symbol:null;
-  const turnover=prior===nextSymbol?0:prior&&nextSymbol?2:1;
-  const tradeCost=turnover*feeBps/10000;
-  // Equal weight benchmark is REBALANCED on each documented evaluation window.
+  // Both studies enter at the next close and liquidate at the test-window end.
+  // Each disjoint window is flat between observations: fees apply at both ends.
+  // The benchmark is equal-weight buy-and-hold WITHIN each interval, not a
+  // continuous, frictionless portfolio across omitted boundary sessions.
+  const turnover=chosen?2:0;
+  const transactionCost=feeBps/10000;
   const mean=selection.reduce((acc,s)=>acc+returns[s],0)/selection.length;
   const model=chosen?returns[chosen.symbol]:0;
-  const ruleFactor=(1-tradeCost)*(1+model),benchmarkFactor=(1+mean)*(1-(complete===1?feeBps/10000:0));
+  const ruleFactor=(1-transactionCost*turnover)*(1+model);
+  const benchmarkFactor=(1-2*transactionCost)*(1+mean);
   if(!finite(ruleFactor)||!finite(benchmarkFactor)||ruleFactor<=0||benchmarkFactor<=0)return fail('Historical return computation failed.');
   ruleWealth*=ruleFactor;benchmarkWealth*=benchmarkFactor;changes+=turnover;
-  prior=chosen?chosen.symbol:null;
+  benchmarkTrades+=2;
   steps.push({decisionDate:date,executionDate:next,testThrough:last,selected:chosen?.symbol||null,
    candidateCount:ranked.length,rulePeriodReturn:fix(ruleFactor-1),benchmarkPeriodReturn:fix(benchmarkFactor-1),
    winnerFiscalEnd:chosen?.fiscalEnd||null,winnerLatestFiled:chosen?.latestFiled||null});
@@ -4404,8 +4408,8 @@ function study({archive,snapshot,history,selection,train=126,step=21,maxDrawdown
    'Only available SEC Company Facts revisions are checked; original superseded filings may be missing.',
    'The cross-sectional rule is predefined for illustration, not a calibrated predictor or the complete Research Hub decision policy.',
    'Next-close price-only evaluation excludes dividends, bid-ask spread, slippage, taxes and corporate actions.',
-   'The benchmark is equal-weighted for each test interval, with illustrative proportional turnover fees for initial entry and weight resets; it omits boundary-session price moves.',
-   'Windows evaluate next-close through the end of each holdout; boundary-session returns are omitted for both alternatives.'
+   'The benchmark is equal-weight buy-and-hold within each test window. Both comparisons pay entry and exit fees; neither holds exposure during omitted boundary sessions.',
+   'Windows evaluate next-close through holdout end and liquidate at that end close. No overnight boundary-session exposure, dividends or financing returns are simulated.'
   ]};
 }
 function exportSafe(r){
@@ -4423,6 +4427,75 @@ function exportSafe(r){
 const api=Object.freeze({study,exportSafe});
 if(typeof module==='object'&&module.exports)module.exports=api;
 root.QFPrivateHistoricalPanelV110=api;
+})(typeof window!=='undefined'?window:globalThis);
+
+/* V12.0: predeclared historical sensitivity grid, not a tuned trading policy.
+ * Pure derived evidence; never accesses accounts, storage, or providers. */
+(function(root){
+'use strict';
+const finite=n=>typeof n==='number'&&Number.isFinite(n);
+const safe=s=>String(s||'Unavailable').slice(0,160);
+const thresholds=[.15,.25,.35],fees=[0,10,30],windows=[10,21];
+function analyze(inputs={}){
+ const study=root.QFPrivateHistoricalPanelV110?.study;
+ if(typeof study!=='function')return {ready:false,reason:'Historical model is missing.'};
+ if(!inputs||!inputs.archive||!inputs.snapshot||!inputs.history||!inputs.selection)
+  return {ready:false,reason:'Import a dated SEC archive and load selected investment price history.'};
+ const scenarios=[];
+ for(const step of windows){
+  for(const limit of thresholds){
+   for(const feeBps of fees){
+    const r=study({...inputs,train:126,step,maxDrawdown:limit,feeBps});
+    if(!r?.ready)return {ready:false,reason:safe(r?.reason),scenarios:[]};
+    const p=r.performance;
+    scenarios.push({step,maxDrawdown:limit,feeBps,
+     scheduled:r.coverage.scheduled,covered:r.coverage.complete,
+     performanceReady:!!p.ready,
+     ruleReturn:p.ready?p.modelReturn:null,benchmarkReturn:p.ready?p.equalWeightReturn:null,
+     spread:p.ready?Number((p.modelReturn-p.equalWeightReturn).toFixed(6)):null,
+     investedWindows:p.ready?p.investedWindows:null,
+     cashWindows:p.ready?p.cashWindows:null,
+     restriction:p.ready?null:safe(p.reason)});
+   }
+  }
+ }
+ const eligible=scenarios.filter(s=>s.performanceReady);
+ const incomplete=scenarios.length-eligible.length;
+ // Never choose or optimize a policy from the grid; report ALL assumptions.
+ const stable=eligible.length===scenarios.length;
+ const group=windows.map(step=>{
+  const rows=scenarios.filter(s=>s.step===step);
+  const ok=rows.filter(s=>s.performanceReady);
+  return {step,comparable:ok.length===rows.length,completeScenarios:ok.length,scheduledScenarios:rows.length,
+   positiveSpread:ok.filter(s=>s.spread>0).length,
+   negativeSpread:ok.filter(s=>s.spread<0).length,
+   noDifference:ok.filter(s=>s.spread===0).length,
+   minSpread:ok.length?Math.min(...ok.map(s=>s.spread)):null,
+   maxSpread:ok.length?Math.max(...ok.map(s=>s.spread)):null};
+ });
+ return {ready:true,fullComparisonReady:stable,scenarioCount:scenarios.length,
+  eligibleScenarios:eligible.length,withheldScenarios:incomplete,groups:group,scenarios,
+  interpretation:stable?'All predefined scenarios have full filing coverage. Outcome dispersion is descriptive, not a parameter recommendation.':
+   'At least one preset scenario is missing dated filing evidence. Do not compare or select strategies from available-only subsets.',
+  limitations:[
+   'All 18 settings are fixed before evaluation: 2 window lengths, 3 drawdown screens and 3 fee schedules.',
+   'Window lengths 10 and 21 have different horizons; do not rank their total returns against one another.',
+   'Current selected issuers remain survivorship-biased; historical delistings and universe changes are absent.',
+   'Not a statistical significance test, causal experiment, out-of-sample optimization or prediction.',
+   'Price-only outcomes omit distributions, delisting returns, spread, slippage, taxes and market impact.',
+   'Missing archival evidence withholds aggregate findings; no missing windows are silently dropped.'
+  ]};
+}
+function exportSafe(r){
+ if(!r||!r.ready)return {schema:'quantforge.research-robustness.v12.0',ready:false,reason:safe(r?.reason)};
+ return {schema:'quantforge.research-robustness.v12.0',ready:true,fullComparisonReady:r.fullComparisonReady,
+  scenarioCount:r.scenarioCount,eligibleScenarios:r.eligibleScenarios,withheldScenarios:r.withheldScenarios,
+  groups:r.groups.map(g=>({...g})),scenarios:r.scenarios.map(s=>({...s})),
+  interpretation:r.interpretation,limitations:r.limitations.slice()};
+}
+const api=Object.freeze({analyze,exportSafe});
+if(typeof module==='object'&&module.exports)module.exports=api;
+root.QFPrivateHistoricalRobustnessV120=api;
 })(typeof window!=='undefined'?window:globalThis);
 
 /* QuantForge private research: pure in-sample portfolio analytics.
@@ -5249,7 +5322,7 @@ root.QFPrivateHistoricalPanelV110=api;
 (function () {
 'use strict';
 const $=id=>document.getElementById(id);
-let guideReportV79=null, linkedResearchBriefV93=null, linkedResearchIntelligenceV94=null, linkedResearchDiagnosticsV95=null,linkedResearchProtocolV96=null,linkedPointInTimeV97=null,linkedSECCoverageV98=null,linkedArchivedSECV99=null,linkedArchiveQualityV100=null,linkedHistoricalPanelV110=null;
+let guideReportV79=null, linkedResearchBriefV93=null, linkedResearchIntelligenceV94=null, linkedResearchDiagnosticsV95=null,linkedResearchProtocolV96=null,linkedPointInTimeV97=null,linkedSECCoverageV98=null,linkedArchivedSECV99=null,linkedArchiveQualityV100=null,linkedHistoricalPanelV110=null,linkedHistoricalRobustnessV120=null;
 let researchSessionJournalV95=[];
 let importedSECArchiveV99=null,archiveFilenameV99='',archiveReadTokenV99=0;
 let privateDecisionCenterV84=null;
@@ -5627,8 +5700,32 @@ function renderHistoricalPanelV110(){
  const lab=$('qf-v110-lab-insight');if(lab)lab.textContent='V11.0 cross-company archival study: '+status+
   (item?.ready?(item.performance.ready?' Observed strategy-versus-benchmark comparison available.':' Cumulative performance withheld.'):'');
 }
+function renderHistoricalRobustnessV120(){
+ const active=!!(privateState&&importedSECArchiveV99&&linkedResearchBriefV93);
+ let result=null;
+ if(active){try{result=window.QFPrivateHistoricalRobustnessV120.analyze({
+  archive:importedSECArchiveV99,snapshot:window.QFPublishedSEC,
+  history:historySeries,selection:researchSelection
+ });}catch(err){result={ready:false,reason:String(err.message||err).slice(0,120)};}}
+ linkedHistoricalRobustnessV120=result;
+ const status=result?.ready?result.eligibleScenarios+' / '+result.scenarioCount+
+  ' predeclared evaluation settings have complete historical evidence.':
+  result?'Historical robustness unavailable: '+safe(result.reason):
+  'Import the SEC archive and run a Research Hub assessment to test all 18 fixed sensitivity settings.';
+ const format=x=>typeof x==='number'&&Number.isFinite(x)?(100*x).toFixed(2)+'%':'Withheld';
+ const table=result?.ready?'<div class="table-wrap"><table class="qf-v95-table"><thead><tr><th>Test sessions</th><th>Drawdown rule</th><th>Fee (bps/side)</th><th>Filing coverage</th><th>Observed model</th><th>Equal-weight</th></tr></thead><tbody>'+
+  result.scenarios.map(r=>'<tr><td>'+safe(r.step)+'</td><td>'+safe(format(r.maxDrawdown))+'</td><td>'+safe(r.feeBps)+'</td><td>'+safe(r.covered)+' / '+safe(r.scheduled)+'</td><td>'+safe(format(r.ruleReturn))+'</td><td>'+safe(format(r.benchmarkReturn))+'</td></tr>').join('')+'</tbody></table></div>':'';
+ const summary=result?.ready?'<p><strong>'+safe(result.eligibleScenarios)+' of '+safe(result.scenarioCount)+'</strong> scenarios available; '+safe(result.withheldScenarios)+' withheld. '+safe(result.interpretation)+'</p>':'';
+ const html='<section class="qf-v95-shell qf-v120-sensitivity" aria-label="Point-in-time sensitivity and historical evidence reliability">'+
+  '<div class="qf-v95-heading"><span class="eyebrow">V12.0 · EVIDENCE RELIABILITY &amp; SENSITIVITY</span><h3>How sensitive are the historical findings to assumptions?</h3><p>'+safe(status)+'</p></div>'+summary+
+  (result?.ready?'<details><summary>Inspect all 18 predefined historical scenarios</summary>'+table+'</details>':'')+
+  '<p class="tiny">Prespecified 10/21-session evaluation horizons, 15/25/35% historical drawdown screens and 0/10/30 bps per-side transaction fees. Compare results only within the same horizon. A present-day company universe and incomplete original filings limit inference. These results are descriptive and do not recommend a strategy or trigger trades.</p></section>';
+ for(const id of ['qf-v120-hub-result','qf-v120-brief']){const node=$(id);if(node)node.innerHTML=html;}
+ const lab=$('qf-v120-lab-insight');if(lab)lab.textContent='V12.0 historical sensitivity: '+status;
+}
 function refreshConnectedResearchV93(){
  renderHistoricalPanelV110();
+ renderHistoricalRobustnessV120();
  renderArchiveQualityV100();
  renderInvestmentIntelligenceV94();
  renderResearchDiagnosticsV95();
@@ -7129,7 +7226,8 @@ $('qf-v93-brief-export').addEventListener('click',()=>{
   secCoverageV98:linkedSECCoverageV98?window.QFPrivateSECCoverageV98.exportSafe(linkedSECCoverageV98):null,
   archivedSECv99:linkedArchivedSECV99?window.QFPrivateArchivedSECValidationV99.exportSafe(linkedArchivedSECV99):null,
   secArchiveReadinessV100:linkedArchiveQualityV100?window.QFPrivateArchiveQualityV100.exportSafe(linkedArchiveQualityV100):null,
-  historicalComparisonV110:linkedHistoricalPanelV110?window.QFPrivateHistoricalPanelV110.exportSafe(linkedHistoricalPanelV110):null});
+  historicalComparisonV110:linkedHistoricalPanelV110?window.QFPrivateHistoricalPanelV110.exportSafe(linkedHistoricalPanelV110):null,
+  historicalSensitivityV120:linkedHistoricalRobustnessV120?window.QFPrivateHistoricalRobustnessV120.exportSafe(linkedHistoricalRobustnessV120):null});
 });
 for(const id of ['qf-v93-briefing','qf-v93-lab-status'])$(id).addEventListener('click',e=>{
  const b=e.target.closest('[data-v93-method]');

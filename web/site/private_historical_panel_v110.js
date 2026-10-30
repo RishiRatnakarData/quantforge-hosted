@@ -24,9 +24,9 @@ function study({archive,snapshot,history,selection,train=126,step=21,maxDrawdown
  for(let end=train-1;end+step<dates.length&&boundaries.length<80;end+=step)boundaries.push(end);
  if(boundaries.length<2)return fail('At least two independent evaluation windows are required.');
  const issuerCoverage=new Map(selection.map(s=>[s,{symbol:s,complete:0,withheld:0,laterVersion:0,gaps:new Map()}]));
- let cash=0,complete=0,changes=0,selectedCount=0,ruleWealth=1,benchmarkWealth=1,prior=null;
+ let cash=0,complete=0,changes=0,selectedCount=0,ruleWealth=1,benchmarkWealth=1;
  const steps=[];
- let lastBenchmarkWeights=null,benchmarkTrades=0;
+ let benchmarkTrades=0;
  for(const end of boundaries){
   const date=dates[end],raw=[];
   for(const s of selection){
@@ -50,16 +50,19 @@ function study({archive,snapshot,history,selection,train=126,step=21,maxDrawdown
   const next=dates[end+1],last=dates[end+step];
   const returns=Object.fromEntries(selection.map(s=>[s,history.closes[s][end+step]/history.closes[s][end+1]-1]));
   if(selection.some(s=>!finite(returns[s])||returns[s]<=-1))return fail('Invalid observed next-close evaluation return.');
-  const nextSymbol=chosen?chosen.symbol:null;
-  const turnover=prior===nextSymbol?0:prior&&nextSymbol?2:1;
-  const tradeCost=turnover*feeBps/10000;
-  // Equal weight benchmark is REBALANCED on each documented evaluation window.
+  // Both studies enter at the next close and liquidate at the test-window end.
+  // Each disjoint window is flat between observations: fees apply at both ends.
+  // The benchmark is equal-weight buy-and-hold WITHIN each interval, not a
+  // continuous, frictionless portfolio across omitted boundary sessions.
+  const turnover=chosen?2:0;
+  const transactionCost=feeBps/10000;
   const mean=selection.reduce((acc,s)=>acc+returns[s],0)/selection.length;
   const model=chosen?returns[chosen.symbol]:0;
-  const ruleFactor=(1-tradeCost)*(1+model),benchmarkFactor=(1+mean)*(1-(complete===1?feeBps/10000:0));
+  const ruleFactor=(1-transactionCost*turnover)*(1+model);
+  const benchmarkFactor=(1-2*transactionCost)*(1+mean);
   if(!finite(ruleFactor)||!finite(benchmarkFactor)||ruleFactor<=0||benchmarkFactor<=0)return fail('Historical return computation failed.');
   ruleWealth*=ruleFactor;benchmarkWealth*=benchmarkFactor;changes+=turnover;
-  prior=chosen?chosen.symbol:null;
+  benchmarkTrades+=2;
   steps.push({decisionDate:date,executionDate:next,testThrough:last,selected:chosen?.symbol||null,
    candidateCount:ranked.length,rulePeriodReturn:fix(ruleFactor-1),benchmarkPeriodReturn:fix(benchmarkFactor-1),
    winnerFiscalEnd:chosen?.fiscalEnd||null,winnerLatestFiled:chosen?.latestFiled||null});
@@ -84,8 +87,8 @@ function study({archive,snapshot,history,selection,train=126,step=21,maxDrawdown
    'Only available SEC Company Facts revisions are checked; original superseded filings may be missing.',
    'The cross-sectional rule is predefined for illustration, not a calibrated predictor or the complete Research Hub decision policy.',
    'Next-close price-only evaluation excludes dividends, bid-ask spread, slippage, taxes and corporate actions.',
-   'The benchmark is equal-weighted for each test interval, with illustrative proportional turnover fees for initial entry and weight resets; it omits boundary-session price moves.',
-   'Windows evaluate next-close through the end of each holdout; boundary-session returns are omitted for both alternatives.'
+   'The benchmark is equal-weight buy-and-hold within each test window. Both comparisons pay entry and exit fees; neither holds exposure during omitted boundary sessions.',
+   'Windows evaluate next-close through holdout end and liquidate at that end close. No overnight boundary-session exposure, dividends or financing returns are simulated.'
   ]};
 }
 function exportSafe(r){
