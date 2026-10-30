@@ -4,6 +4,7 @@
 const $=id=>document.getElementById(id);
 let guideReportV79=null, linkedResearchBriefV93=null, linkedResearchIntelligenceV94=null, linkedResearchDiagnosticsV95=null,linkedResearchProtocolV96=null,linkedPointInTimeV97=null,linkedSECCoverageV98=null,linkedArchivedSECV99=null,linkedArchiveQualityV100=null,linkedHistoricalPanelV110=null,linkedHistoricalRobustnessV120=null,linkedHistoricalAttributionV130=null,linkedDecisionIntegrityV130=null;
 let researchSessionJournalV95=[];
+let linkedWorkflowV140=null;
 let importedSECArchiveV99=null,archiveFilenameV99='',archiveReadTokenV99=0;
 let privateDecisionCenterV84=null;
 let researchOSRunV90=0, researchOSInternalLoadV90=false;
@@ -430,6 +431,58 @@ function renderDecisionIntegrityV130(){
  for(const id of ['qf-v130-hub-result','qf-v130-brief']){const node=$(id);if(node)node.innerHTML=content;}
  const lab=$('qf-v130-lab-insight');if(lab)lab.textContent='V13.0 integrated evidence: '+status;
 }
+function renderWorkflowV140(){
+ if(!window.QFPrivateWorkflowV140)return; // Legacy isolated DOM harness loads the main script without bundled helpers.
+ const workflow=window.QFPrivateWorkflowV140.assess({authenticated:!!privateState,
+  selection:researchSelection,history:historySeries,archive:importedSECArchiveV99,
+  brief:linkedResearchBriefV93,integrity:linkedDecisionIntegrityV130});
+ linkedWorkflowV140=workflow;
+ const progress=$('qf-v140-progress');if(progress)progress.textContent=workflow.completed+' / '+workflow.total+' ready';
+ const summary=$('qf-v140-status');if(summary)summary.textContent=workflow.ready?
+  'Current assessment and evidence review are connected. Review the limitations in the briefing before acting independently.':
+  workflow.next.detail;
+ const rows=$('qf-v140-steps');if(rows)rows.innerHTML=workflow.steps.map(x=>
+  '<div class="qf-v140-step"><span aria-hidden="true">'+(x.ready?'✓':'○')+'</span><strong>'+safe(x.label)+'</strong><span class="tiny">'+(x.ready?'Ready':'Needs action')+'</span></div>').join('')+
+  '<p class="tiny">'+safe(workflow.evidence.detail)+' Historical archive import is optional; it does not establish complete source provenance.</p>';
+ const button=$('qf-v140-next');if(button){button.disabled=!privateState;
+  button.dataset.v140Route=workflow.next.route;
+  button.textContent=workflow.ready?'Open linked briefing':'Next: '+workflow.next.label;}
+ const lab=$('qf-v140-lab-insight');if(lab)lab.textContent=workflow.ready?
+  'Research workflow: assessment connected; historical evidence and provider assumptions still require independent review.':
+  'Research workflow: '+workflow.next.detail;
+ const brief=$('qf-v140-brief-insight');if(brief)brief.textContent=workflow.ready?
+  'The current linked briefing matches the selected and loaded company universe. Workflow readiness is not proof of forecast accuracy.':
+  'No current complete linked briefing: '+workflow.next.detail;
+}
+function compactResearchDetailsV140(){
+ if(typeof document.createElement!=='function')return; // Legacy isolated DOM harness does not emulate layout nodes.
+ const groups=[
+  {view:'decision',ids:['qf-v94-intelligence-hub','qf-v95-hub','qf-v96-hub','qf-v97-hub','qf-v98-hub','qf-v99-hub-result','qf-v100-hub-result','qf-v120-hub-result','qf-v110-hub-result'],label:'Expand previous model calculations, historical audits and sensitivity detail'},
+  {view:'settings',ids:['qf-v94-intelligence-brief','qf-v95-brief','qf-v96-brief','qf-v97-brief','qf-v98-brief','qf-v99-brief','qf-v100-brief','qf-v120-brief','qf-v110-brief'],label:'Expand detailed historical evidence and secondary methods'},
+  {view:'lab',ids:['qf-v94-lab-insight','qf-v96-lab-insight','qf-v97-lab-insight','qf-v98-lab-insight','qf-v99-lab-insight','qf-v100-lab-insight','qf-v110-lab-insight','qf-v120-lab-insight'],label:'Expand individual historical model readiness diagnostics'}
+ ];
+ for(const spec of groups){
+  const nodes=spec.ids.map(id=>$(id));
+  if(nodes.some(x=>!x))throw Error('V14.0 research detail container is missing.');
+  const host=document.querySelector('[data-private-view="'+spec.view+'"]');
+  if(!host)throw Error('V14.0 workspace view missing.');
+  const hubAnchor=spec.view==='decision'?$('qf-v99-hub-result').closest('.qf-v99-import'):null;
+  const box=document.createElement('details');box.className='qf-v140-details';
+  box.setAttribute('aria-label',spec.label);
+  const title=document.createElement('summary');title.textContent=spec.label;
+  const explanation=document.createElement('p');explanation.className='tiny';
+  explanation.textContent='The consolidated research review stays visible. Open these method details to examine separate assumptions, dates, limitations and calculations.';
+  box.appendChild(title);box.appendChild(explanation);
+  for(const node of nodes)box.appendChild(node); // Retains existing IDs, event listeners, and render targets.
+  if(spec.view==='decision'){
+   hubAnchor.parentNode.insertBefore(box,hubAnchor.nextSibling);
+  }else if(spec.view==='settings'){
+   const anchor=$('qf-v130-brief');anchor.parentNode.insertBefore(box,anchor.nextSibling);
+  }else{
+   const anchor=$('qf-v130-lab-insight');anchor.parentNode.insertBefore(box,anchor.nextSibling);
+  }
+ }
+}
 function refreshConnectedResearchV93(){
  renderHistoricalPanelV110();
  renderHistoricalRobustnessV120();
@@ -441,6 +494,7 @@ function refreshConnectedResearchV93(){
  renderPointInTimeV97();
  renderSECCoverageV98();
  renderArchivedSECV99();
+ renderWorkflowV140();
  const packet=linkedResearchBriefV93;
  const title=$('qf-v93-ribbon-title'),detail=$('qf-v93-ribbon-detail'),brief=$('qf-v93-ribbon-brief');
  if(title)title.textContent=packet?'Completed research · '+packet.candidate+' ('+packet.symbol+')':'Research workflow · No current assessment';
@@ -1356,6 +1410,7 @@ function refreshResearchContext(){
   loaded.textContent='No historical data loaded';
   status.textContent=researchSelection.length>=2?'Not loaded yet. Click Load market history before running the analysis tools.':'Choose 2–5 investments and load history to begin.';
  }
+ renderWorkflowV140();
 }
 function invalidateResearchHistory(reason){
  if(!researchOSInternalLoadV90)clearResearchOSV90();
@@ -1383,6 +1438,7 @@ function privateTab(tab){
  if(tab==='settings')renderConnectedBriefV93();
  if(tab==='lab')refreshConnectedResearchV93();
  const shared=$('private-research-dataset');if(shared)shared.hidden=!['research','optimization','backtest','walkforward'].includes(tab);
+ const launch=document.querySelector('.qf-v140-launch');if(launch)launch.hidden=tab!=='decision';
  refreshResearchContext();
  document.querySelectorAll('[data-private-view]').forEach(p=>p.hidden=p.dataset.privateView!==tab);
  document.querySelectorAll('.private-nav [data-private-tab]').forEach(b=>b.classList.toggle('active',b.dataset.privateTab===tab));
@@ -1922,6 +1978,8 @@ for(const id of ['private-fc-years','private-fc-growth','private-fc-margin','pri
  $(id).addEventListener('change',()=>{clearV66Forecast();$('private-fc-output').textContent='Assumptions changed. Re-run company forecast.';});
 }
 
+compactResearchDetailsV140();
+$('qf-v140-next').addEventListener('click',()=>{if(privateState&&linkedWorkflowV140){const target=linkedWorkflowV140.next.route;if(['decision','research','settings'].includes(target))privateTab(target);}});
 document.querySelectorAll('[data-private-tab]').forEach(b=>b.addEventListener('click',()=>privateTab(b.dataset.privateTab)));
 $('qf-v93-ribbon-assess').addEventListener('click',()=>privateTab('decision'));
 $('qf-v93-ribbon-brief').addEventListener('click',()=>privateTab('settings'));
@@ -1937,7 +1995,8 @@ $('qf-v93-brief-export').addEventListener('click',()=>{
   historicalComparisonV110:linkedHistoricalPanelV110?window.QFPrivateHistoricalPanelV110.exportSafe(linkedHistoricalPanelV110):null,
   historicalSensitivityV120:linkedHistoricalRobustnessV120?window.QFPrivateHistoricalRobustnessV120.exportSafe(linkedHistoricalRobustnessV120):null,
   historicalAttributionV130:linkedHistoricalAttributionV130?window.QFPrivateHistoricalAttributionV130.exportSafe(linkedHistoricalAttributionV130):null,
-  researchIntegrityV130:linkedDecisionIntegrityV130?window.QFPrivateDecisionIntegrityV130.exportSafe(linkedDecisionIntegrityV130):null});
+  researchIntegrityV130:linkedDecisionIntegrityV130?window.QFPrivateDecisionIntegrityV130.exportSafe(linkedDecisionIntegrityV130):null,
+  workflowReadinessV140:linkedWorkflowV140?window.QFPrivateWorkflowV140.exportSafe(linkedWorkflowV140):null});
 });
 for(const id of ['qf-v93-briefing','qf-v93-lab-status'])$(id).addEventListener('click',e=>{
  const b=e.target.closest('[data-v93-method]');

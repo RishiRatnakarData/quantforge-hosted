@@ -568,6 +568,26 @@ main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
 #private-signed .qf-v94-neutral{color:#6b6658;font-size:12px}
 @media(max-width:780px){#private-signed .qf-v94-grid{grid-template-columns:1fr}}
 
+
+/* V14.0: one guided workflow; detailed secondary research stays accessible on demand. */
+#private-signed .qf-v140-launch{max-width:1200px;margin:12px auto 20px;padding:17px 19px;border:1px solid #bfdbd3;background:#f7fbf9;border-radius:13px}
+#private-signed .qf-v140-launch[hidden]{display:none!important}
+#private-signed .qf-v140-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#private-signed .qf-v140-top h3{margin:5px 0 8px;color:#174e41;font-size:18px}
+#private-signed .qf-v140-progress{font-weight:650;white-space:nowrap;color:#2a6555;font-size:13px}
+#private-signed .qf-v140-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin:12px 0}
+#private-signed .qf-v140-step{border:1px solid #d5e5df;background:#fff;border-radius:9px;padding:10px;display:flex;flex-direction:column;gap:4px;min-width:0}
+#private-signed .qf-v140-step strong{font-size:12px;line-height:1.4;color:#194d40}
+#private-signed .qf-v140-step>span:first-child{font-size:17px;color:#21604c}
+#private-signed .qf-v140-acceptance{margin-top:15px;border-top:1px solid #d7e5df;padding-top:11px}
+#private-signed .qf-v140-acceptance summary{cursor:pointer;font-weight:600;color:#235b4b;font-size:13px}
+#private-signed .qf-v140-acceptance li{margin-bottom:7px}
+#private-signed .qf-v140-details{margin:20px 0;border:1px solid #cbdcd3;border-radius:12px;padding:13px 17px;background:#fafcfb}
+#private-signed .qf-v140-details summary{cursor:pointer;color:#215444;font-weight:650;line-height:1.6}
+#private-signed .qf-v140-details[open] summary{margin-bottom:12px}
+#private-signed .qf-v140-details .qf-v95-host{max-width:none}
+#private-signed #qf-v140-lab-insight,#private-signed #qf-v140-brief-insight{border-left:3px solid #437b68;padding:7px 12px;background:#f5faf7;margin:12px 0}
+@media(max-width:550px){#private-signed .qf-v140-steps{grid-template-columns:1fr}#private-signed .qf-v140-launch{padding:13px}}
 </style></head><body>
 <div class="app"><aside class="side"><div class="brand"><div class="mark">Q</div>quantforge</div><p class="qf-v83-owner"><span>Designed and developed by</span><strong>Rishi&nbsp;Ratnakar</strong></p><nav id="navigation" aria-label="Main navigation">
   <div class="qf-nav-section" role="group" aria-label="Financial research pages">
@@ -973,6 +993,16 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
       <div class="qf-v93-ribbon-copy"><strong id="qf-v93-ribbon-title">Research workflow · No current assessment</strong><span class="tiny" id="qf-v93-ribbon-detail">Select investments and run an assessment to connect the Research Lab and briefing.</span></div>
       <div class="controls"><button type="button" class="btn sm" id="qf-v93-ribbon-assess">Research Hub</button><button type="button" class="btn sm" id="qf-v93-ribbon-brief" disabled>Open briefing</button></div>
     </div>
+    <section class="pane qf-v140-launch" aria-label="Private research workflow readiness">
+      <div class="qf-v140-top"><div><span class="eyebrow">RESEARCH WORKFLOW</span><h3>What is ready, and what comes next?</h3></div><span id="qf-v140-progress" class="qf-v140-progress">0 / 5</span></div>
+      <div id="qf-v140-status" class="tiny" role="status" aria-live="polite">Checking current research inputs.</div>
+      <div id="qf-v140-steps" class="qf-v140-steps" aria-label="Research prerequisites"></div>
+      <div class="controls"><button type="button" class="btn primary" id="qf-v140-next" disabled>Open next research step</button><button type="button" class="btn sm" data-private-tab="settings">Research briefing</button></div>
+      <details class="qf-v140-acceptance"><summary>Live browser acceptance checklist (not yet independently verified)</summary>
+      <p class="tiny">Automated tests and Cloudflare HTML verification cannot prove that authenticated provider workflows work. Complete these steps in a real browser, without sharing credentials or brokerage account data.</p>
+      <ol class="tiny"><li>Sign in and complete MFA from a fresh private session.</li><li>Open Portfolio and confirm authorized holdings and market quotes load without an error.</li><li>Select 2–5 companies by name, load matching market data, and run one complete Research Hub assessment.</li><li>Import the locally validated SEC revision JSON, confirm issuer coverage, and inspect dates withheld by the historical study.</li><li>Open Research Lab and Briefing; confirm consistent candidate, model counts, and evidence status.</li><li>Save and delete a research archive note, then sign out and confirm protected data disappear. Test persistence after a separate sign-in.</li></ol>
+      <p class="tiny">These are manual tests; this checklist does not automatically mark them passed.</p></details>
+    </section>
     <div id="private-research-dataset" class="pane" hidden aria-label="Research investments">
       <div class="section-title"><h3>Research investments</h3><span class="tiny">Used in Market data, Optimization, Backtests and Walk-forward</span></div>
       <p class="tiny">Choose 2–5 investments and a time period, then load their price history. Optimization, backtesting and walk-forward testing use the same loaded observations. Changing the selection or period requires reloading and recalculating.</p>
@@ -999,6 +1029,7 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
       <div id="qf-v110-lab-insight" class="tiny" aria-live="polite"></div>
       <div id="qf-v120-lab-insight" class="tiny" aria-live="polite"></div>
       <div id="qf-v130-lab-insight" class="tiny" aria-live="polite"></div>
+      <p id="qf-v140-lab-insight" class="tiny" aria-live="polite"></p>
       <div class="controls qf-v93-lab-tools"><button type="button" class="btn" data-private-tab="decision">Return to Research Hub</button><button type="button" class="btn" data-private-tab="settings">View research briefing</button></div>
       <div class="qf-v9-lab-grid">
         <button type="button" data-private-tab="candidate"><strong>Company &amp; factor research</strong><small>SEC fundamentals, downside risk, market ETF beta, independent FF3 regressions</small></button>
@@ -1216,6 +1247,7 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
     <section class="private-view" data-private-view="settings" hidden>
       <h2>Research Briefing &amp; Notes</h2><p class="qf-private-section-intro">The briefing uses the latest completed Research Hub assessment and the exact same research methods and sources. Nothing is recalculated or submitted to a brokerage when you open it.</p>
       <section class="pane qf-v93-brief-intro" aria-label="Connected research report"><div class="qf-v93-row"><div><span class="eyebrow">CONNECTED WORKFLOW</span><h3>Investment research briefing</h3><p class="tiny" id="qf-v93-brief-status">No current linked assessment. Run an automated assessment first.</p></div><button class="btn" type="button" data-private-tab="decision">Return to Research Hub</button></div>
+      <p id="qf-v140-brief-insight" class="tiny" aria-live="polite"></p>
       <div id="qf-v93-briefing" aria-live="polite"><p class="tiny">Once an assessment is complete, the executive findings, conflicts, data coverage, method record, and next research actions will be available here.</p></div>
       <div id="qf-v94-intelligence-brief" class="qf-v94-intelligence" aria-live="polite"></div>
       <div id="qf-v95-brief" class="qf-v95-host" aria-live="polite"></div>
@@ -4646,6 +4678,75 @@ if(typeof module==='object'&&module.exports)module.exports=api;
 root.QFPrivateDecisionIntegrityV130=api;
 })(typeof window!=='undefined'?window:globalThis);
 
+/* V14.0: Pure, fail-closed private workflow readiness. No external I/O or trading. */
+(function(root){
+'use strict';
+const ticker=s=>typeof s==='string'&&/^[A-Z0-9.\-]{1,15}$/.test(s);
+const date=s=>typeof s==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(s)&&!Number.isNaN(Date.parse(s))&&new Date(s).toISOString().slice(0,10)===s;
+const missing=(key,label,route,detail)=>({key,label,route,ready:false,detail});
+const success=(key,label,route,detail)=>({key,label,route,ready:true,detail});
+function assess({authenticated=false,selection,history,archive,brief,integrity}={}){
+ const selected=Array.isArray(selection)?selection:[];
+ const validSelection=selected.length>=2&&selected.length<=5&&selected.every(ticker)&&new Set(selected).size===selected.length;
+ const steps=[authenticated?
+  success('session','Private research session','decision','Authenticated workspace session present; MFA flow requires a separate live browser test.'):
+  missing('session','Private research session','decision','Sign in and complete the authenticator flow.')];
+ steps.push(validSelection?
+  success('selection','Selected investments','decision',`${selected.length} distinct investments selected.`):
+  missing('selection','Selected investments','decision','Choose 2–5 distinct companies by name in Research Hub.'));
+ const syms=history?.symbols,days=history?.dates,closes=history?.closes;
+ const validHistory=validSelection&&authenticated&&Array.isArray(syms)&&syms.length===selected.length&&
+  syms.every(ticker)&&new Set(syms).size===syms.length&&selected.every(x=>syms.includes(x))&&
+  Array.isArray(days)&&days.length>=64&&days.every(date)&&days.every((d,i)=>i===0||d>days[i-1])&&
+  closes&&typeof closes==='object'&&syms.every(s=>Array.isArray(closes[s])&&closes[s].length===days.length&&
+   closes[s].every(v=>typeof v==='number'&&Number.isFinite(v)&&v>0));
+ steps.push(validHistory?success('history','Loaded and matched price history','research',`${syms.length} companies · ${days.length} aligned dated observations.`):
+  missing('history','Loaded and matched price history','research','Load verified historical prices for the exact current company selection.'));
+ const archived=!!(authenticated&&archive&&typeof archive==='object'&&Array.isArray(archive.issuers)&&archive.issuers.length>0);
+ // Archive evidence is optional. Its absence must not be misrepresented as an authenticated or complete historical evaluation.
+ const evidence={key:'archive',label:'Optional historical SEC archive',route:'decision',ready:archived,
+  optional:true,detail:archived?'Local filing archive present for this browser session.':'Import the locally validated SEC archive if testing historical filing evidence.'};
+ const universe=brief?.universe;
+ const matchedBrief=validHistory&&brief?.schema==='quantforge.research-brief.v9.3'&&ticker(brief.symbol)&&
+  Array.isArray(universe)&&universe.length===selected.length&&new Set(universe.map(u=>u?.symbol)).size===selected.length&&
+  universe.every(u=>selected.includes(u.symbol))&&selected.includes(brief.symbol)&&
+  Array.isArray(brief.models)&&typeof brief.readiness==='string';
+ steps.push(matchedBrief?success('assessment','Current linked research assessment','decision',
+  `Assessment for ${brief.symbol} matches the loaded investment universe.`):
+  missing('assessment','Current linked research assessment','decision','Run a new Research Hub assessment after matching market history is loaded.'));
+ const completeIntegrity=matchedBrief&&integrity?.schema==='quantforge.integrity-console.v13.0'&&
+  integrity.ready===true&&integrity.candidate===brief.symbol&&
+  ['blocked','evidence-limited','evidence-complete'].includes(integrity.classification);
+ steps.push(completeIntegrity?success('review','Connected research evidence review','settings',
+  `Integrity classification: ${integrity.classification}. This is not a forecast score.`):
+  missing('review','Connected research evidence review','settings','Inspect the linked research evidence and its documented limitations.'));
+ const first=steps.find(s=>!s.ready);
+ const completed=steps.filter(s=>s.ready).length;
+ let state='research-review-ready';
+ if(!authenticated)state='sign-in-required';
+ else if(!validSelection)state='select-companies';
+ else if(!validHistory)state='load-history';
+ else if(!matchedBrief)state='run-research';
+ else if(!completeIntegrity)state='review-unavailable';
+ else if(integrity.classification==='blocked')state='assessment-blocked';
+ else if(integrity.classification==='evidence-limited')state='evidence-limited';
+ const next=first?{route:first.route,label:first.label,detail:first.detail}:
+  {route:'settings',label:'Review linked research briefing',detail:'Read limitations and evaluate evidence before making an independent decision.'};
+ return {schema:'quantforge.workflow-readiness.v14.0',state,ready:completeIntegrity,
+  completed,total:steps.length,steps,evidence,next,
+  limitation:'Workflow readiness is not provider uptime verification, MFA flow acceptance, a prediction score or an instruction to trade.'};
+}
+function exportSafe(result){
+ if(result?.schema!=='quantforge.workflow-readiness.v14.0')return {schema:'quantforge.workflow-export.v14.0',ready:false};
+ return {schema:'quantforge.workflow-export.v14.0',ready:result.ready,state:result.state,
+  completed:result.completed,total:result.total,steps:result.steps.map(x=>({key:x.key,ready:x.ready})),
+  optionalArchivePresent:result.evidence.ready,limitation:result.limitation};
+}
+const api=Object.freeze({assess,exportSafe});
+if(typeof module==='object'&&module.exports)module.exports=api;
+root.QFPrivateWorkflowV140=api;
+})(typeof window!=='undefined'?window:globalThis);
+
 /* QuantForge private research: pure in-sample portfolio analytics.
  * No external requests, synthetic data, brokerage orders, or portfolio mutations.
  * The public demo model is deliberately not imported here.
@@ -5472,6 +5573,7 @@ root.QFPrivateDecisionIntegrityV130=api;
 const $=id=>document.getElementById(id);
 let guideReportV79=null, linkedResearchBriefV93=null, linkedResearchIntelligenceV94=null, linkedResearchDiagnosticsV95=null,linkedResearchProtocolV96=null,linkedPointInTimeV97=null,linkedSECCoverageV98=null,linkedArchivedSECV99=null,linkedArchiveQualityV100=null,linkedHistoricalPanelV110=null,linkedHistoricalRobustnessV120=null,linkedHistoricalAttributionV130=null,linkedDecisionIntegrityV130=null;
 let researchSessionJournalV95=[];
+let linkedWorkflowV140=null;
 let importedSECArchiveV99=null,archiveFilenameV99='',archiveReadTokenV99=0;
 let privateDecisionCenterV84=null;
 let researchOSRunV90=0, researchOSInternalLoadV90=false;
@@ -5898,6 +6000,58 @@ function renderDecisionIntegrityV130(){
  for(const id of ['qf-v130-hub-result','qf-v130-brief']){const node=$(id);if(node)node.innerHTML=content;}
  const lab=$('qf-v130-lab-insight');if(lab)lab.textContent='V13.0 integrated evidence: '+status;
 }
+function renderWorkflowV140(){
+ if(!window.QFPrivateWorkflowV140)return; // Legacy isolated DOM harness loads the main script without bundled helpers.
+ const workflow=window.QFPrivateWorkflowV140.assess({authenticated:!!privateState,
+  selection:researchSelection,history:historySeries,archive:importedSECArchiveV99,
+  brief:linkedResearchBriefV93,integrity:linkedDecisionIntegrityV130});
+ linkedWorkflowV140=workflow;
+ const progress=$('qf-v140-progress');if(progress)progress.textContent=workflow.completed+' / '+workflow.total+' ready';
+ const summary=$('qf-v140-status');if(summary)summary.textContent=workflow.ready?
+  'Current assessment and evidence review are connected. Review the limitations in the briefing before acting independently.':
+  workflow.next.detail;
+ const rows=$('qf-v140-steps');if(rows)rows.innerHTML=workflow.steps.map(x=>
+  '<div class="qf-v140-step"><span aria-hidden="true">'+(x.ready?'✓':'○')+'</span><strong>'+safe(x.label)+'</strong><span class="tiny">'+(x.ready?'Ready':'Needs action')+'</span></div>').join('')+
+  '<p class="tiny">'+safe(workflow.evidence.detail)+' Historical archive import is optional; it does not establish complete source provenance.</p>';
+ const button=$('qf-v140-next');if(button){button.disabled=!privateState;
+  button.dataset.v140Route=workflow.next.route;
+  button.textContent=workflow.ready?'Open linked briefing':'Next: '+workflow.next.label;}
+ const lab=$('qf-v140-lab-insight');if(lab)lab.textContent=workflow.ready?
+  'Research workflow: assessment connected; historical evidence and provider assumptions still require independent review.':
+  'Research workflow: '+workflow.next.detail;
+ const brief=$('qf-v140-brief-insight');if(brief)brief.textContent=workflow.ready?
+  'The current linked briefing matches the selected and loaded company universe. Workflow readiness is not proof of forecast accuracy.':
+  'No current complete linked briefing: '+workflow.next.detail;
+}
+function compactResearchDetailsV140(){
+ if(typeof document.createElement!=='function')return; // Legacy isolated DOM harness does not emulate layout nodes.
+ const groups=[
+  {view:'decision',ids:['qf-v94-intelligence-hub','qf-v95-hub','qf-v96-hub','qf-v97-hub','qf-v98-hub','qf-v99-hub-result','qf-v100-hub-result','qf-v120-hub-result','qf-v110-hub-result'],label:'Expand previous model calculations, historical audits and sensitivity detail'},
+  {view:'settings',ids:['qf-v94-intelligence-brief','qf-v95-brief','qf-v96-brief','qf-v97-brief','qf-v98-brief','qf-v99-brief','qf-v100-brief','qf-v120-brief','qf-v110-brief'],label:'Expand detailed historical evidence and secondary methods'},
+  {view:'lab',ids:['qf-v94-lab-insight','qf-v96-lab-insight','qf-v97-lab-insight','qf-v98-lab-insight','qf-v99-lab-insight','qf-v100-lab-insight','qf-v110-lab-insight','qf-v120-lab-insight'],label:'Expand individual historical model readiness diagnostics'}
+ ];
+ for(const spec of groups){
+  const nodes=spec.ids.map(id=>$(id));
+  if(nodes.some(x=>!x))throw Error('V14.0 research detail container is missing.');
+  const host=document.querySelector('[data-private-view="'+spec.view+'"]');
+  if(!host)throw Error('V14.0 workspace view missing.');
+  const hubAnchor=spec.view==='decision'?$('qf-v99-hub-result').closest('.qf-v99-import'):null;
+  const box=document.createElement('details');box.className='qf-v140-details';
+  box.setAttribute('aria-label',spec.label);
+  const title=document.createElement('summary');title.textContent=spec.label;
+  const explanation=document.createElement('p');explanation.className='tiny';
+  explanation.textContent='The consolidated research review stays visible. Open these method details to examine separate assumptions, dates, limitations and calculations.';
+  box.appendChild(title);box.appendChild(explanation);
+  for(const node of nodes)box.appendChild(node); // Retains existing IDs, event listeners, and render targets.
+  if(spec.view==='decision'){
+   hubAnchor.parentNode.insertBefore(box,hubAnchor.nextSibling);
+  }else if(spec.view==='settings'){
+   const anchor=$('qf-v130-brief');anchor.parentNode.insertBefore(box,anchor.nextSibling);
+  }else{
+   const anchor=$('qf-v130-lab-insight');anchor.parentNode.insertBefore(box,anchor.nextSibling);
+  }
+ }
+}
 function refreshConnectedResearchV93(){
  renderHistoricalPanelV110();
  renderHistoricalRobustnessV120();
@@ -5909,6 +6063,7 @@ function refreshConnectedResearchV93(){
  renderPointInTimeV97();
  renderSECCoverageV98();
  renderArchivedSECV99();
+ renderWorkflowV140();
  const packet=linkedResearchBriefV93;
  const title=$('qf-v93-ribbon-title'),detail=$('qf-v93-ribbon-detail'),brief=$('qf-v93-ribbon-brief');
  if(title)title.textContent=packet?'Completed research · '+packet.candidate+' ('+packet.symbol+')':'Research workflow · No current assessment';
@@ -6824,6 +6979,7 @@ function refreshResearchContext(){
   loaded.textContent='No historical data loaded';
   status.textContent=researchSelection.length>=2?'Not loaded yet. Click Load market history before running the analysis tools.':'Choose 2–5 investments and load history to begin.';
  }
+ renderWorkflowV140();
 }
 function invalidateResearchHistory(reason){
  if(!researchOSInternalLoadV90)clearResearchOSV90();
@@ -6851,6 +7007,7 @@ function privateTab(tab){
  if(tab==='settings')renderConnectedBriefV93();
  if(tab==='lab')refreshConnectedResearchV93();
  const shared=$('private-research-dataset');if(shared)shared.hidden=!['research','optimization','backtest','walkforward'].includes(tab);
+ const launch=document.querySelector('.qf-v140-launch');if(launch)launch.hidden=tab!=='decision';
  refreshResearchContext();
  document.querySelectorAll('[data-private-view]').forEach(p=>p.hidden=p.dataset.privateView!==tab);
  document.querySelectorAll('.private-nav [data-private-tab]').forEach(b=>b.classList.toggle('active',b.dataset.privateTab===tab));
@@ -7390,6 +7547,8 @@ for(const id of ['private-fc-years','private-fc-growth','private-fc-margin','pri
  $(id).addEventListener('change',()=>{clearV66Forecast();$('private-fc-output').textContent='Assumptions changed. Re-run company forecast.';});
 }
 
+compactResearchDetailsV140();
+$('qf-v140-next').addEventListener('click',()=>{if(privateState&&linkedWorkflowV140){const target=linkedWorkflowV140.next.route;if(['decision','research','settings'].includes(target))privateTab(target);}});
 document.querySelectorAll('[data-private-tab]').forEach(b=>b.addEventListener('click',()=>privateTab(b.dataset.privateTab)));
 $('qf-v93-ribbon-assess').addEventListener('click',()=>privateTab('decision'));
 $('qf-v93-ribbon-brief').addEventListener('click',()=>privateTab('settings'));
@@ -7405,7 +7564,8 @@ $('qf-v93-brief-export').addEventListener('click',()=>{
   historicalComparisonV110:linkedHistoricalPanelV110?window.QFPrivateHistoricalPanelV110.exportSafe(linkedHistoricalPanelV110):null,
   historicalSensitivityV120:linkedHistoricalRobustnessV120?window.QFPrivateHistoricalRobustnessV120.exportSafe(linkedHistoricalRobustnessV120):null,
   historicalAttributionV130:linkedHistoricalAttributionV130?window.QFPrivateHistoricalAttributionV130.exportSafe(linkedHistoricalAttributionV130):null,
-  researchIntegrityV130:linkedDecisionIntegrityV130?window.QFPrivateDecisionIntegrityV130.exportSafe(linkedDecisionIntegrityV130):null});
+  researchIntegrityV130:linkedDecisionIntegrityV130?window.QFPrivateDecisionIntegrityV130.exportSafe(linkedDecisionIntegrityV130):null,
+  workflowReadinessV140:linkedWorkflowV140?window.QFPrivateWorkflowV140.exportSafe(linkedWorkflowV140):null});
 });
 for(const id of ['qf-v93-briefing','qf-v93-lab-status'])$(id).addEventListener('click',e=>{
  const b=e.target.closest('[data-v93-method]');

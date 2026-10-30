@@ -47,6 +47,16 @@ block='''<section class="tabpage" id="page-private">
       <div class="qf-v93-ribbon-copy"><strong id="qf-v93-ribbon-title">Research workflow · No current assessment</strong><span class="tiny" id="qf-v93-ribbon-detail">Select investments and run an assessment to connect the Research Lab and briefing.</span></div>
       <div class="controls"><button type="button" class="btn sm" id="qf-v93-ribbon-assess">Research Hub</button><button type="button" class="btn sm" id="qf-v93-ribbon-brief" disabled>Open briefing</button></div>
     </div>
+    <section class="pane qf-v140-launch" aria-label="Private research workflow readiness">
+      <div class="qf-v140-top"><div><span class="eyebrow">RESEARCH WORKFLOW</span><h3>What is ready, and what comes next?</h3></div><span id="qf-v140-progress" class="qf-v140-progress">0 / 5</span></div>
+      <div id="qf-v140-status" class="tiny" role="status" aria-live="polite">Checking current research inputs.</div>
+      <div id="qf-v140-steps" class="qf-v140-steps" aria-label="Research prerequisites"></div>
+      <div class="controls"><button type="button" class="btn primary" id="qf-v140-next" disabled>Open next research step</button><button type="button" class="btn sm" data-private-tab="settings">Research briefing</button></div>
+      <details class="qf-v140-acceptance"><summary>Live browser acceptance checklist (not yet independently verified)</summary>
+      <p class="tiny">Automated tests and Cloudflare HTML verification cannot prove that authenticated provider workflows work. Complete these steps in a real browser, without sharing credentials or brokerage account data.</p>
+      <ol class="tiny"><li>Sign in and complete MFA from a fresh private session.</li><li>Open Portfolio and confirm authorized holdings and market quotes load without an error.</li><li>Select 2–5 companies by name, load matching market data, and run one complete Research Hub assessment.</li><li>Import the locally validated SEC revision JSON, confirm issuer coverage, and inspect dates withheld by the historical study.</li><li>Open Research Lab and Briefing; confirm consistent candidate, model counts, and evidence status.</li><li>Save and delete a research archive note, then sign out and confirm protected data disappear. Test persistence after a separate sign-in.</li></ol>
+      <p class="tiny">These are manual tests; this checklist does not automatically mark them passed.</p></details>
+    </section>
     <div id="private-research-dataset" class="pane" hidden aria-label="Research investments">
       <div class="section-title"><h3>Research investments</h3><span class="tiny">Used in Market data, Optimization, Backtests and Walk-forward</span></div>
       <p class="tiny">Choose 2–5 investments and a time period, then load their price history. Optimization, backtesting and walk-forward testing use the same loaded observations. Changing the selection or period requires reloading and recalculating.</p>
@@ -73,6 +83,7 @@ block='''<section class="tabpage" id="page-private">
       <div id="qf-v110-lab-insight" class="tiny" aria-live="polite"></div>
       <div id="qf-v120-lab-insight" class="tiny" aria-live="polite"></div>
       <div id="qf-v130-lab-insight" class="tiny" aria-live="polite"></div>
+      <p id="qf-v140-lab-insight" class="tiny" aria-live="polite"></p>
       <div class="controls qf-v93-lab-tools"><button type="button" class="btn" data-private-tab="decision">Return to Research Hub</button><button type="button" class="btn" data-private-tab="settings">View research briefing</button></div>
       <div class="qf-v9-lab-grid">
         <button type="button" data-private-tab="candidate"><strong>Company &amp; factor research</strong><small>SEC fundamentals, downside risk, market ETF beta, independent FF3 regressions</small></button>
@@ -290,6 +301,7 @@ block='''<section class="tabpage" id="page-private">
     <section class="private-view" data-private-view="settings" hidden>
       <h2>Research Briefing &amp; Notes</h2><p class="qf-private-section-intro">The briefing uses the latest completed Research Hub assessment and the exact same research methods and sources. Nothing is recalculated or submitted to a brokerage when you open it.</p>
       <section class="pane qf-v93-brief-intro" aria-label="Connected research report"><div class="qf-v93-row"><div><span class="eyebrow">CONNECTED WORKFLOW</span><h3>Investment research briefing</h3><p class="tiny" id="qf-v93-brief-status">No current linked assessment. Run an automated assessment first.</p></div><button class="btn" type="button" data-private-tab="decision">Return to Research Hub</button></div>
+      <p id="qf-v140-brief-insight" class="tiny" aria-live="polite"></p>
       <div id="qf-v93-briefing" aria-live="polite"><p class="tiny">Once an assessment is complete, the executive findings, conflicts, data coverage, method record, and next research actions will be available here.</p></div>
       <div id="qf-v94-intelligence-brief" class="qf-v94-intelligence" aria-live="polite"></div>
       <div id="qf-v95-brief" class="qf-v95-host" aria-live="polite"></div>
@@ -491,6 +503,27 @@ qfv9_css="""
 @media(max-width:780px){#private-signed .qf-v94-grid{grid-template-columns:1fr}}
 
 """
+qfv9_css += """
+/* V14.0: one guided workflow; detailed secondary research stays accessible on demand. */
+#private-signed .qf-v140-launch{max-width:1200px;margin:12px auto 20px;padding:17px 19px;border:1px solid #bfdbd3;background:#f7fbf9;border-radius:13px}
+#private-signed .qf-v140-launch[hidden]{display:none!important}
+#private-signed .qf-v140-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#private-signed .qf-v140-top h3{margin:5px 0 8px;color:#174e41;font-size:18px}
+#private-signed .qf-v140-progress{font-weight:650;white-space:nowrap;color:#2a6555;font-size:13px}
+#private-signed .qf-v140-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin:12px 0}
+#private-signed .qf-v140-step{border:1px solid #d5e5df;background:#fff;border-radius:9px;padding:10px;display:flex;flex-direction:column;gap:4px;min-width:0}
+#private-signed .qf-v140-step strong{font-size:12px;line-height:1.4;color:#194d40}
+#private-signed .qf-v140-step>span:first-child{font-size:17px;color:#21604c}
+#private-signed .qf-v140-acceptance{margin-top:15px;border-top:1px solid #d7e5df;padding-top:11px}
+#private-signed .qf-v140-acceptance summary{cursor:pointer;font-weight:600;color:#235b4b;font-size:13px}
+#private-signed .qf-v140-acceptance li{margin-bottom:7px}
+#private-signed .qf-v140-details{margin:20px 0;border:1px solid #cbdcd3;border-radius:12px;padding:13px 17px;background:#fafcfb}
+#private-signed .qf-v140-details summary{cursor:pointer;color:#215444;font-weight:650;line-height:1.6}
+#private-signed .qf-v140-details[open] summary{margin-bottom:12px}
+#private-signed .qf-v140-details .qf-v95-host{max-width:none}
+#private-signed #qf-v140-lab-insight,#private-signed #qf-v140-brief-insight{border-left:3px solid #437b68;padding:7px 12px;background:#f5faf7;margin:12px 0}
+@media(max-width:550px){#private-signed .qf-v140-steps{grid-template-columns:1fr}#private-signed .qf-v140-launch{padding:13px}}
+"""
 html=html.replace('</style>',qfv9_css+'</style>',1)
 html=html.replace('.navtop{display:none}', '#private-research-dataset[hidden],#private-signed[hidden],#private-login[hidden],#private-mfa[hidden],#private-mfa-qr-wrap[hidden],#private-mfa-setup-actions[hidden]{display:none!important}#private-message{margin-top:8px}.navtop{display:none}')
 html=html.replace('body></html>','body></html>')
@@ -517,7 +550,7 @@ for slot, file in [('/* QF_MODEL */','model.js'),('/* QF_APP */','app.js'),('/* 
  text=(src/'site'/file).read_text(encoding="utf-8")
  if file=='private.js':
   # Bundled alongside the existing private script: still only three CSP-protected scripts.
-  text=(src/'site/private_ideas_v70.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_allocation_v74.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_value_v73.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_v72.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_guide_v79.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_center_v84.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_candidate_v85.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_factor_scenarios_v86.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_french_factors_v87.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_orchestrator_v91.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_os_v90.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_review_v92.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_brief_v93.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_investment_intelligence_v94.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_portfolio_validation_v95.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_intelligence_v96.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_pit_validation_v97.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_sec_coverage_v98.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_archived_sec_v99.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_archive_quality_v100.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_historical_panel_v110.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_robustness_v120.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_historical_attribution_v130.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_integrity_v130.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_multimarket.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_forecast_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_walkforward_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_diagnostics_v66.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_integrity_v67.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_robustness_v68.js').read_text(encoding='utf-8')+'\n'+text
+  text=(src/'site/private_ideas_v70.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_allocation_v74.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_value_v73.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_v72.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_guide_v79.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_center_v84.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_candidate_v85.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_factor_scenarios_v86.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_french_factors_v87.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_orchestrator_v91.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_os_v90.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_review_v92.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_brief_v93.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_investment_intelligence_v94.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_portfolio_validation_v95.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_intelligence_v96.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_pit_validation_v97.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_sec_coverage_v98.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_archived_sec_v99.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_archive_quality_v100.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_historical_panel_v110.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_robustness_v120.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_historical_attribution_v130.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_integrity_v130.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_workflow_v140.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_multimarket.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_forecast_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_walkforward_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_diagnostics_v66.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_integrity_v67.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_robustness_v68.js').read_text(encoding='utf-8')+'\n'+text
  if file=='app.js':
   assert text.count('/* QF_SEC_DATA */ null')==1
   # Bundle pure SEC analytics in the existing public app script. CSP remains 3 hashes.
