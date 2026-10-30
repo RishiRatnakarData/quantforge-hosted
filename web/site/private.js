@@ -2,13 +2,16 @@
 (function () {
 'use strict';
 const $=id=>document.getElementById(id);
-let guideReportV79=null, linkedResearchBriefV93=null, linkedResearchIntelligenceV94=null, linkedResearchDiagnosticsV95=null,linkedResearchProtocolV96=null,linkedPointInTimeV97=null,linkedSECCoverageV98=null;
+let guideReportV79=null, linkedResearchBriefV93=null, linkedResearchIntelligenceV94=null, linkedResearchDiagnosticsV95=null,linkedResearchProtocolV96=null,linkedPointInTimeV97=null,linkedSECCoverageV98=null,linkedArchivedSECV99=null;
 let researchSessionJournalV95=[];
+let importedSECArchiveV99=null,archiveFilenameV99='',archiveReadTokenV99=0;
 let privateDecisionCenterV84=null;
 let researchOSRunV90=0, researchOSInternalLoadV90=false;
 let candidateDossierV90=null,candidateQuoteV90=null,candidateFactorV91=null;
 function clearResearchOSV90(){
- linkedResearchBriefV93=null;linkedResearchIntelligenceV94=null;linkedResearchDiagnosticsV95=null;linkedResearchProtocolV96=null;linkedPointInTimeV97=null;linkedSECCoverageV98=null;
+ linkedResearchBriefV93=null;linkedResearchIntelligenceV94=null;linkedResearchDiagnosticsV95=null;linkedResearchProtocolV96=null;linkedPointInTimeV97=null;linkedSECCoverageV98=null;linkedArchivedSECV99=null;
+ if(!privateState){importedSECArchiveV99=null;archiveFilenameV99='';archiveReadTokenV99++;
+  const file=$('qf-v99-file');if(file)file.value='';}
  if(typeof refreshConnectedResearchV93==='function')refreshConnectedResearchV93();
  researchOSRunV90++;
  candidateDossierV90=null;candidateQuoteV90=null;candidateFactorV91=null;
@@ -63,6 +66,14 @@ function renderResearchOSV90(result,variants){
   snapshot:window.QFPublishedSEC,history:historySeries,selection:researchSelection,
   candidate:linkedResearchBriefV93.symbol,train:126,step:21
  });}catch(err){console.warn('V9.8 SEC issuer coverage unavailable:',String(err.message||err).slice(0,100));}
+ linkedArchivedSECV99=null;
+ if(importedSECArchiveV99){
+  try{linkedArchivedSECV99=window.QFPrivateArchivedSECValidationV99.run({
+    archive:importedSECArchiveV99,snapshot:window.QFPublishedSEC,
+    history:historySeries,selection:researchSelection,candidate:linkedResearchBriefV93.symbol,
+    train:126,step:21,maxDrawdown:review.constraints.maxDrawdown,feeBps:10
+  });}catch(err){console.warn('V9.9 local archive audit unavailable:',String(err.message||err).slice(0,100));}
+ }
  researchSessionJournalV95.unshift({
   date:String(review.asOf||'').slice(0,10),symbol:String(review.symbol||'').slice(0,20),
   action:String(review.action||'').slice(0,120),readiness:String(review.readiness||'').slice(0,50),
@@ -268,12 +279,66 @@ function renderSECCoverageV98(){
   'V9.8 SEC evidence completeness: '+item.counts.eligible+' / '+item.counts.scheduled+' decision windows support all '+item.rows.length+' selected issuers. Missing data is never filled.':
   'V9.8 SEC coverage awaits a completed assessment and aligned historical prices.';
 }
+function renderArchivedSECV99(){
+ const input=$('qf-v99-file');if(input)input.disabled=!privateState;
+ const status=$('qf-v99-import-status');if(status)status.textContent=!privateState?
+  'Sign in with MFA before importing local filing history.':
+  importedSECArchiveV99?archiveFilenameV99+' · archive imported into memory; never uploaded or saved.':
+  'No local filing archive imported. Current SEC snapshot research is unchanged.';
+ const item=linkedArchivedSECV99;
+ const table=rows=>'<div class="table-wrap"><table class="qf-v95-table"><thead><tr><th>Investment</th><th>Evidence-covered dates</th><th>Later-version dates</th><th>Primary gap</th></tr></thead><tbody>'+rows.map(r=>'<tr>'+[
+   String(assetNames[r.symbol]||r.symbol)+' ('+r.symbol+')',r.eligible+' / '+r.scheduled+' ('+r.coveragePct+'%)',
+   String(r.laterRevisionWindows),r.primaryGap?r.primaryGap.reason+' · '+r.primaryGap.count:'No missing evidence'
+  ].map(x=>'<td>'+safe(x)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
+ const html=item?'<section class="qf-v95-shell qf-v99-shell" aria-label="Locally imported historical SEC revision evidence">'+
+  '<div class="qf-v95-heading"><span class="eyebrow">V9.9 · ARCHIVED FILING HISTORY</span><h3>Historical evidence from original filing versions</h3><p>Compare the imported, dated SEC history against the limited published snapshot using the same loaded investment universe and evaluation dates. No archive data is uploaded.</p></div>'+
+  (item.ready?'<p class="qf-v97-coverage"><strong>'+safe(item.counts.completeUniverse)+' / '+safe(item.counts.scheduled)+'</strong> dates with complete selected-issuer evidence · '+safe(item.counts.withheld)+' withheld</p>'+table(item.issuers)+
+   '<p>'+ (item.performance.ready?'<strong>Restricted historical rule vs passive:</strong> '+safe((100*item.performance.ruleReturn).toFixed(1))+'% vs '+safe((100*item.performance.passiveReturn).toFixed(1))+'% (price-only, dated evaluation, stated fees).':
+    '<strong>Historical comparison withheld:</strong> '+safe(item.performance.reason))+'</p>':
+   '<p><strong>Archive analysis unavailable:</strong> '+safe(item.reason)+'</p>')+
+  '<p class="tiny">Revisions are selected using each decision date. SEC Company Facts may not contain every superseded original filing; the present-day company selection creates survivorship bias. This is not a full decision-engine backtest, forecast, or recommendation.</p></section>':'';
+ for(const id of ['qf-v99-hub-result','qf-v99-brief']){const node=$(id);if(node)node.innerHTML=html;}
+ const lab=$('qf-v99-lab-insight');if(lab)lab.textContent=item&&item.ready?
+  'V9.9 local archived filing evidence: '+item.counts.completeUniverse+' / '+item.counts.scheduled+' decision dates cover every selected issuer; '+(item.performance.ready?'restricted evaluation available.':'performance withheld.'):
+  'V9.9 archive audit: import a local SEC archive and run the Research Hub assessment to examine dated filing revisions.';
+}
+async function importArchivedSECV99(){
+ const field=$('qf-v99-file'),file=field?.files?.[0];if(!file||!privateState)return;
+ const initialState=privateState,token=++archiveReadTokenV99;
+ const messageNode=$('qf-v99-import-status');
+ if(file.size>24*1024*1024||file.size<32){if(messageNode)messageNode.textContent='Archive must be JSON smaller than 24 MB.';field.value='';return;}
+ if(messageNode)messageNode.textContent='Checking the local archive schema, SEC identifiers, and filing dates...';
+ try{
+  const raw=JSON.parse(await file.text());
+  if(token!==archiveReadTokenV99||privateState!==initialState)return;
+  const validated=window.QFPrivateArchivedSECValidationV99.validateArchive(raw,window.QFPublishedSEC);
+  if(!validated.ready)throw new Error(validated.reason);
+  importedSECArchiveV99=validated.archive;archiveFilenameV99=String(file.name).slice(0,90);
+  linkedArchivedSECV99=null;
+  if(linkedResearchBriefV93){
+   const policy=Number($('private-v90-maxdrawdown').value);
+   linkedArchivedSECV99=window.QFPrivateArchivedSECValidationV99.run({
+    archive:importedSECArchiveV99,snapshot:window.QFPublishedSEC,
+    history:historySeries,selection:researchSelection,candidate:linkedResearchBriefV93.symbol,
+    train:126,step:21,maxDrawdown:policy,feeBps:10});
+  }
+  refreshConnectedResearchV93();
+ }catch(err){
+  if(token===archiveReadTokenV99&&privateState===initialState){
+   importedSECArchiveV99=null;linkedArchivedSECV99=null;archiveFilenameV99='';refreshConnectedResearchV93();
+   if(messageNode)messageNode.textContent='Archive rejected: '+String(err.message||err).slice(0,180);
+  }
+ }finally{if(token===archiveReadTokenV99)field.value='';}
+}
+function clearImportedSECV99(){archiveReadTokenV99++;importedSECArchiveV99=null;linkedArchivedSECV99=null;archiveFilenameV99='';
+ const f=$('qf-v99-file');if(f)f.value='';refreshConnectedResearchV93();}
 function refreshConnectedResearchV93(){
  renderInvestmentIntelligenceV94();
  renderResearchDiagnosticsV95();
  renderResearchProtocolV96();
  renderPointInTimeV97();
  renderSECCoverageV98();
+ renderArchivedSECV99();
  const packet=linkedResearchBriefV93;
  const title=$('qf-v93-ribbon-title'),detail=$('qf-v93-ribbon-detail'),brief=$('qf-v93-ribbon-brief');
  if(title)title.textContent=packet?'Completed research · '+packet.candidate+' ('+packet.symbol+')':'Research workflow · No current assessment';
@@ -860,6 +925,7 @@ async function verifyMFA(){
   }catch(e){message(e.message);}
 }
 async function logout(){
+  clearImportedSECV99(); // Invalidate imported financial records and pending reads before asynchronous sign-out.
   researchSessionJournalV95=[];clearResearchOSV90();renderSavedResearchV96();
   try{await api('auth/logout',{});}catch(_){ /* Clear visible private content regardless */ }
   ideasRunSequence++;ideaData=[];ideaFundamentals={};$('ideas-results').textContent='';$('ideas-run').disabled=false;clearDecisionBrief();
@@ -1763,12 +1829,15 @@ $('qf-v93-brief-export').addEventListener('click',()=>{
  downloadResearchJSON('quantforge-v95-linked-research-briefing.json',{...linkedResearchBriefV93,comparativeIntelligence:linkedResearchIntelligenceV94,portfolioValidation:linkedResearchDiagnosticsV95?window.QFPrivatePortfolioValidationV95.exportSafe(linkedResearchDiagnosticsV95):null,
   researchValidationV96:linkedResearchProtocolV96?window.QFPrivateResearchIntelligenceV96.safeSummary(linkedResearchProtocolV96):null,
   filingTimelineV97:linkedPointInTimeV97?window.QFPrivatePointInTimeV97.safeSummary(linkedPointInTimeV97):null,
-  secCoverageV98:linkedSECCoverageV98?window.QFPrivateSECCoverageV98.exportSafe(linkedSECCoverageV98):null});
+  secCoverageV98:linkedSECCoverageV98?window.QFPrivateSECCoverageV98.exportSafe(linkedSECCoverageV98):null,
+  archivedSECv99:linkedArchivedSECV99?window.QFPrivateArchivedSECValidationV99.exportSafe(linkedArchivedSECV99):null});
 });
 for(const id of ['qf-v93-briefing','qf-v93-lab-status'])$(id).addEventListener('click',e=>{
  const b=e.target.closest('[data-v93-method]');
  if(b&&privateState&&['research','candidate','valuation','trade','walkforward','backtest','optimization','lab'].includes(b.dataset.v93Method))privateTab(b.dataset.v93Method);
 });
+$('qf-v99-file').addEventListener('change',importArchivedSECV99);
+$('qf-v99-clear').addEventListener('click',clearImportedSECV99);
 $('private-v90-browse').addEventListener('click',()=>openAssetBrowser('research'));
 $('private-v90-run').addEventListener('click',runResearchOSV90);
 $('qf-v95-journal-clear').addEventListener('click',()=>{researchSessionJournalV95=[];renderResearchDiagnosticsV95();});

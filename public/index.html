@@ -522,6 +522,10 @@ main{width:min(var(--qf-content),100%);padding:36px clamp(22px,3.4vw,44px) 80px}
 #private-signed .qf-v98-shell{border-left:4px solid #53786d}
 #private-signed .qf-v98-shell .table-wrap{overflow-x:auto;margin:13px 0}
 #private-signed .qf-v98-shell .qf-v95-table td{max-width:270px;overflow-wrap:anywhere}
+#private-signed .qf-v99-import{margin-top:20px;border-left:4px solid #567e92}
+#private-signed .qf-v99-import input[type=file]{max-width:100%;min-width:200px}
+#private-signed .qf-v99-shell .table-wrap{overflow-x:auto}
+#private-signed .qf-v99-shell td{max-width:260px;overflow-wrap:anywhere}
 /* V9.4 cross-security evidence and policy stability; same shared research run */
 #private-signed .qf-v95-host{max-width:1200px;margin:20px auto}
 #private-signed .qf-v95-shell{border:1px solid #ccdcd6;background:#f7faf8;border-radius:14px;padding:18px}
@@ -976,6 +980,7 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
       <div id="qf-v96-lab-insight" class="tiny" aria-live="polite"></div>
       <div id="qf-v97-lab-insight" class="tiny" aria-live="polite"></div>
       <div id="qf-v98-lab-insight" class="tiny" aria-live="polite"></div>
+      <div id="qf-v99-lab-insight" class="tiny" aria-live="polite"></div>
       <div class="controls qf-v93-lab-tools"><button type="button" class="btn" data-private-tab="decision">Return to Research Hub</button><button type="button" class="btn" data-private-tab="settings">View research briefing</button></div>
       <div class="qf-v9-lab-grid">
         <button type="button" data-private-tab="candidate"><strong>Company &amp; factor research</strong><small>SEC fundamentals, downside risk, market ETF beta, independent FF3 regressions</small></button>
@@ -1021,6 +1026,13 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
       <div id="qf-v96-hub" class="qf-v95-host" aria-live="polite"></div>
       <div id="qf-v97-hub" class="qf-v95-host" aria-live="polite"></div>
       <div id="qf-v98-hub" class="qf-v95-host" aria-live="polite"></div>
+      <section class="qf-v95-shell qf-v99-import" aria-label="Import historical SEC filing evidence">
+        <span class="eyebrow">V9.9 · OPTIONAL LOCAL SEC ARCHIVE</span><h3>Compare point-in-time filing evidence</h3>
+        <p>Choose a locally generated SEC filing-revision archive to extend the historical evidence audit. The file stays in browser memory; it is not transmitted to the website or included in saved notes.</p>
+        <div class="controls"><label for="qf-v99-file">Local SEC archive JSON</label><input type="file" id="qf-v99-file" accept=".json,application/json" disabled><button type="button" class="btn sm" id="qf-v99-clear">Clear imported archive</button></div>
+        <p id="qf-v99-import-status" class="tiny" aria-live="polite">Sign in with MFA before importing local filing history.</p>
+        <div id="qf-v99-hub-result" aria-live="polite"></div>
+      </section>
       </div>
       <div id="qf-v93-legacy-compat" hidden aria-hidden="true">
       <div class="pane" id="private-decision-center-v84">
@@ -1190,6 +1202,7 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
       <div id="qf-v96-brief" class="qf-v95-host" aria-live="polite"></div>
       <div id="qf-v97-brief" class="qf-v95-host" aria-live="polite"></div>
       <div id="qf-v98-brief" class="qf-v95-host" aria-live="polite"></div>
+      <div id="qf-v99-brief" class="qf-v95-host" aria-live="polite"></div>
       <div class="pane" id="qf-v95-journal"><div class="section-title"><h3>Session research history</h3><button type="button" class="btn sm" id="qf-v95-journal-clear">Clear session list</button></div>
         <p class="tiny">Last eight completed assessment summaries in this authenticated browser session. No account values, holdings, or raw market prices are saved. This list is not a cloud archive and resets on refresh or logout.</p><div id="qf-v95-session-history" aria-live="polite"></div></div>
       <div class="pane qf-v96-saved" id="qf-v96-archive"><div class="section-title"><h3>Saved research archive</h3><button type="button" class="btn primary" id="qf-v96-save" disabled>Save current assessment</button></div><p class="tiny">Saved explicitly to existing MFA-protected private notes; persists across browser sessions. Stores a short conclusion and method count only—not holdings, account balances, market prices, or a full report. Deletion is permanent.</p><p class="tiny" id="qf-v96-archive-status">Owner-only archive</p><div id="qf-v96-saved-list" aria-live="polite"></div></div>
@@ -4039,6 +4052,195 @@ if(typeof module==='object'&&module.exports)module.exports=api;
 root.QFPrivateSECCoverageV98=api;
 })(typeof window!=='undefined'?window:globalThis);
 
+/* QuantForge V9.9: local, revision-aware SEC filing archive point-in-time validation.
+ * User-imported archive is never fetched, transmitted, persisted or used to trade.
+ * This is a restricted historical rule, not a complete decision-engine backtest. */
+(function(root){
+'use strict';
+const FIELDS=['revenue_usd','operating_cash_flow_usd','capex_usd'];
+const TAGS=Object.freeze({
+ revenue_usd:['RevenueFromContractWithCustomerExcludingAssessedTax','RevenueFromContractWithCustomerIncludingAssessedTax','Revenues','SalesRevenueNet'],
+ operating_cash_flow_usd:['NetCashProvidedByUsedInOperatingActivities','NetCashProvidedByUsedInOperatingActivitiesContinuingOperations'],
+ capex_usd:['PaymentsToAcquirePropertyPlantAndEquipment']
+});
+const isDate=x=>typeof x==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(x)&&!Number.isNaN(Date.parse(x))&&new Date(x).toISOString().slice(0,10)===x;
+const symbol=x=>typeof x==='string'&&/^[A-Z0-9.\-]{1,15}$/.test(x);
+const accession=x=>typeof x==='string'&&/^\d{10}-\d{2}-\d{6}$/.test(x);
+const finite=x=>typeof x==='number'&&Number.isFinite(x);
+const today=()=>new Date().toISOString().slice(0,10);
+const dayDiff=(a,b)=>(Date.parse(b)-Date.parse(a))/86400000;
+const fix=x=>finite(x)?Number(x.toFixed(6)):null;
+const bounded=x=>String(x||'Unavailable').slice(0,160);
+function validateArchive(input,snapshot){
+ const fail=reason=>({ready:false,reason,archive:null});
+ if(!input||input.schema!=='quantforge.sec.filing-revisions.v9.8'||!isDate(input.as_of)||input.as_of>today()||
+   !Array.isArray(input.companies)||input.companies.length<1||input.companies.length>100||
+   !Array.isArray(snapshot?.companies)||snapshot.companies.length>500||new Set(snapshot.companies.map(c=>c.symbol)).size!==snapshot.companies.length)
+  return fail('Archive schema, cutoff, size, or SEC reference snapshot is invalid.');
+ const registry=new Map(snapshot.companies.map(c=>[c.symbol,c.cik]));
+ const seen=new Set();let totalVersions=0;
+ for(const issuer of input.companies){
+  if(!symbol(issuer?.symbol)||seen.has(issuer.symbol)||!Number.isSafeInteger(issuer.cik)||issuer.cik<=0||
+   registry.get(issuer.symbol)!==issuer.cik||!Array.isArray(issuer.annual)||
+   issuer.annual.length<1||issuer.annual.length>25)return fail('Duplicate, unsupported, or CIK-mismatched archive issuer.');
+  seen.add(issuer.symbol);
+  const periodSet=new Set();
+  for(const period of issuer.annual){
+   if(!isDate(period?.fiscal_end)||period.fiscal_end>input.as_of||periodSet.has(period.fiscal_end)||
+     !period.revisions||typeof period.revisions!=='object')return fail('Duplicate or invalid annual filing period.');
+   periodSet.add(period.fiscal_end);
+   for(const field of FIELDS){
+    const entries=period.revisions[field];
+    if(!Array.isArray(entries)||entries.length>500)return fail('Missing or excessive filing revisions.');
+    totalVersions+=entries.length;
+    if(totalVersions>250000)return fail('Archive exceeds safe source-row limit.');
+    const duplicate=new Map();
+    for(const version of entries){
+     if(!isDate(version?.start)||!isDate(version.filed)||version.filed>input.as_of||
+       version.filed<period.fiscal_end||dayDiff(version.start,period.fiscal_end)<330||
+       dayDiff(version.start,period.fiscal_end)>400||!accession(version.accession)||
+       typeof version.tag!=='string'||!TAGS[field].includes(version.tag)||
+       !Number.isInteger(version.tag_priority)||version.tag_priority!==TAGS[field].indexOf(version.tag)||
+       !finite(version.value)||Math.abs(version.value)>=1e16||
+       (field==='capex_usd'&&version.value<0))return fail('Invalid source lineage, period, or SEC annual value.');
+     const key=[version.start,version.filed,version.accession,version.tag].join('|');
+     if(duplicate.has(key)&&duplicate.get(key)!==version.value)return fail('Conflicting duplicate source facts.');
+     duplicate.set(key,version.value);
+    }
+   }
+  }
+ }
+ return {ready:true,reason:null,archive:input,issuerCount:seen.size,versionCount:totalVersions,asOf:input.as_of};
+}
+function choose(entries,period,asOf){
+ const eligible=entries.filter(x=>x.filed<=asOf&&x.filed>=period&&
+    dayDiff(x.start,period)>=330&&dayDiff(x.start,period)<=400);
+ if(!eligible.length)return null;
+ const last=eligible.reduce((a,x)=>x.filed>a?x.filed:a,'0000-00-00');
+ const latest=eligible.filter(x=>x.filed===last);
+ const priority=Math.min(...latest.map(x=>x.tag_priority));
+ const preferred=latest.filter(x=>x.tag_priority===priority);
+ if(new Set(preferred.map(x=>x.value)).size!==1)return null;
+ return {value:preferred[0].value,filed:last,source:preferred[0].accession,
+  revised:eligible.some(x=>x.filed<last)};
+}
+function auditAt(issuer,asOf){
+ const fail=reason=>({ready:false,reason});
+ if(!isDate(asOf)||!issuer||!Array.isArray(issuer.annual))return fail('Missing archival filing evidence.');
+ const annual=[];
+ for(const period of issuer.annual){
+  if(period.fiscal_end>asOf)continue;
+  const found=Object.fromEntries(FIELDS.map(field=>[field,choose(period.revisions[field],period.fiscal_end,asOf)]));
+  if(FIELDS.some(field=>!found[field]))continue;
+  if(found.revenue_usd.value<=0||found.capex_usd.value<0)continue;
+  annual.push({fiscalEnd:period.fiscal_end,revenue:found.revenue_usd.value,
+   cashFlow:found.operating_cash_flow_usd.value-found.capex_usd.value,
+   latestFiled:FIELDS.map(f=>found[f].filed).sort().at(-1),
+   laterVersion:FIELDS.some(f=>found[f].revised)});
+ }
+ annual.sort((a,b)=>b.fiscalEnd.localeCompare(a.fiscalEnd));
+ if(annual.length<2)return fail('Two fully filed fiscal years are not available by this decision date.');
+ const latest=annual[0],previous=annual[1];
+ const spacing=dayDiff(previous.fiscalEnd,latest.fiscalEnd);
+ if(spacing<300||spacing>430)return fail('The two most recent available annual periods are not consecutive.');
+ if(dayDiff(latest.fiscalEnd,asOf)>800)return fail('Most recent available fiscal year is too old.');
+ const growth=latest.revenue/previous.revenue-1,margin=latest.cashFlow/latest.revenue;
+ if(!finite(growth)||!finite(margin))return fail('Invalid point-in-time financial ratios.');
+ return {ready:true,period:latest.fiscalEnd,previousPeriod:previous.fiscalEnd,
+  latestFiled:latest.latestFiled>previous.latestFiled?latest.latestFiled:previous.latestFiled,
+  revenueGrowth:fix(growth),fcfMargin:fix(margin),usedLaterVersion:latest.laterVersion||previous.laterVersion};
+}
+function trailingDrawdown(values){let p=values[0],worst=0;for(const x of values){p=Math.max(p,x);worst=Math.min(worst,x/p-1);}return worst;}
+function run({archive,snapshot,history,selection,candidate,train=126,step=21,maxDrawdown=.25,feeBps=10}={}){
+ const fail=reason=>({ready:false,reason,counts:{scheduled:0,completeUniverse:0,withheld:0},
+  issuers:[],performance:{ready:false,reason:'Historical evaluation unavailable.'}});
+ const validated=validateArchive(archive,snapshot);
+ if(!validated.ready)return fail(validated.reason);
+ const pit=root.QFPrivatePointInTimeV97;
+ if(!pit||!pit.validatePrice(history,candidate)||!Array.isArray(selection)||selection.length<2||selection.length>5||
+   new Set(selection).size!==selection.length||selection.some(s=>!symbol(s)||!history.symbols.includes(s))||
+   selection.length!==history.symbols.length||!selection.includes(candidate))return fail('Select and load the exact dated 2–5-investment research universe.');
+ if(!Number.isInteger(train)||train<63||train>504||!Number.isInteger(step)||step<5||step>63||
+   !finite(maxDrawdown)||maxDrawdown<=0||maxDrawdown>=1||!finite(feeBps)||feeBps<0||feeBps>100)
+  return fail('Invalid historical screening configuration.');
+ const bySymbol=new Map(archive.companies.map(x=>[x.symbol,x]));
+ const dates=history.dates;
+ const boundaries=[];
+ for(let end=train-1;end+step<dates.length&&boundaries.length<80;end+=step)boundaries.push(end);
+ if(boundaries.length<2)return fail('At least two historical evaluation windows are required.');
+ const coverage=new Map(selection.map(s=>[s,{symbol:s,scheduled:boundaries.length,eligible:0,withheld:0,
+  laterRevisionWindows:0,firstEligible:null,lastEligible:null,primaryGap:null,_gaps:new Map()}]));
+ let full=0,wealth=1,passive=1,priorExposure=0,changes=0,accepted=0;
+ const windows=[];
+ for(const end of boundaries){
+  const decision=dates[end];const eligible=new Map();
+  for(const s of selection){
+   const issuer=bySymbol.get(s);
+   const evidence=issuer&&decision<=archive.as_of?auditAt(issuer,decision):
+    {ready:false,reason:issuer?'Decision date is after local archive source cutoff.':'Issuer is absent from the imported filing archive.'};
+   const row=coverage.get(s);
+   if(evidence.ready){row.eligible++;eligible.set(s,evidence);
+    if(evidence.usedLaterVersion)row.laterRevisionWindows++;
+    if(!row.firstEligible)row.firstEligible=decision;
+    row.lastEligible=decision;
+   }else{row.withheld++;const reason=bounded(evidence.reason);
+    row._gaps.set(reason,(row._gaps.get(reason)||0)+1);}
+  }
+  if(eligible.size!==selection.length)continue;
+  full++;
+  const point=eligible.get(candidate),prices=history.closes[candidate];
+  const dd=trailingDrawdown(prices.slice(end-train+1,end+1));
+  const exposure=point.revenueGrowth>0&&point.fcfMargin>0&&dd>=-maxDrawdown?1:0;
+  const gross=prices[end+step]/prices[end+1]-1;
+  const cost=Math.abs(exposure-priorExposure)*feeBps/10000;
+  const net=(1-cost)*(1+exposure*gross)-1;
+  if(!finite(gross)||!finite(net)||net<=-1)return fail('Invalid observed evaluation returns.');
+  wealth*=1+net;passive*=1+gross;
+  if(windows.length===0)passive*=1-feeBps/10000;
+  accepted+=exposure;changes+=Math.abs(exposure-priorExposure);priorExposure=exposure;
+  windows.push({decisionDate:decision,executionDate:dates[end+1],testThrough:dates[end+step],
+   fiscalYear:point.period,exposure,observedGrossReturn:fix(gross),observedRuleReturn:fix(net)});
+ }
+ const rows=selection.map(s=>{
+  const r=coverage.get(s),gap=[...r._gaps].sort((a,b)=>b[1]-a[1])[0];
+  return {symbol:s,scheduled:r.scheduled,eligible:r.eligible,withheld:r.withheld,
+   coveragePct:fix(100*r.eligible/r.scheduled),laterRevisionWindows:r.laterRevisionWindows,
+   firstEligible:r.firstEligible,lastEligible:r.lastEligible,primaryGap:gap?{reason:gap[0],count:gap[1]}:null};
+ });
+ const complete=full===boundaries.length;
+ return {ready:true,reason:null,archiveAsOf:archive.as_of,archivedIssuers:validated.issuerCount,
+  sourceVersions:validated.versionCount,counts:{scheduled:boundaries.length,completeUniverse:full,withheld:boundaries.length-full},
+  issuers:rows,performance:complete?{ready:true,
+   policy:'Filing-date-eligible revenue growth > 0, FCF margin > 0, and trailing drawdown inside threshold',
+   ruleReturn:fix(wealth-1),passiveReturn:fix(passive-1),investedWindows:accepted,
+   cashWindows:windows.length-accepted,weightChanges:changes,feeBps,maxDrawdown,
+   testedFrom:windows[0].executionDate,testedThrough:windows.at(-1).testThrough,
+   windows:windows.slice(-8)}:{ready:false,reason:'Cumulative historical returns withheld because one or more scheduled decision windows lacks full issuer coverage.',
+   availableWindows:full,requiredWindows:boundaries.length},
+  limitations:[
+   'SEC Company Facts may omit original superseded filing versions; archival completeness cannot be assumed.',
+   'Historical companies were selected today; this is not a survivorship-bias-free point-in-time universe.',
+   'Only a restricted historical rule is replayed, not the full contemporary Research Hub model.',
+   'Price-only next-close returns exclude dividends, corporate actions, spread, slippage, taxes and market impact.',
+   'The archive is imported locally and kept only in browser memory; no automatic brokerage transactions.'
+  ]};
+}
+function exportSafe(result){
+ if(!result||result.ready!==true)return {schema:'quantforge.archived-sec-evidence.v9.9',ready:false,reason:bounded(result?.reason)};
+ return {schema:'quantforge.archived-sec-evidence.v9.9',ready:true,archiveAsOf:result.archiveAsOf,
+  archivedIssuers:result.archivedIssuers,counts:{...result.counts},
+  issuers:result.issuers.map(r=>({symbol:r.symbol,scheduled:r.scheduled,eligible:r.eligible,withheld:r.withheld,
+   coveragePct:r.coveragePct,laterRevisionWindows:r.laterRevisionWindows})),
+  performance:result.performance.ready?{ready:true,ruleReturn:result.performance.ruleReturn,
+   passiveReturn:result.performance.passiveReturn,feeBps:result.performance.feeBps,
+   testedFrom:result.performance.testedFrom,testedThrough:result.performance.testedThrough}:
+   {ready:false,reason:bounded(result.performance.reason)},limitations:result.limitations.slice(0,5)};
+}
+const api=Object.freeze({validateArchive,auditAt,run,exportSafe});
+if(typeof module==='object'&&module.exports)module.exports=api;
+root.QFPrivateArchivedSECValidationV99=api;
+})(typeof window!=='undefined'?window:globalThis);
+
 /* QuantForge private research: pure in-sample portfolio analytics.
  * No external requests, synthetic data, brokerage orders, or portfolio mutations.
  * The public demo model is deliberately not imported here.
@@ -4863,13 +5065,16 @@ root.QFPrivateSECCoverageV98=api;
 (function () {
 'use strict';
 const $=id=>document.getElementById(id);
-let guideReportV79=null, linkedResearchBriefV93=null, linkedResearchIntelligenceV94=null, linkedResearchDiagnosticsV95=null,linkedResearchProtocolV96=null,linkedPointInTimeV97=null,linkedSECCoverageV98=null;
+let guideReportV79=null, linkedResearchBriefV93=null, linkedResearchIntelligenceV94=null, linkedResearchDiagnosticsV95=null,linkedResearchProtocolV96=null,linkedPointInTimeV97=null,linkedSECCoverageV98=null,linkedArchivedSECV99=null;
 let researchSessionJournalV95=[];
+let importedSECArchiveV99=null,archiveFilenameV99='',archiveReadTokenV99=0;
 let privateDecisionCenterV84=null;
 let researchOSRunV90=0, researchOSInternalLoadV90=false;
 let candidateDossierV90=null,candidateQuoteV90=null,candidateFactorV91=null;
 function clearResearchOSV90(){
- linkedResearchBriefV93=null;linkedResearchIntelligenceV94=null;linkedResearchDiagnosticsV95=null;linkedResearchProtocolV96=null;linkedPointInTimeV97=null;linkedSECCoverageV98=null;
+ linkedResearchBriefV93=null;linkedResearchIntelligenceV94=null;linkedResearchDiagnosticsV95=null;linkedResearchProtocolV96=null;linkedPointInTimeV97=null;linkedSECCoverageV98=null;linkedArchivedSECV99=null;
+ if(!privateState){importedSECArchiveV99=null;archiveFilenameV99='';archiveReadTokenV99++;
+  const file=$('qf-v99-file');if(file)file.value='';}
  if(typeof refreshConnectedResearchV93==='function')refreshConnectedResearchV93();
  researchOSRunV90++;
  candidateDossierV90=null;candidateQuoteV90=null;candidateFactorV91=null;
@@ -4924,6 +5129,14 @@ function renderResearchOSV90(result,variants){
   snapshot:window.QFPublishedSEC,history:historySeries,selection:researchSelection,
   candidate:linkedResearchBriefV93.symbol,train:126,step:21
  });}catch(err){console.warn('V9.8 SEC issuer coverage unavailable:',String(err.message||err).slice(0,100));}
+ linkedArchivedSECV99=null;
+ if(importedSECArchiveV99){
+  try{linkedArchivedSECV99=window.QFPrivateArchivedSECValidationV99.run({
+    archive:importedSECArchiveV99,snapshot:window.QFPublishedSEC,
+    history:historySeries,selection:researchSelection,candidate:linkedResearchBriefV93.symbol,
+    train:126,step:21,maxDrawdown:review.constraints.maxDrawdown,feeBps:10
+  });}catch(err){console.warn('V9.9 local archive audit unavailable:',String(err.message||err).slice(0,100));}
+ }
  researchSessionJournalV95.unshift({
   date:String(review.asOf||'').slice(0,10),symbol:String(review.symbol||'').slice(0,20),
   action:String(review.action||'').slice(0,120),readiness:String(review.readiness||'').slice(0,50),
@@ -5129,12 +5342,66 @@ function renderSECCoverageV98(){
   'V9.8 SEC evidence completeness: '+item.counts.eligible+' / '+item.counts.scheduled+' decision windows support all '+item.rows.length+' selected issuers. Missing data is never filled.':
   'V9.8 SEC coverage awaits a completed assessment and aligned historical prices.';
 }
+function renderArchivedSECV99(){
+ const input=$('qf-v99-file');if(input)input.disabled=!privateState;
+ const status=$('qf-v99-import-status');if(status)status.textContent=!privateState?
+  'Sign in with MFA before importing local filing history.':
+  importedSECArchiveV99?archiveFilenameV99+' · archive imported into memory; never uploaded or saved.':
+  'No local filing archive imported. Current SEC snapshot research is unchanged.';
+ const item=linkedArchivedSECV99;
+ const table=rows=>'<div class="table-wrap"><table class="qf-v95-table"><thead><tr><th>Investment</th><th>Evidence-covered dates</th><th>Later-version dates</th><th>Primary gap</th></tr></thead><tbody>'+rows.map(r=>'<tr>'+[
+   String(assetNames[r.symbol]||r.symbol)+' ('+r.symbol+')',r.eligible+' / '+r.scheduled+' ('+r.coveragePct+'%)',
+   String(r.laterRevisionWindows),r.primaryGap?r.primaryGap.reason+' · '+r.primaryGap.count:'No missing evidence'
+  ].map(x=>'<td>'+safe(x)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
+ const html=item?'<section class="qf-v95-shell qf-v99-shell" aria-label="Locally imported historical SEC revision evidence">'+
+  '<div class="qf-v95-heading"><span class="eyebrow">V9.9 · ARCHIVED FILING HISTORY</span><h3>Historical evidence from original filing versions</h3><p>Compare the imported, dated SEC history against the limited published snapshot using the same loaded investment universe and evaluation dates. No archive data is uploaded.</p></div>'+
+  (item.ready?'<p class="qf-v97-coverage"><strong>'+safe(item.counts.completeUniverse)+' / '+safe(item.counts.scheduled)+'</strong> dates with complete selected-issuer evidence · '+safe(item.counts.withheld)+' withheld</p>'+table(item.issuers)+
+   '<p>'+ (item.performance.ready?'<strong>Restricted historical rule vs passive:</strong> '+safe((100*item.performance.ruleReturn).toFixed(1))+'% vs '+safe((100*item.performance.passiveReturn).toFixed(1))+'% (price-only, dated evaluation, stated fees).':
+    '<strong>Historical comparison withheld:</strong> '+safe(item.performance.reason))+'</p>':
+   '<p><strong>Archive analysis unavailable:</strong> '+safe(item.reason)+'</p>')+
+  '<p class="tiny">Revisions are selected using each decision date. SEC Company Facts may not contain every superseded original filing; the present-day company selection creates survivorship bias. This is not a full decision-engine backtest, forecast, or recommendation.</p></section>':'';
+ for(const id of ['qf-v99-hub-result','qf-v99-brief']){const node=$(id);if(node)node.innerHTML=html;}
+ const lab=$('qf-v99-lab-insight');if(lab)lab.textContent=item&&item.ready?
+  'V9.9 local archived filing evidence: '+item.counts.completeUniverse+' / '+item.counts.scheduled+' decision dates cover every selected issuer; '+(item.performance.ready?'restricted evaluation available.':'performance withheld.'):
+  'V9.9 archive audit: import a local SEC archive and run the Research Hub assessment to examine dated filing revisions.';
+}
+async function importArchivedSECV99(){
+ const field=$('qf-v99-file'),file=field?.files?.[0];if(!file||!privateState)return;
+ const initialState=privateState,token=++archiveReadTokenV99;
+ const messageNode=$('qf-v99-import-status');
+ if(file.size>24*1024*1024||file.size<32){if(messageNode)messageNode.textContent='Archive must be JSON smaller than 24 MB.';field.value='';return;}
+ if(messageNode)messageNode.textContent='Checking the local archive schema, SEC identifiers, and filing dates...';
+ try{
+  const raw=JSON.parse(await file.text());
+  if(token!==archiveReadTokenV99||privateState!==initialState)return;
+  const validated=window.QFPrivateArchivedSECValidationV99.validateArchive(raw,window.QFPublishedSEC);
+  if(!validated.ready)throw new Error(validated.reason);
+  importedSECArchiveV99=validated.archive;archiveFilenameV99=String(file.name).slice(0,90);
+  linkedArchivedSECV99=null;
+  if(linkedResearchBriefV93){
+   const policy=Number($('private-v90-maxdrawdown').value);
+   linkedArchivedSECV99=window.QFPrivateArchivedSECValidationV99.run({
+    archive:importedSECArchiveV99,snapshot:window.QFPublishedSEC,
+    history:historySeries,selection:researchSelection,candidate:linkedResearchBriefV93.symbol,
+    train:126,step:21,maxDrawdown:policy,feeBps:10});
+  }
+  refreshConnectedResearchV93();
+ }catch(err){
+  if(token===archiveReadTokenV99&&privateState===initialState){
+   importedSECArchiveV99=null;linkedArchivedSECV99=null;archiveFilenameV99='';refreshConnectedResearchV93();
+   if(messageNode)messageNode.textContent='Archive rejected: '+String(err.message||err).slice(0,180);
+  }
+ }finally{if(token===archiveReadTokenV99)field.value='';}
+}
+function clearImportedSECV99(){archiveReadTokenV99++;importedSECArchiveV99=null;linkedArchivedSECV99=null;archiveFilenameV99='';
+ const f=$('qf-v99-file');if(f)f.value='';refreshConnectedResearchV93();}
 function refreshConnectedResearchV93(){
  renderInvestmentIntelligenceV94();
  renderResearchDiagnosticsV95();
  renderResearchProtocolV96();
  renderPointInTimeV97();
  renderSECCoverageV98();
+ renderArchivedSECV99();
  const packet=linkedResearchBriefV93;
  const title=$('qf-v93-ribbon-title'),detail=$('qf-v93-ribbon-detail'),brief=$('qf-v93-ribbon-brief');
  if(title)title.textContent=packet?'Completed research · '+packet.candidate+' ('+packet.symbol+')':'Research workflow · No current assessment';
@@ -5721,6 +5988,7 @@ async function verifyMFA(){
   }catch(e){message(e.message);}
 }
 async function logout(){
+  clearImportedSECV99(); // Invalidate imported financial records and pending reads before asynchronous sign-out.
   researchSessionJournalV95=[];clearResearchOSV90();renderSavedResearchV96();
   try{await api('auth/logout',{});}catch(_){ /* Clear visible private content regardless */ }
   ideasRunSequence++;ideaData=[];ideaFundamentals={};$('ideas-results').textContent='';$('ideas-run').disabled=false;clearDecisionBrief();
@@ -6624,12 +6892,15 @@ $('qf-v93-brief-export').addEventListener('click',()=>{
  downloadResearchJSON('quantforge-v95-linked-research-briefing.json',{...linkedResearchBriefV93,comparativeIntelligence:linkedResearchIntelligenceV94,portfolioValidation:linkedResearchDiagnosticsV95?window.QFPrivatePortfolioValidationV95.exportSafe(linkedResearchDiagnosticsV95):null,
   researchValidationV96:linkedResearchProtocolV96?window.QFPrivateResearchIntelligenceV96.safeSummary(linkedResearchProtocolV96):null,
   filingTimelineV97:linkedPointInTimeV97?window.QFPrivatePointInTimeV97.safeSummary(linkedPointInTimeV97):null,
-  secCoverageV98:linkedSECCoverageV98?window.QFPrivateSECCoverageV98.exportSafe(linkedSECCoverageV98):null});
+  secCoverageV98:linkedSECCoverageV98?window.QFPrivateSECCoverageV98.exportSafe(linkedSECCoverageV98):null,
+  archivedSECv99:linkedArchivedSECV99?window.QFPrivateArchivedSECValidationV99.exportSafe(linkedArchivedSECV99):null});
 });
 for(const id of ['qf-v93-briefing','qf-v93-lab-status'])$(id).addEventListener('click',e=>{
  const b=e.target.closest('[data-v93-method]');
  if(b&&privateState&&['research','candidate','valuation','trade','walkforward','backtest','optimization','lab'].includes(b.dataset.v93Method))privateTab(b.dataset.v93Method);
 });
+$('qf-v99-file').addEventListener('change',importArchivedSECV99);
+$('qf-v99-clear').addEventListener('click',clearImportedSECV99);
 $('private-v90-browse').addEventListener('click',()=>openAssetBrowser('research'));
 $('private-v90-run').addEventListener('click',runResearchOSV90);
 $('qf-v95-journal-clear').addEventListener('click',()=>{researchSessionJournalV95=[];renderResearchDiagnosticsV95();});
