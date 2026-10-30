@@ -30,7 +30,7 @@ def test_public_routes_and_sources_unchanged():
 
 def test_private_workflow_without_extra_tabs():
     s = _read('tools/build_unified_site.py')
-    assert s.count('class="private-nav-group"') == 4
+    assert all(f'data-private-tab="{name}"' in s for name in ('decision', 'home', 'settings', 'lab')) and 'qf-v170-nav' in s
     for tab in ('home', 'trade', 'ideas', 'research', 'optimization', 'backtest', 'walkforward', 'valuation', 'settings'):
         assert f'data-private-view="{tab}"' in s
         assert f'data-private-tab="{tab}"' in s

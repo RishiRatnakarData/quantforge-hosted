@@ -19,7 +19,7 @@ def test_manual_accordion_is_no_longer_visible_but_compatibility_endpoints_remai
 def test_nav_and_research_briefing_share_same_model_output():
     builder=read('tools/build_unified_site.py')
     private=read('web/site/private.js')
-    assert '01 · Decision Center' in builder and '04 · Portfolio &amp; Reports' in builder
+    assert 'data-private-tab="decision">Research' in builder and 'data-private-tab="settings">Saved reports' in builder
     assert 'id="qf-v93-research-ribbon"' in builder
     assert 'id="qf-v93-lab-status"' in builder
     assert 'id="qf-v93-briefing"' in builder

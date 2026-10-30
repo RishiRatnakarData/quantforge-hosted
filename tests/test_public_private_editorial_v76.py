@@ -29,7 +29,7 @@ def test_presentation_language_is_project_centered():
 
 def test_authenticated_navigation_preserves_every_existing_tab():
     builder = read("tools/build_unified_site.py")
-    assert 'class="private-nav-group"' in builder
+    assert 'class="private-nav qf-v170-nav"' in builder
     for tab in ("home", "trade", "ideas", "research", "optimization", "backtest", "walkforward", "valuation", "settings"):
         assert f'data-private-tab="{tab}"' in builder
         assert f'data-private-view="{tab}"' in builder

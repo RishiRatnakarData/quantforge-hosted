@@ -15,11 +15,11 @@ def test_limited_public_presentation_is_truthful():
     assert 'SIMULATED PORTFOLIO' in app
     assert 'SIMULATED RISK MODEL' in app
     assert 'DCF ASSUMPTIONS' in app
-    assert 'SIMULATED PEER MODEL' in app
+    assert 'REPORTED SEC COMPANY COMPARISON' in app
     assert 'RESEARCH OVERVIEW' in app
     assert '<strong>Research data:</strong> Historical SEC company financials' in html
     assert 'simulated returns and hypothetical forecasts' in html
-    assert 'not actual market results, valuations, or investment recommendations.' in html
+    assert 'SEC Company Comparison instead uses reported-derived financial ratios' in html
     assert 'Private account data and market feeds' in html
     assert 'FICTIONAL DATA' not in html
 

@@ -6,12 +6,14 @@ let guideReportV79=null, linkedResearchBriefV93=null, linkedResearchIntelligence
 let researchSessionJournalV95=[];
 let linkedWorkflowV140=null;
 let linkedUnifiedDecisionV160=null;
+let multiResearchV170=null;
 let manualAcceptanceV150={};
 let importedSECArchiveV99=null,archiveFilenameV99='',archiveReadTokenV99=0;
 let privateDecisionCenterV84=null;
 let researchOSRunV90=0, researchOSInternalLoadV90=false;
 let candidateDossierV90=null,candidateQuoteV90=null,candidateFactorV91=null;
 function clearResearchOSV90(){
+ multiResearchV170=null;
  linkedUnifiedDecisionV160=null;
  linkedResearchBriefV93=null;linkedResearchIntelligenceV94=null;linkedResearchDiagnosticsV95=null;linkedResearchProtocolV96=null;linkedPointInTimeV97=null;linkedSECCoverageV98=null;linkedArchivedSECV99=null;linkedArchiveQualityV100=null;linkedHistoricalPanelV110=null;linkedHistoricalRobustnessV120=null;linkedHistoricalAttributionV130=null;linkedDecisionIntegrityV130=null;
  if(!privateState){importedSECArchiveV99=null;archiveFilenameV99='';archiveReadTokenV99++;
@@ -488,12 +490,21 @@ function compactResearchDetailsV140(){
 }
 function renderUnifiedDecisionV160(){
  const slot=$('qf-v160-decision-center');
+ const pick=$('qf-v170-selected');
+ if(pick)pick.innerHTML=researchSelection.length?researchSelection.map(sym=>
+  '<button type="button" class="qf-v170-chip" data-v170-remove="'+safe(sym)+'" aria-label="Remove '+safe(assetNames[sym]||sym)+'">'+safe(assetNames[sym]||sym)+' <small>('+safe(sym)+') ×</small></button>').join(''):
+  '<span class="tiny">No investments chosen yet. Choose 2–5 companies to begin.</span>';
+ if(multiResearchV170&&privateState&&multiResearchV170.selected.join(',')===researchSelection.join(',')&&window.QFPrivateSimpleResearchV170){
+  slot.innerHTML=window.QFPrivateSimpleResearchV170.render(multiResearchV170);
+  return;
+ }
+
  if(!slot||!window.QFPrivateUnifiedDecisionV160)return;
  const data=window.QFPrivateUnifiedDecisionV160.summarize({brief:linkedResearchBriefV93,
   integrity:linkedDecisionIntegrityV130,workflow:linkedWorkflowV140});
  linkedUnifiedDecisionV160=data;
  if(!privateState||!data.ready){
-  slot.innerHTML='<div class="qf-v160-hero"><div class="qf-v160-title"><div><span class="eyebrow">CURRENT RESEARCH ASSESSMENT</span><h3>Your research summary</h3><p>Choose 2–5 companies, set your risk limits, and run the complete assessment.</p></div><span class="qf-v160-light">Not assessed</span></div><p class="tiny">No rating or recommendation is displayed until current source data and required research checks are available. Standard analysis uses the built-in SEC snapshot and authenticated market data; no upload is required.</p><div class="controls"><button class="btn sm" type="button" data-v160-route="ideas">Explore companies</button><button class="btn sm" type="button" data-v160-route="lab">Inspect research methods</button></div></div>';
+  slot.innerHTML='<p class="qf-v170-empty">Your comparison will appear here once you run complete research. No stock conclusion is shown without current company and market evidence.</p>';
   return;
  }
  const light=data.riskVeto?'Risk limit breached':({green:'Eligible for further research',amber:'Mixed or limited evidence',red:'Measured risk caution',gray:'Insufficient reliable evidence'}[data.signal]||'Evidence not evaluated');
@@ -531,6 +542,8 @@ function arrangePrivateResearchV160(){
  }
  const oldDetails=document.querySelector('[data-private-view=decision] .qf-v140-details');
  if(oldDetails)lab.appendChild(oldDetails);
+ const technical=$('qf-v160-method-trace');
+ if(technical)lab.appendChild(technical);
 }
 function refreshConnectedResearchV93(){
  renderHistoricalPanelV110();
@@ -588,14 +601,15 @@ function renderConnectedBriefV93(){
 
 async function runResearchOSV90(){
  if(!privateState){message('Sign in with MFA before running research.');return;}
- const status=$('private-v90-report'),button=$('private-v90-run');
+ const status=$('private-v90-report'),button=$('private-v90-run'),progress=$('qf-v170-progress');
  let selected=[...researchSelection];
  if(selected.length<2){
   const held=Object.entries(privateState.holdings||{}).filter(([,qty])=>finite(qty)&&qty>0).map(([sym])=>sym).slice(0,5);
   if(held.length>=2){researchSelection=held;renderResearchSelection();selected=[...researchSelection];}
  }
  if(selected.length<2||selected.length>5){
-  status.textContent='Choose 2–5 investments and select one company to assess. No decision has been generated.';
+  status.textContent='Choose two to five companies. Then select Run complete research. No decision has been generated.';
+  if(progress)progress.textContent='Choose at least two investments first.';
   return;
  }
  let sym=$('private-v90-candidate').value;
@@ -611,6 +625,8 @@ async function runResearchOSV90(){
  let plan=null,results=null;
  const record=(key,state,detail)=>{results=engine.mark(results,key,state,detail);};
  button.disabled=true;
+ button.textContent='Loading financial and market data…';
+ if(progress)progress.textContent='Loading matching company market history…';
  status.textContent='Stage 1/4: loading matching and dated observations…';
  try{
   $('private-history-days').value=$('private-v90-days').value;
@@ -695,11 +711,75 @@ async function runResearchOSV90(){
   const variants=['conservative','balanced','growth'].map(risk=>
    engine.reconcile(window.QFPrivateResearchOSV90.assess({...policyInputs,risk}),results));
   if(!current())return;
-  renderResearchOSV90(engine.reconcile(assessment,results),variants);
-  message('Automated evidence review completed. Partial failures are disclosed; no trade was placed.');
+  const fullAssessment=engine.reconcile(assessment,results);
+  renderResearchOSV90(fullAssessment,variants);
+  const rows=[{
+   symbol:sym,name:assetNames[sym]||sym,decision:fullAssessment.decision,
+   reason:fullAssessment.reason,pro:fullAssessment.pro,con:fullAssessment.con,
+   steps:fullAssessment.steps,modelCompleted:fullAssessment.orchestration?.completed,
+   modelTotal:fullAssessment.orchestration?.total
+  }];
+  // One shared market-history, optimization, backtest and walk-forward pass.
+  // Candidate fundamentals, quotes, valuation context and risk are evaluated separately.
+  // Do not reuse the first candidate's dossier for any other company.
+  for(const symbol of selected.filter(x=>x!==sym)){
+   if(!current())return;
+   status.textContent='Comparing '+safe(assetNames[symbol]||symbol)+' using available SEC, quote, risk and portfolio evidence…';
+   button.textContent='Comparing '+safe(assetNames[symbol]||symbol)+'…';
+   if(progress)progress.textContent='Analyzing '+safe(assetNames[symbol]||symbol)+' ('+(rows.length+1)+' of '+selected.length+')…';
+   let row={symbol,name:assetNames[symbol]||symbol,decision:'Insufficient evidence',
+    reason:'Available provider records could not support a complete candidate assessment.',pro:[],con:[],steps:[],
+    modelCompleted:results.filter(x=>x.status==='completed').length,modelTotal:results.length};
+   try{
+    const companyPromise=valuationCompanies[symbol]?Promise.resolve(valuationCompanies[symbol]):api('private/sec/company?symbol='+encodeURIComponent(symbol));
+    const fetches=await Promise.allSettled([companyPromise,
+     api('private/valuation-capital?symbol='+encodeURIComponent(symbol)),
+     api('private/quotes?symbols='+encodeURIComponent(symbol))]);
+    if(!current())return;
+    const company=fetches[0].status==='fulfilled'&&fetches[0].value?.symbol===symbol?fetches[0].value:null;
+    if(company)valuationCompanies[symbol]=company;
+    const capital=fetches[1].status==='fulfilled'?fetches[1].value:null;
+    const quote=fetches[2].status==='fulfilled'?(fetches[2].value?.quotes||[]).find(x=>x.symbol===symbol):null;
+    let value=null;
+    if(company&&capital&&quote){try{value=window.QFPrivateValueV73.build(company,capital,quote,new Date().toISOString());}catch(_){/* Must withhold ungrounded valuation. */}}
+    const dossier=window.QFPrivateCandidateV85.evaluate({symbol,selection:selected,history:historySeries,
+     company,value,portfolio:session,quotes:quoted,now:new Date().toISOString()});
+    const candidateModels=engine.ledger(engine.plan({selection:selected,symbol,history:historySeries,
+     train:Number($('private-wf-train').value),step:Number($('private-wf-step').value),
+     cap:Number($('private-wf-cap').value),frenchImported:!!frenchFactorsV87}));
+    // Reuse ONLY genuinely shared executions; candidate-specific status is newly measured.
+    let ledger=candidateModels.map(item=>{
+     if(item.key==='candidate')return {...item,status:dossier?.ready?'completed':'failed',detail:dossier?.ready?'Candidate SEC, quote and downside evidence evaluated.':'Company evidence is incomplete.'};
+     if(item.key==='proxy'||item.key==='french')return {...item,status:'ineligible',detail:'Optional candidate-specific factor check was not run in the comparative pass.'};
+     const shared=results.find(r=>r.key===item.key);
+     return shared&&['history','optimization','backtest','walkforward','robustness'].includes(item.key)?{...shared}:item;
+    });
+      const compareAssessment=window.QFPrivateResearchOSV90.assess({
+     asOf:fullAssessment.asOf,symbol,selection:selected,history:historySeries,
+     dossier,quote:quote||quoted[symbol]||null,portfolio:session,
+     optimizer:optimizerResult,walkforward:walkforwardResult,robustness:robustnessResultV68,
+     french:null,risk:$('private-v90-risk').value,horizon:$('private-v90-horizon').value,
+     maxWeight:Number($('private-v90-maxweight').value),maxDrawdown:Number($('private-v90-maxdrawdown').value)
+    });
+    const merged=engine.reconcile(compareAssessment,ledger);
+    row={symbol,name:assetNames[symbol]||symbol,decision:merged.decision,
+     reason:merged.reason,pro:merged.pro,con:merged.con,steps:merged.steps,
+     modelCompleted:merged.orchestration?.completed,modelTotal:merged.orchestration?.total};
+   }catch(e){
+    row.reason='Candidate analysis could not complete from the available provider observations. No result has been invented.';
+   }
+   rows.push(row);
+  }
+  if(!current())return;
+  multiResearchV170={rows,selected,asOf:fullAssessment.asOf,
+   comparison:window.QFPrivateDecisionReviewV92.historicalComparison(historySeries,selected)};
+  renderUnifiedDecisionV160();
+  status.textContent='Complete research updated for all '+selected.length+' selected investments. Detailed method evidence remains in Advanced Research.';
+  if(progress)progress.textContent='Research completed for '+selected.length+' selected investments. Review the results below.';
+  message('Compared all selected investments. Models that could not run are marked incomplete; no trades were placed.');
  }catch(e){
-  if(current())status.textContent='Research stopped without a new decision: '+String(e.message||e).slice(0,240)+'. Please inspect the Research Methods.';
- }finally{if(current())button.disabled=false;}
+  if(current()){status.textContent='Research stopped without a new decision: '+String(e.message||e).slice(0,240)+'. Please inspect the Research Methods.';if(progress)progress.textContent='Research could not complete. No new investment assessment was generated.';}
+ }finally{if(current()){button.disabled=false;button.textContent='Run complete research';}}
 }
 
 function clearDecisionCenterV84(){
@@ -1223,6 +1303,9 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-page],[dat
 /* Private asset directory: click-to-select. Name search is optional. */
 function renderResearchSelection(){
  const target=$('private-history-selection');
+ const chipTarget=$('qf-v170-selected');
+ if(chipTarget)chipTarget.innerHTML=researchSelection.length?researchSelection.map(sym=>
+  '<button type="button" class="qf-v170-chip" data-v170-remove="'+safe(sym)+'" aria-label="Remove '+safe(assetNames[sym]||sym)+'">'+safe(assetNames[sym]||sym)+' ('+safe(sym)+') ×</button>').join(''):'Choose investments by company name to begin.';
  refreshResearchOSChoicesV90();
  $('private-history-symbols').value=researchSelection.join(',');
  if(!researchSelection.length){target.textContent='Choose investments to compare.';return;}
@@ -1284,6 +1367,7 @@ function chooseAsset(symbol,name,kind){
   $('private-quote').textContent='Get market price to inspect the current observation.';
   message('Selected '+name+'. No trade has been placed.');
  }else{
+  if(kind==='crypto'){message('The beginner company research comparison uses corporate financial statements. Choose stocks or ETFs; crypto assets are available in Advanced Research.');return;}
   if(!researchSelection.includes(symbol)){
    if(researchSelection.length>=5){message('You can compare up to five investments. Remove one first.');return;}
    researchSelection.push(symbol);
@@ -1505,7 +1589,7 @@ function privateTab(tab,updateRoute=true){
  document.querySelectorAll('.private-nav-group').forEach(g=>{g.open=g===group;});
  document.querySelectorAll('.private-nav [data-private-tab]').forEach(b=>{if(b.dataset.privateTab===tab)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
  const heading=document.getElementById('qf-private-location');
- if(heading)heading.textContent=group?.querySelector('summary')?.textContent?.replace(/^\d+\s*[·.]\s*/, '')+' / '+(activeButton?.textContent||tab);
+ if(heading)heading.textContent=(activeButton?.textContent||'Advanced research')+' · Private workspace';
  if(updateRoute&&privateState&&typeof location!=='undefined'&&document.querySelector('#page-private.active')){
   const route='#private/'+tab;if(location.hash!==route)history.pushState(null,'',route);
  }
@@ -2107,6 +2191,8 @@ for(const id of ['qf-v93-briefing','qf-v93-lab-status'])$(id).addEventListener('
 $('qf-v99-file').addEventListener('change',importArchivedSECV99);
 $('qf-v99-clear').addEventListener('click',clearImportedSECV99);
 $('private-v90-browse').addEventListener('click',()=>openAssetBrowser('research'));
+$('qf-v170-browse').addEventListener('click',()=>openAssetBrowser('research'));
+$('qf-v170-selected').addEventListener('click',e=>{const b=e.target.closest('[data-v170-remove]');if(!b)return;researchSelection=researchSelection.filter(s=>s!==b.dataset.v170Remove);renderResearchSelection();invalidateResearchHistory('Selection changed. A new complete research run is required.');});
 $('qf-v160-decision-center').addEventListener('click',e=>{const b=e.target.closest('[data-v160-route]');if(b&&privateState&&['lab','ideas','settings'].includes(b.dataset.v160Route))privateTab(b.dataset.v160Route);});
 $('private-v90-run').addEventListener('click',runResearchOSV90);
 $('qf-v95-journal-clear').addEventListener('click',()=>{researchSessionJournalV95=[];renderResearchDiagnosticsV95();});

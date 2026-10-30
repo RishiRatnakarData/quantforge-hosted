@@ -9,12 +9,7 @@ def source(name):
 
 def test_private_navigation_and_public_exit():
     build=source("tools/build_unified_site.py")
-    for title in (
-        "01 · Decision Center",
-        "02 · Companies",
-        "03 · Research Methods",
-        "04 · Portfolio &amp; Reports",
-    ):
+    for title in ("Research", "Portfolio", "Saved reports", "Advanced research"):
         assert title in build
     assert 'data-page="overview">Public research</button>' in build
     assert 'qf-private-exit' in source("web/site/site.template.html")

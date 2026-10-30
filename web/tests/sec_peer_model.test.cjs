@@ -32,3 +32,25 @@ test('data freshness and peer group checks',()=>{
  const r=api.compare(snapshot,'MSFT',{sectorOnly:true});
  assert.ok(r.ready===true||/Insufficient/.test(r.reason));
 });
+test('partial coverage allows KLA and NVIDIA but discloses limited features',()=>{
+ for(const sym of ['KLAC','NVDA','AMZN','JNJ']){
+  const r=api.compare(snapshot,sym);
+  assert.equal(r.ready,true, sym+' should compare when shared SEC ratios are available');
+  assert.ok(r.featureCount>=2&&r.featureCount<=4);
+  assert.ok(r.peers.every(p=>r.indices.every(i=>Number.isFinite(p.values[i]))));
+  assert.equal(r.indices.length,r.features.length);
+ }
+});
+test('editorial peer groups cover most companies and same-group output is transparent',()=>{
+ assert.ok(snapshot.companies.filter(c=>api.sectorOf(c)!=='Not classified').length>=90);
+ const s=api.compare(snapshot,'MSFT',{sectorOnly:true});
+ assert.equal(s.sectorOnly,true);
+ assert.ok(s.peers.every(c=>c.sector==='Technology'));
+});
+test('no one-ratio distance, no zero imputation, no imaginary future filings',()=>{
+ const pnc=api.compare(snapshot,'PNC');
+ assert.equal(pnc.ready,false);
+ const altered=structuredClone(snapshot);const company=altered.companies.find(x=>x.symbol==='KLAC');
+ company.annual[0].sources.revenue_usd.filed='2027-04-01';
+ assert.equal(api.compare(altered,'KLAC').ready,false);
+});

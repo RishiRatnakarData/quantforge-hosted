@@ -11,9 +11,9 @@ def read(path):
 
 def test_consolidated_private_nav_and_research_lab():
     s = read("tools/build_unified_site.py")
-    assert s.count('class="private-nav-group"') == 4
-    expected = ["01 · Decision Center", "02 · Companies",
-                "03 · Research Methods", "04 · Portfolio &amp; Reports"]
+    assert all(f'data-private-tab="{name}"' in s for name in ('decision', 'home', 'settings', 'lab')) and 'qf-v170-nav' in s
+    expected = ['data-private-tab="decision"', 'data-private-tab="home"',
+                'data-private-tab="settings"', 'data-private-tab="lab"']
     assert [s.index(x) for x in expected] == sorted(s.index(x) for x in expected)
     for view in ("decision", "ideas", "home", "trade", "lab", "candidate", "research", "optimization",
                  "backtest", "walkforward", "valuation", "settings"):

@@ -12,8 +12,9 @@ def source(path):
 def test_dashboard_is_inside_private_decision_view():
     b = source("tools/build_unified_site.py")
     before, after = b.split('id="qf-v160-decision-center"', 1)
-    assert 'data-private-view="decision"' in before[-900:]
-    assert 'id="qf-v160-setup"' in after
+    assert before.rfind('data-private-view="decision"') > before.rfind('data-private-view="home"')
+    assert 'id="qf-v160-setup"' in before
+    assert before.index('id="qf-v160-setup"') < before.index('id="private-v90-run"')
     assert 'id="qf-v160-method-trace"' in after
 
 
@@ -24,8 +25,8 @@ def test_advanced_analysis_keeps_all_existing_research_routes():
         "backtest", "walkforward", "research", "settings", "home", "trade",
     ):
         assert f'data-private-tab="{route}"' in b
-    assert b.count('class="private-nav-group"') == 4
-    for section in ("Decision Center", "Companies", "Research Methods", "Portfolio &amp; Reports"):
+    assert all(f'data-private-tab="{name}"' in b for name in ('decision', 'home', 'settings', 'lab')) and 'qf-v170-nav' in b
+    for section in ("Research", "Portfolio", "Saved reports", "Advanced research"):
         assert section in b
 
 

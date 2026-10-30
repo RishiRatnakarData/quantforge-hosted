@@ -36,11 +36,11 @@ block='''<section class="tabpage" id="page-private">
   </div>
   <div id="private-signed" hidden>
     <div class="controls"><span class="mini">Private portfolio · authenticated</span><strong class="tiny" id="qf-private-location" role="status" aria-live="polite">Decision Center / Research summary</strong><button class="btn sm" id="private-logout">Sign out</button></div>
-    <nav class="private-nav" aria-label="Private workspace sections">
-      <details class="private-nav-group" role="group" aria-label="Decision Center" open><summary class="private-nav-title">01 · Decision Center</summary><div class="private-nav-actions"><button class="active" data-private-tab="decision">Research summary</button></div></details>
-      <details class="private-nav-group" role="group" aria-label="Discover and Compare"><summary class="private-nav-title">02 · Companies</summary><div class="private-nav-actions"><button data-private-tab="ideas">Find &amp; screen companies</button><button data-private-tab="candidate">Company &amp; factor analysis</button></div></details>
-      <details class="private-nav-group" role="group" aria-label="Research Methods"><summary class="private-nav-title">03 · Research Methods</summary><div class="private-nav-actions"><button data-private-tab="lab">Methods &amp; evidence audits</button><button data-private-tab="valuation">Valuation &amp; scenarios</button><button data-private-tab="research">Historical market data</button><button data-private-tab="optimization">Risk &amp; optimization</button><button data-private-tab="backtest">Backtesting</button><button data-private-tab="walkforward">Walk-forward &amp; robustness</button></div></details>
-      <details class="private-nav-group" role="group" aria-label="Portfolio and Saved Research"><summary class="private-nav-title">04 · Portfolio &amp; Reports</summary><div class="private-nav-actions"><button data-private-tab="home">Portfolio overview</button><button data-private-tab="trade">Portfolio scenarios</button><button data-private-tab="settings">Reports &amp; saved research</button></div></details>
+    <nav class="private-nav qf-v170-nav" aria-label="Private workspace main destinations">
+      <button class="active" data-private-tab="decision">Research</button>
+      <button data-private-tab="home">Portfolio</button>
+      <button data-private-tab="settings">Saved reports</button>
+      <button data-private-tab="lab" class="qf-v170-advanced-link">Advanced research</button>
     </nav>
     <div id="qf-v93-research-ribbon" class="qf-v93-ribbon" role="status" aria-live="polite">
       <div class="qf-v93-ribbon-copy"><strong id="qf-v93-ribbon-title">Research workflow · No current assessment</strong><span class="tiny" id="qf-v93-ribbon-detail">Select companies and run research to connect your findings and reports.</span></div>
@@ -115,13 +115,16 @@ block='''<section class="tabpage" id="page-private">
     </section>
     <section class="private-view" data-private-view="decision">
       <div class="pane qf-v9-shell qf-v92-workspace" id="private-decision-os-v90">
-        <span class="eyebrow">PRIVATE INVESTMENT RESEARCH</span><h2>Decision Center</h2>
-        <p class="qf-v160-intro">A single visual view of company health, valuation, downside risk, portfolio fit and historical strategy evidence. The existing research engine runs the available tests together; open Advanced Research when you want the underlying methods.</p>
-        <div id="qf-v160-decision-center" class="qf-v160-center" aria-label="Unified evidence-based investment dashboard" aria-live="polite"><p class="tiny">Choose your investments and run the complete assessment. The dashboard will compile the eligible research automatically.</p></div>
-        <details id="qf-v160-setup" class="qf-v160-setup" open><summary>Choose investments and adjust research preferences</summary>
+        <span class="eyebrow">PRIVATE INVESTMENT RESEARCH</span><h2>Research your investments</h2>
+        <p class="qf-v160-intro">Choose companies once. QuantForge loads available financial and market evidence, runs the eligible research models, and explains what the results mean.</p>
+        <div class="qf-v170-start"><h3>Choose 2–5 investments</h3><p>Choose by company name. Every selected company will receive an individual assessment in one comparison.</p>
+          <div id="qf-v170-selected" class="qf-v170-chips" role="status">No companies selected.</div>
+          <button type="button" class="btn" id="qf-v170-browse">Choose companies</button></div>
+
+        <details id="qf-v160-setup" class="qf-v160-setup"><summary>Optional: change research assumptions</summary>
         <div class="qf-v92-setup">
           <section class="qf-v92-step" aria-labelledby="qf-v92-step-one"><div class="qf-v92-stephead"><span aria-hidden="true">01</span><h3 id="qf-v92-step-one">Select investments</h3></div>
-            <p class="tiny">Choose 2–5 companies or funds for a matched historical comparison; pick one candidate for detailed company research.</p>
+            <p class="tiny">The primary candidate below is used for the detailed legacy technical trace; all selected companies are assessed on the results screen.</p>
             <div class="field"><label for="private-v90-candidate">Company to evaluate in depth</label><select id="private-v90-candidate"><option value="">Choose an investment from your selection</option></select></div>
             <button type="button" class="btn" id="private-v90-browse">Browse companies by name</button>
             <p class="tiny" id="private-v90-selection" aria-live="polite">Choose 2–5 investments; historical comparisons require more than one security.</p>
@@ -138,7 +141,8 @@ block='''<section class="tabpage" id="page-private">
           </section>
         </div>
         </details>
-        <div class="qf-v92-runbar"><div><strong>Run complete investment research</strong><p class="tiny">One click loads the matching market history and runs eligible analysis. Built-in SEC information is used automatically; no files are needed for the standard assessment.</p></div><button type="button" class="btn primary" id="private-v90-run">Analyze selected investments</button></div>
+        <div class="qf-v92-runbar qf-v170-runbar"><div><strong>Ready to see your results?</strong><p class="tiny">One action loads available dated data and runs eligible company and portfolio models. No upload or trade required.</p></div><button type="button" class="btn primary" id="private-v90-run">Run complete research</button></div><p class="tiny" id="qf-v170-progress" role="status" aria-live="polite">Select companies, then run the research.</p>
+        <div id="qf-v160-decision-center" class="qf-v160-center" aria-label="Unified evidence-based investment dashboard" aria-live="polite"><p class="tiny">Choose your investments and run the complete assessment. The dashboard will compile the eligible research automatically.</p></div>
         <details id="qf-v160-method-trace" class="qf-v160-method-trace"><summary>Open the original detailed assessment and statistical method trace</summary><div id="private-v90-report" aria-live="polite" role="status"><p class="tiny">Run your assessment to view individual model evidence, assumptions and calculations.</p></div></details>
         <div id="qf-v94-intelligence-hub" class="qf-v94-intelligence" aria-live="polite"></div>
       <div id="qf-v95-hub" class="qf-v95-host" aria-live="polite"></div>
@@ -586,6 +590,57 @@ html=html.replace('</style>', """
 #private-signed #qf-private-location{font-size:12px;color:#315b4b}
 @media(max-width:780px){#private-signed #qf-private-location{order:3;flex-basis:100%}}
 </style>""", 1)
+html=html.replace('</style>', """
+/* Simple private landing page; advanced methods remain accessible from a single link. */
+#private-signed>.private-nav.qf-v170-nav{display:flex;flex-wrap:wrap;gap:8px;position:static;border:0;margin:12px 0 18px;padding:0;align-items:center}
+#private-signed .qf-v170-nav button{font-size:14px;border:1px solid #d1e1d9;background:white;color:#2a5348;border-radius:10px;min-height:42px;padding:10px 18px}
+#private-signed .qf-v170-nav button.active{background:#1d665a;color:white;border-color:#1d665a}
+#private-signed .qf-v170-nav .qf-v170-advanced-link{margin-left:auto;background:transparent;border-color:transparent;text-decoration:underline}
+#private-signed .qf-v170-nav .qf-v170-advanced-link.active{background:#1d665a;text-decoration:none}
+#private-signed .qf-v170-start{border:1px solid #cbded5;background:#f8fbf9;border-radius:14px;padding:19px;margin:20px 0 14px}
+#private-signed .qf-v170-start h3{font-size:19px;margin:0 0 6px}
+#private-signed .qf-v170-start p{font-size:13px;color:#567367;margin:0 0 12px}
+#private-signed .qf-v170-chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+#private-signed .qf-v170-chip{display:inline-block;background:#e1f0e8;color:#194d3c;border:1px solid #c6e3d5;border-radius:20px;padding:6px 12px;font-size:13px;font-weight:650}
+#private-signed .qf-v170-chip small{font-weight:normal}
+#private-signed .qf-v170-runbar{margin:13px 0 17px}
+#private-signed .qf-v170-results{display:block;margin:0}
+#private-signed .qf-v170-head h3{font-size:25px;line-height:1.3;margin:8px 0}
+#private-signed .qf-v170-head p,#private-signed .qf-v170-overview p{font-size:14px;color:#476358;line-height:1.65}
+#private-signed .qf-v170-overview{border-radius:12px;padding:19px;background:#eff7f3;border:1px solid #cae4d4;margin:18px 0}
+#private-signed .qf-v170-overview strong{font-size:18px;color:#1a4b3c}
+#private-signed .qf-v170-overview p{margin-top:6px}
+#private-signed .qf-v170-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(265px,1fr));gap:13px}
+#private-signed .qf-v170-company{border:1px solid #d4e1dc;border-left:5px solid #b7c6c0;background:white;border-radius:13px;padding:17px;min-width:0}
+#private-signed .qf-v170-company.qf-v170-green{border-left-color:#268458}
+#private-signed .qf-v170-company.qf-v170-amber{border-left-color:#c59a43}
+#private-signed .qf-v170-company.qf-v170-red{border-left-color:#ce5b5c}
+#private-signed .qf-v170-company-title{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px;margin-bottom:11px}
+#private-signed .qf-v170-company h4{margin:0;font-size:17px;color:#193d33}
+#private-signed .qf-v170-company h4 small{font-size:11px;color:#668075}
+#private-signed .qf-v170-company p{font-size:13px;line-height:1.6;color:#465e54;margin:8px 0;overflow-wrap:anywhere}
+#private-signed .qf-v170-company .qf-v170-verdict{font-size:14px;display:block}
+#private-signed .qf-v170-pill{font-size:11px;border-radius:18px;padding:4px 9px;background:#ebf0ec;color:#4d655a}
+#private-signed .qf-v170-pill.qf-v170-green{background:#e3f4e9;color:#1f6b42}
+#private-signed .qf-v170-pill.qf-v170-red{background:#fae8e8;color:#94393c}
+#private-signed .qf-v170-pill.qf-v170-amber{background:#fff2dd;color:#805b14}
+#private-signed .qf-v170-chart{border:1px solid #d4e4dc;padding:20px;border-radius:13px;margin:17px 0}
+#private-signed .qf-v170-chart h4{font-size:18px;margin:0 0 7px}
+#private-signed .qf-v170-chart p{font-size:13px;color:#567266}
+#private-signed .qf-v170-bar-row{display:grid;grid-template-columns:minmax(80px,1fr) minmax(85px,2fr) 50px;align-items:center;gap:10px;padding:10px 0;font-size:13px}
+#private-signed .qf-v170-bar{height:13px;background:#eaf1ec;border-radius:9px;overflow:hidden}
+#private-signed .qf-v170-bar>span{display:block;height:100%;background:#aa7861;border-radius:9px}
+#private-signed .qf-v170-footer{font-size:12px;color:#61766c;margin-top:16px}
+#private-signed .qf-v170-empty{padding:18px;border:1px solid #d8e5de;border-radius:11px;color:#51685f}
+/* The primary screen must not repeat the old extensive technical panels. */
+#private-signed [data-private-view=decision] #qf-v94-intelligence-hub,
+#private-signed [data-private-view=decision] #qf-v95-hub,
+#private-signed [data-private-view=decision] #qf-v96-hub,
+#private-signed [data-private-view=decision] #qf-v97-hub,
+#private-signed [data-private-view=decision] #qf-v98-hub,
+#private-signed [data-private-view=decision] #qf-v160-method-trace{display:none!important}
+@media(max-width:680px){#private-signed .qf-v170-nav .qf-v170-advanced-link{margin-left:0}#private-signed .qf-v170-company{padding:13px}#private-signed .qf-v170-bar-row{grid-template-columns:85px 1fr 45px}}
+</style>""",1)
 html=html.replace('.navtop{display:none}',  '#private-research-dataset[hidden],#private-signed[hidden],#private-login[hidden],#private-mfa[hidden],#private-mfa-qr-wrap[hidden],#private-mfa-setup-actions[hidden]{display:none!important}#private-message{margin-top:8px}.navtop{display:none}')
 html=html.replace('body></html>','body></html>')
 # Ensure all app scripts stay CSP-protected; no external JS libraries.
@@ -611,7 +666,7 @@ for slot, file in [('/* QF_MODEL */','model.js'),('/* QF_APP */','app.js'),('/* 
  text=(src/'site'/file).read_text(encoding="utf-8")
  if file=='private.js':
   # Bundled alongside the existing private script: still only three CSP-protected scripts.
-  text=(src/'site/private_ideas_v70.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_allocation_v74.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_value_v73.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_v72.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_guide_v79.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_center_v84.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_candidate_v85.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_factor_scenarios_v86.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_french_factors_v87.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_orchestrator_v91.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_os_v90.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_review_v92.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_brief_v93.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_investment_intelligence_v94.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_portfolio_validation_v95.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_intelligence_v96.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_pit_validation_v97.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_sec_coverage_v98.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_archived_sec_v99.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_archive_quality_v100.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_historical_panel_v110.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_robustness_v120.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_historical_attribution_v130.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_integrity_v130.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_workflow_v140.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_release_acceptance_v150.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_unified_decision_v160.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_multimarket.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_forecast_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_walkforward_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_diagnostics_v66.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_integrity_v67.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_robustness_v68.js').read_text(encoding='utf-8')+'\n'+text
+  text=(src/'site/private_ideas_v70.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_allocation_v74.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_value_v73.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_v72.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_guide_v79.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_center_v84.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_candidate_v85.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_factor_scenarios_v86.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_french_factors_v87.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_orchestrator_v91.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_os_v90.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_review_v92.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_brief_v93.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_investment_intelligence_v94.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_portfolio_validation_v95.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_research_intelligence_v96.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_pit_validation_v97.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_sec_coverage_v98.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_archived_sec_v99.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_archive_quality_v100.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_historical_panel_v110.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_robustness_v120.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_historical_attribution_v130.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_decision_integrity_v130.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_workflow_v140.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_release_acceptance_v150.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_unified_decision_v160.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_simple_research_v170.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_optimizer.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_multimarket.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_forecast_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_walkforward_v65.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_diagnostics_v66.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_integrity_v67.js').read_text(encoding='utf-8')+'\n'+(src/'site/private_robustness_v68.js').read_text(encoding='utf-8')+'\n'+text
  if file=='app.js':
   assert text.count('/* QF_SEC_DATA */ null')==1
   # Bundle pure SEC analytics in the existing public app script. CSP remains 3 hashes.

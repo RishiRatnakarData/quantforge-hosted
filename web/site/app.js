@@ -16,7 +16,7 @@ function nav(name,updateHash=true){
  document.querySelectorAll('.tabpage').forEach(e=>e.classList.toggle('active',e.id==='page-'+name));
  document.querySelectorAll('.nav-btn').forEach(e=>{const active=e.dataset.page===name;e.classList.toggle('active',active);if(active)e.setAttribute('aria-current','page');else e.removeAttribute('aria-current');});
  // Public navigation is always visible; private navigation expands its own task groups.
- const labels={overview:'RESEARCH OVERVIEW',sec:'HISTORICAL SEC DATA',portfolio:'SIMULATED PORTFOLIO',quant:'SIMULATED RISK MODEL',valuation:'DCF ASSUMPTIONS',ml:'SIMULATED PEER MODEL',methods:'DATA & ENGINEERING',systems:'RESEARCH METHODS',lab:'INTERACTIVE ANALYSIS',private:'PRIVATE WORKSPACE'};
+ const labels={overview:'RESEARCH OVERVIEW',sec:'HISTORICAL SEC DATA',portfolio:'SIMULATED PORTFOLIO',quant:'SIMULATED RISK MODEL',valuation:'DCF ASSUMPTIONS',ml:'REPORTED SEC COMPANY COMPARISON',methods:'DATA & ENGINEERING',systems:'RESEARCH METHODS',lab:'INTERACTIVE ANALYSIS',private:'PRIVATE WORKSPACE'};
  const badge=document.querySelector('.topbar .badge');if(badge)badge.textContent=labels[name];
  const eyebrow=document.querySelector('.topbar .eyebrow');if(eyebrow)eyebrow.textContent=name==='private'?'Your portfolio · Personal use':'Financial research · models and data';
  if(updateHash){const route=name==='private'?'#private/decision':'#'+name;if(location.hash!==route)history.pushState(null,'',route);}
@@ -84,19 +84,19 @@ function runDCF(){
 function runPeers(){
  const symbol=$('ml-company').value,sectorOnly=$('ml-sector-only').checked;
  const model=window.QFPublicSECPeers?.compare(SEC_DATA,symbol,{sectorOnly});
- if(!model?.ready){$('ml-result').innerHTML='<div class="pane notice">'+safeText(model?.reason||'SEC comparison is unavailable.')+'</div>';return;}
- const rows=model.peers.slice(0,12).map((c,i)=>[
-  String(i+1),safeText(c.name)+' <span class="tiny">('+safeText(c.symbol)+')</span>',
-  safeText(c.sector),safeText(c.fiscalEnd),c.distance.toFixed(2),
-  '<button type="button" class="btn sm" data-sec-symbol="'+safeText(c.symbol)+'">View financials</button>'
- ]);
- const f=model.features.map((feature,i)=>[safeText(feature.label),model.selected.values[i].toFixed(1)+'%',safeText(feature.description)]);
- $('ml-result').innerHTML='<div class="pane"><div class="section-title"><h3>Closest reported-SEC financial profiles</h3><span class="mini">Reported SEC facts · descriptive</span></div>'+
-  '<p><strong>'+safeText(model.selected.name)+'</strong> ('+safeText(symbol)+') · fiscal year ended '+safeText(model.selected.fiscalEnd)+'</p>'+
-  '<p class="tiny">'+model.eligible+' eligible of '+model.universe+' published companies; '+model.excluded+' excluded for missing accession-backed ratios or stale reporting. '+model.compared+' in this comparison. Source filing cutoff: '+safeText(model.cutoff)+'.</p>'+
-  table(['#','Similar company','Editorial sector','Fiscal year end','Distance','Financial data'],rows)+
-  '<div class="subtle"><h3>Selected issuer financial features</h3>'+table(['Ratio','SEC-derived value','Definition'],f)+'</div>'+
-  '<p class="tiny" style="margin-top:14px">'+safeText(model.message)+' This model does not use stock prices, expected returns, or market capitalization. <a href="'+safeText(model.selected.companyfacts)+'" target="_blank" rel="noopener noreferrer">Original SEC Company Facts</a>.</p></div>';
+ if(!model?.ready){$('ml-result').innerHTML='<div class="pane notice" role="status"><strong>Financial peer comparison unavailable</strong><p>'+safeText(model?.reason||'SEC comparison is unavailable.')+'</p><button type="button" class="btn sm" data-sec-symbol="'+safeText(symbol)+'">View available company financials</button></div>';return;}
+ const peers=model.peers.slice(0,10);
+ const max=Math.max(1,...peers.map(x=>x.distance));
+ const bars=peers.map((c,i)=>'<div class="qf-peer-visual-row"><div><strong>'+safeText(c.name)+'</strong><span class="tiny"> '+safeText(c.symbol)+'</span></div><div class="qf-peer-visual-track" role="img" aria-label="Financial distance '+c.distance.toFixed(2)+'"><span style="width:'+Math.max(3,100*(1-c.distance/(max+0.01))).toFixed(1)+'%"></span></div><strong>'+c.distance.toFixed(2)+'</strong></div>').join('');
+ const data=peers.map((c,i)=>[String(i+1),safeText(c.name)+' ('+safeText(c.symbol)+')',safeText(c.sector),safeText(c.fiscalEnd),c.distance.toFixed(2),'<button type="button" class="btn sm" data-sec-symbol="'+safeText(c.symbol)+'">Financials</button>']);
+ const f=model.features.map((feature,j)=>[safeText(feature.label),model.selected.values[model.indices[j]].toFixed(1)+'%',safeText(feature.description)]);
+ $('ml-result').innerHTML='<div class="pane"><div class="section-title"><h3>Companies with similar reported financial profiles</h3><span class="mini">SEC filing data · '+model.featureCount+' common ratios</span></div>'+
+  '<p><strong>'+safeText(model.selected.name)+'</strong> ('+safeText(symbol)+') · FY '+safeText(model.selected.fiscalEnd)+'</p>'+
+  '<p class="tiny">'+model.compared+' companies with the same usable features out of '+model.universe+' published companies. SEC cutoff '+safeText(model.cutoff)+'. '+safeText(model.caution)+'</p>'+
+  '<div class="qf-peer-visual" aria-label="Closest peer distances"><h4>Closest financial profiles</h4><p class="tiny">Longer bars indicate a closer statistical match; numbers are distances, not quality ratings.</p>'+bars+'</div>'+
+  '<details class="subtle"><summary>See peer figures and reporting dates</summary>'+table(['#','Company','Broad group','Fiscal year','Distance','Open'],data)+'</details>'+
+  '<div class="subtle"><h3>Financial ratios used in this comparison</h3>'+table(['Ratio','Reported-derived value','Meaning'],f)+'</div>'+
+  '<p class="tiny">'+safeText(model.message)+' <a href="'+safeText(model.selected.companyfacts)+'" rel="noopener noreferrer" target="_blank">SEC Company Facts source</a>.</p></div>';
 }
 
 // SEC comparison uses a static, pre-reviewed companyfacts snapshot. No browser API calls.
@@ -235,7 +235,7 @@ function populate(){
  $('trade-symbol').innerHTML=options;
  $('assets-list').innerHTML=M.ASSETS.map(a=>'<button class="asset" data-symbol="'+a.symbol+'"><strong>'+a.name+'</strong><span>'+a.symbol+' · '+a.kind+' · '+fmt(a.price)+'</span></button>').join('');
  $('quant-assets').innerHTML=['MSFT','VOO','AAPL','QQQ','BND','BTC/USD','ETH/USD'].map(s=>'<label class="inline-checkbox"><input type="checkbox" name="quant-asset" value="'+s+'" '+(['MSFT','VOO','BND'].includes(s)?'checked':'')+'>'+M.bySymbol[s].name+'</label>').join('');
- $('ml-company').innerHTML=(SEC_DATA?.companies||[]).map(c=>'<option value="'+safeText(c.symbol)+'">'+safeText(c.name)+' ('+safeText(c.symbol)+')</option>').join('');
+ $('ml-company').innerHTML=(SEC_DATA?.companies||[]).map(c=>{const ready=window.QFPublicSECPeers?.compare(SEC_DATA,c.symbol)?.ready;return '<option value="'+safeText(c.symbol)+'"'+(ready?'':' disabled')+'>'+safeText(c.name)+' ('+safeText(c.symbol)+')'+(ready?'':' — Financials only')+'</option>';}).join('');
  portfolio();runQuant();runDCF();runPeers();renderSEC();renderSECHighlights();
  if(window.QFPublicEvidence)window.QFPublicEvidence.render(SEC_DATA, document.getElementById("systems-sec-quant-v76"));
  if(window.QFResearchLab)window.QFResearchLab.mount(SEC_DATA);

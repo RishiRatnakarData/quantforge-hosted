@@ -31,7 +31,7 @@ def test_private_authentication_and_research_sections_retained():
                    'id="private-research-loaded"', 'id="private-research-selected"'):
         assert anchor in builder
     assert builder.index('id="private-total"') < builder.index('id="private-guide-card-v79"')
-    assert builder.count('class="private-nav-group"') == 4
+    assert all(f'data-private-tab="{name}"' in builder for name in ('decision', 'home', 'settings', 'lab')) and 'qf-v170-nav' in builder
 
 
 def test_ui_only_changes_preserve_client_guardrails():
