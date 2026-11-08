@@ -25,7 +25,7 @@ def test_homepage_is_recruiter_accessible_and_source_linked():
     assert 'data-go="private"' not in start
     assert 'View GitHub source and tests' in start
     assert 'rel="noopener noreferrer"' in start
-    assert 'Financial research, portfolio analytics, and quantitative modeling.' in start
+    assert 'Financial research, built from the data up.' in start
     assert 'simulated returns and hypothetical forecasts' in start
 
 

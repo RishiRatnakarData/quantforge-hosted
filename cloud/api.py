@@ -27,7 +27,13 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from qrcode.image.svg import SvgPathImage
 
-from cloud import asset_directory, crypto_history, sec_fundamentals, valuation_market_v73
+from cloud import (
+    asset_directory,
+    crypto_history,
+    news_intelligence_v180,
+    sec_fundamentals,
+    valuation_market_v73,
+)
 from quantforge.desk.engine import FEE_RATE, QTY, DeskError, cents, money, valid_quote
 from quantforge.desk.market import AlpacaDeskMarket
 from quantforge.live.provider import AlpacaClient, MarketDataError
@@ -530,6 +536,21 @@ def notes(data: PersonalData, request: Request, response: Response):
     current["notes"] = cleaned
     save_state(uid, token, current, version)
     return {"portfolio": current, "version": version + 1}
+
+
+@app.get("/api/private/news-research")
+def private_news_research(request: Request, response: Response, symbols: str):
+    """Read-only private research on provider-supplied headlines; no full-text distribution."""
+    owner(request, response)  # MFA required *before* contacting an external provider.
+    selected = [s.strip().upper() for s in symbols.split(",")]
+    if not 1 <= len(selected) <= 5 or len(set(selected)) != len(selected) or any(
+        not news_intelligence_v180.SYMBOL.fullmatch(s) for s in selected
+    ):
+        raise HTTPException(422, "Choose one to five distinct valid equity symbols.")
+    try:
+        return news_intelligence_v180.alpaca_news(SESSION, selected)
+    except (RuntimeError, ValueError) as exc:
+        raise HTTPException(503, str(exc)) from exc
 
 
 # Read-only, single-owner historical market research. Historical stock bars are

@@ -11,7 +11,7 @@ def read(p: str) -> str:
 def test_public_home_research_breadth_and_owner():
     page = read('web/site/site.template.html')
     home = page.split('id="page-overview"', 1)[1].split('</section>', 1)[0]
-    assert 'Financial research, portfolio analytics, and quantitative modeling.' in home
+    assert 'Financial research, built from the data up.' in home
     assert 'id="qf-company-count-v81"' in home
     assert home.count('class="qf-roadmap-card"') == 4
     for route in ('sec', 'lab', 'quant', 'systems'):

@@ -19,7 +19,7 @@ def test_limited_public_presentation_is_truthful():
     assert 'RESEARCH OVERVIEW' in app
     assert '<strong>Research data:</strong> Historical SEC company financials' in html
     assert 'simulated returns and hypothetical forecasts' in html
-    assert 'SEC Company Comparison instead uses reported-derived financial ratios' in html
+    assert 'No public model is a validated return forecast' in html
     assert 'Private account data and market feeds' in html
     assert 'FICTIONAL DATA' not in html
 

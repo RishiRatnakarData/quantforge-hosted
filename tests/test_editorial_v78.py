@@ -11,9 +11,9 @@ def source(path):
 
 def test_overview_is_specific_without_unearned_claims():
     page = source("web/site/site.template.html")
-    assert 'Financial research, portfolio analytics, and quantitative modeling.' in page
-    assert "QuantForge integrates SEC company disclosures" in page
-    assert "SEC facts from simulated returns and hypothetical forecasts" in page
+    assert 'Financial research, built from the data up.' in page
+    assert "SEC filings, portfolio risk, valuation, and quantitative research" in page
+    assert "<strong>Research data:</strong> Historical SEC company financials" in page
     assert "<strong>Research data:</strong> Historical SEC company financials" in page
     assert "Financial research, built end to end" not in page
     assert "PERSONAL SOFTWARE &amp; DATA SCIENCE PROJECT" not in page
