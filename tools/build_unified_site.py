@@ -378,6 +378,8 @@ def move_panel(pattern, prefix=''):
     return prefix+part
 
 advanced_parts=[
+    # Move progress and live-acceptance controls out of the everyday Research journey.
+    move_panel(r'    <section class="pane qf-v140-launch".*?</section>'),
     move_panel(r'        <details id="qf-v160-setup".*?</details>', '<h3>Model settings</h3>'),
     move_panel(r'        <details id="qf-v160-method-trace".*?</details>', '<h3>Detailed model report</h3>'),
 ]
@@ -390,6 +392,11 @@ for panel_id in ('qf-v93-briefing','qf-v94-intelligence-brief','qf-v95-brief','q
                  'qf-v97-brief','qf-v98-brief','qf-v99-brief','qf-v100-brief',
                  'qf-v130-brief','qf-v120-brief','qf-v110-brief'):
     advanced_parts.append(move_panel(r'\s*<div id="'+panel_id+r'"[^>]*>.*?</div>'))
+# The optional explanatory/suitability worksheet is not the saved-notes workflow.
+# Keep it functional and visible in the specialist area rather than duplicating Research.
+advanced_parts.append(move_panel(
+    r'      <div class="pane" id="private-guide-card-v79">.*?(?=      <div class="pane"><h3>Saved research notes</h3>)'
+))
 advanced_content='<div class="qf-v180-specialist"><h2>Research methods and settings</h2><p>The full calculations, reports and source checks live here. You do not need this page to run the main research.</p>'+''.join(advanced_parts)+'</div>'
 lab='<section class="private-view" data-private-view="lab" hidden>'
 assert lab in block
@@ -404,6 +411,7 @@ if not main_dashboard:
 new_panels='\n        <div id="qf-v180-predictions" class="qf-v180-predictions" aria-live="polite"></div>\n        <div id="qf-v180-news" class="qf-v180-news" aria-live="polite"></div>'
 block=block[:main_dashboard.end()]+new_panels+block[main_dashboard.end():]
 block=block.replace('<h2>Research your investments</h2>', '<h2>Research companies</h2>',1)
+block=block.replace('Decision Center / Research summary', 'Research · Choose companies',1)
 block=block.replace('Choose companies once. QuantForge loads available financial and market evidence, runs the eligible research models, and explains what the results mean.', 'Choose companies. Run one analysis. See the findings.',1)
 block=block.replace('Choose by company name. Every selected company will receive an individual assessment in one comparison.', 'Pick the companies you want to compare.',1)
 block=block.replace('Ready to see your results?', 'Compare your companies',1)
@@ -689,19 +697,21 @@ html=html.replace('</style>', """
 #private-signed .qf-v180-card{border:1px solid #d1e1d9;background:#fff;border-radius:13px;padding:16px;min-width:0}
 #private-signed .qf-v180-card h4{font-size:16px;margin:0 0 8px}
 #private-signed .qf-v180-card p{font-size:13px;color:#4c675c;line-height:1.55;margin:7px 0}
-#private-signed .qf-v180-plot{display:flex;gap:8px;align-items:end;min-height:85px;margin:12px 0}
+#private-signed .qf-v180-plot{display:flex;gap:8px;align-items:flex-end;height:125px;padding-bottom:26px;margin:12px 0}
 #private-signed .qf-v180-plot div{flex:1;border-radius:8px 8px 3px 3px;background:#2e776a;min-height:10px;position:relative}
 #private-signed .qf-v180-plot div:nth-child(2){background:#a98c55}
 #private-signed .qf-v180-plot span{position:absolute;bottom:-19px;left:0;font-size:10px;color:#445d54;white-space:nowrap}
 #private-signed .qf-v180-section h3{font-size:21px;margin:8px 0}
 #private-signed .qf-v180-section>p{font-size:13px;color:#53695f;margin:4px 0 14px}
 #private-signed .qf-v180-news-link{font-size:12px;display:block;margin:7px 0;color:#205f4e}
+#private-signed #qf-v93-research-ribbon{display:none!important} /* Superseded by primary Research, Portfolio and Saved reports navigation. Keep event IDs. */
 #private-signed .qf-v180-specialist{padding:19px;border:1px solid #d9e5de;border-radius:13px;background:#fff;margin:16px 0}
 #private-signed .qf-v180-specialist>p{max-width:65ch;color:#52685e;font-size:13px}
 #private-signed [data-private-view=decision] .qf-v170-footer{display:none}
 #private-signed [data-private-view=home] .qf-private-paths{display:none}
 #private-signed [data-private-view=decision] .qf-v9-shell>.eyebrow{display:none}
-#private-signed details>summary{display:none!important}
+#private-signed details>summary{display:list-item!important;cursor:pointer;list-style:revert;min-height:28px;line-height:1.4}
+#private-signed details>summary:focus-visible{outline:3px solid #90cab7;outline-offset:3px}
 #private-signed details{border-color:#e1e9e3}
 #private-signed .qf-v180-specialist details{margin:12px 0}
 #private-signed .qf-v170-overview p{font-size:13px}
@@ -710,6 +720,12 @@ html=html.replace('</style>', """
 #private-signed .qf-v170-company .tiny{display:none}
 #private-signed .qf-v170-company .qf-v170-plain{margin:6px 0}
 #private-signed .qf-v170-head .eyebrow{display:none}
+#private-signed [data-private-view=decision] .qf-v170-start{margin-top:12px}
+#private-signed [data-private-view=lab]>.qf-v180-specialist{max-width:100%}
+#private-signed .qf-v140-launch{max-width:none}
+#private-signed .qf-v181-model-stats{display:flex;gap:13px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+#private-signed .qf-v181-model-stats span{background:#f1f7f4;border:1px solid #e1ebe5;border-radius:8px;padding:6px 10px;font-size:12px}
+#private-signed .qf-v181-model-stats strong{color:#245747}
 @media(max-width:650px){#private-signed .qf-v180-cards{grid-template-columns:1fr}}
 """+'\n</style>',1)
 
@@ -746,7 +762,8 @@ for slot, file in [('/* QF_MODEL */','model.js'),('/* QF_APP */','app.js'),('/* 
   evidence=(src/'site/public_evidence_v76.js').read_text(encoding='utf-8')
   lab=(src/'site/public_lab_v77.js').read_text(encoding='utf-8')
   visuals=(src/'site/sec_visuals_v81.js').read_text(encoding='utf-8')
-  text=analytics+'\n'+evidence+'\n'+lab+'\n'+visuals+'\n'+text.replace('/* QF_SEC_DATA */ null', snapshot_js)
+  model_evidence=(src/'site/public_model_evidence_v181.js').read_text(encoding='utf-8')
+  text=analytics+'\n'+model_evidence+'\n'+evidence+'\n'+lab+'\n'+visuals+'\n'+text.replace('/* QF_SEC_DATA */ null', snapshot_js)
  text=text.replace('</script','<\\/script')
  html=html.replace(slot,text)
 (root/'public/index.html').write_text(html, encoding="utf-8", newline="\n")

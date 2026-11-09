@@ -84,16 +84,19 @@ function analyze(history,sym){
  const modelBrier=brier('prediction'),baseBrier=brier('baseline');
  const train=rows.filter(r=>r.t+H<n);
  const model=fit(train),current=score(model,features(prices,n-1));
- const qualified=modelBrier<baseBrier-0.001&&tests.length>=10;
- const status=qualified?'Research signal (limited validation)':'No demonstrated advantage over a simple baseline';
+ // The Brier improvement alone is not sufficient: check directional accuracy too.
+ // Screens are deliberately conservative and remain exploratory, not statistical proof.
+ const modelAccuracy=accuracy('prediction'),baseAccuracy=accuracy('baseline');
+ const qualified=modelBrier<baseBrier-0.005&&modelAccuracy>=baseAccuracy&&tests.length>=12;
+ const status=qualified?'Exploratory signal (limited validation)':'No consistent advantage over the simple baseline';
  const direction=current>=0.55?'Upward tilt':current<=0.45?'Downward tilt':'No clear direction';
  const reasons=qualified?
-  'The fixed model beat a historical base-rate forecast on non-overlapping held-out windows. The sample remains small.':
-  'Out-of-sample results did not establish an advantage over a simple past-frequency forecast.';
+  'The model improved both the Brier score and directional accuracy across held-out windows. This remains exploratory, not statistical proof.':
+  'Held-out Brier error, directional accuracy, or sample size did not clear the conservative baseline screen.';
  return {ready:true,symbol:sym,asOf:dates[n-1],forecastHorizon:H,
   model:'L2-regularized logistic regression',features:['5-session return','20-session return','60-session return','20-session volatility','40-session drawdown'],
   trainingExamples:train.length,testWindows:tests.length,firstTestDate:tests[0].date,lastTestDate:tests.at(-1).date,
-  evaluatedAccuracy:accuracy('prediction'),baselineAccuracy:accuracy('baseline'),
+  evaluatedAccuracy:modelAccuracy,baselineAccuracy:baseAccuracy,
   evaluatedBrier:modelBrier,baselineBrier:baseBrier,
   qualified,status,direction:qualified?direction:'Not validated',rawModelScore:current,
   explanation:reasons,source:String(history.source||'authenticated historical prices').slice(0,100),

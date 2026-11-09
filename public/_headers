@@ -1,5 +1,5 @@
 /*
-  Content-Security-Policy: default-src 'none'; script-src 'sha256-dvgmFAfCyMPREtNVbBSiZJ6L43bPo7JnqlThxoy76+w=' 'sha256-AmEOuK5NM7fCEDc3L1FN5kXz4kOISIpZcaRW/VGiJNM=' 'sha256-Fl/Hfb8aIrgs5aNg73kB1wv0SMfqYuMUaB7LosdRdiA='; style-src 'unsafe-inline'; connect-src 'self'; img-src data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'
+  Content-Security-Policy: default-src 'none'; script-src 'sha256-dvgmFAfCyMPREtNVbBSiZJ6L43bPo7JnqlThxoy76+w=' 'sha256-82aRncDDX56SpRrLUYWqNBXdaVQuYDWfyycCQ4Jpv/o=' 'sha256-yEWe8dTFGKUpLxq3nSEUe2C+6PsRclOt1WugHa/tEIU='; style-src 'unsafe-inline'; connect-src 'self'; img-src data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer
   Permissions-Policy: camera=(), microphone=(), geolocation=()

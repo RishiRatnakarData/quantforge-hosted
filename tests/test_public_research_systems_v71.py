@@ -35,5 +35,8 @@ def test_no_private_data_or_unsafe_script_added():
 def test_methods_reflects_deep_private_explanations():
     content = site()
     assert "Data and model validation" in content
-    assert "Private models and public source code" in content
+    assert "Trace a result to the code" in content
+    assert "Five-session up/down classification" in content
+    assert "TF-IDF weighting" in content
+    assert "not evidence of stock-market accuracy" in content
     assert "tests provide scoped evidence" in content

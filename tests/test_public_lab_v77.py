@@ -45,7 +45,8 @@ def test_all_five_career_disciplines_have_actual_exhibits():
 def test_public_lab_is_bundled_into_existing_hash_protected_script():
     builder = read("tools/build_unified_site.py")
     assert "public_lab_v77.js" in builder
-    assert "text=analytics+'\\n'+evidence+'\\n'+lab+'\\n'+visuals+'\\n'+text.replace" in builder
+    assert "public_model_evidence_v181.js" in builder
+    assert "text=analytics+'\\n'+model_evidence+'\\n'+evidence+'\\n'+lab+'\\n'+visuals+'\\n'+text.replace" in builder
     assert "assert len(scripts)==3" in builder
     script = read("web/site/public_lab_v77.js")
     for forbidden in (

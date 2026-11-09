@@ -437,6 +437,28 @@ body:has(#page-private.active) .side{gap:12px}
 body:has(#page-private.active) .side .qf-private-nav-section{margin:0}
 @media(max-width:800px){body:has(#page-private.active) .side nav{display:flex;gap:7px;flex-wrap:wrap}}
 
+/* Public research validation exhibit: sourced methods and an explicitly synthetic test. */
+.qf-v181-validation-exhibit{border-color:#c8dcd2;background:#fcfefd}
+.qf-v181-validation-exhibit>p{font-size:14px;line-height:1.7;margin:11px 0;max-width:83ch;color:#456056}
+.qf-v181-validation-exhibit h2{margin:10px 0;font-size:22px}
+.qf-v181-scope{font-size:12px;color:#5a7368;font-weight:650;margin:10px 0}
+.qf-v181-scores{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:16px 0}
+.qf-v181-score{border:1px solid #d9e7df;border-radius:10px;padding:13px;background:white}
+.qf-v181-score strong{display:block;font-size:22px;font-variant-numeric:tabular-nums;color:#204d3f}
+.qf-v181-score span{color:#61766c;font-size:12px}
+.qf-v181-bars{display:grid;gap:11px;margin:15px 0}
+.qf-v181-bar{display:grid;grid-template-columns:90px minmax(0,1fr) 64px;gap:11px;align-items:center;font-size:12px}
+.qf-v181-track{height:13px;border-radius:9px;background:#e9eeeb;overflow:hidden}
+.qf-v181-track>span{display:block;height:100%;background:#287868;border-radius:9px}
+.qf-v181-bar.baseline .qf-v181-track>span{background:#ab9065}
+.qf-v181-method-sources{display:flex;gap:17px;flex-wrap:wrap;margin:15px 0}
+.qf-v181-method-sources a,.qf-v181-language-grid a{color:#1c6752;font-weight:700;font-size:12px}
+.qf-v181-language-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin-top:19px}
+.qf-v181-language-grid article{border:1px solid #d9e7df;background:white;border-radius:10px;padding:15px}
+.qf-v181-language-grid h3{margin:0 0 7px;font-size:15px}
+.qf-v181-language-grid p{line-height:1.65;color:#516a5f;font-size:13px;margin-bottom:11px}
+@media(max-width:650px){.qf-v181-language-grid,.qf-v181-scores{grid-template-columns:1fr}.qf-v181-bar{grid-template-columns:65px minmax(0,1fr) 55px;gap:6px}}
+
 /* V9 private operating system: public site remains visually unchanged. */
 #private-signed .qf-v9-shell h2{margin:8px 0 10px;font-size:24px}
 #private-signed .qf-v9-shell>p{font-size:13px;line-height:1.75;color:#435f50}
@@ -759,19 +781,21 @@ body:has(#page-private.active) .side .qf-private-nav-section{margin:0}
 #private-signed .qf-v180-card{border:1px solid #d1e1d9;background:#fff;border-radius:13px;padding:16px;min-width:0}
 #private-signed .qf-v180-card h4{font-size:16px;margin:0 0 8px}
 #private-signed .qf-v180-card p{font-size:13px;color:#4c675c;line-height:1.55;margin:7px 0}
-#private-signed .qf-v180-plot{display:flex;gap:8px;align-items:end;min-height:85px;margin:12px 0}
+#private-signed .qf-v180-plot{display:flex;gap:8px;align-items:flex-end;height:125px;padding-bottom:26px;margin:12px 0}
 #private-signed .qf-v180-plot div{flex:1;border-radius:8px 8px 3px 3px;background:#2e776a;min-height:10px;position:relative}
 #private-signed .qf-v180-plot div:nth-child(2){background:#a98c55}
 #private-signed .qf-v180-plot span{position:absolute;bottom:-19px;left:0;font-size:10px;color:#445d54;white-space:nowrap}
 #private-signed .qf-v180-section h3{font-size:21px;margin:8px 0}
 #private-signed .qf-v180-section>p{font-size:13px;color:#53695f;margin:4px 0 14px}
 #private-signed .qf-v180-news-link{font-size:12px;display:block;margin:7px 0;color:#205f4e}
+#private-signed #qf-v93-research-ribbon{display:none!important} /* Superseded by primary Research, Portfolio and Saved reports navigation. Keep event IDs. */
 #private-signed .qf-v180-specialist{padding:19px;border:1px solid #d9e5de;border-radius:13px;background:#fff;margin:16px 0}
 #private-signed .qf-v180-specialist>p{max-width:65ch;color:#52685e;font-size:13px}
 #private-signed [data-private-view=decision] .qf-v170-footer{display:none}
 #private-signed [data-private-view=home] .qf-private-paths{display:none}
 #private-signed [data-private-view=decision] .qf-v9-shell>.eyebrow{display:none}
-#private-signed details>summary{display:none!important}
+#private-signed details>summary{display:list-item!important;cursor:pointer;list-style:revert;min-height:28px;line-height:1.4}
+#private-signed details>summary:focus-visible{outline:3px solid #90cab7;outline-offset:3px}
 #private-signed details{border-color:#e1e9e3}
 #private-signed .qf-v180-specialist details{margin:12px 0}
 #private-signed .qf-v170-overview p{font-size:13px}
@@ -780,6 +804,12 @@ body:has(#page-private.active) .side .qf-private-nav-section{margin:0}
 #private-signed .qf-v170-company .tiny{display:none}
 #private-signed .qf-v170-company .qf-v170-plain{margin:6px 0}
 #private-signed .qf-v170-head .eyebrow{display:none}
+#private-signed [data-private-view=decision] .qf-v170-start{margin-top:12px}
+#private-signed [data-private-view=lab]>.qf-v180-specialist{max-width:100%}
+#private-signed .qf-v140-launch{max-width:none}
+#private-signed .qf-v181-model-stats{display:flex;gap:13px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+#private-signed .qf-v181-model-stats span{background:#f1f7f4;border:1px solid #e1ebe5;border-radius:8px;padding:6px 10px;font-size:12px}
+#private-signed .qf-v181-model-stats strong{color:#245747}
 @media(max-width:650px){#private-signed .qf-v180-cards{grid-template-columns:1fr}}
 
 </style></head><body>
@@ -805,8 +835,8 @@ body:has(#page-private.active) .side .qf-private-nav-section{margin:0}
 <div class="qf-nav-section qf-private-nav-section" role="group" aria-label="Account access"><span class="nav-caption">Your account</span><button class="nav-btn" data-page="private">Private workspace</button><button class="nav-btn qf-private-exit" data-page="overview">Public research</button></div></nav><div class="sidenote">Historical SEC data · reproducible models<br>Personal investment research requires sign-in</div></aside>
 <a class="skip-link" href="#main-content">Skip to content</a><main id="main-content"><div class="topbar"><span class="eyebrow">SEC filings · portfolio models · research methods</span><span class="badge">RESEARCH OVERVIEW</span></div>
 <section class="tabpage active" id="page-overview">
-<div class="intro-simple"><span class="eyebrow">FINANCIAL DATA &amp; QUANTITATIVE ANALYSIS</span><h1>Financial research, built from the data up.</h1><p>SEC filings, portfolio risk, valuation, and quantitative research—connected by tested Python and JavaScript.</p></div>
-<div class="qf-home-meta"><span><strong id="qf-company-count-v81">Available companies</strong> · historical SEC company facts</span><span>Financial research · model validation · source-linked calculations</span></div>
+<div class="intro-simple"><span class="eyebrow">FINANCIAL DATA &amp; QUANTITATIVE ANALYSIS</span><h1>Financial research, built from the data up.</h1><p>SEC-reported company financials, statistical experiments, and portfolio scenarios, with the calculations and tests available to inspect.</p></div>
+<div class="qf-home-meta"><span><strong id="qf-company-count-v81">Available companies</strong> · historical SEC company facts</span><span>Observed filings · derived metrics · labeled hypothetical models</span></div>
 <nav class="qf-home-roadmap" aria-label="Explore financial research">
  <button type="button" class="qf-roadmap-card" data-go="sec"><span>01 · FINANCIAL STATEMENTS</span><strong>Company financials</strong><small>Explore historical SEC revenue, profitability, cash flow, and cross-company comparisons.</small></button>
  <button type="button" class="qf-roadmap-card" data-go="lab"><span>02 · COMPARATIVE ANALYSIS</span><strong>Analysis dashboard</strong><small>Inspect company trends and evaluate simulated allocation strategies with transparent settings.</small></button>
@@ -934,7 +964,20 @@ body:has(#page-private.active) .side .qf-private-nav-section{margin:0}
   <div class="tech-step"><span class="eyebrow">04 / EVALUATION</span><strong>Challenge the result</strong><small>Past-only fitting, out-of-sample windows, fees, passive benchmarks, leave-one-window-out robustness and research reports</small></div>
  </div><p class="tech-note">The public deployment hosts static demonstrations and a reviewed SEC snapshot. Market observations and personal virtual accounts are only accessed in authenticated private workflows.</p></div>
  <nav class="research-jumps" aria-label="Research methods sections"><a href="#systems-public-evidence">Reported SEC comparison</a><a href="#systems-optimization">Optimization</a><a href="#systems-validation">Walk-forward</a><a href="#systems-valuation">Forecasting</a><a href="#systems-ideas">Investment screening</a><a href="#systems-code-evidence">Code and tests</a></nav>
- <!-- QF V8.3 verified methodology atlas: methods already implemented and tested -->
+ <section class="pane qf-v181-validation-exhibit" aria-labelledby="qf-v181-title">
+ <span class="eyebrow">MODEL EVALUATION · REPRODUCIBLE PUBLIC EXAMPLE</span>
+ <h2 id="qf-v181-title">Can a price-direction model beat a simple baseline?</h2>
+ <p>Five-session up/down classification uses lagged returns, historical volatility, and drawdown. An expanding-window L2 logistic regression is tested on later, non-overlapping windows against a past positive-return-frequency baseline. The chart below runs the <strong>same implementation</strong> on generated example prices; it is <strong>not evidence of stock-market accuracy</strong>.</p>
+ <div id="qf-v181-evidence" role="status" aria-live="polite">Computing a reproducible synthetic test…</div>
+ <p class="tiny">Lower Brier score means smaller squared forecast error. The exploratory model score is uncalibrated; neither classification accuracy nor a good synthetic result demonstrates a profitable strategy. Transaction costs, different market regimes, historical issuer selection, and dividends require separate validation.</p>
+ <div class="qf-v181-method-sources"><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/site/private_predictive_ml_v180.js" target="_blank" rel="noopener noreferrer">Model implementation</a><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/tests/private_predictive_ml_v180.test.cjs" target="_blank" rel="noopener noreferrer">Evaluation tests</a></div>
+ <div class="qf-v181-language-grid">
+  <article><h3>Headline subjects</h3><p>Authenticated dated headlines are grouped with token counts, TF-IDF weighting, and cosine similarity to a declared finance vocabulary. This is <strong>lexical topic similarity</strong>, not transformer embeddings or semantic reasoning.</p><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/cloud/news_intelligence_v180.py" target="_blank" rel="noopener noreferrer">Read topic-scoring source</a></article>
+  <article><h3>Headline tone</h3><p>The default method counts positive and negative finance terms with basic negation handling. An optional local FinBERT path exists only when explicitly provisioned. A headline score does not estimate a future stock return.</p><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/tests/test_news_intelligence_v180.py" target="_blank" rel="noopener noreferrer">Read sentiment tests</a></article>
+ </div>
+</section>
+
+<!-- QF V8.3 verified methodology atlas: methods already implemented and tested -->
 <section class="pane" id="qf-v83-method-atlas" aria-labelledby="qf-v83-method-title">
  <div class="section-title"><h3 id="qf-v83-method-title">Methods and mathematical implementation</h3><span class="mini">Algorithms · checks · source code</span></div>
  <p class="evidence-intro">Each method connects an input, a calculation, and a validation check. Reported company disclosures and market-price observations are distinguished from assumptions and simulated public examples.</p>
@@ -1112,8 +1155,7 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
  <div class="controls" style="margin-top:0"><button class="btn primary" data-go="lab">Explore the analysis</button><button class="btn" data-go="systems">Research methods</button><button class="btn" data-go="methods">Data &amp; engineering</button></div>
 </div>
 </section>
-  <div class="pane" style="background:#f1f7f3;border-color:#bad5c7"><div class="section-title"><h3>Private models and public source code</h3><span class="mini">Implementation references</span></div><p class="explain-note" style="margin:0 0 13px">The private workspace supports historical market analysis, portfolio optimization, strategy evaluation, investment screening, and SEC-based valuation scenarios. The methods page explains the underlying calculations; the repository contains the implementations and tests.</p><button class="btn primary" data-go="systems">View research methods</button></div>
-  <div class="pane qf-v180-public-ml"><h3>Predictive research and financial language</h3><p>Private research combines an expanding-window logistic-regression experiment with company financials, risk analysis, and dated news. Results are tested against a simple historical baseline; an unavailable or unproven signal is labeled as such.</p><p class="tiny">News topics use TF-IDF similarity. The default headline tone is a transparent word-based method; local FinBERT inference is optional. Private news and market history do not appear on this public page.</p></div><div class="method-intro"><div><strong>Source data</strong><span>SEC EDGAR Company Facts</span></div><div><strong>Demonstration calculations</strong><span>Simulated portfolio / DCF / quantitative returns</span></div><div><strong>Separate private workspace</strong><span>Owner-only authentication and observations</span></div></div>
+  <div class="pane qf-v181-architecture-bridge"><h3>Trace a result to the code</h3><p>Financial facts and scenario outputs have different origins. The public research page contains reproducible statistical and language-model evidence; the engineering sections below document ingestion, validation, deployment, and access control.</p><button class="btn" data-go="systems">Open model validation</button></div><div class="method-intro"><div><strong>Source data</strong><span>SEC EDGAR Company Facts</span></div><div><strong>Demonstration calculations</strong><span>Simulated portfolio / DCF / quantitative returns</span></div><div><strong>Separate private workspace</strong><span>Owner-only authentication and observations</span></div></div>
   <div class="pane"><div class="section-title"><h3>Data lineage</h3><span class="mini" id="methods-asof">Historical SEC snapshot</span></div>
    <div class="pipeline"><div class="pipe-step"><span>01 · INGEST</span><strong>SEC EDGAR</strong><small>Company Facts / 10-K annual facts</small></div><span class="pipe-arrow" aria-hidden="true">→</span><div class="pipe-step"><span>02 · VALIDATE</span><strong>Periods &amp; provenance</strong><small>CIK, filing dates, units, annual windows</small></div><span class="pipe-arrow" aria-hidden="true">→</span><div class="pipe-step"><span>03 · PUBLISH</span><strong>Read-only snapshot</strong><small>Build-time JSON + protected browser scripts</small></div></div>
    <p class="explain-note">The public browser does not request raw filings or private market quotes. A locally generated and reviewed snapshot is embedded when the site is built. Figures do not auto-refresh.</p>
@@ -1175,7 +1217,7 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
       <button class="btn" id="private-mfa-logout">Sign out</button></div>
   </div>
   <div id="private-signed" hidden>
-    <div class="controls"><span class="mini">Private portfolio · authenticated</span><strong class="tiny" id="qf-private-location" role="status" aria-live="polite">Decision Center / Research summary</strong><button class="btn sm" id="private-logout">Sign out</button></div>
+    <div class="controls"><span class="mini">Private portfolio · authenticated</span><strong class="tiny" id="qf-private-location" role="status" aria-live="polite">Research · Choose companies</strong><button class="btn sm" id="private-logout">Sign out</button></div>
     <nav class="private-nav qf-v170-nav" aria-label="Private workspace main destinations">
       <button class="active" data-private-tab="decision">Research</button>
       <button data-private-tab="home">Portfolio</button>
@@ -1186,7 +1228,21 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
       <div class="qf-v93-ribbon-copy"><strong id="qf-v93-ribbon-title">Research workflow · No current assessment</strong><span class="tiny" id="qf-v93-ribbon-detail">Select companies and run research to connect your findings and reports.</span></div>
       <div class="controls"><button type="button" class="btn sm" id="qf-v93-ribbon-assess">Decision Center</button><button type="button" class="btn sm" id="qf-v93-ribbon-brief" disabled>Open briefing</button></div>
     </div>
-    <section class="pane qf-v140-launch" aria-label="Private research workflow readiness">
+
+    <div id="private-research-dataset" class="pane" hidden aria-label="Research investments">
+      <div class="section-title"><h3>Research investments</h3><span class="tiny">Used in Market data, Optimization, Backtests and Walk-forward</span></div>
+      <p class="tiny">Choose 2–5 investments and a time period, then load their price history. Optimization, backtesting and walk-forward testing use the same loaded observations. Changing the selection or period requires reloading and recalculating.</p>
+      <div class="formgrid" style="margin-top:14px"><div class="field"><label for="private-history-selection">Selected investments (2–5)</label><input type="hidden" id="private-history-symbols" value=""><div id="private-history-selection" class="chosen-assets">Choose investments to compare.</div><button class="btn sm" type="button" id="private-browse-research">Browse investments</button></div>
+      <div class="field"><label for="private-history-days">History period</label><select id="private-history-days"><option value="90">3 months</option><option value="180">6 months</option><option selected value="365">1 year</option><option value="730">2 years</option></select></div></div>
+      <div class="controls"><button class="btn primary" id="private-history-load">Load market history</button><span class="tiny" id="private-history-source"></span></div>
+      <div class="pane" style="background:var(--card,#f6faf8);padding:12px;margin-top:12px;border:1px solid #c9ded5;border-radius:9px">
+        <p class="tiny" style="margin:0 0 8px"><strong>Selected investments:</strong> <span id="private-research-selected" aria-live="polite">None selected</span></p>
+        <div class="tiny"><strong>Historical data loaded:</strong> <span id="private-research-loaded" aria-live="polite">No historical data loaded</span></div>
+      </div>
+      <p class="tiny" id="private-research-state" role="status" aria-live="polite">No market history loaded for the current selection.</p>
+    </div>
+    <section class="private-view" data-private-view="lab" hidden>
+<div class="qf-v180-specialist"><h2>Research methods and settings</h2><p>The full calculations, reports and source checks live here. You do not need this page to run the main research.</p>    <section class="pane qf-v140-launch" aria-label="Private research workflow readiness">
       <div class="qf-v140-top"><div><span class="eyebrow">RESEARCH WORKFLOW</span><h3>Research status</h3></div><span id="qf-v140-progress" class="qf-v140-progress">0 / 5</span></div>
       <div id="qf-v140-status" class="tiny" role="status" aria-live="polite">Checking current research inputs.</div>
       <div id="qf-v140-steps" class="qf-v140-steps" aria-label="Research prerequisites"></div>
@@ -1209,21 +1265,7 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
         <p class="tiny" id="qf-v150-status" role="status" aria-live="polite">Manual verification not recorded.</p>
         <div class="controls"><button class="btn sm" id="qf-v150-download" type="button" disabled>Export redacted acceptance JSON</button><button class="btn sm" id="qf-v150-reset" type="button">Reset results</button></div>
       </div></details>
-    </section>
-    <div id="private-research-dataset" class="pane" hidden aria-label="Research investments">
-      <div class="section-title"><h3>Research investments</h3><span class="tiny">Used in Market data, Optimization, Backtests and Walk-forward</span></div>
-      <p class="tiny">Choose 2–5 investments and a time period, then load their price history. Optimization, backtesting and walk-forward testing use the same loaded observations. Changing the selection or period requires reloading and recalculating.</p>
-      <div class="formgrid" style="margin-top:14px"><div class="field"><label for="private-history-selection">Selected investments (2–5)</label><input type="hidden" id="private-history-symbols" value=""><div id="private-history-selection" class="chosen-assets">Choose investments to compare.</div><button class="btn sm" type="button" id="private-browse-research">Browse investments</button></div>
-      <div class="field"><label for="private-history-days">History period</label><select id="private-history-days"><option value="90">3 months</option><option value="180">6 months</option><option selected value="365">1 year</option><option value="730">2 years</option></select></div></div>
-      <div class="controls"><button class="btn primary" id="private-history-load">Load market history</button><span class="tiny" id="private-history-source"></span></div>
-      <div class="pane" style="background:var(--card,#f6faf8);padding:12px;margin-top:12px;border:1px solid #c9ded5;border-radius:9px">
-        <p class="tiny" style="margin:0 0 8px"><strong>Selected investments:</strong> <span id="private-research-selected" aria-live="polite">None selected</span></p>
-        <div class="tiny"><strong>Historical data loaded:</strong> <span id="private-research-loaded" aria-live="polite">No historical data loaded</span></div>
-      </div>
-      <p class="tiny" id="private-research-state" role="status" aria-live="polite">No market history loaded for the current selection.</p>
-    </div>
-    <section class="private-view" data-private-view="lab" hidden>
-<div class="qf-v180-specialist"><h2>Research methods and settings</h2><p>The full calculations, reports and source checks live here. You do not need this page to run the main research.</p><h3>Model settings</h3>        <details id="qf-v160-setup" class="qf-v160-setup"><summary>Optional: change research assumptions</summary>
+    </section><h3>Model settings</h3>        <details id="qf-v160-setup" class="qf-v160-setup"><summary>Optional: change research assumptions</summary>
         <div class="qf-v92-setup">
           <section class="qf-v92-step" aria-labelledby="qf-v92-step-one"><div class="qf-v92-stephead"><span aria-hidden="true">01</span><h3 id="qf-v92-step-one">Select investments</h3></div>
             <p class="tiny">The primary candidate below is used for the detailed legacy technical trace; all selected companies are assessed on the results screen.</p>
@@ -1265,7 +1307,21 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
       <div id="qf-v98-brief" class="qf-v95-host" aria-live="polite"></div>
       <div id="qf-v99-brief" class="qf-v95-host" aria-live="polite"></div>
       <div id="qf-v100-brief" class="qf-v95-host" aria-live="polite"></div>
-      <div id="qf-v130-brief" class="qf-v130-slot" aria-live="polite"></div><div id="qf-v120-brief" class="qf-v120-slot"></div><div id="qf-v110-brief" class="qf-v95-host" aria-live="polite"></div></div>
+      <div id="qf-v130-brief" class="qf-v130-slot" aria-live="polite"></div><div id="qf-v120-brief" class="qf-v120-slot"></div><div id="qf-v110-brief" class="qf-v95-host" aria-live="polite"></div>      <div class="pane" id="private-guide-card-v79">
+        <div class="section-title"><h3>Optional session overview</h3><span class="mini">Private · educational decision support</span></div>
+        <p class="tiny">For an overview of available work that has not yet been included in an automated Decision Center assessment, use this secondary session summary. It is separate from the linked briefing and cannot issue a candidate recommendation.</p>
+        <div class="formgrid" style="margin-top:12px">
+          <div class="field"><label for="private-guide-horizon-v79">When could you need this money?</label><select id="private-guide-horizon-v79"><option value="unknown">Not sure yet</option><option value="short">Within 3 years</option><option value="medium">3–10 years</option><option value="long">More than 10 years</option></select></div>
+          <div class="field"><label for="private-guide-comfort-v79">How would a large temporary loss affect you?</label><select id="private-guide-comfort-v79"><option value="unknown">Not sure yet</option><option value="low">I could not comfortably absorb it</option><option value="medium">I could tolerate some loss</option><option value="high">I understand substantial losses are possible</option></select></div>
+        </div>
+        <div class="controls"><button class="btn primary" id="private-guide-run-v79" type="button">Summarize available session analyses</button><button class="btn" id="private-guide-export-v79" type="button" disabled>Export private report (JSON)</button></div>
+        <div id="private-guide-result-v79" aria-live="polite" style="margin-top:14px"><p class="tiny">Click Explain my current research when signed in. Results stay in this browser session until cleared.</p></div>
+        <details class="lab-details"><summary>Finance terms · plain-English reference</summary><div class="tiny" style="padding-top:10px"><p><strong>Volatility:</strong> how much prices moved up and down in the observed period.</p><p><strong>Drawdown:</strong> how far a portfolio fell from a prior high.</p><p><strong>Backtest:</strong> a calculation using past prices, not proof of future success.</p><p><strong>Walk-forward:</strong> a backtest that repeatedly fits on earlier data and checks later observations.</p><p><strong>Cash flow:</strong> money reported moving through a company; this is not the same as stock-price return.</p><p><strong>Concentration:</strong> how dependent your portfolio value is on one holding.</p><p><strong>SEC filing:</strong> a company disclosure filed with the US securities regulator.</p><p><strong>FCF proxy:</strong> operating cash flow minus cash spent on property and equipment; not a stock-price target.</p><p><strong>Discount rate:</strong> a model assumption about the value of future cash flow in today’s dollars.</p><p><strong>Correlation:</strong> how two observed return series moved together; historical correlation can change.</p></div></details>
+        <details class="lab-details"><summary>Before acting: a research checklist</summary><div class="tiny" style="padding-top:10px"><ol><li>Can I explain what the company or fund owns and how it makes money?</li><li>Are my financial figures reported, current, and comparable across periods?</li><li>What do the historical risk and walk-forward results disagree about?</li><li>How would this change concentration or cash in my portfolio?</li><li>What information is still missing, and would a possible loss affect money I need soon?</li></ol><p>Use the analysis links in your generated report to answer each question. This is a review tool, not a buy/sell signal.</p></div></details>
+        <p class="tiny">This is a rule-based research explanation, not a generative AI chatbot, investment recommendation, or personalized suitability determination. Nothing is sent to an AI service.</p>
+      </div>
+
+</div>
       <div class="pane qf-v9-shell"><span class="eyebrow">ADVANCED RESEARCH · METHODS LIBRARY</span><h2>Advanced Research Lab</h2>
       <p>The Decision Center runs applicable research automatically. Use this lab to inspect algorithms, change assumptions, and investigate statistical findings in greater detail.</p>
       <p class="tiny">Investment analysis is organized by purpose. Models use dated, matched observations; they do not execute orders.</p>
@@ -1478,20 +1534,6 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
         <p class="tiny">Last eight completed assessment summaries in this authenticated browser session. No account values, holdings, or raw market prices are saved. This list is not a cloud archive and resets on refresh or logout.</p><div id="qf-v95-session-history" aria-live="polite"></div></div>
       <div class="pane qf-v96-saved" id="qf-v96-archive"><div class="section-title"><h3>Saved research</h3><button type="button" class="btn primary" id="qf-v96-save" disabled>Save current assessment</button></div><p class="tiny">Saved explicitly to existing MFA-protected private notes; persists across browser sessions. Stores a short conclusion and method count only—not holdings, account balances, market prices, or a full report. Deletion is permanent.</p><p class="tiny" id="qf-v96-archive-status">Owner-only archive</p><div id="qf-v96-saved-list" aria-live="polite"></div></div>
       <div class="controls"><button class="btn primary" type="button" id="qf-v93-brief-refresh" disabled>Refresh linked briefing</button><button class="btn" type="button" id="qf-v93-brief-export" disabled>Export evidence briefing (JSON)</button></div></section>
-      <div class="pane" id="private-guide-card-v79">
-        <div class="section-title"><h3>Optional session overview</h3><span class="mini">Private · educational decision support</span></div>
-        <p class="tiny">For an overview of available work that has not yet been included in an automated Decision Center assessment, use this secondary session summary. It is separate from the linked briefing and cannot issue a candidate recommendation.</p>
-        <div class="formgrid" style="margin-top:12px">
-          <div class="field"><label for="private-guide-horizon-v79">When could you need this money?</label><select id="private-guide-horizon-v79"><option value="unknown">Not sure yet</option><option value="short">Within 3 years</option><option value="medium">3–10 years</option><option value="long">More than 10 years</option></select></div>
-          <div class="field"><label for="private-guide-comfort-v79">How would a large temporary loss affect you?</label><select id="private-guide-comfort-v79"><option value="unknown">Not sure yet</option><option value="low">I could not comfortably absorb it</option><option value="medium">I could tolerate some loss</option><option value="high">I understand substantial losses are possible</option></select></div>
-        </div>
-        <div class="controls"><button class="btn primary" id="private-guide-run-v79" type="button">Summarize available session analyses</button><button class="btn" id="private-guide-export-v79" type="button" disabled>Export private report (JSON)</button></div>
-        <div id="private-guide-result-v79" aria-live="polite" style="margin-top:14px"><p class="tiny">Click Explain my current research when signed in. Results stay in this browser session until cleared.</p></div>
-        <details class="lab-details"><summary>Finance terms · plain-English reference</summary><div class="tiny" style="padding-top:10px"><p><strong>Volatility:</strong> how much prices moved up and down in the observed period.</p><p><strong>Drawdown:</strong> how far a portfolio fell from a prior high.</p><p><strong>Backtest:</strong> a calculation using past prices, not proof of future success.</p><p><strong>Walk-forward:</strong> a backtest that repeatedly fits on earlier data and checks later observations.</p><p><strong>Cash flow:</strong> money reported moving through a company; this is not the same as stock-price return.</p><p><strong>Concentration:</strong> how dependent your portfolio value is on one holding.</p><p><strong>SEC filing:</strong> a company disclosure filed with the US securities regulator.</p><p><strong>FCF proxy:</strong> operating cash flow minus cash spent on property and equipment; not a stock-price target.</p><p><strong>Discount rate:</strong> a model assumption about the value of future cash flow in today’s dollars.</p><p><strong>Correlation:</strong> how two observed return series moved together; historical correlation can change.</p></div></details>
-        <details class="lab-details"><summary>Before acting: a research checklist</summary><div class="tiny" style="padding-top:10px"><ol><li>Can I explain what the company or fund owns and how it makes money?</li><li>Are my financial figures reported, current, and comparable across periods?</li><li>What do the historical risk and walk-forward results disagree about?</li><li>How would this change concentration or cash in my portfolio?</li><li>What information is still missing, and would a possible loss affect money I need soon?</li></ol><p>Use the analysis links in your generated report to answer each question. This is a review tool, not a buy/sell signal.</p></div></details>
-        <p class="tiny">This is a rule-based research explanation, not a generative AI chatbot, investment recommendation, or personalized suitability determination. Nothing is sent to an AI service.</p>
-      </div>
-
       <div class="pane"><h3>Saved research notes</h3><div class="field" style="margin-top:12px"><label for="private-note">Private note</label><textarea id="private-note" maxlength="2000" rows="3" placeholder="Write a research note..."></textarea></div>
       <div class="controls"><button class="btn" id="private-note-submit">Save note</button></div><div id="private-notes"></div><p class="tiny">Watchlist: <span id="private-watchlist">None</span></p></div>
     </section>
@@ -1795,6 +1837,43 @@ function compare(snapshot,symbol,{sectorOnly=false}={}){
 const api=Object.freeze({compare,companyRow,features,sectorOf});
 if(typeof module==='object'&&module.exports)module.exports=api;
 root.QFPublicSECPeers=api;
+})(typeof window!=='undefined'?window:globalThis);
+
+/* Public reproducible validation exhibit. Synthetic prices; actual private model. */
+(function(root){
+'use strict';
+function fixture(n=355){
+ const dates=[],prices=[];
+ for(let i=0;i<n;i++){
+  dates.push(new Date(Date.UTC(2023,0,1+i)).toISOString().slice(0,10));
+  prices.push(100*Math.exp(i*0.00024+0.018*Math.sin(i/11)+0.008*Math.sin(i/3)));
+ }
+ return {symbols:['DEMO'],dates,closes:{DEMO:prices},asset_classes:{DEMO:'us_equity'},source:'Deterministic, synthetic prices; not market observations'};
+}
+function summary(result){
+ if(!result||!result.ready)return {ready:false,message:'The synthetic model evaluation could not be completed.'};
+ const accurate=x=>Math.round(Math.max(0,Math.min(1,x))*100);
+ const brier=x=>x.toFixed(3);
+ return {ready:true,windows:result.testWindows,start:result.firstTestDate,end:result.lastTestDate,
+  modelAccuracy:accurate(result.evaluatedAccuracy),baselineAccuracy:accurate(result.baselineAccuracy),
+  modelBrier:brier(result.evaluatedBrier),baselineBrier:brier(result.baselineBrier),
+  conclusion:result.qualified?'The model cleared its internal baseline screen on this generated series. This is not evidence of market predictability.':'The model did not clear its internal baseline screen on this generated series.'};
+}
+function render(){
+ if(typeof document==='undefined')return;
+ const host=document.getElementById('qf-v181-evidence');if(!host)return;
+ const ml=root.QFPrivatePredictiveMLV180;
+ const r=summary(ml?ml.analyze(fixture(),'DEMO'):null);
+ if(!r.ready){host.textContent=r.message;return;}
+ const bar=(label,value,extra)=>'<div class="qf-v181-bar '+extra+'"><strong>'+label+'</strong><div class="qf-v181-track"><span style="width:'+value+'%"></span></div><strong>'+value+'%</strong></div>';
+ host.innerHTML='<p class="qf-v181-scope">Generated prices only · '+r.windows+' disjoint five-session held-out windows · '+r.start+' to '+r.end+'</p>'+
+  '<div class="qf-v181-bars" role="img" aria-label="Synthetic evaluation: model directional accuracy '+r.modelAccuracy+' percent; simple baseline '+r.baselineAccuracy+' percent">'+bar('Classifier',r.modelAccuracy,'model')+bar('Baseline',r.baselineAccuracy,'baseline')+'</div>'+
+  '<div class="qf-v181-scores"><div class="qf-v181-score"><strong>'+r.modelBrier+'</strong><span>Model Brier score · smaller is better</span></div><div class="qf-v181-score"><strong>'+r.baselineBrier+'</strong><span>Historical-frequency baseline Brier score</span></div></div><p>'+r.conclusion+'</p>';
+}
+const api=Object.freeze({fixture,summary});
+if(typeof module==='object'&&module.exports)module.exports=api;
+root.QFPublicModelEvidenceV181=api;
+if(typeof window!=='undefined')window.addEventListener('load',render);
 })(typeof window!=='undefined'?window:globalThis);
 
 /* QuantForge public SEC company-facts comparison. No network access, storage or brokerage operations. */
@@ -5229,7 +5308,7 @@ const title=Object.freeze({green:'Passes configured research screens',amber:'Mix
 function prepare({rows,selected,comparison,asOf}={}){
  if(!Array.isArray(selected)||selected.length<2||selected.length>5||!selected.every(isSymbol)||new Set(selected).size!==selected.length||
   !Array.isArray(rows)||rows.length!==selected.length||!selected.every(s=>rows.some(r=>r.symbol===s))||rows.some(r=>!isSymbol(r.symbol)||!r.decision||!r.reason))
-  return {ready:false,reason:'Choose two to five different companies and run complete research before viewing the comparison.'};
+  return {ready:false,reason:'Choose two to five different companies and select Analyze companies to view the comparison.'};
  const result=rows.map(r=>{
   const signal=tone(r),risk=(comparison?.rows||[]).find(a=>a.symbol===r.symbol);
   return {symbol:r.symbol,name:String(r.name||r.symbol).slice(0,90),signal,status:title[signal],
@@ -5257,7 +5336,7 @@ function render(input){
  '<div class="qf-v170-overview"><strong>'+(
   data.priority?safe(data.rows.find(r=>r.symbol===data.priority).name)+' has the clearest screen-compatible case in this selection.':
   count>1?count+' companies pass the configured screens; no single clear leader is established.':
-  'No company has a clear green light under all current research constraints.')+'</strong><p>These are research checks, not a trained stock-return prediction or a recommendation to buy. Red means a selected risk rule was breached; grey means key information was unavailable.</p></div>';
+  'No company has a clear green light under all current research constraints.')+'</strong><p>These findings apply only to the selected assumptions and available evidence. Red marks a risk-screen breach; grey means required evidence is missing. Neither is a buy or sell instruction.</p></div>';
  const cards=data.rows.map(r=>'<article class="qf-v170-company qf-v170-'+r.signal+'" data-symbol="'+safe(r.symbol)+'">'+
   '<div class="qf-v170-company-title"><h4>'+safe(r.name)+' <small>('+safe(r.symbol)+')</small></h4><span class="qf-v170-pill qf-v170-'+r.signal+'">'+badges[r.signal]+'</span></div>'+
   '<strong class="qf-v170-verdict">'+safe(r.status)+'</strong><p>'+safe(r.reason)+'</p>'+
@@ -5268,7 +5347,7 @@ function render(input){
   '</article>').join('');
  const priced=data.rows.filter(r=>finite(r.maxDrawdown));
  const chart=priced.length?'<section class="qf-v170-chart"><h4>How much have these investments fallen in the past?</h4><p>Each bar shows the worst peak-to-trough fall in the shared observed period. A larger bar means a larger historical decline, not a predicted loss.</p>'+priced.map(r=>'<div class="qf-v170-bar-row"><span>'+safe(r.name)+'</span><div class="qf-v170-bar"><span style="width:'+Math.min(100,Math.abs(r.maxDrawdown)/60*100).toFixed(1)+'%"></span></div><strong>'+Math.abs(r.maxDrawdown).toFixed(1)+'%</strong></div>').join('')+'<p class="tiny">'+safe(data.period?.start)+' to '+safe(data.period?.end)+' · '+safe(data.period?.observations)+' matched sessions · price-only data, excluding dividends. Bars capped visually at 60%; labels show actual values.</p></section>':
- '<p class="qf-v170-empty">The companies do not yet have a complete shared price history for a valid comparison. No chart was invented.</p>';
+ '<p class="qf-v170-empty">Matched historical price coverage was insufficient. The downside comparison is withheld rather than filled with estimates.</p>';
  return '<div class="qf-v170-results">'+head+'<div class="qf-v170-cards">'+cards+'</div>'+chart+'<p class="qf-v170-footer">Need the underlying statistics, exact model settings or historical data limitations? Open <b>Advanced Research</b> from the navigation. The main comparison remains unchanged until new research is run.</p></div>';
 }
 const api=Object.freeze({prepare,tone,render});
@@ -5362,16 +5441,19 @@ function analyze(history,sym){
  const modelBrier=brier('prediction'),baseBrier=brier('baseline');
  const train=rows.filter(r=>r.t+H<n);
  const model=fit(train),current=score(model,features(prices,n-1));
- const qualified=modelBrier<baseBrier-0.001&&tests.length>=10;
- const status=qualified?'Research signal (limited validation)':'No demonstrated advantage over a simple baseline';
+ // The Brier improvement alone is not sufficient: check directional accuracy too.
+ // Screens are deliberately conservative and remain exploratory, not statistical proof.
+ const modelAccuracy=accuracy('prediction'),baseAccuracy=accuracy('baseline');
+ const qualified=modelBrier<baseBrier-0.005&&modelAccuracy>=baseAccuracy&&tests.length>=12;
+ const status=qualified?'Exploratory signal (limited validation)':'No consistent advantage over the simple baseline';
  const direction=current>=0.55?'Upward tilt':current<=0.45?'Downward tilt':'No clear direction';
  const reasons=qualified?
-  'The fixed model beat a historical base-rate forecast on non-overlapping held-out windows. The sample remains small.':
-  'Out-of-sample results did not establish an advantage over a simple past-frequency forecast.';
+  'The model improved both the Brier score and directional accuracy across held-out windows. This remains exploratory, not statistical proof.':
+  'Held-out Brier error, directional accuracy, or sample size did not clear the conservative baseline screen.';
  return {ready:true,symbol:sym,asOf:dates[n-1],forecastHorizon:H,
   model:'L2-regularized logistic regression',features:['5-session return','20-session return','60-session return','20-session volatility','40-session drawdown'],
   trainingExamples:train.length,testWindows:tests.length,firstTestDate:tests[0].date,lastTestDate:tests.at(-1).date,
-  evaluatedAccuracy:accuracy('prediction'),baselineAccuracy:accuracy('baseline'),
+  evaluatedAccuracy:modelAccuracy,baselineAccuracy:baseAccuracy,
   evaluatedBrier:modelBrier,baselineBrier:baseBrier,
   qualified,status,direction:qualified?direction:'Not validated',rawModelScore:current,
   explanation:reasons,source:String(history.source||'authenticated historical prices').slice(0,100),
@@ -6238,21 +6320,22 @@ function renderPredictiveV180(history,selected){
    '<div class="qf-v180-plot" role="img" aria-label="Held-out directional accuracy '+safe(accuracy)+' percent versus simple baseline '+safe(base)+' percent">'+
    '<div style="height:'+Math.max(8,Number(accuracy))+'%"><span>Model '+safe(accuracy)+'%</span></div>'+
    '<div style="height:'+Math.max(8,Number(base))+'%"><span>Baseline '+safe(base)+'%</span></div></div>'+
-   '<p class="tiny">'+row.testWindows+' separate 5-session tests · '+safe(row.firstTestDate)+' to '+safe(row.lastTestDate)+'</p></article>';
+   '<div class="qf-v181-model-stats"><span><strong>Score error:</strong> '+safe(row.evaluatedBrier.toFixed(3))+' vs baseline '+safe(row.baselineBrier.toFixed(3))+'</span><span><strong>Test windows:</strong> '+row.testWindows+'</span></div>'+
+   '<p class="tiny">Smaller score error is better · '+safe(row.firstTestDate)+' to '+safe(row.lastTestDate)+'</p></article>';
  }).join('');
- box.innerHTML='<section class="qf-v180-section"><h3>Can a model anticipate price direction?</h3><p>A real logistic-regression experiment uses past returns, volatility and declines. We test on later periods, not the training sample. If it cannot beat a simple baseline, we do not treat the result as a signal.</p><div class="qf-v180-cards">'+rows+'</div><p class="tiny">This tests 5-session direction, not a future price or profit estimate. Accuracy is historical and may not persist. Model scores are uncalibrated.</p></section>';
+ box.innerHTML='<section class="qf-v180-section"><h3>Price-direction experiment</h3><p>A real logistic-regression experiment uses past returns, volatility and declines. We test on later periods, not the training sample. If it cannot beat a simple baseline, we do not treat the result as a signal.</p><div class="qf-v180-cards">'+rows+'</div><p class="tiny">This tests 5-session direction, not a future price or profit estimate. Accuracy is historical and may not persist. Model scores are uncalibrated.</p></section>';
 }
 function renderNewsV180(result,selected){
  const box=$('qf-v180-news');if(!box)return;
  if(!result||!Array.isArray(result.rows)||result.rows.length!==selected.length||
-  result.rows.some(r=>!selected.includes(r.symbol))){box.innerHTML='<section class="qf-v180-section"><h3>What is in the news?</h3><p>Recent, verified financial headlines are unavailable. No sentiment result is inferred.</p></section>';return;}
+  result.rows.some(r=>!selected.includes(r.symbol))){box.innerHTML='<section class="qf-v180-section"><h3>What is in the news?</h3><p>News could not be checked or no eligible dated headlines were returned. No tone score is inferred.</p></section>';return;}
  const articles=result.rows.map(row=>'<article class="qf-v180-card"><h4>'+safe(assetNames[row.symbol]||row.symbol)+'</h4>'+
   '<p><b>'+safe(row.tone)+'</b> · '+safe(row.articles)+' dated headlines</p>'+
   (Array.isArray(row.topics)&&row.topics.length?'<p>Common subjects: '+row.topics.map(safe).join(', ')+'</p>':'')+
   (Array.isArray(row.headlines)?row.headlines.slice(0,2).map(h=>'<p><b>'+safe(h.tone)+'</b> · '+safe(h.headline)+
    '<small> · '+safe(String(h.created_at||'').slice(0,10))+' · '+safe(h.source)+'</small></p>').join(''):'')+
   '</article>').join('');
- box.innerHTML='<section class="qf-v180-section"><h3>What are the headlines saying?</h3><p>Dated Alpaca news, grouped by financial subject and headline tone. The language method does not predict stock prices.</p>'+
+ box.innerHTML='<section class="qf-v180-section"><h3>Recent headline themes</h3><p>Dated Alpaca news, grouped by financial subject and headline tone. The language method does not predict stock prices.</p>'+
   '<div class="qf-v180-cards">'+articles+'</div><p class="tiny">Tone method: '+safe(result.method)+'. Topics: '+safe(result.topic_method)+'. Coverage may be incomplete.</p></section>';
 }
 async function loadNewsV180(selected,valid){
@@ -6263,10 +6346,6 @@ async function loadNewsV180(selected,valid){
   newsResultV180=result;
   renderNewsV180(result,selected);
  }catch(e){if(valid())renderNewsV180(null,selected);}
-}
-function flattenPrivateDetailsV180(){
- const root=$('private-signed');if(!root||typeof root.querySelectorAll!=='function')return;
- root.querySelectorAll('details').forEach(el=>{if(!el.open)el.open=true;});
 }
 function clearResearchOSV90(){
  multiResearchV170=null;
@@ -6282,7 +6361,7 @@ function clearResearchOSV90(){
  candidateDossierV90=null;candidateQuoteV90=null;candidateFactorV91=null;
  const button=$('private-v90-run');if(button)button.disabled=false;
  const report=$('private-v90-report');
- if(report)report.textContent='Research inputs changed. Run complete research to rebuild an evidence-linked assessment.';
+ if(report)report.textContent='Research inputs changed. Select Analyze companies to refresh the findings.';
 }
 function refreshResearchOSChoicesV90(){
  const picker=$('private-v90-candidate');if(!picker)return;
@@ -6763,7 +6842,7 @@ function renderUnifiedDecisionV160(){
   integrity:linkedDecisionIntegrityV130,workflow:linkedWorkflowV140});
  linkedUnifiedDecisionV160=data;
  if(!privateState||!data.ready){
-  slot.innerHTML='<p class="qf-v170-empty">Your comparison will appear here once you run complete research. No stock conclusion is shown without current company and market evidence.</p>';
+  slot.innerHTML='<p class="qf-v170-empty">Your comparison will appear here after you select Analyze companies. No stock conclusion is shown without current company and market evidence.</p>';
   return;
  }
  const light=data.riskVeto?'Risk limit breached':({green:'Eligible for further research',amber:'Mixed or limited evidence',red:'Measured risk caution',gray:'Insufficient reliable evidence'}[data.signal]||'Evidence not evaluated');
@@ -6867,7 +6946,7 @@ async function runResearchOSV90(){
   if(held.length>=2){researchSelection=held;renderResearchSelection();selected=[...researchSelection];}
  }
  if(selected.length<2||selected.length>5){
-  status.textContent='Choose two to five companies. Then select Run complete research. No decision has been generated.';
+  status.textContent='Choose two to five companies. Then select Analyze companies. No decision has been generated.';
   if(progress)progress.textContent='Choose at least two investments first.';
   return;
  }
@@ -8451,12 +8530,6 @@ for(const id of ['qf-v93-briefing','qf-v93-lab-status'])$(id).addEventListener('
 });
 $('qf-v99-file').addEventListener('change',importArchivedSECV99);
 $('qf-v99-clear').addEventListener('click',clearImportedSECV99);
-if(typeof MutationObserver!=='undefined'){
- const privateRoot=$('private-signed');
- if(privateRoot){const observer=new MutationObserver(flattenPrivateDetailsV180);
-  observer.observe(privateRoot,{childList:true,subtree:true});}
-}
-flattenPrivateDetailsV180();
 $('private-v90-browse').addEventListener('click',()=>openAssetBrowser('research'));
 $('qf-v170-browse').addEventListener('click',()=>openAssetBrowser('research'));
 $('qf-v170-selected').addEventListener('click',e=>{const b=e.target.closest('[data-v170-remove]');if(!b)return;researchSelection=researchSelection.filter(s=>s!==b.dataset.v170Remove);renderResearchSelection();invalidateResearchHistory('Selection changed. A new complete research run is required.');});

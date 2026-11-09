@@ -436,6 +436,28 @@ body:has(#page-private.active) .side .qf-private-exit{display:flex!important}
 body:has(#page-private.active) .side{gap:12px}
 body:has(#page-private.active) .side .qf-private-nav-section{margin:0}
 @media(max-width:800px){body:has(#page-private.active) .side nav{display:flex;gap:7px;flex-wrap:wrap}}
+
+/* Public research validation exhibit: sourced methods and an explicitly synthetic test. */
+.qf-v181-validation-exhibit{border-color:#c8dcd2;background:#fcfefd}
+.qf-v181-validation-exhibit>p{font-size:14px;line-height:1.7;margin:11px 0;max-width:83ch;color:#456056}
+.qf-v181-validation-exhibit h2{margin:10px 0;font-size:22px}
+.qf-v181-scope{font-size:12px;color:#5a7368;font-weight:650;margin:10px 0}
+.qf-v181-scores{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:16px 0}
+.qf-v181-score{border:1px solid #d9e7df;border-radius:10px;padding:13px;background:white}
+.qf-v181-score strong{display:block;font-size:22px;font-variant-numeric:tabular-nums;color:#204d3f}
+.qf-v181-score span{color:#61766c;font-size:12px}
+.qf-v181-bars{display:grid;gap:11px;margin:15px 0}
+.qf-v181-bar{display:grid;grid-template-columns:90px minmax(0,1fr) 64px;gap:11px;align-items:center;font-size:12px}
+.qf-v181-track{height:13px;border-radius:9px;background:#e9eeeb;overflow:hidden}
+.qf-v181-track>span{display:block;height:100%;background:#287868;border-radius:9px}
+.qf-v181-bar.baseline .qf-v181-track>span{background:#ab9065}
+.qf-v181-method-sources{display:flex;gap:17px;flex-wrap:wrap;margin:15px 0}
+.qf-v181-method-sources a,.qf-v181-language-grid a{color:#1c6752;font-weight:700;font-size:12px}
+.qf-v181-language-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin-top:19px}
+.qf-v181-language-grid article{border:1px solid #d9e7df;background:white;border-radius:10px;padding:15px}
+.qf-v181-language-grid h3{margin:0 0 7px;font-size:15px}
+.qf-v181-language-grid p{line-height:1.65;color:#516a5f;font-size:13px;margin-bottom:11px}
+@media(max-width:650px){.qf-v181-language-grid,.qf-v181-scores{grid-template-columns:1fr}.qf-v181-bar{grid-template-columns:65px minmax(0,1fr) 55px;gap:6px}}
 </style></head><body>
 <div class="app"><aside class="side"><div class="brand"><div class="mark">Q</div>quantforge</div><p class="qf-v83-owner"><span>Designed and developed by</span><strong>Rishi&nbsp;Ratnakar</strong></p><nav id="navigation" aria-label="Main navigation">
   <div class="qf-nav-section" role="group" aria-label="Financial research pages">
@@ -459,8 +481,8 @@ body:has(#page-private.active) .side .qf-private-nav-section{margin:0}
 </nav><div class="sidenote">Historical SEC data · reproducible models<br>Personal investment research requires sign-in</div></aside>
 <a class="skip-link" href="#main-content">Skip to content</a><main id="main-content"><div class="topbar"><span class="eyebrow">SEC filings · portfolio models · research methods</span><span class="badge">RESEARCH OVERVIEW</span></div>
 <section class="tabpage active" id="page-overview">
-<div class="intro-simple"><span class="eyebrow">FINANCIAL DATA &amp; QUANTITATIVE ANALYSIS</span><h1>Financial research, built from the data up.</h1><p>SEC filings, portfolio risk, valuation, and quantitative research—connected by tested Python and JavaScript.</p></div>
-<div class="qf-home-meta"><span><strong id="qf-company-count-v81">Available companies</strong> · historical SEC company facts</span><span>Financial research · model validation · source-linked calculations</span></div>
+<div class="intro-simple"><span class="eyebrow">FINANCIAL DATA &amp; QUANTITATIVE ANALYSIS</span><h1>Financial research, built from the data up.</h1><p>SEC-reported company financials, statistical experiments, and portfolio scenarios, with the calculations and tests available to inspect.</p></div>
+<div class="qf-home-meta"><span><strong id="qf-company-count-v81">Available companies</strong> · historical SEC company facts</span><span>Observed filings · derived metrics · labeled hypothetical models</span></div>
 <nav class="qf-home-roadmap" aria-label="Explore financial research">
  <button type="button" class="qf-roadmap-card" data-go="sec"><span>01 · FINANCIAL STATEMENTS</span><strong>Company financials</strong><small>Explore historical SEC revenue, profitability, cash flow, and cross-company comparisons.</small></button>
  <button type="button" class="qf-roadmap-card" data-go="lab"><span>02 · COMPARATIVE ANALYSIS</span><strong>Analysis dashboard</strong><small>Inspect company trends and evaluate simulated allocation strategies with transparent settings.</small></button>
@@ -588,7 +610,20 @@ body:has(#page-private.active) .side .qf-private-nav-section{margin:0}
   <div class="tech-step"><span class="eyebrow">04 / EVALUATION</span><strong>Challenge the result</strong><small>Past-only fitting, out-of-sample windows, fees, passive benchmarks, leave-one-window-out robustness and research reports</small></div>
  </div><p class="tech-note">The public deployment hosts static demonstrations and a reviewed SEC snapshot. Market observations and personal virtual accounts are only accessed in authenticated private workflows.</p></div>
  <nav class="research-jumps" aria-label="Research methods sections"><a href="#systems-public-evidence">Reported SEC comparison</a><a href="#systems-optimization">Optimization</a><a href="#systems-validation">Walk-forward</a><a href="#systems-valuation">Forecasting</a><a href="#systems-ideas">Investment screening</a><a href="#systems-code-evidence">Code and tests</a></nav>
- <!-- QF V8.3 verified methodology atlas: methods already implemented and tested -->
+ <section class="pane qf-v181-validation-exhibit" aria-labelledby="qf-v181-title">
+ <span class="eyebrow">MODEL EVALUATION · REPRODUCIBLE PUBLIC EXAMPLE</span>
+ <h2 id="qf-v181-title">Can a price-direction model beat a simple baseline?</h2>
+ <p>Five-session up/down classification uses lagged returns, historical volatility, and drawdown. An expanding-window L2 logistic regression is tested on later, non-overlapping windows against a past positive-return-frequency baseline. The chart below runs the <strong>same implementation</strong> on generated example prices; it is <strong>not evidence of stock-market accuracy</strong>.</p>
+ <div id="qf-v181-evidence" role="status" aria-live="polite">Computing a reproducible synthetic test…</div>
+ <p class="tiny">Lower Brier score means smaller squared forecast error. The exploratory model score is uncalibrated; neither classification accuracy nor a good synthetic result demonstrates a profitable strategy. Transaction costs, different market regimes, historical issuer selection, and dividends require separate validation.</p>
+ <div class="qf-v181-method-sources"><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/site/private_predictive_ml_v180.js" target="_blank" rel="noopener noreferrer">Model implementation</a><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/web/tests/private_predictive_ml_v180.test.cjs" target="_blank" rel="noopener noreferrer">Evaluation tests</a></div>
+ <div class="qf-v181-language-grid">
+  <article><h3>Headline subjects</h3><p>Authenticated dated headlines are grouped with token counts, TF-IDF weighting, and cosine similarity to a declared finance vocabulary. This is <strong>lexical topic similarity</strong>, not transformer embeddings or semantic reasoning.</p><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/cloud/news_intelligence_v180.py" target="_blank" rel="noopener noreferrer">Read topic-scoring source</a></article>
+  <article><h3>Headline tone</h3><p>The default method counts positive and negative finance terms with basic negation handling. An optional local FinBERT path exists only when explicitly provisioned. A headline score does not estimate a future stock return.</p><a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/tests/test_news_intelligence_v180.py" target="_blank" rel="noopener noreferrer">Read sentiment tests</a></article>
+ </div>
+</section>
+
+<!-- QF V8.3 verified methodology atlas: methods already implemented and tested -->
 <section class="pane" id="qf-v83-method-atlas" aria-labelledby="qf-v83-method-title">
  <div class="section-title"><h3 id="qf-v83-method-title">Methods and mathematical implementation</h3><span class="mini">Algorithms · checks · source code</span></div>
  <p class="evidence-intro">Each method connects an input, a calculation, and a validation check. Reported company disclosures and market-price observations are distinguished from assumptions and simulated public examples.</p>
@@ -766,8 +801,7 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
  <div class="controls" style="margin-top:0"><button class="btn primary" data-go="lab">Explore the analysis</button><button class="btn" data-go="systems">Research methods</button><button class="btn" data-go="methods">Data &amp; engineering</button></div>
 </div>
 </section>
-  <div class="pane" style="background:#f1f7f3;border-color:#bad5c7"><div class="section-title"><h3>Private models and public source code</h3><span class="mini">Implementation references</span></div><p class="explain-note" style="margin:0 0 13px">The private workspace supports historical market analysis, portfolio optimization, strategy evaluation, investment screening, and SEC-based valuation scenarios. The methods page explains the underlying calculations; the repository contains the implementations and tests.</p><button class="btn primary" data-go="systems">View research methods</button></div>
-  <div class="pane qf-v180-public-ml"><h3>Predictive research and financial language</h3><p>Private research combines an expanding-window logistic-regression experiment with company financials, risk analysis, and dated news. Results are tested against a simple historical baseline; an unavailable or unproven signal is labeled as such.</p><p class="tiny">News topics use TF-IDF similarity. The default headline tone is a transparent word-based method; local FinBERT inference is optional. Private news and market history do not appear on this public page.</p></div><div class="method-intro"><div><strong>Source data</strong><span>SEC EDGAR Company Facts</span></div><div><strong>Demonstration calculations</strong><span>Simulated portfolio / DCF / quantitative returns</span></div><div><strong>Separate private workspace</strong><span>Owner-only authentication and observations</span></div></div>
+  <div class="pane qf-v181-architecture-bridge"><h3>Trace a result to the code</h3><p>Financial facts and scenario outputs have different origins. The public research page contains reproducible statistical and language-model evidence; the engineering sections below document ingestion, validation, deployment, and access control.</p><button class="btn" data-go="systems">Open model validation</button></div><div class="method-intro"><div><strong>Source data</strong><span>SEC EDGAR Company Facts</span></div><div><strong>Demonstration calculations</strong><span>Simulated portfolio / DCF / quantitative returns</span></div><div><strong>Separate private workspace</strong><span>Owner-only authentication and observations</span></div></div>
   <div class="pane"><div class="section-title"><h3>Data lineage</h3><span class="mini" id="methods-asof">Historical SEC snapshot</span></div>
    <div class="pipeline"><div class="pipe-step"><span>01 · INGEST</span><strong>SEC EDGAR</strong><small>Company Facts / 10-K annual facts</small></div><span class="pipe-arrow" aria-hidden="true">→</span><div class="pipe-step"><span>02 · VALIDATE</span><strong>Periods &amp; provenance</strong><small>CIK, filing dates, units, annual windows</small></div><span class="pipe-arrow" aria-hidden="true">→</span><div class="pipe-step"><span>03 · PUBLISH</span><strong>Read-only snapshot</strong><small>Build-time JSON + protected browser scripts</small></div></div>
    <p class="explain-note">The public browser does not request raw filings or private market quotes. A locally generated and reviewed snapshot is embedded when the site is built. Figures do not auto-refresh.</p>

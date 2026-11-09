@@ -12,7 +12,7 @@ def source(path):
 def test_overview_is_specific_without_unearned_claims():
     page = source("web/site/site.template.html")
     assert 'Financial research, built from the data up.' in page
-    assert "SEC filings, portfolio risk, valuation, and quantitative research" in page
+    assert "SEC-reported company financials, statistical experiments, and portfolio scenarios" in page
     assert "<strong>Research data:</strong> Historical SEC company financials" in page
     assert "<strong>Research data:</strong> Historical SEC company financials" in page
     assert "Financial research, built end to end" not in page

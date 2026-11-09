@@ -29,21 +29,22 @@ function renderPredictiveV180(history,selected){
    '<div class="qf-v180-plot" role="img" aria-label="Held-out directional accuracy '+safe(accuracy)+' percent versus simple baseline '+safe(base)+' percent">'+
    '<div style="height:'+Math.max(8,Number(accuracy))+'%"><span>Model '+safe(accuracy)+'%</span></div>'+
    '<div style="height:'+Math.max(8,Number(base))+'%"><span>Baseline '+safe(base)+'%</span></div></div>'+
-   '<p class="tiny">'+row.testWindows+' separate 5-session tests · '+safe(row.firstTestDate)+' to '+safe(row.lastTestDate)+'</p></article>';
+   '<div class="qf-v181-model-stats"><span><strong>Score error:</strong> '+safe(row.evaluatedBrier.toFixed(3))+' vs baseline '+safe(row.baselineBrier.toFixed(3))+'</span><span><strong>Test windows:</strong> '+row.testWindows+'</span></div>'+
+   '<p class="tiny">Smaller score error is better · '+safe(row.firstTestDate)+' to '+safe(row.lastTestDate)+'</p></article>';
  }).join('');
- box.innerHTML='<section class="qf-v180-section"><h3>Can a model anticipate price direction?</h3><p>A real logistic-regression experiment uses past returns, volatility and declines. We test on later periods, not the training sample. If it cannot beat a simple baseline, we do not treat the result as a signal.</p><div class="qf-v180-cards">'+rows+'</div><p class="tiny">This tests 5-session direction, not a future price or profit estimate. Accuracy is historical and may not persist. Model scores are uncalibrated.</p></section>';
+ box.innerHTML='<section class="qf-v180-section"><h3>Price-direction experiment</h3><p>A real logistic-regression experiment uses past returns, volatility and declines. We test on later periods, not the training sample. If it cannot beat a simple baseline, we do not treat the result as a signal.</p><div class="qf-v180-cards">'+rows+'</div><p class="tiny">This tests 5-session direction, not a future price or profit estimate. Accuracy is historical and may not persist. Model scores are uncalibrated.</p></section>';
 }
 function renderNewsV180(result,selected){
  const box=$('qf-v180-news');if(!box)return;
  if(!result||!Array.isArray(result.rows)||result.rows.length!==selected.length||
-  result.rows.some(r=>!selected.includes(r.symbol))){box.innerHTML='<section class="qf-v180-section"><h3>What is in the news?</h3><p>Recent, verified financial headlines are unavailable. No sentiment result is inferred.</p></section>';return;}
+  result.rows.some(r=>!selected.includes(r.symbol))){box.innerHTML='<section class="qf-v180-section"><h3>What is in the news?</h3><p>News could not be checked or no eligible dated headlines were returned. No tone score is inferred.</p></section>';return;}
  const articles=result.rows.map(row=>'<article class="qf-v180-card"><h4>'+safe(assetNames[row.symbol]||row.symbol)+'</h4>'+
   '<p><b>'+safe(row.tone)+'</b> · '+safe(row.articles)+' dated headlines</p>'+
   (Array.isArray(row.topics)&&row.topics.length?'<p>Common subjects: '+row.topics.map(safe).join(', ')+'</p>':'')+
   (Array.isArray(row.headlines)?row.headlines.slice(0,2).map(h=>'<p><b>'+safe(h.tone)+'</b> · '+safe(h.headline)+
    '<small> · '+safe(String(h.created_at||'').slice(0,10))+' · '+safe(h.source)+'</small></p>').join(''):'')+
   '</article>').join('');
- box.innerHTML='<section class="qf-v180-section"><h3>What are the headlines saying?</h3><p>Dated Alpaca news, grouped by financial subject and headline tone. The language method does not predict stock prices.</p>'+
+ box.innerHTML='<section class="qf-v180-section"><h3>Recent headline themes</h3><p>Dated Alpaca news, grouped by financial subject and headline tone. The language method does not predict stock prices.</p>'+
   '<div class="qf-v180-cards">'+articles+'</div><p class="tiny">Tone method: '+safe(result.method)+'. Topics: '+safe(result.topic_method)+'. Coverage may be incomplete.</p></section>';
 }
 async function loadNewsV180(selected,valid){
@@ -54,10 +55,6 @@ async function loadNewsV180(selected,valid){
   newsResultV180=result;
   renderNewsV180(result,selected);
  }catch(e){if(valid())renderNewsV180(null,selected);}
-}
-function flattenPrivateDetailsV180(){
- const root=$('private-signed');if(!root||typeof root.querySelectorAll!=='function')return;
- root.querySelectorAll('details').forEach(el=>{if(!el.open)el.open=true;});
 }
 function clearResearchOSV90(){
  multiResearchV170=null;
@@ -73,7 +70,7 @@ function clearResearchOSV90(){
  candidateDossierV90=null;candidateQuoteV90=null;candidateFactorV91=null;
  const button=$('private-v90-run');if(button)button.disabled=false;
  const report=$('private-v90-report');
- if(report)report.textContent='Research inputs changed. Run complete research to rebuild an evidence-linked assessment.';
+ if(report)report.textContent='Research inputs changed. Select Analyze companies to refresh the findings.';
 }
 function refreshResearchOSChoicesV90(){
  const picker=$('private-v90-candidate');if(!picker)return;
@@ -554,7 +551,7 @@ function renderUnifiedDecisionV160(){
   integrity:linkedDecisionIntegrityV130,workflow:linkedWorkflowV140});
  linkedUnifiedDecisionV160=data;
  if(!privateState||!data.ready){
-  slot.innerHTML='<p class="qf-v170-empty">Your comparison will appear here once you run complete research. No stock conclusion is shown without current company and market evidence.</p>';
+  slot.innerHTML='<p class="qf-v170-empty">Your comparison will appear here after you select Analyze companies. No stock conclusion is shown without current company and market evidence.</p>';
   return;
  }
  const light=data.riskVeto?'Risk limit breached':({green:'Eligible for further research',amber:'Mixed or limited evidence',red:'Measured risk caution',gray:'Insufficient reliable evidence'}[data.signal]||'Evidence not evaluated');
@@ -658,7 +655,7 @@ async function runResearchOSV90(){
   if(held.length>=2){researchSelection=held;renderResearchSelection();selected=[...researchSelection];}
  }
  if(selected.length<2||selected.length>5){
-  status.textContent='Choose two to five companies. Then select Run complete research. No decision has been generated.';
+  status.textContent='Choose two to five companies. Then select Analyze companies. No decision has been generated.';
   if(progress)progress.textContent='Choose at least two investments first.';
   return;
  }
@@ -2242,12 +2239,6 @@ for(const id of ['qf-v93-briefing','qf-v93-lab-status'])$(id).addEventListener('
 });
 $('qf-v99-file').addEventListener('change',importArchivedSECV99);
 $('qf-v99-clear').addEventListener('click',clearImportedSECV99);
-if(typeof MutationObserver!=='undefined'){
- const privateRoot=$('private-signed');
- if(privateRoot){const observer=new MutationObserver(flattenPrivateDetailsV180);
-  observer.observe(privateRoot,{childList:true,subtree:true});}
-}
-flattenPrivateDetailsV180();
 $('private-v90-browse').addEventListener('click',()=>openAssetBrowser('research'));
 $('qf-v170-browse').addEventListener('click',()=>openAssetBrowser('research'));
 $('qf-v170-selected').addEventListener('click',e=>{const b=e.target.closest('[data-v170-remove]');if(!b)return;researchSelection=researchSelection.filter(s=>s!==b.dataset.v170Remove);renderResearchSelection();invalidateResearchHistory('Selection changed. A new complete research run is required.');});
