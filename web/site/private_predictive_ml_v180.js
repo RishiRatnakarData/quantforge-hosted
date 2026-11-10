@@ -87,6 +87,15 @@ function analyze(history,sym){
  // The Brier improvement alone is not sufficient: check directional accuracy too.
  // Screens are deliberately conservative and remain exploratory, not statistical proof.
  const modelAccuracy=accuracy('prediction'),baseAccuracy=accuracy('baseline');
+ // Three coarse reliability groups are shown as descriptive holdout diagnostics, not
+ // calibrated future-return probabilities (small test counts may be very noisy).
+ const calibration=[0,1,2].map(bin=>{
+  const group=tests.filter(v=>Math.min(2,Math.floor(v.prediction*3))===bin);
+  return {range:[bin/3,(bin+1)/3],count:group.length,
+   mean_prediction:group.length?mean(group.map(v=>v.prediction)):null,
+   observed_positive:group.length?mean(group.map(v=>v.y)):null};
+ });
+ const testPositiveRate=mean(tests.map(v=>v.y));
  const qualified=modelBrier<baseBrier-0.005&&modelAccuracy>=baseAccuracy&&tests.length>=12;
  const status=qualified?'Exploratory signal (limited validation)':'No consistent advantage over the simple baseline';
  const direction=current>=0.55?'Upward tilt':current<=0.45?'Downward tilt':'No clear direction';
@@ -98,6 +107,10 @@ function analyze(history,sym){
   trainingExamples:train.length,testWindows:tests.length,firstTestDate:tests[0].date,lastTestDate:tests.at(-1).date,
   evaluatedAccuracy:modelAccuracy,baselineAccuracy:baseAccuracy,
   evaluatedBrier:modelBrier,baselineBrier:baseBrier,
+  testPositiveRate,calibration,validation:{horizon:H,first:tests[0].date,last:tests.at(-1).date,
+   disjoint_test_windows:tests.length,baseline:'Expanding historical positive-outcome frequency',
+   label_maturity:'Training labels end no later than each test feature date',
+   calibration_limit:'Three descriptive score bins; no post-hoc probability recalibration or claimed future calibration'},
   qualified,status,direction:qualified?direction:'Not validated',rawModelScore:current,
   explanation:reasons,source:String(history.source||'authenticated historical prices').slice(0,100),
   limitations:'Exploratory 5-session price-direction classification. Price-only bars omit dividends, spread and taxes. Market regimes can change. The score is uncalibrated, not a probability of future profit.'};

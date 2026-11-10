@@ -88,7 +88,7 @@ jobs:
           PY
 
   release_a_browser:
-    name: Release A and B shared-app browser journeys
+    name: Release A, B and C shared-app browser journeys
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
@@ -106,3 +106,5 @@ jobs:
         run: python tools/smoke_release_a_browser.py
       - name: Verify Release B Compare, Portfolio, owner accounting and provider-failure isolation
         run: python tools/smoke_release_b_browser.py
+      - name: Verify Release C Models, Methods, source scope and private gating
+        run: python tools/smoke_release_c_browser.py

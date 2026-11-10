@@ -509,6 +509,15 @@ body:has(#page-private.active) .side .qf-private-nav-section{margin:0}
 .qf-b21-chart-label{display:inline-block;font-size:0.81rem;margin-right:16px}.qf-b21-chart-legend{display:flex;flex-wrap:wrap;gap:8px;padding:8px 2px}
 .qf-b21-hidden-unavailable{color:#725d48}.qf-b21-sort{cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px}
 @media(max-width:740px){.qf-b21-two{grid-template-columns:minmax(0,1fr)}.qf-b21-compare-controls{grid-template-columns:minmax(0,1fr)}.qf-b21-slider-line{grid-template-columns:minmax(75px,1fr) minmax(82px,1.5fr) 47px;gap:6px}.qf-b21-chart{min-height:180px}}
+
+/* Release C models and methods - direct result/evaluation/method tabs without disclosures. */
+.qf-c22-pane{min-width:0}.qf-c22-sectionbar{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:13px}.qf-c22-sectionbar>.qf-v20-subnav{margin:0}
+.qf-c22-provenance{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin:4px 0 18px;color:#60756b;font-size:12px}.qf-c22-tag{padding:5px 10px;border-radius:8px;font-size:11px;font-weight:720;background:#e9f4ed;color:#155846}.qf-c22-tag.synthetic{background:#f7f1e5;color:#735830}
+.qf-c22-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:13px 0 18px}.qf-c22-metric{background:#fafcfb;border:1px solid #dce9e3;border-radius:11px;padding:15px;min-width:0}.qf-c22-metric small{display:block;color:#657a70;font-size:11px}.qf-c22-metric strong{display:block;font-size:clamp(15px,1.8vw,21px);margin:6px 0;overflow-wrap:anywhere}.qf-c22-metric span{display:block;color:#74857c;font-size:11px;line-height:1.5}
+#qf-c22-model-output>.pane,#qf-c22-method-content>.pane{min-width:0;margin:14px 0;overflow-wrap:anywhere}.qf-c22-chart{width:100%;height:auto;display:block;margin:18px 0;max-height:240px}.qf-c22-unavailable{border:1px solid #e0e8e2}.qf-c22-flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:22px 0}.qf-c22-flow div{border:1px solid #cbded2;border-radius:9px;padding:12px;background:#f3f8f4;flex:1 1 150px;text-align:center}.qf-c22-flow span{color:#648576;font-weight:bold}
+#qf-c22-method-content table,#qf-c22-model-output table{font-size:12px}#qf-c22-model-output .pane p,#qf-c22-method-content .pane p{max-width:900px;line-height:1.7}#qf-c22-model-output .pane a,#qf-c22-method-content .pane a{overflow-wrap:anywhere}
+@media(max-width:900px){.qf-c22-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:500px){.qf-c22-sectionbar{display:block}.qf-c22-sectionbar .qf-v20-subnav{margin-top:10px}.qf-c22-flow div{flex-basis:100%}}
 </style></head><body>
 <div class="app"><aside class="side"><div class="brand"><div class="mark">Q</div>quantforge</div><p class="qf-v83-owner"><span>Designed and developed by</span><strong>Rishi&nbsp;Ratnakar</strong></p><nav id="qf-v20-navigation" class="qf-v20-navigation" aria-label="QuantForge research sections">
 <button type="button" class="nav-btn active" data-page="explore" aria-current="page">Explore</button>
@@ -582,7 +591,12 @@ body:has(#page-private.active) .side .qf-private-nav-section{margin:0}
  <section class="pane"><h2>Correlation of historical daily returns</h2><p class="tiny">Pearson correlation of common-date simple returns; unstable across samples and not a prediction of diversification.</p><div id="qf-b21-correlation" class="qf-b21-heat-wrap">No common return history loaded.</div></section>
  </div>
 </section>
-<section class="tabpage" id="page-models" aria-labelledby="qf-v20-models-title"><div class="qf-v20-intro"><div><div class="eyebrow">STATISTICS / MODELING</div><h1 id="qf-v20-models-title">Models and evidence</h1><p>Research experiments are shown with the data they use, their evaluation, and limitations.</p><p id="qf-v20-model-selected" class="tiny"></p></div></div><nav class="qf-v20-subnav" aria-label="Model categories"><button type="button" data-qf-model="prediction" class="active">Prediction</button><button type="button" data-qf-model="risk">Risk</button><button type="button" data-qf-model="valuation">Valuation</button><button type="button" data-qf-model="strategy">Strategy testing</button></nav><div id="qf-v20-model-prediction" class="qf-v20-model-slot"><div id="qf-v20-model-evidence-target"></div><p class="tiny">The public classifier example uses generated prices and the same L2 logistic numerical engine as private research. It does not demonstrate market forecasting skill.</p></div><div id="qf-v20-model-risk" class="qf-v20-model-slot" hidden></div><div id="qf-v20-model-valuation" class="qf-v20-model-slot" hidden></div><div id="qf-v20-model-strategy" class="qf-v20-model-slot" hidden></div></section>
+<section class="tabpage" id="page-models" aria-labelledby="qf-v20-models-title">
+ <div class="qf-v20-intro"><div><div class="eyebrow">RESEARCH / STATISTICAL EXPERIMENTS</div><h1 id="qf-v20-models-title">Models</h1><p>Analyze the company selected in Explore. Every result identifies its inputs, evaluation, assumptions and uncertainty.</p><p id="qf-v20-model-selected" class="tiny"></p></div></div>
+ <nav class="qf-v20-subnav" aria-label="Model categories"><button type="button" class="active" data-qf-model="prediction">Prediction</button><button type="button" data-qf-model="risk">Risk</button><button type="button" data-qf-model="valuation">Valuation</button><button type="button" data-qf-model="strategy">Strategy testing</button></nav>
+ <div class="qf-c22-pane"><div class="qf-c22-sectionbar"><strong>Research evidence</strong><nav class="qf-v20-subnav" role="tablist" aria-label="Model research views"><button role="tab" aria-selected="true" class="active" data-qf-c22-phase="results">Results</button><button role="tab" aria-selected="false" data-qf-c22-phase="evaluation">Evaluation</button><button role="tab" aria-selected="false" data-qf-c22-phase="method">Method</button></nav></div>
+ <div id="qf-c22-model-output" role="tabpanel" aria-live="polite">Select a company in Explore.</div></div>
+</section>
 <section class="tabpage active" id="page-overview">
 <div class="intro-simple"><span class="eyebrow">FINANCIAL DATA &amp; QUANTITATIVE ANALYSIS</span><h1>Financial research, built from the data up.</h1><p>SEC-reported company financials, statistical experiments, and portfolio scenarios, with the calculations and tests available to inspect.</p></div>
 <div class="qf-home-meta"><span><strong id="qf-company-count-v81">Available companies</strong> · historical SEC company facts</span><span>Observed filings · derived metrics · labeled hypothetical models</span></div>
@@ -906,6 +920,13 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
 </section>
 
 <section class="tabpage" id="page-methods">
+<div id="qf-c22-methods-main">
+ <div class="qf-v20-intro"><div><div class="eyebrow">DATA / METHODS / ENGINEERING</div><h1>Methods</h1><p>Trace research outputs to source records, computation, evaluation and test coverage.</p></div></div>
+ <nav class="qf-v20-subnav" role="tablist" aria-label="Method sections"><button role="tab" aria-selected="true" class="active" data-qf-c22-method="overview">Overview</button><button role="tab" aria-selected="false" data-qf-c22-method="data">Data</button><button role="tab" aria-selected="false" data-qf-c22-method="statistical">Statistical methods</button><button role="tab" aria-selected="false" data-qf-c22-method="engineering">Engineering</button></nav>
+ <div id="qf-c22-method-content" role="tabpanel" aria-live="polite"></div>
+</div>
+<div id="qf-c22-legacy-methods" hidden aria-hidden="true">
+
   <div class="pagehead"><span class="eyebrow">METHODS</span><h1>Data and engineering</h1><p>How the data, models, application, and tests fit together.</p></div>
 <section class="qf-methods-guide" aria-labelledby="qf-methods-guide-title">
   <h2 id="qf-methods-guide-title">How the research platform works</h2>
@@ -963,6 +984,7 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
   <tr><td>Platform</td><td>MFA owner boundaries; restricted proxy; CSP hashes; private JS regression suite</td><td>Tests confidentiality and deployed script integrity</td></tr>
   </tbody></table></div><p class="explain-note">CI runs Python 3.11 and 3.12 along with JavaScript checks. Passing tests provide scoped evidence, not investment performance claims or complete security assurance.</p></div>
   <div class="notice">Historical financial disclosures may be updated or restated. Model scenarios are not investment advice.</div>
+</div>
 </section>
 <div class="footerline">QuantForge · Rishi Ratnakar · <button class="text-link" data-go="methods">Data &amp; engineering</button> · SEC Financials uses historical filings. Public portfolio and model scenarios use illustrative inputs. Private account data and market feeds are not available in the public site. This project is not an investment recommendation.</div>
 </main></div>

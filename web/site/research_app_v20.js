@@ -52,7 +52,7 @@ function selectCompany(symbol){
  const f=Q.financialSummary(c,data.as_of);
  renderFinances(f);renderSource(f);renderChartEmpty('Preparing chart…');
  renderNewsEmpty(mode()==='private'?'Checking dated headlines…':'News is available only through owner-authorized market providers. No public headlines are invented.');
- setAccount();loadPrice();loadNews();
+ setAccount();window.dispatchEvent(new Event('qf:research-context'));loadPrice();loadNews();
 }
 function renderChartEmpty(msg){$('qf-v20-chart').textContent=msg;$('qf-v20-price-stats').replaceChildren();$('qf-v20-price-table').replaceChildren();}
 function renderSource(f){
@@ -158,7 +158,7 @@ async function loadPrice(){
  if(!privateResearch){
   state.price=Q.syntheticPrice(symbol);
   state.priceSource={type:'synthetic',source:'Seeded deterministic simulation (browser only)',coverage:'No link to actual company price observations.'};
-  renderPriceData();return;
+  renderPriceData();window.dispatchEvent(new Event('qf:research-context'));return;
  }
  renderChartEmpty('Requesting owner-authorized historical closes…');
  try{
@@ -168,13 +168,14 @@ async function loadPrice(){
   if(raw.licensed_private!==true||raw.symbol!==symbol||raw.ohlcv_available!==false)throw Error('Unexpected or unsupported market-data contract.');
   state.price=Q.priceSeries(raw.observations);
   state.priceSource={...raw,type:'market'};
-  renderPriceData();
+  renderPriceData();window.dispatchEvent(new Event('qf:research-context'));
   if(state.benchmarkOn)loadBenchmark();
  }catch(e){if(token!==state.priceToken)return;
   state.price=null;state.priceSource=null;renderChartEmpty('Observed prices unavailable: '+String(e.message||e).slice(0,170)+'. SEC financials remain available.');
   $('qf-v20-current').textContent='Unavailable';$('qf-v20-change').textContent='No synthetic fallback used in private mode';
   $('qf-v20-source-badge').textContent='Market data unavailable';
   const coverage=$('qf-v20-price-coverage');if(coverage)coverage.textContent='Private market observations unavailable; no replacement or fabricated prices.';
+  window.dispatchEvent(new Event('qf:research-context'));
  }
 }
 async function loadBenchmark(){
@@ -500,18 +501,11 @@ function exportPortfolio(){if(!state.portfolioScenario||!state.portfolioData)ret
 
 function showModel(name){
  state.model=name;
- document.querySelectorAll('[data-qf-model]').forEach(b=>b.classList.toggle('active',b.dataset.qfModel===name));
- for(const route of ['prediction','risk','valuation','strategy'])$('qf-v20-model-'+route).hidden=route!==name;
+ if(window.QFModelsMethods22)window.QFModelsMethods22.showModel(name);
 }
 function mountModels(){
- const v=$('qf-v181-title')?.closest('.qf-v181-validation-exhibit');
- if(v)$('qf-v20-model-evidence-target').appendChild(v);
- const move=(from,to)=>{const source=$(from),dest=$(to);if(source&&dest){const nodes=[...source.children];for(const child of nodes)dest.appendChild(child);}};
- move('page-quant','qf-v20-model-risk');
- move('page-valuation','qf-v20-model-valuation');
- const walk=$('lab-walkforward');if(walk)$('qf-v20-model-strategy').appendChild(walk);
- // Existing tested public numerical engines retain their original IDs and event handlers.
- showModel('prediction');
+ // Legacy model DOM and its tested handlers stay in their hidden original routes.
+ // Release C presents new evidence views instead of moving old accordion panels.
 }
 function authUpdate(){
  const signed=$('private-signed');const ready=signed&&!signed.hidden;
@@ -587,5 +581,8 @@ function init(){
  selectCompany(state.symbol);renderCompareChips();authUpdate();
 }
 init();
-window.QFResearch20=Object.freeze({choose:selectCompany,analyze});
+window.QFResearch20=Object.freeze({choose:selectCompany,analyze,
+ context:()=>({symbol:state.symbol,name:company().name,origin:state.priceSource?.type||null,
+  prices:state.price?state.price.map(p=>({date:p.date,close:p.close})):null,
+  financial:Q.financialSummary(company(),data.as_of),snapshot:data.as_of})});
 })();
