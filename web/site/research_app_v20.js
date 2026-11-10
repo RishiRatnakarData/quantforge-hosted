@@ -27,7 +27,7 @@ async function getPrivate(path){
 }
 function setAccount(){
  $('qf-v20-account-status').textContent=mode()==='private'?'MFA verified · entitled owner data':'Public SEC research · illustrative price chart';
- $('qf-v20-mode').textContent=mode()==='private'?'Private tools / sign out':'Private workspace';
+ $('qf-v20-mode').textContent=mode()==='private'?'My workspace':'Sign in';
  $('qf-v20-benchmark-wrap').hidden=mode()!=='private';
  $('qf-v20-universe').textContent=companies.length+' SEC companies · '+(mode()==='private'?'private market feed':'public demonstration');
 }
@@ -93,10 +93,11 @@ function renderPriceData(){
  if(!state.price||!source){renderChartEmpty('Historical price data is unavailable. SEC financials and analysis remain available.');return;}
  const real=source.type==='market';
  $('qf-v20-source-badge').textContent=real?'Observed · '+(source.equity_feed||'crypto').toUpperCase():'Illustrative · synthetic';
- const price=Q.chartWindow(state.price,state.range);
+ const rawPrice=Q.chartWindow(state.price,state.range);
+ const price=real||!rawPrice.length?rawPrice:rawPrice.map(p=>({...p,close:100*p.close/rawPrice[0].close}));
  if(!price.length){renderChartEmpty('No observations in this chart range.');return;}
- $('qf-v20-current').textContent=usd(price[price.length-1].close);
- $('qf-v20-change').textContent=(real?'Observed close':'Simulated example')+' · '+price[price.length-1].date;
+ $('qf-v20-current').textContent=real?usd(price[price.length-1].close):value(price[price.length-1].close,1)+' index';
+ $('qf-v20-change').textContent=(real?'Observed close':'Illustrative index · 100 at window start')+' · '+price[price.length-1].date;
  const overall=real?Q.priceStatistics(Q.chartWindow(state.price,Math.max(30,Number(state.range)||730))):null;
  const change=price[price.length-1].close/price[0].close-1;
  $('qf-v20-price-stats').innerHTML=[['Window change',pct(change)],['Price observations',String(price.length)],['Observed max drawdown',overall?pct(overall.max_drawdown):'Not evaluated']].map(x=>'<div><small>'+esc(x[0])+'</small><strong>'+esc(x[1])+'</strong></div>').join('');
@@ -128,19 +129,19 @@ function drawPriceChart(price,benchmark,real){
  const path=xs=>xs.map((r,i)=>(i?'L':'M')+X(i).toFixed(2)+','+Y(r.close).toFixed(2)).join(' ');
  const grid=Array.from({length:5},(_,i)=>{
   const y=top+(bottom-top)*i/4;
-  return '<line x1="'+left+'" x2="'+right+'" y1="'+y+'" y2="'+y+'" stroke="#e0eae5"/><text x="'+(left-9)+'" y="'+(y+4)+'" font-size="10" text-anchor="end" fill="#637b70">'+(normalized?value(hi-(hi-lo)*i/4,0):'$'+value(hi-(hi-lo)*i/4,0))+'</text>';
+  return '<line x1="'+left+'" x2="'+right+'" y1="'+y+'" y2="'+y+'" stroke="#e0eae5"/><text x="'+(left-9)+'" y="'+(y+4)+'" font-size="10" text-anchor="end" fill="#637b70">'+(normalized||!real?value(hi-(hi-lo)*i/4,0):'$'+value(hi-(hi-lo)*i/4,0))+'</text>';
  }).join('');
  const ticks=[0,0.25,0.5,0.75,1].map(t=>{
   const i=Math.round((series.length-1)*t);
   return '<text x="'+X(i)+'" y="270" font-size="11" text-anchor="middle" fill="#688177">'+esc(series[i].date.slice(0,7))+'</text>';
  }).join('');
  const mark=real?'':'<text x="375" y="55" text-anchor="middle" font-size="19" font-weight="750" fill="#d4e5dc">SYNTHETIC · NOT REAL MARKET PRICES</text>';
- $('qf-v20-chart').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" tabindex="0" role="img" aria-label="'+(real?'Observed':'Synthetic demonstration')+' close-price chart '+esc(series[0].date)+' to '+esc(series[series.length-1].date)+'. Arrow keys inspect values."><title>'+(real?'Observed, price-only historical closes':'Synthetic illustration, not actual company market prices')+'</title>'+grid+ticks+mark+'<path d="'+path(series)+'" fill="none" stroke="#19826c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>'+(bench?'<path d="'+path(bench)+'" fill="none" stroke="#b88c45" stroke-width="2" stroke-dasharray="6 5"/>':'')+'<line id="qf-v20-crosshair" x1="'+X(series.length-1)+'" x2="'+X(series.length-1)+'" y1="'+top+'" y2="'+bottom+'" stroke="#839c91" stroke-dasharray="3 4"/><circle id="qf-v20-crossdot" cx="'+X(series.length-1)+'" cy="'+Y(series[series.length-1].close)+'" r="5" fill="#155f50" stroke="#fff" stroke-width="2"/></svg><div class="qf-v20-cursor" aria-live="polite"><span id="qf-v20-cursor-value"></span><span>'+(normalized?'Indexed to 100 · common observed dates · SPY dashed':'Close price · hover or use arrow keys')+'</span></div>';
+ $('qf-v20-chart').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" tabindex="0" role="img" aria-label="'+(real?'Observed':'Synthetic demonstration')+' close-price chart '+esc(series[0].date)+' to '+esc(series[series.length-1].date)+'. Arrow keys inspect values."><title>'+(real?'Observed, price-only historical closes':'Synthetic illustration, not actual company market prices')+'</title>'+grid+ticks+mark+'<path d="'+path(series)+'" fill="none" stroke="#19826c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>'+(bench?'<path d="'+path(bench)+'" fill="none" stroke="#b88c45" stroke-width="2" stroke-dasharray="6 5"/>':'')+'<line id="qf-v20-crosshair" x1="'+X(series.length-1)+'" x2="'+X(series.length-1)+'" y1="'+top+'" y2="'+bottom+'" stroke="#839c91" stroke-dasharray="3 4"/><circle id="qf-v20-crossdot" cx="'+X(series.length-1)+'" cy="'+Y(series[series.length-1].close)+'" r="5" fill="#155f50" stroke="#fff" stroke-width="2"/></svg><div class="qf-v20-cursor" aria-live="polite"><span id="qf-v20-cursor-value"></span><span>'+(normalized?'Indexed to 100 · common observed dates · SPY dashed':real?'Close price · hover or use arrow keys':'Illustrative index · not a stock quote')+'</span></div>';
  const svg=$('qf-v20-chart').querySelector('svg');let index=series.length-1;
  const update=i=>{index=Math.min(series.length-1,Math.max(0,i));
   const x=X(index);$('qf-v20-crosshair').setAttribute('x1',x);$('qf-v20-crosshair').setAttribute('x2',x);
   $('qf-v20-crossdot').setAttribute('cx',x);$('qf-v20-crossdot').setAttribute('cy',Y(series[index].close));
-  $('qf-v20-cursor-value').textContent=series[index].date+' · '+(normalized?value(series[index].close,2)+' indexed':'$'+value(series[index].close,2))+(bench?' · SPY '+value(bench[index].close,2):'');};
+  $('qf-v20-cursor-value').textContent=series[index].date+' · '+(normalized||!real?value(series[index].close,2)+' index':'$'+value(series[index].close,2))+(bench?' · SPY '+value(bench[index].close,2):'');};
  update(index);
  svg.addEventListener('pointermove',e=>{
   const rect=svg.getBoundingClientRect(),ratio=(e.clientX-rect.left)/rect.width;
@@ -229,8 +230,11 @@ function csv(rows,name){
 }
 function exportPrice(){
  if(!state.price)return;
- csv([['symbol','date','close_usd','price_origin','source_description'],...state.price.map(p=>[state.symbol,p.date,p.close,state.priceSource.type,state.priceSource.source])],
- 'quantforge-'+state.symbol+'-'+state.priceSource.type+'-closes.csv');
+ const observed=state.priceSource.type==='market',rows=state.price;
+ const origin=rows[0]?.close;
+ csv([['symbol','date',observed?'close_usd':'illustrative_index_100_at_first_date','price_origin','source_description'],
+  ...rows.map(p=>[state.symbol,p.date,observed?p.close:100*p.close/origin,state.priceSource.type,state.priceSource.source])],
+ 'quantforge-'+state.symbol+'-'+(observed?'observed-closes':'synthetic-index')+'.csv');
 }
 function exportSEC(){
  const f=Q.financialSummary(company(),data.as_of);

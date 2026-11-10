@@ -518,15 +518,50 @@ body:has(#page-private.active) .side .qf-private-nav-section{margin:0}
 #qf-c22-method-content table,#qf-c22-model-output table{font-size:12px}#qf-c22-model-output .pane p,#qf-c22-method-content .pane p{max-width:900px;line-height:1.7}#qf-c22-model-output .pane a,#qf-c22-method-content .pane a{overflow-wrap:anywhere}
 @media(max-width:900px){.qf-c22-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:500px){.qf-c22-sectionbar{display:block}.qf-c22-sectionbar .qf-v20-subnav{margin-top:10px}.qf-c22-flow div{flex-basis:100%}}
+
+/* Final integration: grayscale, clean routes, contextual authenticated workspace. */
+:root{--bg:#f5f6f7;--paper:#ffffff;--ink:#181b1f;--muted:#636971;--accent:#292d33;--accent-light:#eceef0;--line:#dfe2e5;--card:#f8f9fa}
+html{scroll-behavior:smooth}body{color:var(--ink);background:var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+h1,h2,h3,h4,.brand,.mark,.intro-simple h1,.tech-lead h1,.ideas-score{font-family:inherit!important;letter-spacing:-.025em}
+h1{font-weight:730}h2,h3{font-weight:690}
+.side{background:#fff;border-color:#e2e4e7}.brand.qf-v23-brand{display:flex;align-items:center;gap:10px;border:0;background:transparent;text-transform:none;font-size:20px;letter-spacing:-.035em;font-weight:760;padding:8px 7px;cursor:pointer;color:#202329;text-align:left}.brand.qf-v23-brand .mark{border-radius:11px;background:#272c32;color:white;flex-shrink:0;font-size:16px;width:36px;height:36px;display:grid;place-items:center}.qf-v23-brand:focus-visible{outline:3px solid #697079;outline-offset:3px}
+.qf-v23-method-credit{display:flex;gap:8px;color:#767d85;font-size:11px;margin:0 0 16px}.qf-v23-method-credit strong{color:#343b44}.qf-v83-owner,.side .sidenote,.side .nav-caption,#qf-v20-account-status,.qf-v20-intro .eyebrow,.qf-v20-intro>div>p{display:none!important}
+.qf-v20-navigation .nav-btn,.qf-v20-account .nav-btn{border:0;background:transparent;color:#555c63;font-weight:630;border-radius:9px;text-align:left;box-shadow:none}
+.qf-v20-navigation .nav-btn:hover,.qf-v20-navigation .nav-btn:focus-visible,.qf-v20-account .nav-btn:hover{background:#f0f1f2;color:#202429}
+.qf-v20-navigation .nav-btn.active,.qf-v20-account .nav-btn.active{background:#262b31!important;color:#fff!important;box-shadow:none!important}
+.qf-v20-account{border-color:#e4e5e7}.qf-v20-account .nav-btn{width:100%;border:1px solid #d8dbdf}
+.pane,.qf-c22-pane>.pane,.qf-v20-stock{background:#fff;border:1px solid #e1e4e7;border-radius:16px;box-shadow:0 2px 16px rgba(25,28,32,.025)}
+.btn.primary,button.primary,.btn-primary{background:#272c31!important;border-color:#272c31!important;color:#fff!important}.btn.primary:hover,button.primary:hover{background:#3b4047!important}
+a,.qf-v20-news-item a{color:#333c47}.btn:not(.primary){border-color:#cdd3d8!important;color:#30383f!important;background:#fff!important}.btn:not(.primary):hover{background:#f1f2f3!important}.qf-v20-search-area input:focus,.qf-v20-search-area input:focus-visible{border-color:#77818a!important;outline:2px solid #b8bfc6!important;outline-offset:2px;box-shadow:none!important}
+.qf-v20-universe,.qf-v20-source-badge,.qf-v20-chips button,.qf-v20-kpis>div,.qf-b21-compare-controls,.qf-v20-timebar button,.qf-v20-metric-tabs button,.qf-v20-subnav button{background:#f3f4f5;color:#50565d;border-color:#e0e3e5}
+.qf-v20-timebar button.active,.qf-v20-metric-tabs button.active,.qf-v20-subnav button.active,.qf-v20-chips button:hover{background:#dfe2e6;color:#181c20}
+.qf-v20-ticker,.qf-v20-finding>span,.qf-v20-finding.caution>span{color:#4c545d}
+.qf-v20-chart svg path[stroke="#19826c"],#qf-v20-chart path[stroke="#19826c"]{stroke:#363d45}
+.qf-v20-fin-svg rect[fill="#227b69"]{fill:#59616a}
+.qf-v20-fin-svg rect[fill="#c57d67"]{fill:#a2a8ae}.qf-v20-chart svg text[fill="#d4e5dc"]{fill:#d5d8dc}.qf-v20-chart svg text[fill="#637b70"],.qf-v20-chart svg text[fill="#688177"]{fill:#677078}.qf-v20-chart svg circle[fill="#155f50"]{fill:#424a53}.qf-v20-evidence #qf-v20-coverage,.qf-v20-evidence #qf-v20-news{color:#5e6872}.qf-v20-news-item a{color:#303841}.qf-v20-finding small{color:#6d747c}.qf-v20-fin-svg text{fill:#626b74}.qf-v20-cursor,.qf-v20-chart-bottom p{color:#66707b}
+.qf-v20-chart svg path[stroke="#b88c45"]{stroke:#899099}
+.qf-v20-findings,.qf-v20-evidence{color:#30363b}
+.topbar .eyebrow,.topbar .badge{font-size:11px;color:#58616a}.topbar .badge{background:#eef0f2}.topbar{display:none!important}main{padding-top:clamp(22px,3vw,42px)}
+.qf-v23-owner-action[hidden]{display:none!important}.qf-v23-portfolio-account{display:flex;justify-content:flex-end;margin-bottom:15px}
+.qf-v23-landing{padding:clamp(26px,4vw,52px);margin:0;max-width:1100px}.qf-v23-landing[hidden],#qf-v23-explore-content[hidden]{display:none!important}
+.qf-v23-label{font-size:11px;letter-spacing:.12em;font-weight:750;color:#707781;margin:0 0 12px}.qf-v23-landing h1{font-size:clamp(30px,4vw,53px);max-width:740px;line-height:1.11;margin:7px 0 19px;letter-spacing:-.05em}.qf-v23-landing>p:not(.qf-v23-label){font-size:15px;max-width:640px;color:#60676e;line-height:1.65}.qf-v23-home-actions{display:flex;gap:10px;flex-wrap:wrap;margin:27px 0 35px}.qf-v23-home-actions .btn{min-height:45px;padding-inline:20px}
+.qf-v23-home-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}.qf-v23-home-steps>div{padding:22px;background:#fafafa;border:1px solid #e4e5e7;border-radius:13px;display:grid;gap:9px}.qf-v23-home-steps strong{font-size:16px}.qf-v23-home-steps span{font-size:12px;color:#6d747a}.qf-v23-home-foot{font-size:11px!important;margin:27px 0 0!important}
+.qf-v23-drawer{padding:0;border:1px solid #dadddf;box-shadow:0 18px 80px #10151a26;border-radius:18px;width:min(640px,calc(100vw - 24px));max-height:min(92vh,960px);overflow-y:auto;color:#252b31;background:#fff}.qf-v23-drawer::backdrop{background:rgba(15,18,22,.43)}.qf-v23-drawer[open]{display:block}
+.qf-v23-owner-head{display:flex;justify-content:space-between;gap:15px;align-items:center;padding:23px 25px;border-bottom:1px solid #e6e8ea}.qf-v23-owner-head h2{font-size:24px;margin:0}.qf-v23-owner-tabs{display:flex;gap:8px;padding:15px 25px}.qf-v23-owner-tabs button{border:0;border-radius:9px;background:#f1f2f3;color:#555b62;padding:9px 14px;font-weight:690}.qf-v23-owner-tabs button.active{background:#2b3036;color:#fff}
+.qf-v23-drawer [data-qf-v23-panel]{padding:8px 25px 18px}.qf-v23-drawer [data-qf-v23-panel][hidden]{display:none!important}.qf-v23-drawer label{font-size:12px;display:block;margin-bottom:8px;color:#565e66;font-weight:700}.qf-v23-drawer textarea,.qf-v23-drawer select,.qf-v23-drawer input{width:100%;border:1px solid #d7dadf;border-radius:9px;padding:10px;font:inherit;background:#fff;color:#1f252b}.qf-v23-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:14px 0 20px;flex-wrap:wrap}.qf-v23-toolbar .tiny{font-size:11px;color:#69717a}.qf-v23-owner-status{margin:0 25px 18px;font-size:12px;color:#4d5861;min-height:20px}.qf-v23-owner-footer{border-top:1px solid #e5e7e9;padding:15px 25px 22px;display:flex;align-items:center;justify-content:space-between;gap:15px}.qf-v23-owner-footer span{font-size:11px;color:#747b81}
+.qf-v23-note-entry{border-top:1px solid #e8eaec;padding:12px 0;display:flex;justify-content:space-between;gap:12px}.qf-v23-note-entry p{margin:0;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}.qf-v23-note-entry small{display:block;color:#737a82;margin-top:5px;font-size:11px}.qf-v23-trade-fields{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:10px}.qf-v23-portfolio-explain{font-size:12px;color:#626c75}.qf-v23-owner-kpis{display:flex;gap:15px;padding:12px 0}.qf-v23-owner-kpis strong{font-size:18px}.qf-v23-owner-kpis small{display:block;font-size:11px;color:#69717a}.qf-v23-owner-account-table{max-height:210px;overflow:auto}.qf-v23-owner-account-table table{font-size:12px}
+@media(max-width:800px){.side{padding:15px}.brand.qf-v23-brand{font-size:18px}.qf-v20-navigation{margin-top:8px}.qf-v20-account{margin-top:9px}.qf-v20-account .nav-btn{width:auto}}
+@media(max-width:600px){.qf-v23-home-steps{grid-template-columns:1fr}.qf-v23-owner-head,.qf-v23-owner-tabs,.qf-v23-drawer [data-qf-v23-panel],.qf-v23-owner-footer{padding-left:16px;padding-right:16px}.qf-v23-owner-status{margin-left:16px;margin-right:16px}.qf-v23-trade-fields{grid-template-columns:1fr}.qf-v23-owner-footer{align-items:start}.qf-v23-landing{padding:25px 19px}.qf-v23-home-actions{margin-bottom:22px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 </style></head><body>
-<div class="app"><aside class="side"><div class="brand"><div class="mark">Q</div>quantforge</div><p class="qf-v83-owner"><span>Designed and developed by</span><strong>Rishi&nbsp;Ratnakar</strong></p><nav id="qf-v20-navigation" class="qf-v20-navigation" aria-label="QuantForge research sections">
+<div class="app"><aside class="side"><button type="button" class="brand qf-v23-brand" id="qf-v23-home-button" aria-label="QuantForge home"><span class="mark" aria-hidden="true">Q</span><span>QuantForge</span></button><nav id="qf-v20-navigation" class="qf-v20-navigation" aria-label="QuantForge research sections">
 <button type="button" class="nav-btn active" data-page="explore" aria-current="page">Explore</button>
 <button type="button" class="nav-btn" data-page="compare">Compare</button>
 <button type="button" class="nav-btn" data-page="models">Models</button>
 <button type="button" class="nav-btn" data-page="portfolio">Portfolio</button>
 <button type="button" class="nav-btn" data-page="methods">Methods</button>
 </nav>
-<div class="qf-v20-account"><span class="nav-caption">Account</span><button type="button" class="nav-btn" id="qf-v20-mode" data-page="private">Private workspace</button><p id="qf-v20-account-status" aria-live="polite">Public research · no sign-in needed</p></div>
+<div class="qf-v20-account"><button type="button" class="nav-btn" id="qf-v20-mode" data-page="private">Sign in</button><p id="qf-v20-account-status" aria-live="polite">Public research · no sign-in needed</p></div>
 <nav id="navigation" aria-label="Main navigation">
   <div class="qf-nav-section" role="group" aria-label="Financial research pages">
     <span class="nav-caption">Financial research</span>
@@ -549,7 +584,16 @@ body:has(#page-private.active) .side .qf-private-nav-section{margin:0}
 </nav><div class="sidenote">Historical SEC data · reproducible models<br>Personal investment research requires sign-in</div></aside>
 <a class="skip-link" href="#main-content">Skip to content</a><main id="main-content"><div class="topbar"><span class="eyebrow">SEC filings · portfolio models · research methods</span><span class="badge">RESEARCH OVERVIEW</span></div>
 <section class="tabpage" id="page-explore" aria-labelledby="qf-v20-explore-title">
- <div class="qf-v20-intro"><div><div class="eyebrow">COMPANY RESEARCH / EXPLORE</div><h1 id="qf-v20-explore-title">Understand a company, one finding at a time.</h1><p>Reported company financials, transparent historical context, and experiments—not investment recommendations.</p></div><span id="qf-v20-universe" class="qf-v20-universe">94 SEC issuers</span></div>
+<section id="qf-v23-landing" class="qf-v23-landing pane" hidden aria-labelledby="qf-v23-landing-title">
+ <p class="qf-v23-label">QUANTFORGE</p><h1 id="qf-v23-landing-title">Financial research, made clearer.</h1>
+ <p>Understand company financials, compare historical evidence, and explore hypothetical portfolio decisions.</p>
+ <div class="qf-v23-home-actions"><button type="button" id="qf-v23-open-research" class="btn primary">Explore companies</button><button type="button" class="btn" data-go="compare">Compare</button><button type="button" class="btn" data-go="portfolio">Portfolio</button></div>
+ <div class="qf-v23-home-steps"><div><strong>Explore</strong><span>SEC financial trends and company context</span></div><div><strong>Models</strong><span>Prediction experiments, risk, and valuation</span></div><div><strong>Methods</strong><span>Sources, assumptions, tests and engineering</span></div></div>
+ <p class="qf-v23-home-foot">Public research uses reported SEC statements and clearly labeled illustrative prices. Signed-in research can use entitled historical provider data.</p>
+</section>
+<div id="qf-v23-explore-content">
+
+ <div class="qf-v20-intro"><div><div class="eyebrow">COMPANY RESEARCH / EXPLORE</div><h1 id="qf-v20-explore-title">Explore company research</h1><p>Reported company financials, transparent historical context, and experiments—not investment recommendations.</p></div><span id="qf-v20-universe" class="qf-v20-universe">94 SEC issuers</span></div>
  <div class="qf-v20-explore-grid">
   <div class="qf-v20-primary">
    <section class="pane qf-v20-stock" aria-label="Company and market chart">
@@ -566,11 +610,12 @@ body:has(#page-private.active) .side .qf-private-nav-section{margin:0}
    <section class="pane" aria-labelledby="qf-v20-financials-title"><div class="section-title"><div><div class="eyebrow">REPORTED COMPANY DATA</div><h2 id="qf-v20-financials-title">Financial performance</h2></div><button type="button" id="qf-v20-export-sec" class="btn sm">Export financials CSV</button></div><p id="qf-v20-filing-status" class="tiny"></p><div id="qf-v20-financial-kpis" class="qf-v20-kpis"></div><div class="qf-v20-metric-tabs" role="group" aria-label="Financial chart metric"><button type="button" data-qf-financial="revenue_usd" class="active">Revenue</button><button type="button" data-qf-financial="net_income_usd">Net income</button><button type="button" data-qf-financial="free_cash_flow_usd">Cash flow</button></div><div id="qf-v20-financial-chart"></div><div class="table-wrap" id="qf-v20-financial-table"></div><p class="tiny" id="qf-v20-sec-source"></p></section>
   </div>
   <div class="qf-v20-secondary">
-   <section class="pane qf-v20-findings" aria-labelledby="qf-v20-findings-title"><div class="eyebrow">AUTOMATIC RESEARCH</div><h2 id="qf-v20-findings-title">What stands out</h2><p>Evidence from reported filings and, when available, observed prices.</p><button type="button" class="btn primary" id="qf-v20-analyze">Analyze company</button><p id="qf-v20-run-state" role="status" class="tiny">Choose a company to begin.</p><div id="qf-v20-findings" aria-live="polite"></div><div class="qf-v20-actions"><button type="button" class="btn sm" id="qf-v20-add-compare">Add to Compare</button><button type="button" class="btn sm" data-page="models">Models &amp; evaluation</button></div></section>
+   <section class="pane qf-v20-findings" aria-labelledby="qf-v20-findings-title"><div class="eyebrow">AUTOMATIC RESEARCH</div><h2 id="qf-v20-findings-title">What stands out</h2><p>Evidence from reported filings and, when available, observed prices.</p><button type="button" class="btn primary" id="qf-v20-analyze">Analyze company</button><button type="button" class="btn qf-v23-owner-action" data-qf-v23-open="notes" hidden>Research notes</button><p id="qf-v20-run-state" role="status" class="tiny">Choose a company to begin.</p><div id="qf-v20-findings" aria-live="polite"></div><div class="qf-v20-actions"><button type="button" class="btn sm" id="qf-v20-add-compare">Add to Compare</button><button type="button" class="btn sm" data-page="models">Models &amp; evaluation</button></div></section>
    <section class="pane" aria-labelledby="qf-v20-news-title"><div class="eyebrow">CONTEXT, NOT A FORECAST</div><h2 id="qf-v20-news-title">News &amp; Context</h2><p class="tiny">Dated headlines and lexical topic/tone analysis only when available to the authenticated owner.</p><div id="qf-v20-news" aria-live="polite">Public mode has no licensed news feed. No headlines are invented.</div></section>
    <section class="pane qf-v20-evidence"><h2>Sources &amp; coverage</h2><div id="qf-v20-coverage">Choose a covered company for fiscal-year, filing and market-data sources.</div><p class="tiny">Historical SEC facts and prices have different dates and licenses. Missing data is not replaced by zero or fabricated facts.</p></section>
   </div>
  </div>
+</div>
 </section>
 <section class="tabpage" id="page-compare" aria-labelledby="qf-v20-compare-title">
  <div class="qf-v20-intro"><div><div class="eyebrow">MULTI-COMPANY RESEARCH</div><h1 id="qf-v20-compare-title">Compare companies</h1><p>See how businesses and historical prices differ on matching dates. Choose 2–5 names; every metric carries its source and period.</p></div></div>
@@ -646,6 +691,8 @@ body:has(#page-private.active) .side .qf-private-nav-section{margin:0}
   <div class="notice">Data sources: SEC filings for company figures; simulated inputs for portfolio and valuation examples. No public model is a validated return forecast.</div>
 </section>
 <section class="tabpage" id="page-portfolio" aria-labelledby="qf-v20-portfolio-heading">
+<div class="qf-v23-portfolio-account"><button type="button" class="btn qf-v23-owner-action" data-qf-v23-open="portfolio" hidden>My virtual holdings and trades</button></div>
+
 <div class="qf-v20-intro"><div><div class="eyebrow">HYPOTHETICAL PORTFOLIO RESEARCH</div><h1 id="qf-v20-portfolio-heading">Portfolio</h1><p>Explore a sample virtual portfolio, test target allocations and inspect concentration. Simulated holdings and prices are illustrative, not live account data.</p></div></div>
 <nav class="qf-v20-subnav" aria-label="Portfolio views">
 <button type="button" data-qf-portfolio="overview" aria-pressed="true" class="active">Overview</button>
@@ -919,7 +966,7 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
   <div class="controls"><button class="btn primary" data-go="sec">Explore SEC data</button><button class="btn" data-go="quant">Run simulated optimization</button><button class="btn" data-go="methods">See detailed engineering</button></div></div>
 </section>
 
-<section class="tabpage" id="page-methods">
+<section class="tabpage" id="page-methods"><p class="qf-v23-method-credit"><span>Designed and developed by</span><strong>Rishi&nbsp;Ratnakar</strong></p><p class="tiny">Private account data and market feeds are not available in the public site. Public model and price scenarios are illustrative; this application is not an investment recommendation.</p>
 <div id="qf-c22-methods-main">
  <div class="qf-v20-intro"><div><div class="eyebrow">DATA / METHODS / ENGINEERING</div><h1>Methods</h1><p>Trace research outputs to source records, computation, evaluation and test coverage.</p></div></div>
  <nav class="qf-v20-subnav" role="tablist" aria-label="Method sections"><button role="tab" aria-selected="true" class="active" data-qf-c22-method="overview">Overview</button><button role="tab" aria-selected="false" data-qf-c22-method="data">Data</button><button role="tab" aria-selected="false" data-qf-c22-method="statistical">Statistical methods</button><button role="tab" aria-selected="false" data-qf-c22-method="engineering">Engineering</button></nav>
@@ -986,8 +1033,27 @@ PV = Σ [FCFₜ/(1+r)ᵗ] + TV/(1+r)ᴺ</div>
   <div class="notice">Historical financial disclosures may be updated or restated. Model scenarios are not investment advice.</div>
 </div>
 </section>
-<div class="footerline">QuantForge · Rishi Ratnakar · <button class="text-link" data-go="methods">Data &amp; engineering</button> · SEC Financials uses historical filings. Public portfolio and model scenarios use illustrative inputs. Private account data and market feeds are not available in the public site. This project is not an investment recommendation.</div>
+<div class="footerline">QuantForge · Rishi Ratnakar · <button class="text-link" data-go="methods">Methods &amp; engineering</button></div>
 </main></div>
+
+<dialog id="qf-v23-owner-panel" class="qf-v23-drawer" aria-labelledby="qf-v23-owner-title">
+ <div class="qf-v23-owner-head"><div><p class="qf-v23-label">MFA-PROTECTED ACCOUNT</p><h2 id="qf-v23-owner-title">My workspace</h2></div><button type="button" id="qf-v23-close" class="btn sm" aria-label="Close workspace">Close</button></div>
+ <nav class="qf-v23-owner-tabs" aria-label="Owner tools"><button type="button" data-qf-v23-tab="notes" class="active" aria-pressed="true">Research notes</button><button type="button" data-qf-v23-tab="portfolio" aria-pressed="false">Virtual portfolio</button></nav>
+ <div data-qf-v23-panel="notes">
+  <label for="qf-v23-note">Note for the selected company</label><textarea id="qf-v23-note" rows="3" maxlength="2000" placeholder="Write a research observation…"></textarea>
+  <div class="qf-v23-toolbar"><span id="qf-v23-note-company" class="tiny"></span><button type="button" id="qf-v23-save" class="btn primary">Save note</button></div>
+  <div id="qf-v23-note-list" aria-live="polite">Sign in to load saved notes.</div>
+ </div>
+ <div data-qf-v23-panel="portfolio" hidden>
+  <p class="qf-v23-portfolio-explain">Owner-only virtual holdings. No real-money orders or brokerage account access.</p>
+  <div id="qf-v23-account-overview" aria-live="polite">Loading virtual account…</div>
+  <div class="qf-v23-trade-fields"><div><label for="qf-v23-trade-symbol">Investment</label><select id="qf-v23-trade-symbol"></select></div><div><label for="qf-v23-trade-side">Action</label><select id="qf-v23-trade-side"><option value="buy">Virtual buy ($ budget)</option><option value="sell">Virtual sell (units)</option></select></div><div><label for="qf-v23-trade-amount">Amount</label><input id="qf-v23-trade-amount" type="number" min="0.01" step="any" value="100" /></div></div>
+  <div class="qf-v23-toolbar"><button type="button" id="qf-v23-trade-submit" class="btn primary">Record virtual transaction</button><button type="button" id="qf-v23-refresh" class="btn">Refresh</button></div>
+ </div>
+ <p id="qf-v23-owner-status" class="qf-v23-owner-status" role="status" aria-live="polite"></p>
+ <div class="qf-v23-owner-footer"><button type="button" id="qf-v23-signout" class="btn">Sign out</button><span>Owner-only data stays behind the existing MFA API.</span></div>
+</dialog>
 <script>/* QF_MODEL */</script>
 <script>/* QF_APP */</script>
+
 </body></html>

@@ -1177,7 +1177,7 @@ function clearMFA(){
   $('private-mfa-setup-actions').hidden=true;
 }
 async function handleAuthState(state){
-  if(state.signed_in){clearMFA();showStep('ready');await loadState();const requested=location.hash.match(/^#private\/([a-z]+)$/)?.[1];privateTab(requested&&document.querySelector('[data-private-view="'+requested+'"]')?requested:'decision',false);privatePeers();return;}
+  if(state.signed_in){clearMFA();showStep('ready');await loadState();const requested=location.hash.match(/^#private\/([a-z]+)$/)?.[1];privateTab(requested&&document.querySelector('[data-private-view="'+requested+'"]')?requested:'decision',false);privatePeers();window.dispatchEvent(new Event('qf:owner-auth-ready'));return;}
   if(!state.mfa_required){clearMFA();showStep('login');privateState=null;clearResearchOSV90();renderSavedResearchV96();return;}
   showStep('mfa');
   privateState=null;clearResearchOSV90();renderSavedResearchV96();
@@ -2435,6 +2435,42 @@ $('private-allocation-export-v74').addEventListener('click',()=>{
 $('private-valuation-run').addEventListener('click',privateValuation);
 $('private-valuation-run').addEventListener('click',()=>{valueBridgeRequestV73++;$('private-value-output-v73').textContent='';});
 $('private-capital-submit').addEventListener('click',changeCapital);
+
+// Shared UI bridge: use the existing MFA-gated API and versioned state writers.
+// This exposes NO credentials, provider tokens, or bypass of owner() checks.
+window.QFPrivateBridgeV23=Object.freeze({
+ ready:()=>Boolean(privateState&&!$('private-signed').hidden),
+ snapshot:()=>privateState&&!$('private-signed').hidden?{
+  cash:Number(privateState.cash),
+  holdings:{...(privateState.holdings||{})},
+  notes:(privateState.notes||[]).map(x=>({text:String(x.text||''),at:String(x.at||''),symbol:String(x.symbol||'')})),
+  trades:(privateState.trades||[]).slice(0,12).map(x=>({symbol:String(x.symbol||''),side:String(x.side||''),units:Number(x.units),at:String(x.at||'')}))
+ }:null,
+ async refresh(){if(!privateState)throw Error('MFA sign-in required.');await loadState();return this.snapshot();},
+ async saveNote(text,symbol){
+  if(!privateState)throw Error('MFA sign-in required.');
+  const value=String(text||'').trim(),sym=String(symbol||'').toUpperCase();
+  if(!value||value.length>2000||!/^[A-Z0-9.\-]{1,15}$/.test(sym))throw Error('Choose a company and enter a note of up to 2000 characters.');
+  const notes=[{text:value,at:new Date().toISOString(),symbol:sym},...(privateState.notes||[])].slice(0,100);
+  const data=await api('private/notes',{expected_version:version,watchlist:privateState.watchlist||[],notes});
+  privateState=data.portfolio;version=data.version;render();return this.snapshot();
+ },
+ async deleteNote(index){
+  if(!privateState)throw Error('MFA sign-in required.');
+  const old=privateState.notes||[];
+  if(!Number.isInteger(index)||index<0||index>=old.length)throw Error('Note no longer exists.');
+  const data=await api('private/notes',{expected_version:version,watchlist:privateState.watchlist||[],notes:old.filter((_,i)=>i!==index)});
+  privateState=data.portfolio;version=data.version;render();return this.snapshot();
+ },
+ async trade(symbol,side,amount){
+  if(!privateState)throw Error('MFA sign-in required.');
+  const sym=String(symbol||'').toUpperCase(),action=String(side||''),v=Number(amount);
+  if(!/^[A-Z0-9.\-]{1,15}$/.test(sym)||!['buy','sell'].includes(action)||!Number.isFinite(v)||v<=0)throw Error('Choose an eligible investment and a positive amount.');
+  const data=await api('private/trade',{symbol:sym,side:action,amount:String(v),expected_version:version});
+  privateState=data.portfolio;version=data.version;await loadState();return this.snapshot();
+ },
+ async signOut(){await logout();window.dispatchEvent(new Event('qf:owner-auth-ended'));}
+});
 privatePeers();
 
 })();
