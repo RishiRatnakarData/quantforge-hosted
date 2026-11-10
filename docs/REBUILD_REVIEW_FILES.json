@@ -1,7 +1,7 @@
 {
   "base_commit": "53dcc960c6f0c036beb00435173b33fa49574b1a",
   "review_branch": "codex/quantforge-product-rebuild",
-  "publication": "not pushed, merged or deployed",
+  "publication": "Owner authorized full publication; candidate must pass CI before main promotion. Live owner acceptance remains separate.",
   "manifest_self_hash": "excluded",
   "files": [
     {
@@ -10,7 +10,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "b68b8691b2d23543a423e0eeff65fc0d21bce16ed08f9a66f16cadf5d5d91137"
+      "sha256": "ceced1dadbf133f1cae475ba5d471d3ea6c9db453453ce2b786080cabe803ec6"
     },
     {
       "path": "cloud/api.py",
@@ -18,15 +18,15 @@
     },
     {
       "path": "public/_headers",
-      "sha256": "172bff154f22cd934fb99911edce69fe793147a8c95b002d108c4afc71f1579c"
+      "sha256": "71e201a184cd2319a15eae7cc2d0618ab7b6224c56b68849ccbc87eb01a86b09"
     },
     {
       "path": "public/index.html",
-      "sha256": "6d93fd388ed4ca8d1da1f50c53203da01e71f5830ef36ae3290b3bd00382d4cd"
+      "sha256": "f060ebad7d1b626cd47131f5b97d8b372948adce5912ce8788070fe4977c467c"
     },
     {
       "path": "tools/build_unified_site.py",
-      "sha256": "e71e765acee26586bde4fa464593df60530b5548d6e885e29a3333ff2bfa8e72"
+      "sha256": "77eec1579b98f8c845f12c4f633441197c2200a46cb10befabc23dbfd2345570"
     },
     {
       "path": "tools/smoke_release_a_browser.py",
@@ -50,7 +50,7 @@
     },
     {
       "path": "tools/smoke_completion_browser.py",
-      "sha256": "751558d8f6aaae39b22b7a68a1a801d5780ab01632fcd47b4e5eeaf3f594fcdb"
+      "sha256": "46b57f105ea416a5e356ce71e474a2d5cc7decd4a44e4fb7016328fe10f52f59"
     },
     {
       "path": "web/site/private.js",
@@ -70,7 +70,7 @@
     },
     {
       "path": "web/site/research_models_methods_ui_v22.js",
-      "sha256": "f682e1fe35615fb459142386567bd9ccc7eb4c26ed3b1270526b029cca663477"
+      "sha256": "a870f7c6ecd428439e194fd3c85b99bb61f34010c8bfc01f828b2ba3ee6282c3"
     },
     {
       "path": "web/site/research_private_shell_v23.js",
@@ -78,7 +78,7 @@
     },
     {
       "path": "web/site/site.template.html",
-      "sha256": "8a254ea605918488cd6d53868c68562d5e0fe2caf9d49973ba03bb515e089d26"
+      "sha256": "2b1a5fc2341cc3c3a81698ad02545b420781078dfa3fcd0dbfc7d23e438267db"
     },
     {
       "path": "web/site/research_errors_v24.js",
@@ -86,7 +86,7 @@
     },
     {
       "path": "web/site/research_exhibits_v24.js",
-      "sha256": "934048eff7e4a90529e6c244dee489a72c15f5eca169aa5457d6428260fd3373"
+      "sha256": "92fb5571e79dc2fa7c9a1b193de28b472200d17160d03f762d8498a38314b194"
     },
     {
       "path": "web/site/research_deep_v25.js",
@@ -118,7 +118,16 @@
     },
     {
       "path": "docs/CODEX_REBUILD_PROGRESS.md",
-      "sha256": "2483ea16d165d91c19effee90c57053f5d083807178216385999e1c27f57117b"
+      "sha256": "347fd65b0412f4b9b63204f585711eb9e25e6af0949e97f9d3aba318fddea486"
+    },
+    {
+      "path": "web/site/research_evidence_v26.js",
+      "sha256": "88b6e15c2174618c64a93c76eeab80a273fddfc63b5d5f06c886868e16d7fde3"
+    },
+    {
+      "path": "web/tests/research_evidence_v26.test.cjs",
+      "sha256": "f0ca2757df70d1774f51e1773f948babbda8ff77b10cec421be772402e58f3a9"
     }
-  ]
+  ],
+  "previous_review_commit": "b6f69c001906370af2cbfe34196619ba5bf920ee"
 }

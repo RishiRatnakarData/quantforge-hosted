@@ -188,6 +188,28 @@ async def journey(browser, engine, width):
             assert 'TEST' not in await page.locator('#qf-v20-compare-chips').inner_text()
             assert 'Edited offline note' not in await page.locator('body').inner_text()
             assert 'Server-verified valuation recorded.' not in await page.locator('body').inner_text()
+        # A career reviewer can trace each claim without private source access.
+        await page.locator('#qf-v20-navigation [data-page="methods"]').click()
+        await page.locator('[data-qf-c22-method="overview"]').click()
+        await page.locator('#qf-c22-method-content [data-qf26-tour="engineering"]').click()
+        await expect(page.locator('.qf26-pipeline li')).to_have_count(4)
+        await expect(page.locator('[data-qf26-discipline]')).to_have_count(8)
+        for discipline in ('data', 'analysis', 'ml', 'statistics', 'finance', 'optimization', 'nlp', 'software'):
+            await page.locator(f'[data-qf26-discipline="{discipline}"]').click()
+            await expect(page.locator('#qf26-evidence-detail')).to_contain_text('Reproducible checks')
+            assert await page.locator('#qf26-evidence-detail code').count() >= 2
+        await page.locator('[data-qf26-discipline="statistics"]').click()
+        await capture(page, prefix + '-technical-evidence')
+        await page.locator('[data-qf26-open="statistics"]').click()
+        chart = page.locator('svg[data-qf26-chart]').first
+        await chart.focus()
+        await page.keyboard.press('Home')
+        start = await page.locator('.qf26-readout').first.inner_text()
+        await page.keyboard.press('End')
+        assert start != await page.locator('.qf26-readout').first.inner_text()
+        await expect(page.locator('.qf26-readout').first).to_contain_text('%')
+        assert await page.locator('svg[data-qf26-chart]').count() == 2
+        await capture(page, prefix + '-risk-scaled-plots')
         assert not errors, errors[:5]
     await page.close()
     print(f'{engine} {width}px deep engines / optional evidence / snapshot funding accounting / note editing / mode isolation PASS', flush=True)

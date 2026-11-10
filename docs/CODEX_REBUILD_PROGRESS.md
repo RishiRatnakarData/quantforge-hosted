@@ -109,3 +109,14 @@ Repository environment was used for all Python commands. Browser/video inspectio
 The remaining items are external acceptance and publication gates, not hidden claims of live-provider or historical-data availability. Preserve the approved product and these tested guards during owner review.
 
 Final frozen-build evidence: all six Chromium/Firefox/WebKit desktop/mobile completion journeys passed with the matching HTML/CSP artifact pair. A test-harness artifact race during an intermediate regeneration was corrected by freezing that pair for each run.
+
+
+## November 10 production-candidate audit and career evidence
+
+The owner approved the prior branch push and preview, then explicitly requested full production publication after this final requirements audit. Earlier no-publication rows above describe the frozen b6f69c0 review state; they are not the current authorization boundary. b6f69c0 passed remote CI run 42904722936, deployed to a Cloudflare branch preview, and matched the reviewed HTML SHA-256. Six read-only hosted public browser journeys passed.
+
+The follow-up candidate adds a guided in-app project walkthrough and eight technical-evidence disciplines with exact existing source/test references. The visual pipeline explains source validation, pure computations, result evidence and public/private trust boundaries. It avoids invented technologies, credentials, employment claims and predictive-performance claims. README now reflects the actual five-section product rather than the obsolete Decision Center and scoring UI.
+
+Model risk and strategy plots now include responsive numerical scales, exact dated keyboard/hover inspection and persistent readouts. Risk shows all drawdown observations plus a nine-bin return distribution with exact ranges/counts; it reuses the existing return and histogram engines. Original numerical definitions and auth checks are unchanged. Six completion journeys now verify all eight evidence disciplines, walkthrough navigation and chart keyboard behavior in public/private fixture modes. Exact source/test references are checked on disk.
+
+Candidate validation: 580 Python tests, 399 JavaScript tests; Ruff, privacy/CSP, syntax and whitespace checks; A–D browser journeys and full-route matrix; Chromium/Firefox/WebKit completion at 1440px/390px. New screenshots are in the local review gallery's production-candidate folder. Production release must still be verified by SHA on main, GitHub CI, Cloudflare bytes/CSP and Render health revision. Actual owner MFA, provider and state-persistence acceptance remains separate; do not report it as completed from fixture tests.

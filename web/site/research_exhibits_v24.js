@@ -35,8 +35,7 @@ function model(category,phase,ctx,models){
  if(category==='risk'){
   let peak=ctx.prices[0].close;
   const rows=ctx.prices.map(p=>{peak=Math.max(peak,p.close);return [p.date,p.close/peak-1];});
-  const step=Math.max(1,Math.floor(rows.length/8));
-  return section('Downside through this history',bars('Drawdown at sampled dates',rows.filter((_,i)=>i%step===0||i===rows.length-1))+ '<p>Each bar measures the loss from the highest close seen by that date. Maximum drawdown also includes dates between these samples.</p>');
+  return section('Downside through this history',root.QFCharts26.curve('Historical drawdown from the preceding peak',rows.map(r=>r[0]),[{name:'Drawdown',values:rows.map(r=>r[1])}],{format:'percent'})+'<p>Every close is measured against the highest preceding close, including that date. A 20% loss requires a 25% gain to recover. This is an observed path within these inputs, not a future loss bound.</p>'+root.QFCharts26.histogram(ctx));
  }
  if(category==='valuation'){
   const v=models.valuation.scenarios.find(s=>s.name==='Base');if(!v?.ready)return '';

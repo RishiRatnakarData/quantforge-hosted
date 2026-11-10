@@ -770,7 +770,7 @@ for slot, file in [('/* QF_MODEL */','model.js'),('/* QF_APP */','app.js'),('/* 
   research_c_ui=(src/'site/research_models_methods_ui_v22.js').read_text(encoding='utf-8')
   research_ui=(src/'site/research_app_v20.js').read_text(encoding='utf-8')
   text=analytics+'\n'+model_evidence+'\n'+evidence+'\n'+lab+'\n'+visuals+'\n'+text.replace('/* QF_SEC_DATA */ null', snapshot_js)
-  text=(src/'site/research_errors_v24.js').read_text(encoding='utf-8')+'\n'+(src/'site/research_exhibits_v24.js').read_text(encoding='utf-8')+'\n'+research_core+'\n'+research_b+'\n'+research_c+'\n'+text+'\n'+research_ui+'\n'+research_c_ui
+  text=(src/'site/research_errors_v24.js').read_text(encoding='utf-8')+'\n'+(src/'site/research_exhibits_v24.js').read_text(encoding='utf-8')+'\n'+(src/'site/research_evidence_v26.js').read_text(encoding='utf-8')+'\n'+research_core+'\n'+research_b+'\n'+research_c+'\n'+text+'\n'+research_ui+'\n'+research_c_ui
  text=text.replace('</script','<\\/script')
  html=html.replace(slot,text)
 (root/'public/index.html').write_text(html, encoding="utf-8", newline="\n")

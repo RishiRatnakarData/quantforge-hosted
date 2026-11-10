@@ -1,96 +1,69 @@
-# QuantForge
+# QuantForge 2.0
 
-**QuantForge 2.0 — completed local review implementation:** five shared research sections, explicit public/private data modes, retained numerical engines, source-aware charts, authenticated saved research and virtual-account history. See the [feature parity and acceptance report](docs/CODEX_REBUILD_PROGRESS.md). Publication and actual owner/provider acceptance remain separate.
-**Financial research grounded in reported company data, quantitative models, and reproducible software engineering.**
+QuantForge is a financial research and software engineering project built to explore company financials, statistical uncertainty and hypothetical portfolios. It demonstrates applied statistical data science through traceable inputs, retained numerical engines, reproducible evaluation and an authenticated private experience.
 
-QuantForge is a full-stack financial research platform combining SEC company fundamentals, statistical modeling, portfolio analytics, valuation scenarios, and historical strategy evaluation. It has two deliberately separate experiences:
+[Public application](https://quantforge-648.pages.dev/) · [Current feature parity and acceptance](docs/CODEX_REBUILD_PROGRESS.md) · [Research methodology](docs/methodology/QUANT_RESEARCH_METHODS.md)
 
-- **Public research:** sourced, historical SEC financial statements and transparent *illustrative* portfolio and valuation models.
-- **Private research:** an owner-authenticated, MFA-protected research workspace using eligible historical market data and virtual portfolio information. The private workspace has no real-money order execution.
+## One application, five sections
 
-[Public research website](https://quantforge-648.pages.dev/) · [Research methods](docs/methodology/QUANT_RESEARCH_METHODS.md) · [SEC and valuation methodology](docs/methodology/SEC_AND_DCF.md)
-
-## Explore the public research
-
-| Area | What it shows | Important boundary |
-| --- | --- | --- |
-| **Company financials** | SEC annual financials, growth, margins, cash-flow proxies, cross-company comparisons, and filing provenance | Reported figures and derived metrics are distinct from hypothetical scenarios |
-| **Analysis dashboard** | Trends and comparisons of financial and statistical observations | Do not interpret displayed associations as investment predictions |
-| **Portfolio simulator** | Interactive portfolios, allocations, and price-based examples | Uses illustrative/simulated market inputs, not account holdings |
-| **Risk & allocation** | Covariance, volatility, risk contributions, allocation constraints, and stress illustrations | Results depend on assumptions and data coverage |
-| **DCF scenarios** | Editable assumptions and discounted-cash-flow sensitivity | Scenario output is not an analyst target price or trade instruction |
-| **Peer comparison** | Financial-feature comparison and similarity methods | Financial similarity does not establish future stock performance |
-| **Research methods** | Model design, statistical validation, trade-offs, and code references | Read limitations and leakage controls alongside results |
-| **Data & engineering** | Architecture, provenance, tests, CI, and privacy design | Technical checks do not certify predictive accuracy |
-
-## Private research workspace
-
-The private workspace provides an integrated investment research workflow, separated from the public demo and protected by authentication and MFA. It includes:
-
-1. **Decision Center** — a consolidated research conclusion, eligibility and completeness measures, historical evidence screens, risk flags, and supporting rationale. Its traffic lights and 0–100 evidence-alignment index are **descriptive screening heuristics**, not calibrated return forecasts, probabilities, or buy/sell instructions.
-2. **Companies** — named-company browsing, shortlist screening, company fundamentals, candidate evidence, and statistical factors.
-3. **Research Methods** — market-history diagnostics, optimization, valuation scenarios, backtesting, walk-forward comparison, historical SEC coverage, and sensitivity studies.
-4. **Portfolio & Reports** — virtual portfolio context, illustrative trade scenarios, research briefs, and protected saved notes.
-
-**Data availability:** Standard research uses the application's published SEC snapshot and eligible authenticated market-history feeds. A deeper SEC original-versus-revised filing archive is kept off the public website and is not automatically accessible to the hosted browser. An optional local import supports advanced studies where available. Missing or stale inputs are not silently substituted.
-
-## What the engineering demonstrates
-
-| Discipline | Implementation |
+| Section | Working research flow |
 | --- | --- |
-| **Data engineering** | SEC Company Facts ingestion, normalization, fiscal-year and filing-date treatment, coverage checks, and provenance |
-| **Statistics / quantitative finance** | Time-series analysis, covariance and portfolio risk, drawdown measures, constrained optimization, and baseline comparisons |
-| **Financial analysis** | Growth and profitability, cash-flow measures, valuation sensitivity, and peer financial profiles |
-| **Research validation** | Past-only evaluation windows, fee-aware historical comparisons, missing-evidence withholding, robustness checks, and reproducible outputs |
-| **Full-stack software** | Python/FastAPI backend, browser-based interfaces, owner authentication/MFA, hosted deployments, automated regression tests, and CI |
+| Explore | Name search, source-labeled interactive history, SEC financial trends and filing lineage, evidence-backed briefing, dated private news and contextual saved research |
+| Compare | 2–5 names, common-date normalized paths, financial contrasts, distributions, correlation, risk/return, sortable tables and safe CSV |
+| Models | Prediction, Risk, Valuation and Strategy Testing; each has Results / Evaluation / Method with baselines, accessible equations, sensitivity and limitations |
+| Portfolio | Overview, What If? and Portfolio Analysis; constrained allocations, covariance, Monte Carlo scenarios and authentic recorded virtual-account marks |
+| Methods | Overview, Data, Statistical Methods and Engineering; walkthrough, SEC lineage, visual architecture and eight inspectable technical disciplines with source/test references |
 
-## Data integrity and research limits
+The clickable brand opens a compact Home inside Explore. Company selection carries across sections. Private company notes belong in Explore; virtual funding, holdings and transactions belong in Portfolio.
 
-- **Historical financial statements:** SEC-reported figures are tied to issuer identifiers and annual filing periods. Revenue, margins, and cash-flow calculations must retain their source and transformation context.
-- **Point-in-time work:** Filing availability matters. Fiscal year-end alone does not make a later filing known to a historical model; historical completeness and issuer-universe survivorship remain limits.
-- **Historical price research:** Data eligibility, exchange/calendar differences, available intervals, and price-only returns may limit comparisons. Price-only returns can omit dividends and other economic effects.
-- **Research scores:** Screening colors, model-completion percentages, and weighted evidence alignment are distinct measurements. They are not calibrated probabilities, investment suitability ratings, or predictions of future profits.
-- **Hypothetical models:** Public simulated inputs, valuation assumptions, and hypothetical portfolio outcomes are labeled separately from observed SEC data and private provider observations.
-- **No live trading:** Virtual trade scenarios and research actions are not real brokerage orders.
+## Honest data modes
 
-## Architecture at a glance
+**Public:** Historical SEC Company Facts are real reported financial observations. Market-path demonstrations are deterministic synthetic inputs, explicitly labeled as such. They are not actual company stock prices or evidence of market predictive skill.
+
+**Private:** Owner identity and Supabase authenticator MFA gate eligible Alpaca history, quotes, asset listings and news. Provider entitlement, dates and feed conventions remain visible. Version-checked Supabase state supports notes, saved briefings and virtual transactions. There is no real-money order execution.
+
+Recorded virtual-account history starts only when the owner requests server-verified marks. Deposits and withdrawals change contributed capital; they are not gains. Unrecorded historical account values and unsupported time-weighted percentage returns are not fabricated. A missing provider disables the affected output instead of substituting simulated private data.
+
+## Technical evidence
+
+| Discipline | Implementation | Reproducible checks |
+| --- | --- | --- |
+| SEC data engineering | [Snapshot ETL](tools/build_public_sec_snapshot.py), [financial transformations](web/site/sec_analytics.js) | [Snapshot validation](tests/test_public_sec_snapshot.py), [metric fixtures](web/tests/sec_analytics.test.cjs) |
+| Analysis and communication | [Shared research flow](web/site/research_app_v20.js), [comparison and portfolio arithmetic](web/site/research_compare_portfolio_v21.js) | [Numerical comparison tests](web/tests/research_compare_portfolio_v21.test.cjs) |
+| Statistical ML | [L2 five-session direction classifier](web/site/private_predictive_ml_v180.js) | [Mature-label, chronological and baseline tests](web/tests/private_predictive_ml_v180.test.cjs) |
+| Statistics and risk | [Returns, volatility, VaR/ES, drawdown and moving blocks](web/site/research_models_core_v22.js) | [Numerical and input guards](web/tests/research_models_core_v22.test.cjs) |
+| Financial scenarios | [Cash-flow proxy DCF and rate sensitivity](web/site/research_models_core_v22.js) | [Scenario calculation tests](web/tests/research_models_core_v22.test.cjs) |
+| Optimization and backtesting | [Constrained optimizer](web/site/private_optimizer.js), [rolling allocation](web/site/private_walkforward_v65.js) | [Optimizer](web/tests/private_optimizer.test.cjs), [forecast/walk-forward](web/tests/private_research_v65.test.cjs) |
+| NLP | [Sparse TF-IDF, cosine topics and negation-aware lexical tone](cloud/news_intelligence_v180.py) | [Text and endpoint fixtures](tests/test_news_intelligence_v180.py) |
+| Software and cloud | [FastAPI](cloud/api.py), [same-origin proxy](functions/api/[[path]].js), [deterministic builder](tools/build_unified_site.py) | [Owner/MFA/API](tests/test_hosted_web.py), [snapshot accounting](tests/test_valuation_snapshots.py), [three-browser acceptance](tools/smoke_completion_browser.py) |
+
+Methods → Engineering presents the same evidence in the running application, without requiring repository access. The repository remains private; historical release documents are retained for traceability rather than describing the current navigation.
+
+## Architecture and deliberate choices
 
 ```text
-PUBLIC RESEARCH
-SEC Company Facts -> validated issuer snapshot -> Cloudflare Pages
-                                     + public illustrative models
+SEC Company Facts → validated annual snapshot → public static research
+Synthetic paths  → reproducible public numerical experiments
 
-PRIVATE WORKSPACE (MFA required)
-Browser -> Cloudflare /api proxy -> FastAPI / Render
-                                  |-- Supabase authentication, RLS and notes
-                                  |-- authorized market data / asset listings
-                                  `-- SEC financial evidence and research methods
+Browser → Cloudflare same-origin proxy → FastAPI / Render
+                                      ├─ owner + authenticator verification
+                                      ├─ Supabase RLS / versioned virtual state
+                                      └─ entitled Alpaca assets, prices and news
 
-LOCAL, NONPUBLIC HISTORICAL DATA
-SEC filing revision archive -> local coverage and lineage reports
-                                  `-- optional owner-side advanced import
-
-VALIDATION
-Python + Node tests -> Ruff -> deterministic site build -> CSP/privacy audit
-                    -> GitHub Actions -> deployment content verification
+Eligible inputs → retained pure engines → scoped evidence → shared five-section UI
 ```
 
-## Code structure
+Native JavaScript avoids a framework rewrite; native MathML avoids an external equation script. The static build retains three CSP-hashed scripts. Provider credentials and owner state stay outside public assets. Optional revision archives and daily FF3 data are bounded, local-to-session inputs; routine research does not require uploads. ETF proxy factors are not official Fama–French factors.
 
-| Location | Purpose |
-| --- | --- |
-| `tools/build_unified_site.py` | Generates the hosted website and its three hashed-script CSP header |
-| `web/site/` | Public/private frontend source and finance/research modules |
-| `web/tests/` | JavaScript research, security, and UI-contract tests |
-| `tests/` | Python computation, integration, and release-regression tests |
-| `docs/methodology/` | Model assumptions, data definitions, and limitations |
-| `docs/` | Release history and deeper technical reference material |
+## Evaluation and limitations
 
-The repository contains historical release notes. Those documents are retained for traceability and should not be read as the current feature or verification status.
+Logistic direction is not a dollar-price forecast. Accuracy, Brier, calibration counts and a historical-frequency baseline describe later test windows, with weak signals withheld. Historical covariance fits are separate from rolling out-of-sample diagnostics. Selection, survivorship, fees, price adjustments, dividends and regime changes limit backtests. Circular moving-block intervals describe historical volatility sensitivity, not calibrated future loss bounds.
 
-## Development and verification
+DCF discounts an operating-cash-flow-minus-capex proxy under explicit assumptions. It does not establish FCFF, enterprise value, equity value or a fair share-price target. Current SEC snapshots do not establish what an original filing said at every past decision date. Missing values remain unavailable rather than zero.
 
-From a configured developer environment, the principal checks are:
+## Verification
+
+Use this checkout's configured `.venv`, not an interpreter from an older checkout:
 
 ```powershell
 .\.venv\Scripts\python.exe -m ruff check .
@@ -99,10 +72,7 @@ node --test (Get-ChildItem web/tests -Filter '*.test.cjs' | ForEach-Object FullN
 .\.venv\Scripts\python.exe tools/build_unified_site.py
 .\.venv\Scripts\python.exe tools/audit_public_bundle.py
 .\.venv\Scripts\python.exe tools/prepublish_check.py
+.\.venv\Scripts\python.exe tools/smoke_completion_browser.py
 ```
 
-**Verification scope:** The last confirmed major release was published and CI-verified at commit `1e78dd45d6b74c5ce7582e493d4292a5878cc13a`. Deployment and test status for later changes must be checked against their own commits and CI runs. Owner-side MFA, provider, and saved-note acceptance remains a separate sign-off step.
-
----
-
-*QuantForge is a research and engineering project, not an investment advisory or trading service. Historical or modeled observations do not guarantee future performance.*
+The current candidate passes 580 Python and 399 JavaScript tests, plus the original A–D journeys, full-route browser matrix and completed-engine journeys in Chromium, Firefox and WebKit at desktop/mobile widths. Private automated journeys use isolated fixtures, never real credentials or account writes. GitHub Actions and deployment evidence must be matched to the release SHA; automated tests do not certify live provider entitlement or owner persistence. Those remain separate owner checks.
