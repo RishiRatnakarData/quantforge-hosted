@@ -15,7 +15,7 @@ const evidenceId=id=>esc(id.replaceAll(':',' · '));
 const safeUrl=s=>{try{const u=new URL(s);return u.protocol==='https:'&&u.hostname&&u.username===''&&u.password===''?u.href:null;}catch(_){return null;}};
 const state={symbol:bySymbol.has('MSFT')?'MSFT':companies[0].symbol,range:365,finance:'revenue_usd',price:null,priceSource:null,
  privateReady:false,privateMode:false,priceToken:0,newsToken:0,runToken:0,benchmark:null,benchmarkOn:false,benchToken:0,
- result:null,compare:[],model:'prediction',loadingPrice:false};
+ result:null,compare:[],model:'prediction',loadingPrice:false,compareToken:0,comparison:null,compareSource:null,financeSort:'symbol',financeSortDirection:1,financeCompare:null,portfolioToken:0,ownerToken:0,portfolioData:null,portfolioWeights:null,portfolioBase:null,portfolioKey:null,portfolioOrigin:'',portfolioScenario:null,optimization:null,benchmarkB:null};
 let resultsOpen=false;
 function company(){return bySymbol.get(state.symbol);}
 function mode(){return state.privateMode&&state.privateReady?'private':'public';}
@@ -238,16 +238,266 @@ function exportSEC(){
  for(const r of f.annual)rows.push([state.symbol,data.as_of,r.fiscal_end,...columns.map(k=>r.metrics[k]??null),...columns.filter(k=>k!=='free_cash_flow_usd').flatMap(k=>[r.sources?.[k]?.filed??null,r.sources?.[k]?.accession??null])]);
  csv(rows,'quantforge-'+state.symbol+'-reported-sec.csv');
 }
-function addCompare(){if(!state.compare.includes(state.symbol)&&state.compare.length<5)state.compare.push(state.symbol);renderCompareChips();}
+function addCompare(){if(!state.compare.includes(state.symbol)&&state.compare.length<5){state.compare.push(state.symbol);invalidateComparison();}renderCompareChips();}
 function renderCompareChips(){
  $('qf-v20-compare-chips').innerHTML=state.compare.map(s=>'<button type="button" data-qf-remove="'+esc(s)+'" aria-label="Remove '+esc(s)+'">'+esc(bySymbol.get(s).name)+' · '+esc(s)+' ×</button>').join('');
+ $('qf-b21-compare-count').textContent=state.compare.length+' / 5 selected';
 }
-function runCompare(){
- if(state.compare.length<2||state.compare.length>5){$('qf-v20-compare-output').textContent='Choose 2–5 distinct covered companies. Return to Explore to choose your starting company.';return;}
- const details=state.compare.map(s=>({c:bySymbol.get(s),f:Q.financialSummary(bySymbol.get(s),data.as_of)}));
- const cells=details.map(({c,f})=>'<tr><th>'+esc(c.name)+' ('+esc(c.symbol)+')</th><td>'+esc(f.source.period)+'</td><td>'+esc(money(f.metrics.revenue_usd))+'</td><td>'+esc(pct(f.metrics.revenue_growth))+'</td><td>'+esc(pct(f.metrics.operating_margin))+'</td><td>'+esc(money(f.metrics.free_cash_flow_usd))+'</td></tr>').join('');
- $('qf-v20-compare-output').innerHTML='<div class="notice">Only annual SEC metrics are compared. Fiscal periods and business models may differ; the historical stock-return comparison is not yet enabled in Release A.</div><div class="table-wrap"><table><thead><tr><th>Company</th><th>Fiscal end</th><th>Revenue</th><th>Growth</th><th>Operating margin</th><th>FCF proxy</th></tr></thead><tbody>'+cells+'</tbody></table></div>';
+const B=window.QFResearchB21;
+const colorSet=['#136b59','#4a6cba','#d88a3c','#9963ad','#b4515a','#566c79'];
+const rowsOrNull=value=>typeof value==='number'&&Number.isFinite(value);
+function money2(v){return rowsOrNull(v)?'$'+value(v,2):'—';}
+function percentOrNA(v){return rowsOrNull(v)?pct(v):'—';}
+function names(){return state.compare.map(s=>bySymbol.get(s)?.name||s);}
+function invalidateComparison(){
+ state.compareToken++;state.comparison=null;state.compareSource=null;state.benchmarkB=null;
+ state.portfolioData=null;state.portfolioWeights=null;state.portfolioBase=null;state.portfolioOrigin='';state.optimization=null;state.financeCompare=null;state.portfolioToken++;
+ $('qf-b21-compare-export').disabled=true;$('qf-b21-finance-export').disabled=true;$('qf-b21-portfolio-export').disabled=true;
+ $('qf-b21-compare-state').textContent='Selection changed. Click Compare to calculate results for the current companies.';
+ $('qf-b21-compare-chart').textContent='Run Compare to load eligible history on common dates.';
+ $('qf-b21-finance-table').textContent='Selection changed. Run Compare to refresh this financial table.';
+ $('qf-b21-risk-table').textContent='No shared history loaded.';
+ $('qf-b21-distribution').replaceChildren();$('qf-b21-risk-scatter').replaceChildren();$('qf-b21-correlation').textContent='No common return history loaded.';
+ $('qf-b21-optimizer-output').replaceChildren();
 }
+function linePlot(target,dates,series){
+ if(!dates||dates.length<2||!series.length){$(target).textContent='No eligible aligned data for this chart.';return;}
+ const W=870,H=275,left=57,right=855,top=20,bottom=234;
+ const numbers=series.flatMap(s=>s.values).filter(rowsOrNull);if(!numbers.length){$(target).textContent='No finite observations.';return;}
+ let lo=Math.min(...numbers),hi=Math.max(...numbers);if(hi-lo<0.01){lo-=2;hi+=2;}const margin=(hi-lo)*0.10;lo-=margin;hi+=margin;
+ const X=i=>left+(right-left)*i/(dates.length-1),Y=v=>bottom-(v-lo)/(hi-lo)*(bottom-top);
+ const lines=series.map((s,i)=>'<path fill="none" stroke="'+colorSet[i%colorSet.length]+'" stroke-width="2.8" stroke-linejoin="round" d="'+s.values.map((v,j)=>(j?'L':'M')+X(j).toFixed(1)+' '+Y(v).toFixed(1)).join(' ')+'"/>').join('');
+ const guide=[0,0.5,1].map(f=>{const v=lo+f*(hi-lo),y=Y(v);return '<line x1="'+left+'" x2="'+right+'" y1="'+y+'" y2="'+y+'" stroke="#dce9e4"/><text x="'+(left-9)+'" y="'+(y+4)+'" font-size="12" text-anchor="end" fill="#526e62">'+value(v,1)+'</text>';}).join('');
+ const legend='<div class="qf-b21-chart-legend">'+series.map((s,i)=>'<span class="qf-b21-chart-label"><span style="color:'+colorSet[i%colorSet.length]+'">●</span> '+esc(s.label)+'</span>').join('')+'</div>';
+ $(target).innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" tabindex="0" aria-label="'+esc(series.map(s=>s.label).join(', '))+' compared on '+esc(dates[0])+' through '+esc(dates.at(-1))+'; use left and right arrows to inspect values">'+guide+lines+
+  '<text x="'+left+'" y="'+(H-15)+'" fill="#526e62" font-size="13">'+esc(dates[0])+'</text><text x="'+right+'" y="'+(H-15)+'" text-anchor="end" fill="#526e62" font-size="13">'+esc(dates.at(-1))+'</text><line id="'+target+'-cross" x1="'+right+'" x2="'+right+'" y1="'+top+'" y2="'+bottom+'" stroke="#647b70" stroke-dasharray="3 4"/></svg>'+legend+'<p role="status" class="tiny" id="'+target+'-cursor"></p>';
+ const svg=$(target).querySelector('svg');let index=dates.length-1;
+ const update=i=>{index=Math.max(0,Math.min(dates.length-1,i));const x=X(index).toFixed(1);const cross=$(target+'-cross');cross.setAttribute('x1',x);cross.setAttribute('x2',x);
+  $(target+'-cursor').textContent=dates[index]+' · '+series.map(s=>s.label+': '+value(s.values[index],2)).join(' · ');};
+ svg.addEventListener('pointermove',e=>{const rect=svg.getBoundingClientRect(),px=(e.clientX-rect.left)/rect.width;update(Math.round((px*W-left)/(right-left)*(dates.length-1)));});
+ svg.addEventListener('keydown',e=>{const n=e.key==='ArrowLeft'?index-1:e.key==='ArrowRight'?index+1:e.key==='Home'?0:e.key==='End'?dates.length-1:null;if(n!==null){e.preventDefault();update(n);}});
+ update(index);
+}
+function renderFinanceComparison(){
+ const symbols=state.compare;
+ const fs=symbols.map(s=>({symbol:s,f:B&&Q.financialSummary(bySymbol.get(s),data.as_of)}));
+ const entries=[['symbol','Company'],['fiscal','FY end'],['revenue','Revenue ($B)'],['growth','Growth'],['margin','Operating margin'],['fcf','FCF proxy ($B)']];
+ const raw=fs.map(({symbol,f})=>({symbol,name:bySymbol.get(symbol).name,fiscal:f.source?.period||'',revenue:f.metrics.revenue_usd,growth:f.metrics.revenue_growth,margin:f.metrics.operating_margin,fcf:f.metrics.free_cash_flow_usd,f}));
+ state.financeCompare=raw;
+ const field=state.financeSort||'symbol',sign=state.financeSortDirection||1;
+ raw.sort((a,b)=>{const x=a[field],y=b[field];if(x==null)return y==null?0:1;if(y==null)return -1;return (typeof x==='number'?x-y:String(x).localeCompare(String(y)))*sign;});
+ const moneyB=n=>rowsOrNull(n)?value(n/1e9,2):'—';
+ const body=raw.map(r=>'<tr><th scope="row">'+esc(r.name)+' ('+esc(r.symbol)+')</th><td>'+esc(r.fiscal||'—')+'</td><td>'+esc(moneyB(r.revenue))+'</td><td>'+esc(percentOrNA(r.growth))+'</td><td>'+esc(percentOrNA(r.margin))+'</td><td>'+esc(moneyB(r.fcf))+'</td></tr>').join('');
+ $('qf-b21-finance-table').innerHTML='<table><thead><tr>'+entries.map(([key,label])=>'<th scope="col"><button type="button" class="qf-b21-sort" data-qf-b21-sort="'+key+'" aria-label="Sort by '+label+'">'+label+'</button></th>').join('')+'</tr></thead><tbody>'+body+'</tbody></table><p class="tiny">SEC snapshot '+esc(data.as_of)+' · FCF is operating cash flow minus cash PPE purchases. Fiscal periods differ; ratios may not be comparable for banks and operating companies. — means unavailable, not zero.</p>';
+ $('qf-b21-finance-export').disabled=false;
+}
+function riskTable(result){
+ const m=result.metrics;
+ $('qf-b21-risk-table').innerHTML='<table><thead><tr><th>Company</th><th>Change</th><th>Annualized vol.</th><th>Max drawdown</th><th>Daily ES 95%</th></tr></thead><tbody>'+result.symbols.map(s=>'<tr><th>'+esc(s)+'</th><td>'+esc(pct(m[s].total_return))+'</td><td>'+esc(pct(m[s].annual_volatility))+'</td><td>'+esc(pct(m[s].max_drawdown))+'</td><td>'+esc(pct(m[s].daily_es95_loss))+'</td></tr>').join('')+'</tbody></table>';
+ const W=460,H=220,x0=48,x1=442,y0=22,y1=187;
+ const maxX=Math.max(0.01,...result.symbols.map(s=>m[s].annual_volatility))*1.17;
+ const lowY=Math.min(0,...result.symbols.map(s=>m[s].total_return))*1.12-0.01,highY=Math.max(0.01,...result.symbols.map(s=>m[s].total_return))*1.12+0.01;
+ const X=v=>x0+(x1-x0)*v/maxX,Y=v=>y1-(y1-y0)*(v-lowY)/(highY-lowY);
+ $('qf-b21-risk-scatter').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Historical return versus annualized price volatility scatter"><line x1="'+x0+'" x2="'+x1+'" y1="'+y1+'" y2="'+y1+'" stroke="#9db4aa"/><line x1="'+x0+'" x2="'+x0+'" y1="'+y0+'" y2="'+y1+'" stroke="#9db4aa"/>'+result.symbols.map((s,i)=>'<circle cx="'+X(m[s].annual_volatility)+'" cy="'+Y(m[s].total_return)+'" r="6" fill="'+colorSet[i]+'"><title>'+esc(s)+': '+esc(pct(m[s].total_return))+' total price return; '+esc(pct(m[s].annual_volatility))+' annualized volatility</title></circle><text x="'+(X(m[s].annual_volatility)+8)+'" y="'+(Y(m[s].total_return)-8)+'" font-size="12">'+esc(s)+'</text>').join('')+'<text x="'+(x1-8)+'" y="'+(H-6)+'" text-anchor="end" font-size="12">Historical annualized volatility →</text><text x="6" y="16" font-size="12">Total return ↑</text></svg>';
+}
+function heatmap(target,result){
+ if(!result){$(target).textContent='No common-dated risk sample available.';return;}
+ const names=result.symbols, C=result.correlation_matrix;
+ const row=C.map((cells,i)=>'<tr><th scope="row">'+esc(names[i])+'</th>'+cells.map(v=>{
+  const safe=rowsOrNull(v),shade=safe?'rgba('+(v>=0?'26,111,85':'170,104,73')+','+(0.10+Math.abs(v)*0.45).toFixed(2)+')':'#edf1ef';
+  return '<td style="background:'+shade+'" aria-label="'+esc(names[i])+' correlation '+(safe?v.toFixed(3):'unavailable')+'">'+(safe?v.toFixed(2):'—')+'</td>';
+ }).join('')+'</tr>').join('');
+ $(target).innerHTML='<table><thead><tr><th></th>'+names.map(s=>'<th scope="col">'+esc(s)+'</th>').join('')+'</tr></thead><tbody>'+row+'</tbody></table>';
+}
+function renderHistogram(result){
+ const hist=B.histogram(result,9),W=520,H=195,base=157,maxCount=Math.max(1,...Object.values(hist.counts).flat());
+ const band=440/9;
+ $('qf-b21-distribution').innerHTML='<svg role="img" viewBox="0 0 '+W+' '+H+'" aria-label="Daily return histogram for each company">'+result.symbols.flatMap((s,j)=>hist.counts[s].map((count,i)=>{
+  const barWidth=band/result.symbols.length*0.82,x=50+band*i+j*(band/result.symbols.length),h=count/maxCount*126;
+  return '<rect x="'+x.toFixed(2)+'" y="'+(base-h).toFixed(2)+'" width="'+barWidth.toFixed(2)+'" height="'+h.toFixed(2)+'" fill="'+colorSet[j]+'"><title>'+esc(s)+' · '+value(hist.edges[i]*100,1)+'% to '+value(hist.edges[i+1]*100,1)+'%: '+count+' sessions</title></rect>';
+ })).join('')+'<line x1="50" y1="'+base+'" x2="500" y2="'+base+'" stroke="#a8bdb3"/><text x="50" y="181" font-size="12">'+value(hist.edges[0]*100,1)+'%</text><text x="500" y="181" font-size="12" text-anchor="end">'+value(hist.edges.at(-1)*100,1)+'%</text></svg><div class="qf-b21-chart-legend">'+result.symbols.map((s,i)=>'<span class="qf-b21-chart-label" style="color:'+colorSet[i]+'">● '+esc(s)+'</span>').join('')+'</div>';
+}
+function publicBatch(symbols,days){
+ const cutoff=days;const observations=Object.fromEntries(symbols.map(s=>[s,Q.chartWindow(Q.syntheticPrice(s),cutoff)]));
+ const aligned=B.align(observations,symbols);
+ return {aligned,source:'Deterministic simulated price histories — NOT observed '+symbols.join(', ')+' shares; no actual company returns.',kind:'synthetic'};
+}
+async function fetchBatch(symbols,days){
+ if(mode()!=='private')return publicBatch(symbols,days);
+ const data=await getPrivate('private/history?'+new URLSearchParams({symbols:symbols.join(','),days:String(days)}));
+ return {aligned:B.fromBatch(data,symbols),source:String(data.source||'Alpaca owner-only split-adjusted daily closes')+' · '+String(data.coverage||''),kind:'market'};
+}
+async function fetchBenchmark(aligned,days,kind){
+ try{
+  const series=kind==='market'?Q.priceSeries((await getPrivate('private/history-single?'+new URLSearchParams({symbol:'SPY',days:String(days)}))).observations):Q.chartWindow(Q.syntheticPrice('SPY'),days);
+  const dates=new Map(series.map(row=>[row.date,row.close]));if(!aligned.dates.every(d=>dates.has(d)))return null;
+  const first=dates.get(aligned.dates[0]);return {symbol:'SPY',kind,values:aligned.dates.map(d=>dates.get(d)/first*100)};
+ }catch(_){return null;}
+}
+async function runCompare(){
+ const symbols=state.compare.slice();const request=++state.compareToken;
+ if(symbols.length<2||symbols.length>5){$('qf-b21-compare-state').textContent='Select 2–5 distinct companies first.';return;}
+ renderFinanceComparison();
+ $('qf-b21-compare-state').textContent='Aligning '+symbols.length+' company histories on shared observed dates…';
+ $('qf-b21-compare-chart').textContent='Loading eligible price history…';
+ try{
+  const days=Number($('qf-b21-compare-range').value);
+  const batch=await fetchBatch(symbols,days);
+  if(request!==state.compareToken||symbols.join(',')!==state.compare.join(','))return;
+  const result=B.compare(batch.aligned);
+  state.comparison=result;state.compareSource=batch;state.portfolioData=result;state.portfolioOrigin=batch.source;
+  const benchmark=await fetchBenchmark(batch.aligned,days,batch.kind);
+  if(request!==state.compareToken)return;
+  state.benchmarkB=benchmark;
+  $('qf-b21-compare-state').textContent=symbols.length+' companies · '+result.coverage.common_closes+' identical dated closes · '+result.coverage.first+' through '+result.coverage.last;
+  const plot=result.symbols.map((s,i)=>({label:s,values:result.indexed[s]}));
+  if(benchmark)plot.push({label:batch.kind==='market'?'SPY observed':'SPY illustrative',values:benchmark.values});
+  linePlot('qf-b21-compare-chart',result.dates,plot);
+  $('qf-b21-compare-provenance').textContent=batch.source+' '+result.convention+' Benchmark is '+(benchmark?(batch.kind==='market'?'observed price-only':'synthetic and illustrative'):'not available for all exact dates')+'. No missing dates were filled.';
+  riskTable(result);renderHistogram(result);heatmap('qf-b21-correlation',result);$('qf-b21-compare-export').disabled=false;
+  if($('page-portfolio').classList.contains('active'))renderPortfolioResearch();
+ }catch(e){if(request!==state.compareToken)return;
+  state.comparison=null;state.compareSource=null;state.portfolioData=null;state.benchmarkB=null;
+  $('qf-b21-compare-state').textContent='History unavailable: '+String(e.message||e).slice(0,180)+' SEC comparison remains available.';
+  $('qf-b21-compare-chart').textContent='No compatible common-date price history. No synthetic fallback in owner mode.';
+  $('qf-b21-compare-provenance').textContent='Unavailable market history; SEC financial rows are independent.';
+ }
+}
+function currentUniverse(){
+ if(state.compare.length>=2)return state.compare.slice();
+ const chosen=[state.symbol,...['MSFT','AAPL','NVDA'].filter(s=>s!==state.symbol&&bySymbol.has(s))];
+ state.compare=chosen.slice(0,3);renderCompareChips();
+ return state.compare.slice();
+}
+function resetWeights(symbols){
+ const key=symbols.join(',');if(state.portfolioKey===key&&state.portfolioWeights)return;
+ state.portfolioKey=key;state.portfolioWeights=B.suggestedWeights(symbols);state.portfolioBase={...state.portfolioWeights};state.optimization=null;
+}
+function weightPercentageSet(symbols,symbol,next){
+ const previous=state.portfolioWeights,clamped=Math.max(0,Math.min(100,Math.round(next)));
+ const others=[...symbols,'cash'].filter(s=>s!==symbol);const desired=100-clamped;
+ const initial=others.map(s=>Math.max(0,Math.round((previous[s]||0)*100)));
+ const sum=initial.reduce((a,b)=>a+b,0);
+ const raw=others.map((s,i)=>sum>0?initial[i]*desired/sum:desired/others.length);
+ const ints=raw.map(Math.floor),remainder=desired-ints.reduce((a,b)=>a+b,0);
+ [...others.keys()].sort((a,b)=>(raw[b]-ints[b])-(raw[a]-ints[a])).slice(0,remainder).forEach(i=>ints[i]++);
+ const weights={[symbol]:clamped/100};others.forEach((s,i)=>{weights[s]=ints[i]/100;});B.validWeights(symbols,weights);
+ state.portfolioWeights=weights;
+}
+function renderSliders(){
+ const symbols=currentUniverse(),weights=state.portfolioWeights;
+ $('qf-b21-weight-controls').innerHTML=[...symbols,'cash'].map(s=>'<label class="qf-b21-slider-line"><span>'+esc(s==='cash'?'Cash':(bySymbol.get(s)?.name||s))+'</span><input type="range" min="0" max="100" step="1" value="'+Math.round(weights[s]*100)+'" data-qf-b21-weight="'+esc(s)+'" aria-label="'+esc(s)+' allocation percentage"/><output>'+Math.round(weights[s]*100)+'%</output></label>').join('');
+ $('qf-b21-weights-total').textContent='Total 100% · '+symbols.length+' companies + cash · adjustments maintain full allocation';
+}
+function renderConcentration(){
+ const symbols=currentUniverse();if(!state.portfolioWeights)return;
+ const c=B.concentration(symbols,state.portfolioWeights);
+ $('qf-b21-concentration').innerHTML=[['Invested weight',pct(c.invested_share)],['Cash',pct(c.cash_share)],['Concentration · HHI',c.invested_hhi===null?'N/A (all cash)':value(c.invested_hhi,3)],['Effective positions',c.effective_positions===null?'N/A':value(c.effective_positions,2)]].map(([a,b])=>'<div><small>'+esc(a)+'</small><strong>'+esc(b)+'</strong></div>').join('');
+}
+function renderPortfolioResearch(){
+ const symbols=currentUniverse();resetWeights(symbols);renderSliders();renderConcentration();
+ const result=state.portfolioData;
+ if(!result||result.symbols.join(',')!==symbols.join(',')){
+  $('qf-b21-overview-chart').textContent='Eligible common-date history is not loaded.';
+  $('qf-b21-whatif-chart').textContent='Historical chart unavailable. Allocation and concentration remain interactive.';
+  $('qf-b21-overview-stats').replaceChildren();$('qf-b21-whatif-stats').replaceChildren();
+  $('qf-b21-analysis-stats').replaceChildren();heatmap('qf-b21-analysis-corr',null);
+  $('qf-b21-analysis-stress').textContent='No aligned history; risk statistics withheld rather than invented.';
+  $('qf-b21-portfolio-export').disabled=true;
+  return;
+ }
+ let amount=Number($('qf-b21-amount').value);if(!Number.isFinite(amount)||amount<100||amount>1e8){
+  $('qf-b21-whatif-chart').textContent='Enter a hypothetical starting value from $100 to $100 million.';return;
+ }
+ const baseline=B.scenario(result,state.portfolioBase,amount),selected=B.scenario(result,state.portfolioWeights,amount);
+ state.portfolioScenario={baseline,selected};
+ const benchmark=state.benchmarkB&&state.benchmarkB.values.length===result.dates.length?state.benchmarkB:null;
+ const lines=[{label:'Your weights',values:selected.indexed},{label:'Starting weights',values:baseline.indexed}];
+ if(benchmark)lines.push({label:benchmark.kind==='market'?'SPY observed':'SPY simulated',values:benchmark.values});
+ linePlot('qf-b21-overview-chart',result.dates,[{label:'Illustrative current basket',values:baseline.indexed},...(benchmark?[{label:benchmark.kind==='market'?'SPY observed':'SPY simulated',values:benchmark.values}]:[])]);
+ linePlot('qf-b21-whatif-chart',result.dates,lines);
+ const info=state.portfolioOrigin||'Synthetic illustrated price samples.';
+ $('qf-b21-overview-data-status').textContent=result.coverage.first+' to '+result.coverage.last+' · '+result.coverage.common_closes+' common closes · '+info;
+ $('qf-b21-overview-stats').innerHTML=[['Illustrative period change',pct(baseline.summary.total_return)],['Historical annualized volatility',pct(baseline.summary.annual_volatility)],['Max drawdown',pct(baseline.summary.max_drawdown)]].map(([a,b])=>'<div><small>'+esc(a)+'</small><strong>'+esc(b)+'</strong></div>').join('');
+ $('qf-b21-whatif-stats').innerHTML=[['Historical period change',pct(selected.summary.total_return)],['Annualized volatility',pct(selected.summary.annual_volatility)],['Max drawdown',pct(selected.summary.max_drawdown)],['Historical daily ES 95%',pct(selected.summary.daily_es95_loss)]].map(([a,b])=>'<div><small>'+esc(a)+'</small><strong>'+esc(b)+'</strong></div>').join('');
+ $('qf-b21-whatif-provenance').textContent=info+' Historical daily constant-weight rebalancing; no fees, interest, taxes or dividends modeled. Starting value '+usd(amount)+'. '+(benchmark?'Benchmark series indexed on all matching dates.':'Benchmark withheld because its exact dates were not available.')+' No recorded account P&L or future prediction.';
+ const split=selected.split_vol;
+ $('qf-b21-analysis-stats').innerHTML=[['Annualized volatility',pct(selected.summary.annual_volatility)],['Maximum drawdown',pct(selected.summary.max_drawdown)],['Daily loss VaR 95%',pct(selected.summary.daily_var95_loss)],['Daily loss ES 95%',pct(selected.summary.daily_es95_loss)]].map(([a,b])=>'<div><small>'+esc(a)+'</small><strong>'+esc(b)+'</strong></div>').join('');
+ $('qf-b21-analysis-source').textContent=info+' Common-date return matrix: '+result.coverage.common_closes+' observations. VaR/ES are daily empirical losses, not worst-case bounds.';
+ heatmap('qf-b21-analysis-corr',result);
+ $('qf-b21-analysis-stress').textContent='Worst observed sample day: '+pct(selected.summary.worst_day)+'. '+(split?'First-half vs second-half annualized historical volatility: '+pct(split.first_half)+' vs '+pct(split.second_half)+'. This is a stability diagnostic, not a confidence interval.':'Sample too short for a two-half volatility comparison.')+' Neither historical stress nor fitted minimum variance establishes future outcomes.';
+ $('qf-b21-portfolio-export').disabled=false;
+}
+async function loadPortfolioResearch(){
+ const symbols=currentUniverse(),key=symbols.join(',');resetWeights(symbols);renderPortfolioResearch();
+ if(state.portfolioData?.symbols.join(',')===key)return;
+ const token=++state.portfolioToken;
+ $('qf-b21-overview-data-status').textContent='Loading '+symbols.length+' company histories for the portfolio study…';
+ try{
+  const days=Number($('qf-b21-compare-range').value);
+  const batch=await fetchBatch(symbols,days);
+  if(token!==state.portfolioToken||state.compare.join(',')!==key)return;
+  const result=B.compare(batch.aligned);
+  state.portfolioData=result;state.portfolioOrigin=batch.source;
+  state.benchmarkB=await fetchBenchmark(batch.aligned,days,batch.kind);
+  if(token!==state.portfolioToken)return;
+  renderPortfolioResearch();
+ }catch(e){if(token!==state.portfolioToken)return;
+  state.portfolioData=null;
+  $('qf-b21-overview-data-status').textContent='History unavailable: '+String(e.message||e).slice(0,150)+'. Allocation math still works.';
+  renderPortfolioResearch();
+ }
+}
+async function loadOwnerVirtualState(){
+ const token=++state.ownerToken,el=$('qf-b21-owner-account');
+ el.hidden=mode()!=='private';if(el.hidden){$('qf-b21-owner-account-table').replaceChildren();return;}
+ $('qf-b21-owner-account-status').textContent='Loading MFA-protected virtual account balances…';
+ try{
+  const r=await getPrivate('private/state');if(token!==state.ownerToken||mode()!=='private')return;
+  const p=r.portfolio||{},holdings=p.holdings||{},cash=p.cash;
+  if(!rowsOrNull(cash)||typeof holdings!=='object'||Array.isArray(holdings))throw Error('Owner virtual state missing expected fields.');
+  const rows=Object.entries(holdings).filter(([s,q])=>/^[A-Z0-9./-]{1,15}$/.test(s)&&rowsOrNull(q)&&q>=0).slice(0,30);
+  $('qf-b21-owner-account-table').innerHTML='<table><thead><tr><th>Virtual position</th><th>Quantity</th></tr></thead><tbody>'+rows.map(([s,q])=>'<tr><th>'+esc(s)+'</th><td>'+esc(value(q,6))+'</td></tr>').join('')+'<tr><th>Cash (owner only)</th><td>'+esc(usd(cash))+'</td></tr></tbody></table>';
+  $('qf-b21-owner-account-status').textContent='Saved owner state · version '+String(Number(r.version)||0)+'. Loading entitled market observations for conditional valuation…';
+  if(rows.length>8||rows.length!==Object.keys(holdings).filter(s=>holdings[s]!==0).length)throw Error('Too many or invalid owner positions for complete quote coverage; P&L withheld.');
+  const symbols=rows.filter(([,q])=>q>0).map(([s])=>s);
+  const quoteResponse=symbols.length?await getPrivate('private/quotes?'+new URLSearchParams({symbols:symbols.join(',')})):{quotes:[]};
+  if(token!==state.ownerToken||mode()!=='private')return;
+  const snapshot=B.ownerSnapshot(p,quoteResponse.quotes,new Date().toISOString());
+  $('qf-b21-owner-account-table').innerHTML='<div class="qf-b21-kpi-row">'+[
+   ['Virtual marked value',usd(snapshot.total_value)],['Net capital contributed',usd(snapshot.net_contributions)],['Indicative cumulative paper P&L',usd(snapshot.cumulative_paper_pnl)]
+  ].map(([a,b])=>'<div><small>'+esc(a)+'</small><strong>'+esc(b)+'</strong></div>').join('')+'</div>'+
+   '<table><thead><tr><th>Owner-only holding</th><th>Units</th><th>Authorized quote</th><th>Indicative value</th><th>Last quote date</th></tr></thead><tbody>'+
+   snapshot.quotes.map(q=>'<tr><th>'+esc(q.symbol)+'</th><td>'+esc(value(q.units,6))+'</td><td>'+esc(usd(q.price))+'</td><td>'+esc(usd(q.market_value))+'</td><td>'+esc(q.timestamp.slice(0,16))+'</td></tr>').join('')+
+   '<tr><th>Uninvested virtual cash</th><td>—</td><td>—</td><td>'+esc(usd(snapshot.cash))+'</td><td>Ledger</td></tr></tbody></table>';
+  $('qf-b21-owner-account-status').textContent=snapshot.note;
+ }catch(e){if(token===state.ownerToken)$('qf-b21-owner-account-status').textContent='Owner-only portfolio valuation withheld: '+String(e.message||e).slice(0,150)+'. Stored holdings and cash remain visible when authorized.';}
+}
+function lowerRisk(){
+ if(!state.portfolioData){$('qf-b21-optimizer-output').textContent='Minimum variance unavailable without common-date price history.';return;}
+ try{
+  const run=B.minimumVariance(state.portfolioData,state.portfolioWeights,0.7);state.optimization=run;
+  $('qf-b21-optimizer-output').innerHTML='<div class="qf-b21-note"><strong>Historical minimum-variance experiment</strong><p>Annualized fitted volatility: '+esc(pct(run.base.summary.annual_volatility))+' → '+esc(pct(run.optimized.summary.annual_volatility))+'. Kept cash '+esc(pct(run.weights.cash))+', maximum company allocation 70%.</p><p>'+esc(run.limitation)+'</p><button class="btn sm" type="button" id="qf-b21-apply-optimizer">Apply illustrative weights</button></div>';
+  // Avoid mixing model language with financial advice; these are constrained fitted weights only.
+ }catch(e){$('qf-b21-optimizer-output').textContent='Optimization withheld: '+String(e.message||e).slice(0,180);}
+}
+function exportComparison(){
+ if(!state.comparison)return;
+ const r=state.comparison,header=['date',...r.symbols.map(s=>s+'_close_usd'),...r.symbols.map(s=>s+'_indexed')];
+ csv([header,...r.dates.map((d,i)=>[d,...r.symbols.map(s=>r.indexed[s][i]===null?null:state.compareSource.aligned.closes[s][i]),...r.symbols.map(s=>r.indexed[s][i])])],
+  'quantforge-compare-'+(state.compareSource.kind==='market'?'private-observed':'synthetic-example')+'.csv');
+}
+function exportComparisonSEC(){if(!state.financeCompare)return;
+ const rows=[['symbol','issuer','snapshot_as_of','fiscal_end','revenue_usd','revenue_growth_fraction','operating_margin_fraction','fcf_proxy_usd','revenue_filing_accession']];
+ for(const r of state.financeCompare){rows.push([r.symbol,r.name,data.as_of,r.fiscal,r.revenue,r.growth,r.margin,r.fcf,r.f.annual[0]?.sources?.revenue_usd?.accession||null]);}
+ csv(rows,'quantforge-reported-sec-comparison.csv');
+}
+function exportPortfolio(){if(!state.portfolioScenario||!state.portfolioData)return;
+ const {selected,baseline}=state.portfolioScenario;
+ csv([['date','hypothetical_selected_index','starting_weight_index','market_source_kind'],...selected.dates.map((d,i)=>[d,selected.indexed[i],baseline.indexed[i],state.compareSource?.kind|| (mode()==='private'?'market':'synthetic')])],
+  'quantforge-hypothetical-portfolio-study.csv');
+}
+
 function showModel(name){
  state.model=name;
  document.querySelectorAll('[data-qf-model]').forEach(b=>b.classList.toggle('active',b.dataset.qfModel===name));
@@ -266,7 +516,8 @@ function mountModels(){
 function authUpdate(){
  const signed=$('private-signed');const ready=signed&&!signed.hidden;
  if(state.privateReady===ready)return;
- state.privateReady=ready;
+ state.privateReady=ready;invalidateComparison();state.portfolioToken++;state.ownerToken++;
+ if(ready)loadOwnerVirtualState();else $('qf-b21-owner-account').hidden=true;
  if(ready){state.privateMode=true;setAccount();if(location.hash.startsWith('#private/'))window.QFNavigate20('explore');selectCompany(state.symbol);}
  else if(state.privateMode){state.privateMode=false;setAccount();selectCompany(state.symbol);}
 }
@@ -291,8 +542,18 @@ function init(){
    if(mode()==='private'&&(next===730||next==='ALL')&&state.priceSource?.type==='market'&&state.price.length<340)loadPrice();else renderPriceData();return;
   }
   const financial=e.target.closest('[data-qf-financial]');if(financial){state.finance=financial.dataset.qfFinancial;renderFinances(Q.financialSummary(company(),data.as_of));return;}
-  const rm=e.target.closest('[data-qf-remove]');if(rm){state.compare=state.compare.filter(s=>s!==rm.dataset.qfRemove);renderCompareChips();return;}
+  const rm=e.target.closest('[data-qf-remove]');if(rm){state.compare=state.compare.filter(s=>s!==rm.dataset.qfRemove);invalidateComparison();renderCompareChips();return;}
   const model=e.target.closest('[data-qf-model]');if(model){showModel(model.dataset.qfModel);return;}
+  const sort=e.target.closest('[data-qf-b21-sort]');if(sort&&['symbol','fiscal','revenue','growth','margin','fcf'].includes(sort.dataset.qfB21Sort)){
+   if(state.financeSort===sort.dataset.qfB21Sort)state.financeSortDirection*=-1;
+   else {state.financeSort=sort.dataset.qfB21Sort;state.financeSortDirection=1;}
+   renderFinanceComparison();return;
+  }
+  if(e.target.closest('#qf-b21-edit-universe')){window.QFNavigate20('compare');return;}
+  if(e.target.closest('#qf-b21-lower-risk')){lowerRisk();return;}
+  if(e.target.closest('#qf-b21-apply-optimizer')&&state.optimization){
+   state.portfolioWeights={...state.optimization.weights};renderPortfolioResearch();return;
+  }
  });
  $('qf-v20-analyze').addEventListener('click',analyze);
  $('qf-v20-add-compare').addEventListener('click',()=>{addCompare();window.QFNavigate20('compare');});
@@ -302,14 +563,28 @@ function init(){
  $('qf-v20-compare-options').innerHTML=companies.map(c=>'<option value="'+esc(c.name+' ('+c.symbol+')')+'"></option>').join('');
  $('qf-v20-compare-search').addEventListener('change',e=>{
   const query=e.target.value.trim().toLowerCase(),c=companies.find(c=>c.symbol.toLowerCase()===query||(c.name+' ('+c.symbol+')').toLowerCase()===query);
-  if(c&&!state.compare.includes(c.symbol)&&state.compare.length<5)state.compare.push(c.symbol);
+  if(c&&!state.compare.includes(c.symbol)&&state.compare.length<5){state.compare.push(c.symbol);invalidateComparison();}
   renderCompareChips();e.target.value='';
  });
  $('qf-v20-compare-run').addEventListener('click',runCompare);
+ $('qf-b21-compare-range').addEventListener('change',()=>{invalidateComparison();state.portfolioToken++;});
+ $('qf-b21-compare-export').addEventListener('click',exportComparison);
+ $('qf-b21-finance-export').addEventListener('click',exportComparisonSEC);
+ $('qf-b21-portfolio-export').addEventListener('click',exportPortfolio);
+ $('qf-b21-amount').addEventListener('input',renderPortfolioResearch);
+ $('qf-b21-weight-controls').addEventListener('input',e=>{
+  const control=e.target.closest('[data-qf-b21-weight]');if(!control)return;
+  weightPercentageSet(currentUniverse(),control.dataset.qfB21Weight,Number(control.value));
+  state.optimization=null;$('qf-b21-optimizer-output').replaceChildren();renderPortfolioResearch();
+ });
  mountModels();
  const auth=$('private-signed');if(auth)new MutationObserver(authUpdate).observe(auth,{attributes:true,attributeFilter:['hidden']});
- window.addEventListener('qf:route-change',e=>{if(e.detail.route==='compare'){if(!state.compare.includes(state.symbol))addCompare();}if(e.detail.route==='explore')setAccount();});
- selectCompany(state.symbol);authUpdate();
+ window.addEventListener('qf:route-change',e=>{
+  if(e.detail.route==='compare'){if(!state.compare.includes(state.symbol))addCompare();}
+  if(e.detail.route==='portfolio'){loadPortfolioResearch();if(mode()==='private')loadOwnerVirtualState();}
+  if(e.detail.route==='explore')setAccount();
+ });
+ selectCompany(state.symbol);renderCompareChips();authUpdate();
 }
 init();
 window.QFResearch20=Object.freeze({choose:selectCompany,analyze});

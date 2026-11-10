@@ -88,7 +88,7 @@ jobs:
           PY
 
   release_a_browser:
-    name: Release A stock-first browser journeys
+    name: Release A and B shared-app browser journeys
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
@@ -104,3 +104,5 @@ jobs:
         run: python tools/build_unified_site.py
       - name: Verify desktop, mobile, keyboard, routing and mocked private outage
         run: python tools/smoke_release_a_browser.py
+      - name: Verify Release B Compare, Portfolio, owner accounting and provider-failure isolation
+        run: python tools/smoke_release_b_browser.py

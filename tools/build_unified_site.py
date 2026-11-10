@@ -764,9 +764,10 @@ for slot, file in [('/* QF_MODEL */','model.js'),('/* QF_APP */','app.js'),('/* 
   visuals=(src/'site/sec_visuals_v81.js').read_text(encoding='utf-8')
   model_evidence=(src/'site/public_model_evidence_v181.js').read_text(encoding='utf-8')
   research_core=(src/'site/research_core_v20.js').read_text(encoding='utf-8')
+  research_b=(src/'site/research_compare_portfolio_v21.js').read_text(encoding='utf-8')
   research_ui=(src/'site/research_app_v20.js').read_text(encoding='utf-8')
   text=analytics+'\n'+model_evidence+'\n'+evidence+'\n'+lab+'\n'+visuals+'\n'+text.replace('/* QF_SEC_DATA */ null', snapshot_js)
-  text=research_core+'\n'+text+'\n'+research_ui
+  text=research_core+'\n'+research_b+'\n'+text+'\n'+research_ui
  text=text.replace('</script','<\\/script')
  html=html.replace(slot,text)
 (root/'public/index.html').write_text(html, encoding="utf-8", newline="\n")
