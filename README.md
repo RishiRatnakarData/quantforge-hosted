@@ -20,7 +20,7 @@ The clickable brand opens a compact Home inside Explore. Company selection carri
 
 **Public:** Historical SEC Company Facts are real reported financial observations. Market-path demonstrations are deterministic synthetic inputs, explicitly labeled as such. They are not actual company stock prices or evidence of market predictive skill.
 
-**Private:** Owner identity and Supabase authenticator MFA gate eligible Alpaca history, quotes, asset listings and news. Provider entitlement, dates and feed conventions remain visible. Version-checked Supabase state supports notes, saved briefings and virtual transactions. There is no real-money order execution.
+**Private:** Owner identity and Supabase authenticator MFA gate eligible Alpaca history, quotes, asset listings and news. Provider entitlement, dates and feed conventions remain visible. Version-checked Supabase state supports notes, saved briefings and virtual transactions. **No live trading:** all transactions are virtual; there is no real-money order execution.
 
 Recorded virtual-account history starts only when the owner requests server-verified marks. Deposits and withdrawals change contributed capital; they are not gains. Unrecorded historical account values and unsupported time-weighted percentage returns are not fabricated. A missing provider disables the affected output instead of substituting simulated private data.
 
