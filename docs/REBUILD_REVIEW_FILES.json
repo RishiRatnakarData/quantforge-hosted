@@ -1,0 +1,124 @@
+{
+  "base_commit": "53dcc960c6f0c036beb00435173b33fa49574b1a",
+  "review_branch": "codex/quantforge-product-rebuild",
+  "publication": "not pushed, merged or deployed",
+  "manifest_self_hash": "excluded",
+  "files": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "95fff11df581a7a3ef9be55b291c2f433035cb6a4a3fc449d39ed5ac69de1820"
+    },
+    {
+      "path": "README.md",
+      "sha256": "b68b8691b2d23543a423e0eeff65fc0d21bce16ed08f9a66f16cadf5d5d91137"
+    },
+    {
+      "path": "cloud/api.py",
+      "sha256": "b0e6d3670a49d00074f1ee427242263020478ba9acad88e7beb5fa0de88ac6b0"
+    },
+    {
+      "path": "public/_headers",
+      "sha256": "172bff154f22cd934fb99911edce69fe793147a8c95b002d108c4afc71f1579c"
+    },
+    {
+      "path": "public/index.html",
+      "sha256": "6d93fd388ed4ca8d1da1f50c53203da01e71f5830ef36ae3290b3bd00382d4cd"
+    },
+    {
+      "path": "tools/build_unified_site.py",
+      "sha256": "e71e765acee26586bde4fa464593df60530b5548d6e885e29a3333ff2bfa8e72"
+    },
+    {
+      "path": "tools/smoke_release_a_browser.py",
+      "sha256": "7efbfcf1d45ee2f93207dc8fd296af8b6f2000131ea2250ebfefea5383186f6c"
+    },
+    {
+      "path": "tools/smoke_release_b_browser.py",
+      "sha256": "48238ba8df775ff821e5f6e06a15826f14edcc72bf3b2cca568bb57c4f08b898"
+    },
+    {
+      "path": "tools/smoke_release_c_browser.py",
+      "sha256": "9af7a5aa6e9e7c01b722fc2144ad1b356c8f86d9f76badcbbebfaac826256a00"
+    },
+    {
+      "path": "tools/smoke_release_d_browser.py",
+      "sha256": "742530984e4e718ae65c4f953900bd3d822c74f985f78e37ad932e85e19b2465"
+    },
+    {
+      "path": "tools/smoke_rebuild_browser.py",
+      "sha256": "ecf0eb047b5c0e215d1bd0bfc948ec56babd80172dcfe39f5b2f74156cf8df37"
+    },
+    {
+      "path": "tools/smoke_completion_browser.py",
+      "sha256": "751558d8f6aaae39b22b7a68a1a801d5780ab01632fcd47b4e5eeaf3f594fcdb"
+    },
+    {
+      "path": "web/site/private.js",
+      "sha256": "54a44e1382ecaa86285af3146c1ee20736d5b9d13d1dccf99aa08481202da58e"
+    },
+    {
+      "path": "web/site/private_predictive_ml_v180.js",
+      "sha256": "cd76faae990a8203ae3f0dbf755a04d2e2626a3fd727ed0d89b148857413b178"
+    },
+    {
+      "path": "web/site/research_app_v20.js",
+      "sha256": "77f561a3ae4e11c6363edcc8457c3c3e653762b6de14a03bccceccebbe871f29"
+    },
+    {
+      "path": "web/site/research_core_v20.js",
+      "sha256": "42d896cc6e98312503788ba98c2cfba545213688b95b8c3e3696a14463621b6c"
+    },
+    {
+      "path": "web/site/research_models_methods_ui_v22.js",
+      "sha256": "f682e1fe35615fb459142386567bd9ccc7eb4c26ed3b1270526b029cca663477"
+    },
+    {
+      "path": "web/site/research_private_shell_v23.js",
+      "sha256": "37d5c5967d19efca4932f29b458d830c715c3a39aca219fbf0c178e66d2c0549"
+    },
+    {
+      "path": "web/site/site.template.html",
+      "sha256": "8a254ea605918488cd6d53868c68562d5e0fe2caf9d49973ba03bb515e089d26"
+    },
+    {
+      "path": "web/site/research_errors_v24.js",
+      "sha256": "eaaf29c760bf4e6bc2babb275f4a6ff05c6688e045b137044d766e03a9c69796"
+    },
+    {
+      "path": "web/site/research_exhibits_v24.js",
+      "sha256": "934048eff7e4a90529e6c244dee489a72c15f5eca169aa5457d6428260fd3373"
+    },
+    {
+      "path": "web/site/research_deep_v25.js",
+      "sha256": "ed869b4cf689fb536b5874fdb012f2a500833540f89e9659ba603567d87906a0"
+    },
+    {
+      "path": "web/site/research_deep_ui_v25.js",
+      "sha256": "8d5e18f44b5993899b76ca369af9c4d752db4da6980e9e2b60743c7cc59c64bb"
+    },
+    {
+      "path": "web/site/research_account_history_v25.js",
+      "sha256": "358e2b3323d13dd2a84a96eca587522cce78ee668beba14a4cfd3bbd1eb06939"
+    },
+    {
+      "path": "web/tests/research_errors_v24.test.cjs",
+      "sha256": "0bef100d143eb02e8f4f29d4a8e28eb1e9bbec7c07bfea67972089a25ccaaff8"
+    },
+    {
+      "path": "web/tests/research_deep_v25.test.cjs",
+      "sha256": "743f0b19f2c491348b87c033b434a4f285f3749177bc2bb42ae51d7331a4408d"
+    },
+    {
+      "path": "web/tests/research_account_history_v25.test.cjs",
+      "sha256": "319ac3cfb1af9e6a08181ffd83af8b00665b44693a93d6ad03173d2cd1ccef7f"
+    },
+    {
+      "path": "tests/test_valuation_snapshots.py",
+      "sha256": "7c5dfc420a82f07ee37f2207538cc33eb2f67bf1cf81a97858a4cb2d0603e93f"
+    },
+    {
+      "path": "docs/CODEX_REBUILD_PROGRESS.md",
+      "sha256": "2483ea16d165d91c19effee90c57053f5d083807178216385999e1c27f57117b"
+    }
+  ]
+}

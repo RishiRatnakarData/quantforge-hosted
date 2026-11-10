@@ -1,6 +1,6 @@
 # QuantForge
 
-**QuantForge 2.0 Release A (source package, pending owner deployment acceptance):** the new stock-first Explore, five-section navigation, SEC research findings, synthetic public chart, and MFA-scoped single-company market history are documented in [Release A engineering inventory](docs/RELEASE_A_2026-11-09.md). Market-data rights, live Render and authenticated provider behavior require separate verification.
+**QuantForge 2.0 — completed local review implementation:** five shared research sections, explicit public/private data modes, retained numerical engines, source-aware charts, authenticated saved research and virtual-account history. See the [feature parity and acceptance report](docs/CODEX_REBUILD_PROGRESS.md). Publication and actual owner/provider acceptance remain separate.
 **Financial research grounded in reported company data, quantitative models, and reproducible software engineering.**
 
 QuantForge is a full-stack financial research platform combining SEC company fundamentals, statistical modeling, portfolio analytics, valuation scenarios, and historical strategy evaluation. It has two deliberately separate experiences:

@@ -100,7 +100,7 @@ function analyze(history,sym){
  const status=qualified?'Exploratory signal (limited validation)':'No consistent advantage over the simple baseline';
  const direction=current>=0.55?'Upward tilt':current<=0.45?'Downward tilt':'No clear direction';
  const reasons=qualified?
-  'The model improved both the Brier score and directional accuracy across held-out windows. This remains exploratory, not statistical proof.':
+  'The model improved the Brier score and matched or exceeded baseline directional accuracy across held-out windows. This remains exploratory, not statistical proof.':
   'Held-out Brier error, directional accuracy, or sample size did not clear the conservative baseline screen.';
  return {ready:true,symbol:sym,asOf:dates[n-1],forecastHorizon:H,
   model:'L2-regularized logistic regression',features:['5-session return','20-session return','60-session return','20-session volatility','40-session drawdown'],

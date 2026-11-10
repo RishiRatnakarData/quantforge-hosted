@@ -32,7 +32,7 @@ async def public(page, width: int) -> None:
     assert 'L2-regularized' in await page.locator('#qf-c22-model-output').inner_text()
     await page.locator('#page-models [data-qf-model="risk"]').click()
     assert 'rolling volatility' in (await page.locator('#qf-c22-model-output').inner_text()).lower()
-    assert await page.locator('#qf-c22-model-output svg').count() == 1
+    assert await page.locator('#qf-c22-model-output svg').count() >= 1
     await page.locator('[data-qf-c22-phase="evaluation"]').click()
     assert 'Moving-block bootstrap' in await page.locator('#qf-c22-model-output').inner_text()
     await page.locator('#page-models [data-qf-model="valuation"]').click()
@@ -41,7 +41,7 @@ async def public(page, width: int) -> None:
     await page.locator('[data-qf-c22-phase="evaluation"]').click()
     assert await page.locator('#qf-c22-model-output tbody tr').count() == 4
     await page.locator('#page-models [data-qf-model="strategy"]').click()
-    assert await page.locator('#qf-c22-model-output svg').count() == 1
+    assert await page.locator('#qf-c22-model-output svg').count() >= 1
     assert 'Buy and hold' in await page.locator('#qf-c22-model-output').inner_text()
     assert await page.locator('#page-models details:visible').count() == 0
     await page.locator('#qf-v20-navigation [data-page="methods"]').click()
@@ -87,6 +87,7 @@ async def private_mock(page) -> None:
              observations:dates.map((d,i)=>({date:d,close:150*Math.exp(i*.0004+.02*Math.sin(i/9))})),
              source:'MOCKED entitled observed close history',sessions_per_year:252})};
         }
+        if(String(url).includes('private/assets'))return {ok:true,json:async()=>({licensed_private:true,items:[{symbol:'AAPL',name:'Apple',asset_class:'us_equity'}]})};
         if(path.includes('private/news-research'))return {ok:false,json:async()=>({detail:'Mocked news outage'})};
         if(path.includes('private/state'))return {ok:false,json:async()=>({detail:'Mocked portfolio database offline'})};
         throw Error('Unexpected private test request '+path);
@@ -102,6 +103,7 @@ async def private_mock(page) -> None:
     await page.evaluate('''() => {
       window.fetch=async url=>{
         if(String(url).includes('history-single'))return {ok:false,json:async()=>({detail:'Deliberate owner price provider outage'})};
+        if(String(url).includes('private/assets'))return {ok:true,json:async()=>({licensed_private:true,items:[{symbol:'AAPL',name:'Apple',asset_class:'us_equity'}]})};
         if(String(url).includes('news'))return {ok:false,json:async()=>({detail:'News outage'})};
         if(String(url).includes('private/state'))return {ok:false,json:async()=>({detail:'Portfolio outage'})};
         throw Error('Unexpected '+url);

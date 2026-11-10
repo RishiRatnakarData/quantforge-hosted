@@ -98,8 +98,8 @@ jobs:
           python-version: '3.12'
       - name: Install offline browser test dependency
         run: |
-          python -m pip install playwright==1.57.0
-          python -m playwright install --with-deps chromium
+          python -m pip install playwright==1.57.0 "requests>=2.31"
+          python -m playwright install --with-deps chromium firefox webkit
       - name: Build generated public site with deterministic CSP
         run: python tools/build_unified_site.py
       - name: Verify desktop, mobile, keyboard, routing and mocked private outage
@@ -110,3 +110,7 @@ jobs:
         run: python tools/smoke_release_c_browser.py
       - name: Verify unified private shell, mocked MFA, notes, virtual trades and logout
         run: python tools/smoke_release_d_browser.py
+      - name: Product rebuild desktop and mobile acceptance
+        run: python tools/smoke_rebuild_browser.py
+      - name: Completed engines under real CSP in Chromium Firefox WebKit
+        run: python tools/smoke_completion_browser.py

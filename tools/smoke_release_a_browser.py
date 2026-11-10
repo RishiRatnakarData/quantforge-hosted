@@ -85,6 +85,7 @@ async def assert_private_mock(page) -> None:
             coverage:'test fixture, not real provider acceptance',
             equity_feed:'sip',licensed_private:true,ohlcv_available:false})};
         }
+        if(String(url).includes('private/assets'))return {ok:true,json:async()=>({licensed_private:true,items:[{symbol:'AAPL',name:'Apple',asset_class:'us_equity'}]})};
         if (pathname.includes('news-research'))return {ok:false,json:async()=>({detail:'Test news unavailable'})};
         throw Error('Unexpected request '+pathname);
       };

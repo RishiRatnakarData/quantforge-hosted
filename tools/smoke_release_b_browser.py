@@ -76,6 +76,7 @@ async def private_mock(page) -> None:
       window.qfTestRequests=[];
       window.fetch=async url=>{
         const path=String(url);window.qfTestRequests.push(path);
+        if(path.includes('auth/login'))return {ok:true,json:async()=>({signed_in:true})};
         const params=new URLSearchParams((path.split('?')[1]||''));
         if(path.includes('private/history?')){
           const symbols=params.get('symbols').split(',');
@@ -98,8 +99,12 @@ async def private_mock(page) -> None:
         if(path.includes('news-research'))return {ok:false,json:async()=>({detail:'Test news endpoint unavailable'})};
         throw Error('Unexpected private test route '+path);
       };
-      document.getElementById('private-signed').hidden=false;
     }''')
+    await page.locator('#qf-v20-mode').click()
+    await page.locator('#private-email').fill('offline' + '@' + 'example.invalid')
+    await page.locator('#private-password').fill('offline-fixture-password')
+    await page.locator('#private-login-submit').click()
+    await page.wait_for_function('window.QFPrivateBridgeV23.ready()')
     await page.wait_for_timeout(190)
     await page.locator('#qf-v20-navigation [data-page="compare"]').click()
     await page.locator('#qf-v20-compare-search').fill('Apple (AAPL)')

@@ -54,7 +54,7 @@ function syntheticPrice(symbol){
  return rows;
 }
 function financialSummary(company,cutoff){
- if(!company||!Array.isArray(company.annual))return {status:'unavailable',metrics:{},evidence:[],findings:[],annual:[],limitations:['No annual SEC filings in the published snapshot.']};
+ if(!company||!Array.isArray(company.annual))return {status:'unavailable',symbol:company?.symbol||null,source:{type:'sec',period:null},metrics:{},evidence:[],findings:[],annual:[],limitations:['No annual SEC filings in the published snapshot.']};
  const rows=[...company.annual].filter(r=>iso(r?.fiscal_end)&&r.metrics).sort((a,b)=>b.fiscal_end.localeCompare(a.fiscal_end));
  const a=rows[0],b=rows[1];
  const am=a?.metrics||{},bm=b?.metrics||{};

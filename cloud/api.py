@@ -112,7 +112,10 @@ async def desk_error_handler(_request: Request, exc: DeskError):
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "mode": "single-owner-hosted", "paper_only": True}
+    revision = os.getenv("RENDER_GIT_COMMIT", "")
+    return {"status": "ok", "mode": "single-owner-hosted", "paper_only": True,
+            "api_contract": "shared-research-v25",
+            "revision": revision if re.fullmatch(r"[0-9a-f]{40}", revision) else "not-reported"}
 
 
 class Credentials(BaseModel):
@@ -749,5 +752,51 @@ def private_capital(data: CapitalRequest, request: Request, response: Response):
         events = current.get("capital_events", [])
         current["capital_events"] = ([{"action": data.action, "amount": float(amount),
                                       "at": dt.datetime.now(dt.UTC).isoformat()}] + events)[:100]
+    save_state(uid, token, current, version)
+    return {"portfolio": current, "version": version + 1, "paper_only": True}
+
+
+class ValuationSnapshotRequest(BaseModel):
+    expected_version: int = Field(ge=0)
+
+
+@app.post("/api/private/valuation-snapshot")
+def private_valuation_snapshot(data: ValuationSnapshotRequest, request: Request, response: Response):
+    """Record an explicit owner-requested mark, never a reconstructed account history."""
+    uid, token = owner(request, response)
+    current, version = read_state(uid, token)
+    if version != data.expected_version:
+        raise HTTPException(409, "Portfolio changed. Reload first.")
+    cash = money(current.get("cash"), "virtual cash")
+    capital = money(current.get("initial_cash"), "net contributed capital")
+    holdings = current.get("holdings")
+    if cash < 0 or capital < 0 or not isinstance(holdings, dict):
+        raise HTTPException(422, "Virtual account is incomplete; valuation withheld.")
+    positions = []
+    for symbol, raw_units in holdings.items():
+        units = money(raw_units, "held units")
+        if units < 0 or not SYMBOL_RE.fullmatch(symbol):
+            raise HTTPException(422, "Virtual positions are invalid; valuation withheld.")
+        if units > 0:
+            positions.append((symbol, units))
+    if len(positions) > 8:
+        raise HTTPException(422, "Snapshot needs complete quote coverage for at most eight positions.")
+    total = cash
+    observations = []
+    for symbol, units in positions:
+        observed = valid_quote(quote(symbol), require_fresh=True)
+        if observed["symbol"] != symbol:
+            raise HTTPException(422, "Quote identity mismatch; valuation withheld.")
+        total += units * money(observed["price"], "observed price")
+        observations.append({"symbol": symbol, "observed_at": observed["timestamp"],
+                             "source": str(observed.get("venue", "Provider"))[:60]})
+    history = current.get("valuations", [])
+    if not isinstance(history, list):
+        raise HTTPException(422, "Stored valuation history is invalid.")
+    record = {"at": dt.datetime.now(dt.UTC).isoformat(), "value": float(cents(total)),
+              "cash": float(cents(cash)), "net_contributions": float(cents(capital)),
+              "pnl": float(cents(total - capital)), "observations": observations,
+              "source": "server-verified virtual account mark", "schema_version": 1}
+    current["valuations"] = (history + [record])[-365:]
     save_state(uid, token, current, version)
     return {"portfolio": current, "version": version + 1, "paper_only": True}

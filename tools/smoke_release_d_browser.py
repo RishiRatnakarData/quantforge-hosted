@@ -37,7 +37,7 @@ MOCK = r'''() => {
       const input=JSON.parse(options.body);if(input.expected_version!==window.qfMockVersion)return response({detail:'Version changed'},false);
       window.qfMockOwner.holdings[input.symbol]=2;window.qfMockOwner.cash-=Number(input.amount);
       window.qfMockVersion++;return response({portfolio:window.qfMockOwner,version:window.qfMockVersion,paper_only:true});}
-    if(p.includes('private/assets'))return response({assets:[]});
+    if(p.includes('private/assets'))return response({licensed_private:true,total:1,items:[{symbol:'MSFT',name:'Microsoft',asset_class:'us_equity'}]});
     throw Error('Unexpected route '+p);
   };
 }'''
@@ -72,22 +72,26 @@ async def run_page(browser, width: int) -> None:
         await page.evaluate("window.QFNavigate20('private')")
         assert await page.locator('.tabpage.active').get_attribute('id') == 'page-explore'
         assert await page.locator('[data-qf-v23-open="notes"]').is_visible()
-        await page.locator('#qf-v20-mode').click()
-        assert await page.locator('#qf-v23-owner-panel').is_visible()
+        await page.locator('[data-qf-v23-open="notes"]').click()
+        assert not await page.locator('#qf-v23-owner-panel').is_visible()
+        assert await page.locator('#qf24-notes').is_visible()
         assert await page.locator('#qf-v23-note-company').inner_text() == 'Microsoft (MSFT)'
         await page.locator('#qf-v23-note').fill('A concise sample research note.')
         await page.locator('#qf-v23-save').click()
-        await page.get_by_text('Research note saved.', exact=True).wait_for()
+        await page.locator('#qf24-note-status').get_by_text('Research note saved.', exact=True).wait_for()
         assert await page.locator('#qf-v23-note-list .qf-v23-note-entry').count() == 1
-        await page.locator('[data-qf-v23-tab="portfolio"]').click()
+        await page.locator('#qf-v20-navigation [data-page="portfolio"]').click()
+        await page.locator('[data-qf-portfolio="overview"]').click()
+        await page.wait_for_function("document.querySelector('#qf-v23-trade-symbol').options.length>0")
         assert 'Virtual cash' in await page.locator('#qf-v23-account-overview').inner_text()
         await page.locator('#qf-v23-trade-amount').fill('120')
         page.once('dialog', lambda dialog: asyncio.create_task(dialog.accept()))
         await page.locator('#qf-v23-trade-submit').click()
-        await page.get_by_text('Virtual transaction recorded. No live order sent.', exact=True).wait_for()
+        await page.locator('#qf24-trade-status').get_by_text('Virtual transaction recorded. No live order sent.', exact=True).wait_for()
         assert await page.locator('#qf-v23-account-overview').get_by_text('$2,380.00').count() >= 1
         if width == 1440:
             await page.screenshot(path=os.getenv('QF_D23_PRIVATE_SCREENSHOT', '/tmp/qf_d23_private.png'))
+        await page.locator('#qf-v20-mode').click()
         await page.locator('#qf-v23-signout').click()
         await page.wait_for_function("!window.QFPrivateBridgeV23.ready()")
         assert not await page.locator('#qf-v23-owner-panel').is_visible()

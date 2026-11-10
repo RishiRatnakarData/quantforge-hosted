@@ -1155,9 +1155,9 @@ function message(msg){$('private-message').textContent=msg;}
 async function api(path, body){
   const init={credentials:'same-origin',cache:'no-store'};
   if(body!==undefined){init.method='POST';init.headers={'Content-Type':'application/json','X-QF-Action':'1'};init.body=JSON.stringify(body);}
-  const r=await fetch('/api/'+path,init);
+  let r;try{r=await fetch('/api/'+path,init);}catch(_){throw Error('Could not reach the service. Check your connection and try again.');}
   let data;try{data=await r.json();}catch(_){throw Error('Service unavailable. Free hosting may be waking up.');}
-  if(!r.ok)throw Error(data.detail || data.error || ('HTTP '+r.status));
+  if(!r.ok)throw Error(window.QFErrors24.apiError(r.status,path));
   return data;
 }
 function showStep(step){
@@ -2441,11 +2441,22 @@ $('private-capital-submit').addEventListener('click',changeCapital);
 window.QFPrivateBridgeV23=Object.freeze({
  ready:()=>Boolean(privateState&&!$('private-signed').hidden),
  snapshot:()=>privateState&&!$('private-signed').hidden?{
-  cash:Number(privateState.cash),
+  cash:Number(privateState.cash),initial_cash:Number(privateState.initial_cash),
+  valuations:(privateState.valuations||[]).map(p=>({at:String(p.at||''),value:Number(p.value),cash:Number(p.cash),net_contributions:Number(p.net_contributions),pnl:Number(p.pnl),source:String(p.source||'')})),
   holdings:{...(privateState.holdings||{})},
   notes:(privateState.notes||[]).map(x=>({text:String(x.text||''),at:String(x.at||''),symbol:String(x.symbol||'')})),
   trades:(privateState.trades||[]).slice(0,12).map(x=>({symbol:String(x.symbol||''),side:String(x.side||''),units:Number(x.units),at:String(x.at||'')}))
  }:null,
+ async recordSnapshot(){if(!privateState||$('private-signed').hidden)throw Error('MFA sign-in required.');const result=await api('private/valuation-snapshot',{expected_version:version});privateState=result.portfolio;version=result.version;render();return this.snapshot();},
+ async capital(action,amount){if(!privateState||$('private-signed').hidden||!['deposit','withdraw'].includes(action))throw Error('MFA sign-in and a supported funding action are required.');const result=await api('private/capital',{action,amount:String(amount),expected_version:version});privateState=result.portfolio;version=result.version;render();return this.snapshot();},
+ async updateNote(index,text,symbol){
+  if(!privateState||$('private-signed').hidden)throw Error('MFA sign-in required.');
+  const notes=(privateState.notes||[]).map(n=>({...n})),value=String(text||'').trim();
+  if(!Number.isInteger(index)||!notes[index]||notes[index].symbol!==symbol||!value||value.length>2000)throw Error('Note changed or input invalid. Refresh before editing.');
+  notes[index]={...notes[index],text:value,at:new Date().toISOString()};
+  const result=await api('private/notes',{expected_version:version,watchlist:privateState.watchlist||[],notes});privateState=result.portfolio;version=result.version;render();return this.snapshot();
+ },
+ async assets(query){if(!privateState||$('private-signed').hidden)throw Error('MFA sign-in required.');return api('private/assets?'+new URLSearchParams({category:'all',query:String(query).slice(0,60)}));},
  async refresh(){if(!privateState)throw Error('MFA sign-in required.');await loadState();return this.snapshot();},
  async saveNote(text,symbol){
   if(!privateState)throw Error('MFA sign-in required.');

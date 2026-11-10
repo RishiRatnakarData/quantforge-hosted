@@ -1,126 +1,121 @@
-/* Unified owner experience. No independent tokens, storage or non-MFA API path. */
+/* Contextual owner tools reuse the original MFA and versioned-state bridge. */
 (function(){
 'use strict';
-const $=id=>document.getElementById(id);
-const bridge=()=>window.QFPrivateBridgeV23;
-const drawer=$('qf-v23-owner-panel');
-if(!drawer||!$('qf-v23-home-button'))return;
-let active='notes',busy=false,landing=false;
+const $=id=>document.getElementById(id),bridge=()=>window.QFPrivateBridgeV23;
+const drawer=$('qf-v23-owner-panel');if(!drawer)return;
+ $('main-content').prepend($('qf24-mode-bar'));
 const escapeHTML=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const fmtUSD=n=>Number.isFinite(n)?n.toLocaleString('en-US',{style:'currency',currency:'USD'}):'Unavailable';
-function ready(){return Boolean(bridge()?.ready());}
-function setStatus(text){$('qf-v23-owner-status').textContent=String(text||'');}
+const usd=n=>Number.isFinite(n)?n.toLocaleString('en-US',{style:'currency',currency:'USD'}):'Unavailable';
+const context=()=>window.QFResearch20?.context?.();
+const signed=()=>Boolean(bridge()?.ready()),privateMode=()=>signed()&&context()?.mode==='private';
+let busy=false,landing=false,request=0,assetRequest=0,timer,editing=null,lastSymbol=null;
+const notePanel=drawer.querySelector('[data-qf-v23-panel="notes"]'),tradePanel=drawer.querySelector('[data-qf-v23-panel="portfolio"]');
+function host(id,title){const section=document.createElement('section');section.id=id;section.className='qf24-context';section.hidden=true;const h=document.createElement('h2');h.textContent=title;section.append(h);return section;}
+const notes=host('qf24-notes','Saved research for this company');notes.append(notePanel);notePanel.hidden=false;
+const saveBrief=document.createElement('button');saveBrief.id='qf24-save-brief';saveBrief.className='btn';saveBrief.textContent='Save current research brief';notePanel.insertBefore(saveBrief,$('qf-v23-note-list'));
+const noteStatus=document.createElement('p');noteStatus.id='qf24-note-status';noteStatus.setAttribute('role','status');notes.append(noteStatus);
+$('qf-v23-explore-content').append(notes);
+const account=host('qf24-transactions','Saved virtual account and transactions');account.append(tradePanel);tradePanel.hidden=false;
+const tradeStatus=document.createElement('p');tradeStatus.id='qf24-trade-status';tradeStatus.setAttribute('role','status');account.append(tradeStatus);
+$('qf-v20-portfolio-overview').prepend(account);
+const historyPanel=document.createElement('section');historyPanel.id='qf25-account-history';historyPanel.className='qf24-context';historyPanel.hidden=true;
+historyPanel.innerHTML='<h2>Recorded virtual-account value</h2><p>Each point is an owner-requested, server-verified mark. Contributions are shown separately; no past account values are inferred from today’s holdings.</p><button id="qf25-record-mark" class="btn primary">Record current valuation</button><div id="qf25-account-chart"></div><div class="qf24-assumptions"><label>Virtual funding action<select id="qf25-capital-action"><option value="deposit">Deposit virtual funds</option><option value="withdraw">Withdraw virtual funds</option></select></label><label>Amount ($)<input id="qf25-capital-amount" type="number" min="1" max="1000000" value="1000"></label><button class="btn" id="qf25-capital-submit">Record funding change</button></div><p id="qf25-account-status" role="status"></p>';
+$('qf-v20-portfolio-overview').prepend(historyPanel);
+function paintHistory(data){
+ const host=$('qf25-account-chart');host.replaceChildren();
+ try{const r=window.QFAccountHistory25.summarize(data.valuations||[]);if(!r.count){host.textContent='No recorded marks yet. Record a valuation to start genuine account history.';return;}
+ host.innerHTML=window.QFDeepUI25?.curve('Recorded value and net contributed capital (USD)',r.points.map(p=>p.at.slice(0,16)),[{name:'Account value',values:r.points.map(p=>p.value)},{name:'Net contributions',values:r.points.map(p=>p.net_contributions)}])||'';
+ const info=document.createElement('p');info.textContent=r.count+' recorded marks · value change '+usd(r.value_change)+' · net funding change '+usd(r.capital_change)+' · change attributable to paper P&L '+usd(r.pnl_change)+'. Percentage or time-weighted returns are withheld: marks do not value every external flow at its exact event time.';host.append(info);
+ }catch(_){host.textContent='Recorded history is inconsistent; performance withheld. Refresh the account.';}
+}
+$('qf25-record-mark').addEventListener('click',()=>void work(()=>bridge().recordSnapshot(),'Server-verified valuation recorded.'));
+$('qf25-capital-submit').addEventListener('click',()=>void work(()=>bridge().capital($('qf25-capital-action').value,$('qf25-capital-amount').value),'Virtual funding changed. Record a fresh valuation to update the chart.'));
+
+drawer.querySelector('.qf-v23-owner-tabs').remove();
+$('qf-v23-owner-title').textContent='Account';
+const accountHelp=document.createElement('p');accountHelp.className='pane';accountHelp.textContent='Your company notes are in Explore. Saved virtual holdings and transactions are in Portfolio.';drawer.insertBefore(accountHelp,$('qf-v23-owner-status'));
+const assetLabel=document.createElement('label');assetLabel.htmlFor='qf24-trade-search';assetLabel.textContent='Search eligible provider assets by name';
+const search=document.createElement('input');search.id='qf24-trade-search';search.type='search';search.placeholder='Company or ticker';search.maxLength=60;
+const assetStatus=document.createElement('p');assetStatus.id='qf24-asset-status';assetStatus.setAttribute('role','status');
+$('qf-v23-account-overview').after($('qf-b21-owner-account'));
+tradePanel.insertBefore(assetLabel,tradePanel.querySelector('.qf-v23-trade-fields'));assetLabel.append(search,assetStatus);
+const ledger=document.createElement('div');ledger.id='qf24-transaction-ledger';ledger.className='table-wrap';tradePanel.append(ledger);
+function status(text){$('qf-v23-owner-status').textContent=text;noteStatus.textContent=text;tradeStatus.textContent=text;$('qf25-account-status').textContent=text;}
 function close(){if(drawer.open)drawer.close();}
-function setLanding(value){
- if(value)window.QFNavigate20('explore');
- landing=Boolean(value);
- $('qf-v23-landing').hidden=!landing;
- $('qf-v23-explore-content').hidden=landing;
-}
-function setTab(name){
- if(!['notes','portfolio'].includes(name))return;
- active=name;
- drawer.querySelectorAll('[data-qf-v23-panel]').forEach(e=>e.hidden=e.dataset.qfV23Panel!==name);
- drawer.querySelectorAll('[data-qf-v23-tab]').forEach(e=>{const selected=e.dataset.qfV23Tab===name;e.classList.toggle('active',selected);e.setAttribute('aria-pressed',String(selected));});
-}
-function paintAccount(data){
- const host=$('qf-v23-account-overview');
- if(!data){host.textContent='Your private portfolio is unavailable. Sign in again.';return;}
- const holdings=Object.entries(data.holdings).filter(([,units])=>Number(units)>0);
- host.innerHTML='<div class="qf-v23-owner-kpis"><div><small>Virtual cash</small><strong>'+escapeHTML(fmtUSD(data.cash))+'</strong></div><div><small>Positions</small><strong>'+holdings.length+'</strong></div></div>'+
-  '<div class="qf-v23-owner-account-table table-wrap"><table><thead><tr><th>Investment</th><th>Units</th></tr></thead><tbody>'+
-  (holdings.map(([sym,n])=>'<tr><td>'+escapeHTML(sym)+'</td><td>'+escapeHTML(Number(n).toLocaleString('en-US',{maximumFractionDigits:6}))+'</td></tr>').join('')||'<tr><td colspan="2">No virtual holdings yet.</td></tr>')+
-  '</tbody></table></div><p class="tiny">No account valuation shown without verified current quotes. Transactions use server-validated provider observations.</p>';
-}
-function paintNotes(data){
- const host=$('qf-v23-note-list');
- host.replaceChildren();
- if(!data){host.textContent='Private notes unavailable.';return;}
- const notes=data.notes.filter(n=>n.text&&!window.QFPrivateResearchIntelligenceV96?.readArchive?.(n));
- if(!notes.length){host.textContent='No personal research notes saved.';return;}
- for(const note of notes){
-  const actualIndex=data.notes.indexOf(note);
-  const row=document.createElement('div');row.className='qf-v23-note-entry';
-  const body=document.createElement('div'),content=document.createElement('p'),metadata=document.createElement('small');
-  content.textContent=note.text;metadata.textContent=(note.symbol||'Research')+' · '+(note.at||'Saved');
-  body.append(content,metadata);
-  const del=document.createElement('button');del.type='button';del.className='btn sm';del.textContent='Delete';del.dataset.qfV23Delete=String(actualIndex);
-  row.append(body,del);host.append(row);
- }
-}
-function paint(data){paintNotes(data);paintAccount(data);}
-function selectedCompany(){return window.QFResearch20?.context?.()||null;}
-function syncAccount(){
- const signed=ready(),button=$('qf-v20-mode');
- button.textContent=signed?'My workspace':'Sign in';
- button.setAttribute('aria-label',signed?'Open owner notes and virtual portfolio':'Sign in to private research');
- document.querySelectorAll('.qf-v23-owner-action').forEach(e=>e.hidden=!signed);
- if(!signed){close();$('qf-v23-note-list').replaceChildren();$('qf-v23-account-overview').textContent='Private account requires MFA.';}
-}
-function populateAssets(){
- const assets=window.QFPublishedSEC?.companies||[];
- const choices=[...assets.map(c=>({s:c.symbol,label:c.name})),...['VOO','QQQ','SPY','BND'].map(s=>({s,label:s+' ETF'}))];
- const seen=new Set();
+function home(value){if(value)window.QFNavigate20('explore');landing=Boolean(value);$('qf-v23-landing').hidden=!landing;$('qf-v23-explore-content').hidden=landing;}
+function populateAssets(items=[]){
  const select=$('qf-v23-trade-symbol');select.replaceChildren();
- for(const a of choices){if(seen.has(a.s))continue;seen.add(a.s);const option=document.createElement('option');option.value=a.s;option.textContent=a.label+' ('+a.s+')';select.append(option);}
+ for(const item of items){if(item.asset_class!=='us_equity'||!/^[A-Z][A-Z0-9.]{0,9}$/.test(item.symbol))continue;const option=document.createElement('option');option.value=item.symbol;option.textContent=item.name+' ('+item.symbol+')';select.append(option);}
+ $('qf-v23-trade-submit').disabled=select.options.length===0;
+}
+async function assets(query){
+ const token=++assetRequest;
+ assetStatus.textContent='Checking provider listings…';populateAssets();
+ try{const result=await bridge().assets(query);
+  if(token!==assetRequest||!privateMode())return;
+  if(result.licensed_private!==true||!Array.isArray(result.items))throw Error('Invalid directory response.');
+  populateAssets(result.items);assetStatus.textContent=result.total+' matching listings. Price entitlement and SEC coverage are checked separately.';
+ }catch(_){if(token===assetRequest&&privateMode())assetStatus.textContent='Provider asset search unavailable. No substitute asset list is used.';}
+}
+search.addEventListener('input',()=>{clearTimeout(timer);assetRequest++;populateAssets();timer=setTimeout(()=>{if(privateMode())void assets(search.value.trim());},250);});
+function paint(data){
+ const list=$('qf-v23-note-list');list.replaceChildren();
+ if(!data)return;paintHistory(data);
+ const company=context();if(lastSymbol!==company.symbol){editing=null;$('qf-v23-note').value='';lastSymbol=company.symbol;}$('qf-v23-note-company').textContent=company.name+' ('+company.symbol+')';
+ const visible=data.notes.map((n,i)=>({n,i})).filter(({n})=>n.symbol===company.symbol);
+ if(!visible.length)list.textContent='No notes saved for this company yet.';
+ for(const {n,i} of visible){const row=document.createElement('div');row.className='qf-v23-note-entry';const body=document.createElement('div'),p=document.createElement('p'),meta=document.createElement('small'),del=document.createElement('button');const archived=window.QFPrivateResearchIntelligenceV96?.readArchive?.(n);p.textContent=archived?'Saved historical assessment · '+archived.date+' · '+archived.universe.join(', ')+' · '+archived.covered+' completed methods. Recorded research screen: '+archived.action+'. This archive is a historical record, not a current recommendation.':n.text;meta.textContent=n.at;body.append(p,meta);del.className='btn sm';del.textContent='Delete';del.dataset.qfV23Delete=String(i);if(!archived){const edit=document.createElement('button');edit.type='button';edit.className='btn sm';edit.textContent='Edit';edit.dataset.qfV23Edit=String(i);row.append(edit);}row.prepend(body);row.append(del);list.append(row);}
+ const holdings=Object.entries(data.holdings).filter(([,units])=>units>0);
+ $('qf-v23-account-overview').innerHTML='<div class="qf-v23-owner-kpis"><div><small>Virtual cash</small><strong>'+escapeHTML(usd(data.cash))+'</strong></div><div><small>Saved positions</small><strong>'+holdings.length+'</strong></div></div><p>Marked value and contributions appear below only when the quote coverage is complete. No account performance path is invented from current holdings.</p>';
+ ledger.innerHTML='<h3>Recent virtual transactions</h3><table><thead><tr><th>Investment</th><th>Action</th><th>Units</th><th>Recorded</th></tr></thead><tbody>'+data.trades.map(t=>'<tr><td>'+escapeHTML(t.symbol)+'</td><td>'+escapeHTML(t.side)+'</td><td>'+escapeHTML(t.units)+'</td><td>'+escapeHTML(t.at)+'</td></tr>').join('')+'</tbody></table>';
+ if(!data.trades.length)ledger.append('No recorded virtual transactions.');
+}
+function sync(){
+ const active=privateMode();notes.hidden=!active;account.hidden=!active;historyPanel.hidden=!active;
+ const bar=$('qf24-mode-bar');bar.dataset.mode=active?'private':'public';
+ $('qf24-mode-label').textContent=active?'PRIVATE · MFA VERIFIED · PROVIDER DATA SUBJECT TO ENTITLEMENT':'PUBLIC · HISTORICAL SEC + SYNTHETIC PRICES';
+ const toggle=$('qf24-switch-mode');toggle.hidden=!signed();toggle.textContent=active?'View public demo':'Return to private research';
+ $('qf-v20-mode').textContent=signed()?'My workspace':'Sign in';
+ document.querySelectorAll('.qf-v23-owner-action').forEach(e=>e.hidden=!active);
+ document.querySelectorAll('[data-qf24-sample-account]').forEach(e=>e.hidden=active);
+ if(!active){request++;assetRequest++;clearTimeout(timer);populateAssets();$('qf-v23-note-list').replaceChildren();$('qf-v23-account-overview').replaceChildren();ledger.replaceChildren();$('qf-v23-note').value='';$('qf25-account-chart').replaceChildren();editing=null;lastSymbol=null;status('');close();}
+ else paint(bridge().snapshot());
+}
+async function refresh(){const token=++request;try{const data=await bridge().refresh();if(token===request&&privateMode())paint(data);}catch(_){if(token===request&&privateMode())status('Unable to refresh private data. Try again.');}}
+async function work(job,ok){
+ if(busy||!privateMode())return;busy=true;const token=request;status('Saving securely…');
+ const buttons=[...notes.querySelectorAll('button'),...account.querySelectorAll('button'),...historyPanel.querySelectorAll('button')];buttons.forEach(b=>b.disabled=true);
+ try{const data=await job();if(token===request&&privateMode()){paint(data);status(ok);window.dispatchEvent(new Event('qf:owner-state'));}}
+ catch(e){if(token===request&&privateMode())status(String(e.message||'Save unavailable.').slice(0,220));}
+ finally{busy=false;buttons.forEach(b=>b.disabled=false);$('qf-v23-trade-submit').disabled=!$('qf-v23-trade-symbol').options.length;}
 }
 async function open(name){
- if(!ready()){window.QFNavigate20('private');return;}
- setTab(name||'notes');syncAccount();setStatus('');
- const selected=selectedCompany();$('qf-v23-note-company').textContent=selected?selected.name+' ('+selected.symbol+')':'';
- if(selected&&[...$('qf-v23-trade-symbol').options].some(o=>o.value===selected.symbol))$('qf-v23-trade-symbol').value=selected.symbol;
- if(!drawer.open)drawer.showModal();
- try{const snapshot=await bridge().refresh();if(!ready())throw Error('Session ended.');paint(snapshot);}catch(e){if(ready())setStatus('Unable to refresh private data: '+String(e.message||e));}
+ if(!signed()){window.QFNavigate20('private');return;}
+ if(!privateMode())window.QFResearch20.switchMode('private');
+ if(name==='portfolio'){window.QFNavigate20('portfolio');document.querySelector('[data-qf-portfolio="overview"]').click();account.scrollIntoView({block:'start'});void assets(context().symbol);}
+ else{home(false);window.QFNavigate20('explore');notes.scrollIntoView({block:'start'});$('qf-v23-note').focus();}
+ await refresh();
 }
-async function work(job,ok){
- if(busy)return;busy=true;setStatus('Saving securely…');
- for(const btn of drawer.querySelectorAll('button'))if(btn.id!=='qf-v23-close')btn.disabled=true;
- try{const data=await job();if(!ready()&&data!==null)throw Error('Session ended.');paint(data);setStatus(ok);}
- catch(e){setStatus(String(e.message||e).slice(0,220));}
- finally{busy=false;for(const btn of drawer.querySelectorAll('button'))btn.disabled=false;}
-}
-$('qf-v23-home-button').addEventListener('click',()=>setLanding(true));
-$('qf-v23-open-research').addEventListener('click',()=>{setLanding(false);$('qf-v20-search').focus();});
-$('qf-v20-mode').addEventListener('click',event=>{if(ready()){event.preventDefault();event.stopImmediatePropagation();void open('notes');}},true);
-document.addEventListener('click',event=>{
- const launch=event.target.closest('[data-qf-v23-open]');if(launch){event.preventDefault();void open(launch.dataset.qfV23Open);return;}
- const panel=event.target.closest('[data-qf-v23-tab]');if(panel){setTab(panel.dataset.qfV23Tab);return;}
- const remove=event.target.closest('[data-qf-v23-delete]');if(remove&&ready()){
-  const i=Number(remove.dataset.qfV23Delete);if(!window.confirm('Delete this private note?'))return;
-  void work(()=>bridge().deleteNote(i),'Research note deleted.');
- }
+$('qf24-switch-mode').addEventListener('click',()=>{close();window.QFResearch20.switchMode(privateMode()?'public':'private');sync();});
+$('qf-v23-home-button').addEventListener('click',()=>home(true));
+$('qf-v23-open-research').addEventListener('click',()=>{home(false);$('qf-v20-search').focus();});
+function find(){const query=$('qf24-home-search').value;home(false);const input=$('qf-v20-search');input.value=query;setTimeout(()=>input.dispatchEvent(new Event('input')),0);input.focus();}
+$('qf24-home-find').addEventListener('click',find);$('qf24-home-search').addEventListener('keydown',e=>{if(e.key==='Enter')find();});
+$('qf-v20-mode').addEventListener('click',e=>{if(signed()){e.preventDefault();e.stopImmediatePropagation();drawer.showModal();}},true);
+document.addEventListener('click',e=>{
+ const action=e.target.closest('[data-qf-v23-open]');if(action){e.preventDefault();void open(action.dataset.qfV23Open);}
+ const edit=e.target.closest('[data-qf-v23-edit]');if(edit&&privateMode()){editing=Number(edit.dataset.qfV23Edit);const note=bridge().snapshot()?.notes[editing];if(note&&note.symbol===context().symbol){$('qf-v23-note').value=note.text;$('qf-v23-note').focus();status('Editing saved note. Save to update it.');}else editing=null;}
+ const del=e.target.closest('[data-qf-v23-delete]');if(del&&privateMode()&&window.confirm('Delete this private note?'))void work(()=>bridge().deleteNote(Number(del.dataset.qfV23Delete)),'Research note deleted.');
 });
 $('qf-v23-close').addEventListener('click',close);
-$('qf-v23-save').addEventListener('click',()=>{const text=$('qf-v23-note').value.trim(),sym=selectedCompany()?.symbol;
- if(!text||!sym){setStatus('Select a company and enter a note.');return;}
- void work(async()=>{const data=await bridge().saveNote(text,sym);$('qf-v23-note').value='';return data;},'Research note saved.');
-});
-$('qf-v23-trade-submit').addEventListener('click',()=>{
- const symbol=$('qf-v23-trade-symbol').value,side=$('qf-v23-trade-side').value,amount=$('qf-v23-trade-amount').value;
- if(!window.confirm('Record this virtual '+side+' for '+symbol+'? No real brokerage order will be placed.'))return;
- void work(()=>bridge().trade(symbol,side,amount),'Virtual transaction recorded. No live order sent.');
-});
-$('qf-v23-refresh').addEventListener('click',()=>void work(()=>bridge().refresh(),'Owner data refreshed.'));
-$('qf-v23-signout').addEventListener('click',()=>{
- if(!ready())return;
- void work(async()=>{await bridge().signOut();syncAccount();window.QFNavigate20('explore');return null;},'Signed out.');
-});
-window.addEventListener('qf:route-change',event=>{
- if(event.detail?.route==='private'&&ready()){
-  const oldRoute=location.hash.match(/^#private\/([a-z]+)$/)?.[1];
-  const destination=['home','trade'].includes(oldRoute)?'portfolio':
-    ['lab','optimization','backtest','walkforward','valuation'].includes(oldRoute)?'models':
-    oldRoute==='ideas'?'compare':'explore';
-  window.QFNavigate20(destination);return;
- }
- if(event.detail?.route==='explore')setLanding(false);
- if(event.detail?.route!=='explore')landing=false;
-});
-window.addEventListener('qf:owner-auth-ready',()=>{syncAccount();window.QFNavigate20('explore');});
-window.addEventListener('qf:owner-auth-ended',()=>{syncAccount();window.QFNavigate20('explore');});
-const signed=$('private-signed');if(signed)new MutationObserver(syncAccount).observe(signed,{attributes:true,attributeFilter:['hidden']});
-// A signed-in session opening a previously bookmarked legacy view uses the shared app instead.
-if(ready()&&location.hash.startsWith('#private/'))window.QFNavigate20('explore');
-populateAssets();syncAccount();
-window.QFUnifiedPrivate23=Object.freeze({open,home:()=>setLanding(true),state:()=>({signedIn:ready(),landing})});
+$('qf-v23-save').addEventListener('click',()=>{const text=$('qf-v23-note').value.trim(),symbol=context().symbol;if(!text){status('Enter a research note first.');return;}void work(async()=>{const data=editing===null?await bridge().saveNote(text,symbol):await bridge().updateNote(editing,text,symbol);editing=null;$('qf-v23-note').value='';return data;},'Research note saved.');});
+saveBrief.addEventListener('click',()=>{const ctx=context(),text=$('qf-v20-findings').innerText.trim();if(!text){status('Analyze this company before saving its brief.');return;}const note=ctx.name+' ('+ctx.symbol+') · SEC snapshot '+ctx.snapshot+' · '+$('qf-v20-chart-source').textContent+'\n'+text;void work(()=>bridge().saveNote(note.slice(0,2000),ctx.symbol),'Research brief saved as a dated note.');});
+$('qf-v23-trade-submit').addEventListener('click',()=>{const symbol=$('qf-v23-trade-symbol').value;if(!symbol)return;if(!window.confirm('Record this virtual transaction for '+symbol+'? No real order will be placed.'))return;void work(()=>bridge().trade(symbol,$('qf-v23-trade-side').value,$('qf-v23-trade-amount').value),'Virtual transaction recorded. No live order sent.');});
+$('qf-v23-refresh').addEventListener('click',()=>void refresh());
+$('qf-v23-signout').addEventListener('click',async()=>{try{await bridge().signOut();sync();close();window.QFNavigate20('explore');}catch(_){status('Sign-out could not be completed. Try again.');}});
+window.addEventListener('qf:route-change',e=>{if(e.detail?.route==='private'&&signed()){window.QFNavigate20('explore');return;}if(e.detail?.route==='explore')home(false);sync();if(e.detail?.route==='portfolio'&&privateMode())void assets(context().symbol);});
+window.addEventListener('qf:research-context',sync);window.addEventListener('qf:data-mode',sync);
+window.addEventListener('qf:owner-auth-ready',()=>{sync();window.QFNavigate20('explore');});window.addEventListener('qf:owner-auth-ended',()=>{sync();window.QFNavigate20('explore');});
+const legacy=$('private-signed');if(legacy)new MutationObserver(sync).observe(legacy,{attributes:true,attributeFilter:['hidden']});
+sync();window.QFUnifiedPrivate23=Object.freeze({open,home:()=>home(true),state:()=>({signedIn:signed(),landing})});
 })();
