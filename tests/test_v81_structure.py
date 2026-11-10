@@ -15,7 +15,7 @@ def test_public_routes_and_sources_unchanged():
     for route in ('overview', 'sec', 'lab', 'portfolio', 'quant', 'valuation', 'ml', 'systems', 'methods'):
         assert f'id="page-{route}"' in s and f'data-page="{route}"' in s
     assert s.count('class="qf-nav-section"') == 3
-    assert s.count('class="qf-secondary-details"') == 1
+    assert s.count('class="qf-secondary-details"') == 0
     assert s.index('id="qf-company-count-v81"') < s.index('id="home-sec-highlights"')
     assert s.index('id="page-sec"') < s.index('id="qf-sec-metric-v81"') < s.index('id="page-portfolio"')
     assert 'historical sec' in s.lower()

@@ -7,6 +7,20 @@ window.QFPublishedSEC=SEC_DATA;
 const fmt=n=>Number(n).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2});
 const pct=n=>(100*n).toFixed(1)+'%';
 let state={cash:3500,holdings:{MSFT:5,VOO:8,AAPL:3,'BTC/USD':0.006}};
+let activePortfolioView='overview';
+function showPortfolioView(name){
+ if(!['overview','whatif','analysis'].includes(name))return;
+ activePortfolioView=name;
+ document.querySelectorAll('[data-qf-portfolio]').forEach(button=>{
+  const active=button.dataset.qfPortfolio===name;
+  button.classList.toggle('active',active);
+  button.setAttribute('aria-pressed',String(active));
+ });
+ for(const view of ['overview','whatif','analysis']){
+  const panel=document.getElementById('qf-v20-portfolio-'+view);
+  if(panel)panel.hidden=view!==name;
+ }
+}
 const table=(heads,rows)=>'<div class="table-wrap"><table><thead><tr>'+heads.map(h=>'<th>'+h+'</th>').join('')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+row.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
 const error=(id,msg)=>{$(id).textContent=msg||'';};
 const num=id=>Number($(id).value);
@@ -29,6 +43,11 @@ function nav(name,updateHash=true){
 window.QFNavigate20=nav;
 function portfolio(){
  const holds=M.exposure(state.holdings),total=holds.total+state.cash;
+ const exposureWeights=holds.total>0?holds.holdings.map(row=>row.value/holds.total):[];
+ const hhi=exposureWeights.length?exposureWeights.reduce((sum,weight)=>sum+weight*weight,0):null;
+ const hhiEl=$('qf-v20-portfolio-hhi'),cashEl=$('qf-v20-portfolio-cash-share');
+ if(hhiEl)hhiEl.textContent=hhi===null?'Not applicable':hhi.toFixed(3);
+ if(cashEl)cashEl.textContent=total>0?pct(state.cash/total):'Not applicable';
  $('home-value').textContent=$('portfolio-total').textContent=fmt(total);
  $('home-cash').textContent=$('portfolio-cash').textContent=fmt(state.cash);
  $('home-invested').textContent=$('portfolio-invested').textContent=fmt(holds.total);
@@ -73,7 +92,7 @@ function runQuant(){
   const o=M.optimize(s,cap,crypto),a=M.monteCarlo(o.base,o.cov,budget,4221),b=M.monteCarlo(o.weights,o.cov,budget,4221);
   const rows=[['Annualized model volatility',pct(o.baselineVol),pct(o.optimalVol)],['Modeled 21-day VaR 95%',fmt(a.var95),fmt(b.var95)],['Modeled expected shortfall',fmt(a.es95),fmt(b.es95)],['5th-percentile value',fmt(a.low),fmt(b.low)],['Median value',fmt(a.median),fmt(b.median)],['95th-percentile value',fmt(a.high),fmt(b.high)],...s.map((sym,i)=>[M.bySymbol[sym].name,pct(o.base[i]),pct(o.weights[i])])];
   const cor=o.cov.map((row,i)=>[s[i],...row.map((x,j)=>((x / Math.sqrt(o.cov[i][i]*o.cov[j][j]))||0).toFixed(2))]);
-  $('quant-result').innerHTML='<div class="pane"><div class="section-title"><h3>Allocation comparison</h3><span class="mini">Simulated data</span></div>'+table(['Metric','Baseline','Constrained'],rows)+'<details class="subtle"><summary>Correlation matrix</summary>'+table(['',...s],cor)+'</details><p class="tiny" style="margin-top:14px">Optimization minimizes estimated variance with weight limits and a small turnover penalty. 276 synthetic daily return observations, 21-session simulations, zero forecast drift. These are not calibrated market risk forecasts.</p></div>';
+  $('quant-result').innerHTML='<div class="pane"><div class="section-title"><h3>Allocation comparison</h3><span class="mini">Simulated data</span></div>'+table(['Metric','Baseline','Constrained'],rows)+'<section class="subtle"><h3>Correlation matrix</h3>'+table(['',...s],cor)+'</details><p class="tiny" style="margin-top:14px">Optimization minimizes estimated variance with weight limits and a small turnover penalty. 276 synthetic daily return observations, 21-session simulations, zero forecast drift. These are not calibrated market risk forecasts.</p></div>';
  }catch(e){error('quant-error',e.message);$('quant-result').innerHTML='';}
 }
 function runDCF(){
@@ -82,7 +101,7 @@ function runDCF(){
  try{
   const r=M.dcf(s,opts);
   let sens=[];for(const dw of [-0.01,0,0.01])for(const dg of [-0.005,0,0.005]){const w=opts.wacc+dw,g=opts.terminal+dg;let v='—';if(w>g){v=fmt(M.dcf(s,{...opts,wacc:w,terminal:g}).value);}sens.push([(w*100).toFixed(1)+'%',(g*100).toFixed(2)+'%',v]);}
-  $('dcf-result').innerHTML='<div class="pane">'+(r.enterprise<0||r.value<0?'<div class="notice qf-dcf-warning" role="status"><strong>Adverse valuation scenario.</strong> Under these assumptions, discounted future cash flows imply a negative enterprise or per-share model value. This is not a possible quoted stock-price target or a prediction of a negative share price. Review cash generation, discount rate and terminal growth, then compare the sensitivity table; no result is silently clamped.</div>':'<p class="tiny" style="margin-bottom:14px">All amounts below are hypothetical outputs under selected assumptions, not market-price estimates.</p>')+'<div class="three"><div class="metric"><span class="muted">Illustrative value per share</span><strong>'+fmt(r.value)+'</strong></div><div class="metric"><span class="muted">Terminal share of EV</span><strong>'+pct(r.terminalFraction)+'</strong></div><div class="metric"><span class="muted">Enterprise value</span><strong>'+fmt(r.enterprise)+'B</strong></div></div><h3 class="section-title">WACC / terminal-growth sensitivity</h3>'+table(['WACC','Terminal growth','Per share'],sens)+'<details class="subtle"><summary>Five-year forecast</summary>'+table(['Year','Revenue ($B)','FCF ($B)'],r.forecast.map(x=>[x.year,fmt(x.revenue),fmt(x.fcf)]))+'</details><p class="tiny" style="margin-top:13px">Illustrative revenue, reinvestment ratios, net debt and shares. 5-year unlevered FCF discounted by WACC; perpetuity terminal value. This is not a real-company valuation.</p></div>';
+  $('dcf-result').innerHTML='<div class="pane">'+(r.enterprise<0||r.value<0?'<div class="notice qf-dcf-warning" role="status"><strong>Adverse valuation scenario.</strong> Under these assumptions, discounted future cash flows imply a negative enterprise or per-share model value. This is not a possible quoted stock-price target or a prediction of a negative share price. Review cash generation, discount rate and terminal growth, then compare the sensitivity table; no result is silently clamped.</div>':'<p class="tiny" style="margin-bottom:14px">All amounts below are hypothetical outputs under selected assumptions, not market-price estimates.</p>')+'<div class="three"><div class="metric"><span class="muted">Illustrative value per share</span><strong>'+fmt(r.value)+'</strong></div><div class="metric"><span class="muted">Terminal share of EV</span><strong>'+pct(r.terminalFraction)+'</strong></div><div class="metric"><span class="muted">Enterprise value</span><strong>'+fmt(r.enterprise)+'B</strong></div></div><h3 class="section-title">WACC / terminal-growth sensitivity</h3>'+table(['WACC','Terminal growth','Per share'],sens)+'<section class="subtle"><h3>Five-year forecast</h3>'+table(['Year','Revenue ($B)','FCF ($B)'],r.forecast.map(x=>[x.year,fmt(x.revenue),fmt(x.fcf)]))+'</details><p class="tiny" style="margin-top:13px">Illustrative revenue, reinvestment ratios, net debt and shares. 5-year unlevered FCF discounted by WACC; perpetuity terminal value. This is not a real-company valuation.</p></div>';
  }catch(e){error('dcf-error',e.message);$('dcf-result').innerHTML='';}
 }
 function runPeers(){
@@ -98,7 +117,7 @@ function runPeers(){
   '<p><strong>'+safeText(model.selected.name)+'</strong> ('+safeText(symbol)+') · FY '+safeText(model.selected.fiscalEnd)+'</p>'+
   '<p class="tiny">'+model.compared+' companies with the same usable features out of '+model.universe+' published companies. SEC cutoff '+safeText(model.cutoff)+'. '+safeText(model.caution)+'</p>'+
   '<div class="qf-peer-visual" aria-label="Closest peer distances"><h4>Closest financial profiles</h4><p class="tiny">Longer bars indicate a closer statistical match; numbers are distances, not quality ratings.</p>'+bars+'</div>'+
-  '<details class="subtle"><summary>See peer figures and reporting dates</summary>'+table(['#','Company','Broad group','Fiscal year','Distance','Open'],data)+'</details>'+
+  '<section class="subtle"><h3>Peer figures and reporting dates</h3>'+table(['#','Company','Broad group','Fiscal year','Distance','Open'],data)+'</details>'+
   '<div class="subtle"><h3>Financial ratios used in this comparison</h3>'+table(['Ratio','Reported-derived value','Meaning'],f)+'</div>'+
   '<p class="tiny">'+safeText(model.message)+' <a href="'+safeText(model.selected.companyfacts)+'" rel="noopener noreferrer" target="_blank">SEC Company Facts source</a>.</p></div>';
 }
@@ -245,6 +264,7 @@ function populate(){
  if(window.QFResearchLab)window.QFResearchLab.mount(SEC_DATA);
 }
 document.addEventListener('click',e=>{
+ const view=e.target.closest('[data-qf-portfolio]');if(view){showPortfolioView(view.dataset.qfPortfolio);return;}
  const btn=e.target.closest('[data-page], [data-go], [data-symbol], [data-sec-symbol]');if(!btn)return;
  if(btn.dataset.page)nav(btn.dataset.page);
  else if(btn.dataset.go)nav(btn.dataset.go);

@@ -77,6 +77,11 @@ def audit(repo: Path):
     main.feed(built)
     case = Analyzer()
     case.feed(study)
+    portfolio_html = built.split('<section class="tabpage" id="page-portfolio"', 1)[1].split('<section class="tabpage" id="page-quant"', 1)[0]
+    assert '<details' not in portfolio_html, "Portfolio main view must not contain disclosure accordions"
+    for subview in ('overview', 'whatif', 'analysis'):
+        assert f'data-qf-portfolio="{subview}"' in portfolio_html
+        assert f'id="qf-v20-portfolio-{subview}"' in portfolio_html
     assert main.primary_order == list(CURRENT_ROUTES), "The visible 2.0 nav must have exactly five routes"
     for route in CURRENT_ROUTES:
         assert main.primary_nav.get(route) == 1, f"Primary 2.0 route {route} duplicated"

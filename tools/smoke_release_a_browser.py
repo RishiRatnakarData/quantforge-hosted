@@ -44,6 +44,23 @@ async def assert_public(page, width: int) -> None:
     await svg.press("ArrowLeft")
     assert await page.locator("#qf-v20-cursor-value").inner_text() != before
 
+    # Regression for the customer-reported legacy Portfolio accordion.
+    await page.locator('#qf-v20-navigation [data-page="portfolio"]').click()
+    assert await page.locator('.tabpage.active').get_attribute('id') == 'page-portfolio'
+    assert await page.locator('#page-portfolio details').count() == 0
+    assert await page.locator('#page-portfolio .qf-secondary-details').count() == 0
+    assert await page.locator('#portfolio-table table tbody tr').count() >= 2
+    assert await page.locator('#qf-v20-portfolio-overview').is_visible()
+    await page.locator('[data-qf-portfolio="whatif"]').click()
+    assert await page.locator('#qf-v20-portfolio-whatif').is_visible()
+    assert not await page.locator('#qf-v20-portfolio-overview').is_visible()
+    await page.locator('#rebalance-submit').click()
+    assert await page.locator('#rebalance-result table').count() == 1
+    await page.locator('[data-qf-portfolio="analysis"]').click()
+    assert await page.locator('#qf-v20-portfolio-analysis').is_visible()
+    assert await page.locator('#qf-v20-portfolio-hhi').inner_text() != '—'
+    assert await page.evaluate('document.documentElement.scrollWidth <= window.innerWidth')
+    await page.locator('#qf-v20-navigation [data-page="explore"]').click()
     await page.locator('#qf-v20-navigation [data-page="compare"]').click()
     assert await page.locator(".tabpage.active").get_attribute("id") == "page-compare"
     await page.evaluate("history.back()")

@@ -18,7 +18,7 @@ def _check(page):
     assert 'What the project covers' in methods
     assert 'More research in the private workspace' in methods
     assert '<details class="qf-secondary-details"><summary>How the research platform works</summary>' not in methods
-    assert page.count('class="qf-secondary-details"') == 1
+    assert page.count('class="qf-secondary-details"') == 0
     assert '<span>Designed and developed by</span><strong>Rishi&nbsp;Ratnakar</strong>' in page
     assert '.qf-v83-owner strong{display:block;white-space:nowrap;' in page
     for target in ('data-go="sec"', 'data-go="quant"', 'data-go="lab"'):
