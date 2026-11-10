@@ -10,19 +10,23 @@ let state={cash:3500,holdings:{MSFT:5,VOO:8,AAPL:3,'BTC/USD':0.006}};
 const table=(heads,rows)=>'<div class="table-wrap"><table><thead><tr>'+heads.map(h=>'<th>'+h+'</th>').join('')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+row.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
 const error=(id,msg)=>{$(id).textContent=msg||'';};
 const num=id=>Number($(id).value);
-const PUBLIC_PAGES=new Set(['overview','sec','portfolio','quant','valuation','ml','methods','systems','lab']);
+const PUBLIC_PAGES=new Set(['explore','compare','models','portfolio','methods','overview','sec','quant','valuation','ml','systems','lab']);
+const LEGACY_ROUTES={overview:'explore',sec:'explore',lab:'models',quant:'models',valuation:'models',ml:'compare',systems:'methods'};
 function nav(name,updateHash=true){
+ name=LEGACY_ROUTES[name]||name;
  if(name!=='private' && !PUBLIC_PAGES.has(name))return;
  document.querySelectorAll('.tabpage').forEach(e=>e.classList.toggle('active',e.id==='page-'+name));
  document.querySelectorAll('.nav-btn').forEach(e=>{const active=e.dataset.page===name;e.classList.toggle('active',active);if(active)e.setAttribute('aria-current','page');else e.removeAttribute('aria-current');});
  // Public navigation is always visible; private navigation expands its own task groups.
- const labels={overview:'RESEARCH OVERVIEW',sec:'HISTORICAL SEC DATA',portfolio:'SIMULATED PORTFOLIO',quant:'SIMULATED RISK MODEL',valuation:'DCF ASSUMPTIONS',ml:'REPORTED SEC COMPANY COMPARISON',methods:'DATA & ENGINEERING',systems:'RESEARCH METHODS',lab:'INTERACTIVE ANALYSIS',private:'PRIVATE WORKSPACE'};
+ const labels={explore:'EXPLORE',compare:'COMPARE',models:'MODELS',overview:'RESEARCH OVERVIEW',sec:'HISTORICAL SEC DATA',portfolio:'SIMULATED PORTFOLIO',quant:'SIMULATED RISK MODEL',valuation:'DCF ASSUMPTIONS',ml:'REPORTED SEC COMPANY COMPARISON',methods:'DATA & ENGINEERING',systems:'RESEARCH METHODS',lab:'INTERACTIVE ANALYSIS',private:'PRIVATE WORKSPACE'};
  const badge=document.querySelector('.topbar .badge');if(badge)badge.textContent=labels[name];
  const eyebrow=document.querySelector('.topbar .eyebrow');if(eyebrow)eyebrow.textContent=name==='private'?'Your portfolio · Personal use':'Financial research · models and data';
  if(updateHash){const route=name==='private'?'#private/decision':'#'+name;if(location.hash!==route)history.pushState(null,'',route);}
  window.scrollTo({top:0,behavior:'instant'});
+ window.dispatchEvent(new CustomEvent('qf:route-change',{detail:{route:name}}));
 }
 
+window.QFNavigate20=nav;
 function portfolio(){
  const holds=M.exposure(state.holdings),total=holds.total+state.cash;
  $('home-value').textContent=$('portfolio-total').textContent=fmt(total);
@@ -264,11 +268,11 @@ $('qf-sec-project-v81').addEventListener('click',projectV81);
 $('sec-margin-shock').addEventListener('input',renderSEC);
 $('sec-rank-metric').addEventListener('change',renderSECRanking);
 $('sec-export').addEventListener('click',downloadSECCsv);
-function restorePublicRoute(){const target=location.hash.slice(1);if(PUBLIC_PAGES.has(target))nav(target,false);else if(target.startsWith('private/')){nav('private',false);window.dispatchEvent(new Event('qf:private-route'));}}
+function restorePublicRoute(){const target=location.hash.slice(1);if(!target)nav('explore',false);else if(PUBLIC_PAGES.has(target))nav(target,false);else if(target.startsWith('private/')){nav('private',false);window.dispatchEvent(new Event('qf:private-route'));}}
 window.addEventListener('popstate',restorePublicRoute);
 window.addEventListener('hashchange',restorePublicRoute);
 populate();
-const initial=window.location.hash.slice(1);if(PUBLIC_PAGES.has(initial))nav(initial,false);else if(initial.startsWith('private/'))nav('private',false);
+const initial=window.location.hash.slice(1);if(PUBLIC_PAGES.has(initial))nav(initial,false);else if(initial.startsWith('private/'))nav('private',false);else nav('explore',false);
 const qfCountV81=$('qf-company-count-v81');if(qfCountV81)qfCountV81.textContent=SEC_DATA?.companies?.length?SEC_DATA.companies.length+' companies':'Company financials unavailable';
 const methodsAsOf=$('methods-asof');if(methodsAsOf && SEC_DATA && SEC_DATA.as_of)methodsAsOf.textContent='SEC filing cutoff · '+SEC_DATA.as_of;
 

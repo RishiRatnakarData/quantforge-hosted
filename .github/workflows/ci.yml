@@ -86,3 +86,21 @@ jobs:
           assert (root/'stock_bars.csv').stat().st_size > 1000
           print('V4.2 synthetic site artifacts verified')
           PY
+
+  release_a_browser:
+    name: Release A stock-first browser journeys
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install offline browser test dependency
+        run: |
+          python -m pip install playwright==1.57.0
+          python -m playwright install --with-deps chromium
+      - name: Build generated public site with deterministic CSP
+        run: python tools/build_unified_site.py
+      - name: Verify desktop, mobile, keyboard, routing and mocked private outage
+        run: python tools/smoke_release_a_browser.py

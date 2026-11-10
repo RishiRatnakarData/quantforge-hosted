@@ -8,7 +8,7 @@ root=Path(__file__).resolve().parents[1]
 src=root/'web'
 html=(src/'site/site.template.html').read_text(encoding="utf-8")
 nav='<div class="qf-nav-section qf-private-nav-section" role="group" aria-label="Account access"><span class="nav-caption">Your account</span><button class="nav-btn" data-page="private">Private workspace</button><button class="nav-btn qf-private-exit" data-page="overview">Public research</button></div>'
-html=html.replace('</nav>',nav+'</nav>',1)
+html=html.replace('</nav><div class="sidenote">',nav+'</nav><div class="sidenote">',1)
 block='''<section class="tabpage" id="page-private">
   <div class="pagehead"><h1>Private workspace</h1><p id="private-status">Private · Sign in required</p><p class="tiny">Personal holdings, market-history analysis, and company valuation. Sign-in and authenticator verification required.</p></div>
   <div class="pane" id="private-login"><h3>Sign in</h3>
@@ -763,7 +763,10 @@ for slot, file in [('/* QF_MODEL */','model.js'),('/* QF_APP */','app.js'),('/* 
   lab=(src/'site/public_lab_v77.js').read_text(encoding='utf-8')
   visuals=(src/'site/sec_visuals_v81.js').read_text(encoding='utf-8')
   model_evidence=(src/'site/public_model_evidence_v181.js').read_text(encoding='utf-8')
+  research_core=(src/'site/research_core_v20.js').read_text(encoding='utf-8')
+  research_ui=(src/'site/research_app_v20.js').read_text(encoding='utf-8')
   text=analytics+'\n'+model_evidence+'\n'+evidence+'\n'+lab+'\n'+visuals+'\n'+text.replace('/* QF_SEC_DATA */ null', snapshot_js)
+  text=research_core+'\n'+text+'\n'+research_ui
  text=text.replace('</script','<\\/script')
  html=html.replace(slot,text)
 (root/'public/index.html').write_text(html, encoding="utf-8", newline="\n")

@@ -634,6 +634,79 @@ def private_history(request: Request, response: Response, symbols: str, days: in
             "as_of": end.isoformat(), "licensed_private": True}
 
 
+@app.get("/api/private/history-single")
+def private_history_single(request: Request, response: Response, symbol: str, days: int = 365):
+    """MFA-protected single-symbol observations; does not change the 2-5 asset contract.
+
+    Source values are daily split-adjusted closes, not OHLCV/candlestick data.
+    Historical rights remain owner-only; the public site never caches this response.
+    """
+    owner(request, response)
+    selected = symbol.strip().upper()
+    if not SYMBOL_RE.fullmatch(selected) or "," in symbol:
+        raise HTTPException(422, "Select one supported investment symbol.")
+    if days not in (90, 180, 365, 730):
+        raise HTTPException(422, "Choose a supported historical period.")
+    end = dt.datetime.now(dt.UTC).date() - dt.timedelta(days=1)
+    start = end - dt.timedelta(days=days)
+    crypto = selected in crypto_history.SUPPORTED
+    feed = None
+    try:
+        if crypto:
+            observations = crypto_history.history(selected, start.isoformat(), end.isoformat())
+        else:
+            client = AlpacaClient.from_environment()
+            try:
+                observations = client.history(selected, start.isoformat(), end.isoformat())
+                feed = "sip"
+            except MarketDataError as exc:
+                if "HTTP 403" not in str(exc) or "feed or endpoint access denied" not in str(exc):
+                    raise
+                observations = client.history(selected, start.isoformat(), end.isoformat(), feed="iex")
+                feed = "iex"
+    except (MarketDataError, crypto_history.CryptoHistoryError) as exc:
+        raise HTTPException(422, str(exc)) from exc
+    if not isinstance(observations, list) or len(observations) < 15:
+        raise HTTPException(422, "At least 15 observed daily closes are required.")
+    if any(not isinstance(item, dict) for item in observations):
+        raise HTTPException(422, "Provider returned malformed observations.")
+    checked = []
+    prior = ""
+    for item in sorted(observations, key=lambda row: str(row.get("date", ""))):
+        date, close = item.get("date"), item.get("close")
+        if not isinstance(date, str) or date <= prior:
+            raise HTTPException(422, "Provider returned duplicate or unordered dates.")
+        try:
+            dt.date.fromisoformat(date)
+        except ValueError as exc:
+            raise HTTPException(422, "Provider returned an invalid date.") from exc
+        if not isinstance(close, (int, float)) or isinstance(close, bool) or (
+            not 0 < float(close) < float("inf")
+        ):
+            raise HTTPException(422, "Provider returned a nonpositive or invalid close.")
+        checked.append({"date": date, "close": float(close)})
+        prior = date
+    source = (
+        "Alpaca US crypto daily UTC closes" if crypto else
+        "Alpaca SIP split-adjusted daily stock closes" if feed == "sip" else
+        "Alpaca IEX-only split-adjusted daily stock closes"
+    )
+    coverage = (
+        "Crypto calendar days; prices exclude spread and fees." if crypto else
+        "Stock sessions; split-adjusted daily closes exclude dividends and fees."
+    )
+    if feed == "iex":
+        coverage += " IEX is a single venue, not a consolidated US market feed."
+    return {
+        "schema_version": 1, "symbol": selected, "observations": checked,
+        "asset_class": "crypto" if crypto else "us_equity",
+        "source": source, "coverage": coverage, "equity_feed": feed,
+        "as_of": checked[-1]["date"], "requested_end": end.isoformat(),
+        "licensed_private": True, "price_adjustment": "split" if not crypto else "none",
+        "ohlcv_available": False,
+    }
+
+
 class CapitalRequest(BaseModel):
     action: str
     amount: str
