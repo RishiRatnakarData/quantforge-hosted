@@ -18,7 +18,9 @@ def test_shared_routes_brand_landing_and_contextual_owner_controls() -> None:
     for page in ('explore', 'compare', 'models', 'portfolio', 'methods'):
         assert html.count(f'id="page-{page}"') == 1
     assert 'data-qf-v23-open="notes"' in html
-    assert 'data-qf-v23-open="portfolio"' in html
+    assert 'data-qf-v23-open="portfolio"' not in html  # redundant same-page scroll action removed
+    workflow = src('web/site/portfolio_workflow_v27.js')
+    assert 'qf27-buy' in workflow and 'qf27-sell' in workflow and 'qf27-confirm' in workflow
     assert 'id="qf-v23-signout"' in html
     assert 'qf-v83-owner' in html  # historical CSS remains; sidebar byline is removed
     assert '<p class="qf-v83-owner">' not in html

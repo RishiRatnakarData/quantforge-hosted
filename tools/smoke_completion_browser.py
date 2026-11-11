@@ -8,6 +8,7 @@ import math
 import os
 from pathlib import Path
 
+from browser_product_contract import pick_compare
 from playwright.async_api import async_playwright, expect
 from smoke_rebuild_browser import FIXTURE, HTML
 
@@ -102,15 +103,14 @@ async def journey(browser, engine, width):
             await expect(page.locator('#qf-v20-news')).to_contain_text('50 dated headlines')
         prefix = f'v25-{engine}-{mode}-{width}'
         await page.locator('#qf-v20-navigation [data-page="explore"]').click()
-        await page.locator('#qf-v20-analyze').click()
+        await page.locator('#qf27-analyze').click()
         await page.locator('#qf25-company table').first.wait_for()
         assert 'undefined' not in await page.locator('#qf25-company').inner_text()
         await capture(page, prefix + '-connected-research')
         await page.locator('#qf-v20-navigation [data-page="compare"]').click()
         for symbol in ('AAPL', 'NVDA'):
-            await page.locator('#qf-v20-compare-search').fill(symbol)
-            await page.locator('#qf-v20-compare-search').dispatch_event('change')
-        await page.locator('#qf25-peers svg').wait_for()
+            await pick_compare(page, symbol)
+        await page.locator('#qf25-peers svg').first.wait_for()
         assert 'shared ratios' in await page.locator('#qf25-peers').inner_text()
         await capture(page, prefix + '-financial-peers')
         await page.locator('#qf-v20-navigation [data-page="models"]').click()
@@ -164,12 +164,13 @@ async def journey(browser, engine, width):
             await expect(page.locator('#qf25-account-chart')).to_contain_text('1 recorded marks')
             await page.locator('#qf25-capital-amount').fill('500')
             await page.locator('#qf25-capital-submit').click()
-            await expect(page.locator('#qf-v23-account-overview')).to_contain_text('$3,000.00')
+            await expect(page.locator('#qf27-account-summary')).to_contain_text('$3,000.00')
             await page.locator('#qf25-record-mark').click()
             await expect(page.locator('#qf25-account-chart')).to_contain_text('2 recorded marks')
             assert 'paper P&L $0.00' in await page.locator('#qf25-account-chart').inner_text()
             await capture(page, prefix + '-recorded-account-history')
             await page.locator('#qf-v20-navigation [data-page="explore"]').click()
+            await page.locator('[data-qf27-explore="brief"]').click()
             await page.locator('#qf-v23-note').fill('Original offline note')
             await page.locator('#qf-v23-save').click()
             await expect(page.locator('#qf-v23-note-list')).to_contain_text('Original offline note')
@@ -180,9 +181,8 @@ async def journey(browser, engine, width):
             assert await page.evaluate('window.qfMockOwner.notes.length') == 1
             await page.locator('#qf-v20-navigation [data-page="compare"]').click()
             await page.locator('#qf-v20-compare-search').fill('Offline')
-            await expect(page.locator('#qf-v20-compare-options option[value="Offline Test Company (TEST)"]')).to_have_count(1)
-            await page.locator('#qf-v20-compare-search').fill('Offline Test Company (TEST)')
-            await page.locator('#qf-v20-compare-search').dispatch_event('change')
+            await expect(page.locator('#qf27-compare-options [data-qf27-symbol="TEST"]')).to_have_count(1)
+            await pick_compare(page, 'TEST')
             assert 'TEST' in await page.locator('#qf-v20-compare-chips').inner_text()
             await page.locator('#qf24-switch-mode').click()
             assert 'TEST' not in await page.locator('#qf-v20-compare-chips').inner_text()
@@ -201,14 +201,14 @@ async def journey(browser, engine, width):
         await page.locator('[data-qf26-discipline="statistics"]').click()
         await capture(page, prefix + '-technical-evidence')
         await page.locator('[data-qf26-open="statistics"]').click()
-        chart = page.locator('svg[data-qf26-chart]').first
+        chart = page.locator('#qf-c22-model-output svg[data-qf26-chart]').first
         await chart.focus()
         await page.keyboard.press('Home')
-        start = await page.locator('.qf26-readout').first.inner_text()
+        start = await page.locator('#qf-c22-model-output .qf26-readout').first.inner_text()
         await page.keyboard.press('End')
-        assert start != await page.locator('.qf26-readout').first.inner_text()
-        await expect(page.locator('.qf26-readout').first).to_contain_text('%')
-        assert await page.locator('svg[data-qf26-chart]').count() == 2
+        assert start != await page.locator('#qf-c22-model-output .qf26-readout').first.inner_text()
+        await expect(page.locator('#qf-c22-model-output .qf26-readout').first).to_contain_text('%')
+        assert await page.locator('#qf-c22-model-output svg[data-qf26-chart]').count() == 2
         await capture(page, prefix + '-risk-scaled-plots')
         assert not errors, errors[:5]
     await page.close()

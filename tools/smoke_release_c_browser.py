@@ -26,7 +26,7 @@ async def public(page, width: int) -> None:
     assert 'Synthetic' in await page.locator('#qf-c22-model-output').inner_text()
     assert 'Brier score' in await page.locator('#qf-c22-model-output').inner_text()
     await page.locator('[data-qf-c22-phase="evaluation"]').click()
-    assert await page.locator('#qf-c22-model-output tbody tr').count() == 3
+    assert await page.get_by_role('heading',name='Chronological held-out evaluation',exact=True).locator('..').locator('tbody tr').count() == 3
     assert 'calibration' in (await page.locator('#qf-c22-model-output').inner_text()).lower()
     await page.locator('[data-qf-c22-phase="method"]').click()
     assert 'L2-regularized' in await page.locator('#qf-c22-model-output').inner_text()
@@ -58,7 +58,7 @@ async def public(page, width: int) -> None:
     assert await page.locator('#page-methods details:visible').count() == 0
     await page.locator('#qf-v20-navigation [data-page="explore"]').click()
     await page.locator('#qf-v20-search').fill('Apple')
-    await page.locator('[data-qf-pick="AAPL"]').click()
+    await page.locator('#qf-v20-search-results [data-qf27-symbol="AAPL"]').click()
     await page.locator('#qf-v20-navigation [data-page="models"]').click()
     assert 'Apple (AAPL)' in await page.locator('#qf-v20-model-selected').inner_text()
     assert 'Synthetic' in await page.locator('#qf-c22-model-output').inner_text()
@@ -111,7 +111,7 @@ async def private_mock(page) -> None:
     }''')
     await page.locator('#qf-v20-navigation [data-page="explore"]').click()
     await page.locator('#qf-v20-search').fill('Apple')
-    await page.locator('[data-qf-pick="AAPL"]').click()
+    await page.locator('#qf-v20-search-results [data-qf27-symbol="AAPL"]').click()
     await page.wait_for_timeout(190)
     await page.locator('#qf-v20-navigation [data-page="models"]').click()
     assert 'Not enough eligible evidence' in await page.locator('#qf-c22-model-output').inner_text()

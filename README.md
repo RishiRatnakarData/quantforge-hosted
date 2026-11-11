@@ -75,4 +75,11 @@ node --test (Get-ChildItem web/tests -Filter '*.test.cjs' | ForEach-Object FullN
 .\.venv\Scripts\python.exe tools/smoke_completion_browser.py
 ```
 
-The current candidate passes 580 Python and 399 JavaScript tests, plus the original A–D journeys, full-route browser matrix and completed-engine journeys in Chromium, Firefox and WebKit at desktop/mobile widths. Private automated journeys use isolated fixtures, never real credentials or account writes. GitHub Actions and deployment evidence must be matched to the release SHA; automated tests do not certify live provider entitlement or owner persistence. Those remain separate owner checks.
+The current candidate passes 592 Python and 402 JavaScript tests, plus the original A–D journeys, full-route browser matrix and completed-engine journeys in Chromium, Firefox and WebKit at desktop/mobile widths. Private automated journeys use isolated fixtures, never real credentials or account writes. GitHub Actions and deployment evidence must be matched to the release SHA; automated tests do not certify live provider entitlement or owner persistence. Those remain separate owner checks.
+
+
+## Next major improvement — local review candidate
+
+[Source-grounded gap inventory, implementation and acceptance](docs/PRODUCT_IMPROVEMENT_2026_11_10.md)
+
+This review stage adds a single name-first investment picker, server-calculated virtual trade previews and receipt/replay handling, owned-position sells, SEC-first public Explore, inspectable headline context, corrected peer units, a compact account view, twelve worked mathematical studies and an integrated source-backed case report. The prior published release is `da1f755`; this candidate is not pushed or deployed. Its private browser acceptance uses isolated fixtures and requires fresh owner acceptance after any approved release.

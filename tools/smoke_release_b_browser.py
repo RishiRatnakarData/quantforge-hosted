@@ -7,6 +7,7 @@ import asyncio
 import os
 from pathlib import Path
 
+from browser_product_contract import pick_compare
 from playwright.async_api import async_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -20,8 +21,7 @@ async def public(page, width: int) -> None:
     await page.locator('#qf-v20-navigation [data-page="compare"]').click()
     assert await page.locator('.tabpage.active').get_attribute('id') == 'page-compare'
     assert await page.locator('#qf-v20-compare-chips button').count() == 1
-    await page.locator('#qf-v20-compare-search').fill('Apple (AAPL)')
-    await page.locator('#qf-v20-compare-search').dispatch_event('change')
+    await pick_compare(page, 'AAPL')
     assert await page.locator('#qf-v20-compare-chips button').count() == 2
     await page.locator('#qf-v20-compare-run').click()
     assert await page.locator('#qf-b21-compare-chart svg').count() == 1
@@ -58,8 +58,7 @@ async def public(page, width: int) -> None:
     assert await page.evaluate('document.documentElement.scrollWidth <= innerWidth')
     # Any edited universe must invalidate previously calculated prices and leave SEC available.
     await page.locator('#qf-v20-navigation [data-page="compare"]').click()
-    await page.locator('#qf-v20-compare-search').fill('NVIDIA (NVDA)')
-    await page.locator('#qf-v20-compare-search').dispatch_event('change')
+    await pick_compare(page, 'NVDA')
     assert await page.locator('#qf-b21-compare-export').is_disabled()
     assert await page.locator('#qf-b21-finance-table tbody tr').count() == 0  # stale SEC rows invalidated
     assert 'Selection changed' in await page.locator('#qf-b21-compare-state').inner_text()
@@ -77,6 +76,7 @@ async def private_mock(page) -> None:
       window.fetch=async url=>{
         const path=String(url);window.qfTestRequests.push(path);
         if(path.includes('auth/login'))return {ok:true,json:async()=>({signed_in:true})};
+        if(path.includes('private/assets'))return {ok:true,json:async()=>({licensed_private:true,items:QFPublishedSEC.companies.filter(c=>['MSFT','AAPL','NVDA'].includes(c.symbol)).map(c=>({symbol:c.symbol,name:c.name,asset_class:'us_equity'}))})};
         const params=new URLSearchParams((path.split('?')[1]||''));
         if(path.includes('private/history?')){
           const symbols=params.get('symbols').split(',');
@@ -107,8 +107,7 @@ async def private_mock(page) -> None:
     await page.wait_for_function('window.QFPrivateBridgeV23.ready()')
     await page.wait_for_timeout(190)
     await page.locator('#qf-v20-navigation [data-page="compare"]').click()
-    await page.locator('#qf-v20-compare-search').fill('Apple (AAPL)')
-    await page.locator('#qf-v20-compare-search').dispatch_event('change')
+    await pick_compare(page, 'AAPL')
     await page.locator('#qf-v20-compare-run').click()
     await page.wait_for_timeout(160)
     assert await page.locator('#qf-b21-compare-chart svg').count() == 1
@@ -118,12 +117,13 @@ async def private_mock(page) -> None:
     await page.wait_for_timeout(180)
     assert await page.locator('#qf-b21-owner-account').is_visible()
     assert '1,537.80' in await page.locator('#qf-b21-owner-account-table').inner_text(), await page.locator('#qf-b21-owner-account-table').inner_text()
-    assert 'cumulative paper P&L' in await page.locator('#qf-b21-owner-account-table').inner_text()
+    assert 'Cumulative paper P&L' in await page.locator('#qf27-account-summary').inner_text()
     assert not errors, errors[:3]
     print('Release B mocked authenticated history/state and isolated news failures PASS', flush=True)
     # Force an outage and a selection change; do not use public synthetic prices as fallback.
     await page.evaluate('''() => {
       window.fetch=async url=>{
+       if(String(url).includes('private/assets'))return {ok:true,json:async()=>({licensed_private:true,items:[{symbol:'NVDA',name:'NVIDIA',asset_class:'us_equity'}]})};
        if(String(url).includes('private/history?'))return {ok:false,json:async()=>({detail:'Deliberate provider outage'})};
        if(String(url).includes('private/state'))return {ok:false,json:async()=>({detail:'Test database offline'})};
        if(String(url).includes('history-single'))return {ok:false,json:async()=>({detail:'Test price feed offline'})};
@@ -132,8 +132,7 @@ async def private_mock(page) -> None:
       };
     }''')
     await page.locator('#qf-v20-navigation [data-page="compare"]').click()
-    await page.locator('#qf-v20-compare-search').fill('NVIDIA (NVDA)')
-    await page.locator('#qf-v20-compare-search').dispatch_event('change')
+    await pick_compare(page, 'NVDA')
     await page.locator('#qf-v20-compare-run').click()
     assert 'History unavailable' in await page.locator('#qf-b21-compare-state').inner_text()
     assert await page.locator('#qf-b21-compare-chart svg').count() == 0

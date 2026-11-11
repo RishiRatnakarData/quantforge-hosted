@@ -461,20 +461,18 @@ def quotes(request: Request, response: Response, symbols: str):
 class TradeRequest(BaseModel):
     symbol: str
     side: str
-    amount: str  # USD spending budget to buy; units to sell
+    amount: str  # USD budget to buy; units to sell
     expected_version: int = Field(ge=0)
+    request_id: str = Field(default="", max_length=64, pattern=r"^[a-zA-Z0-9-]*$")
+    reference_price: str = ""
 
 
-@app.post("/api/private/trade")
-def trade(data: TradeRequest, request: Request, response: Response):
-    uid, token = owner(request, response)
-    current, version = read_state(uid, token)
-    if version != data.expected_version:
-        raise HTTPException(409, "Portfolio changed. Reload first.")
+def trade_terms(current: dict, data: TradeRequest, observation: dict) -> dict:
+    """One decimal calculation shared by preview and commit; never mutates state."""
     sym = data.symbol.strip().upper()
     if not SYMBOL_RE.fullmatch(sym) or data.side not in ("buy", "sell"):
         raise HTTPException(422, "Invalid trade.")
-    q = valid_quote(quote(sym), require_fresh=True)
+    q = valid_quote(observation, require_fresh=True)
     if q["symbol"] != sym:
         raise HTTPException(422, "Market observation did not match the chosen investment.")
     amount = money(data.amount, "trade amount")
@@ -483,6 +481,10 @@ def trade(data: TradeRequest, request: Request, response: Response):
     price = money(q["price"], "price")
     cash = money(current["cash"], "cash")
     old = money(current["holdings"].get(sym, 0), "owned units")
+    if data.reference_price:
+        reference = money(data.reference_price, "preview price")
+        if reference <= 0 or abs(price-reference)/reference > money("0.005", "price tolerance"):
+            raise HTTPException(422, "Price changed by more than 0.5%. Review a fresh preview.")
     if data.side == "buy":
         if amount < 1 or amount > cash:
             raise HTTPException(422, "Buy budget must be at least $1 and within available cash.")
@@ -492,25 +494,60 @@ def trade(data: TradeRequest, request: Request, response: Response):
         delta = gross + fee
         if units <= 0 or delta > cash or delta > amount:
             raise HTTPException(422, "Buy exceeds virtual funds.")
-        current["holdings"][sym] = float(old + units)
-        cash = cash - delta
+        cash_after = cash-delta
+        held_after = old+units
     else:
         units = amount.quantize(QTY, rounding=ROUND_DOWN)
         if not units or units > old:
             raise HTTPException(422, "Cannot sell more units than held.")
         gross = cents(units * price)
         fee = cents(gross * FEE_RATE)
-        cash += gross - fee
-        if old == units:
-            current["holdings"].pop(sym, None)
-        else:
-            current["holdings"][sym] = float(old - units)
-    current["cash"] = float(cents(cash))
-    current["trades"] = ([{"at": dt.datetime.now(dt.UTC).isoformat(),
-                          "symbol": sym, "side": data.side, "units": float(units),
-                          "price": q["price"], "fee": float(fee),
-                          "venue": q["venue"], "observed_at": q["timestamp"]}]
-                        + current.get("trades", []))[:80]
+        cash_after = cash+gross-fee
+        held_after = old-units
+    return {"symbol": sym, "side": data.side, "units": float(units),
+            "gross": float(gross), "fee": float(fee), "price": q["price"],
+            "cash_before": float(cash), "cash_after": float(cents(cash_after)),
+            "cash_impact": float(cents(cash_after-cash)), "held_after": float(held_after),
+            "venue": q["venue"], "observed_at": q["timestamp"], "paper_only": True}
+
+
+@app.post("/api/private/trade-preview")
+def preview_trade(data: TradeRequest, request: Request, response: Response):
+    uid, token = owner(request, response)
+    current, version = read_state(uid, token)
+    if version != data.expected_version:
+        raise HTTPException(409, "Portfolio changed. Reload first.")
+    sym = data.symbol.strip().upper()
+    if not SYMBOL_RE.fullmatch(sym) or data.side not in ("buy", "sell"):
+        raise HTTPException(422, "Invalid investment or transaction side.")
+    return {"preview": trade_terms(current, data, quote(sym)), "version": version}
+
+
+@app.post("/api/private/trade")
+def trade(data: TradeRequest, request: Request, response: Response):
+    uid, token = owner(request, response)
+    current, version = read_state(uid, token)
+    # A lost response may be reconciled with the SAME request ID; never duplicate a receipt.
+    repeated = next((t for t in current.get("trades", []) if data.request_id and t.get("request_id") == data.request_id), None)
+    if repeated:
+        if (repeated["symbol"] != data.symbol.strip().upper() or repeated["side"] != data.side
+                or money(repeated.get("request_amount", "0"), "original amount") != money(data.amount, "trade amount")):
+            raise HTTPException(409, "Request identifier already belongs to another transaction.")
+        return {"portfolio": current, "version": version, "paper_only": True, "reconciled": True}
+    if version != data.expected_version:
+        raise HTTPException(409, "Portfolio changed. Reload first.")
+    sym = data.symbol.strip().upper()
+    if not SYMBOL_RE.fullmatch(sym) or data.side not in ("buy", "sell"):
+        raise HTTPException(422, "Invalid investment or transaction side.")
+    terms = trade_terms(current, data, quote(sym))
+    if terms["held_after"]:
+        current["holdings"][sym] = terms["held_after"]
+    else:
+        current["holdings"].pop(sym, None)
+    current["cash"] = terms["cash_after"]
+    receipt = {k: terms[k] for k in ("symbol", "side", "units", "price", "fee", "gross", "cash_impact", "venue", "observed_at")}
+    receipt.update({"at": dt.datetime.now(dt.UTC).isoformat(), "request_id": data.request_id, "request_amount": data.amount})
+    current["trades"] = ([receipt] + current.get("trades", []))[:80]
     save_state(uid, token, current, version)
     return {"portfolio": current, "version": version + 1, "paper_only": True}
 

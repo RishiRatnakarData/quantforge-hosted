@@ -1142,7 +1142,7 @@ function runGuideV79(){
 }
 
 const M=window.QFModel;
-let privateState=null, version=0, quoted={}, mfaFactorId=null;
+let privateState=null, version=0, quoted={}, mfaFactorId=null, privateGeneration=0;
 let researchSelection=[];
 let valuationCompanies={};
 let assetNames={};
@@ -1153,14 +1153,17 @@ const usd=n=>Number(n).toLocaleString('en-US',{style:'currency',currency:'USD',m
 const safe=s=>String(s).replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
 function message(msg){$('private-message').textContent=msg;}
 async function api(path, body){
+  const generation=privateGeneration;
   const init={credentials:'same-origin',cache:'no-store'};
   if(body!==undefined){init.method='POST';init.headers={'Content-Type':'application/json','X-QF-Action':'1'};init.body=JSON.stringify(body);}
   let r;try{r=await fetch('/api/'+path,init);}catch(_){throw Error('Could not reach the service. Check your connection and try again.');}
   let data;try{data=await r.json();}catch(_){throw Error('Service unavailable. Free hosting may be waking up.');}
-  if(!r.ok)throw Error(window.QFErrors24.apiError(r.status,path));
+  if(path.startsWith('private/')&&generation!==privateGeneration)throw Error('Private session changed; the old response was discarded.');
+  if(!r.ok)throw Object.assign(Error(window.QFErrors24.apiError(r.status,path)),{status:r.status});
   return data;
 }
 function showStep(step){
+  if(step!=='ready')privateGeneration++;
   $('private-login').hidden=step!=='login';
   $('private-mfa').hidden=step!=='mfa';
   $('private-signed').hidden=step!=='ready';
@@ -1199,7 +1202,7 @@ async function loadState(){
   clearAllocationV74();
   clearResearchOSV90();
   clearGuideV79();
-  const d=await api('private/state');privateState=d.portfolio;version=d.version;
+  const d=await api('private/state');if(privateState&&d.version<version)throw Error('An older account response was discarded. Refresh again.');privateState=d.portfolio;version=d.version;
   quoted={}; // Never carry fictional quotes across a private session.
   const symbols=Object.keys(privateState.holdings || {});
   if(symbols.length){
@@ -1260,6 +1263,7 @@ async function verifyMFA(){
   }catch(e){message(e.message);}
 }
 async function logout(){
+  privateGeneration++;
   clearImportedSECV99(); // Invalidate imported financial records and pending reads before asynchronous sign-out.
   researchSessionJournalV95=[];clearResearchOSV90();renderSavedResearchV96();
   try{await api('auth/logout',{});}catch(_){ /* Clear visible private content regardless */ }
@@ -2445,7 +2449,8 @@ window.QFPrivateBridgeV23=Object.freeze({
   valuations:(privateState.valuations||[]).map(p=>({at:String(p.at||''),value:Number(p.value),cash:Number(p.cash),net_contributions:Number(p.net_contributions),pnl:Number(p.pnl),source:String(p.source||'')})),
   holdings:{...(privateState.holdings||{})},
   notes:(privateState.notes||[]).map(x=>({text:String(x.text||''),at:String(x.at||''),symbol:String(x.symbol||'')})),
-  trades:(privateState.trades||[]).slice(0,12).map(x=>({symbol:String(x.symbol||''),side:String(x.side||''),units:Number(x.units),at:String(x.at||'')}))
+  version,capital_events:(privateState.capital_events||[]).map(x=>({...x})),
+  trades:(privateState.trades||[]).slice(0,80).map(x=>({...x,symbol:String(x.symbol||''),side:String(x.side||''),units:Number(x.units),at:String(x.at||'')}))
  }:null,
  async recordSnapshot(){if(!privateState||$('private-signed').hidden)throw Error('MFA sign-in required.');const result=await api('private/valuation-snapshot',{expected_version:version});privateState=result.portfolio;version=result.version;render();return this.snapshot();},
  async capital(action,amount){if(!privateState||$('private-signed').hidden||!['deposit','withdraw'].includes(action))throw Error('MFA sign-in and a supported funding action are required.');const result=await api('private/capital',{action,amount:String(amount),expected_version:version});privateState=result.portfolio;version=result.version;render();return this.snapshot();},
@@ -2456,7 +2461,7 @@ window.QFPrivateBridgeV23=Object.freeze({
   notes[index]={...notes[index],text:value,at:new Date().toISOString()};
   const result=await api('private/notes',{expected_version:version,watchlist:privateState.watchlist||[],notes});privateState=result.portfolio;version=result.version;render();return this.snapshot();
  },
- async assets(query){if(!privateState||$('private-signed').hidden)throw Error('MFA sign-in required.');return api('private/assets?'+new URLSearchParams({category:'all',query:String(query).slice(0,60)}));},
+ async assets(query,category='all'){if(!privateState||$('private-signed').hidden)throw Error('MFA sign-in required.');return api('private/assets?'+new URLSearchParams({category,query:String(query).slice(0,60)}));},
  async refresh(){if(!privateState)throw Error('MFA sign-in required.');await loadState();return this.snapshot();},
  async saveNote(text,symbol){
   if(!privateState)throw Error('MFA sign-in required.');
@@ -2473,12 +2478,13 @@ window.QFPrivateBridgeV23=Object.freeze({
   const data=await api('private/notes',{expected_version:version,watchlist:privateState.watchlist||[],notes:old.filter((_,i)=>i!==index)});
   privateState=data.portfolio;version=data.version;render();return this.snapshot();
  },
- async trade(symbol,side,amount){
+ async previewTrade(symbol,side,amount){if(!privateState||$('private-signed').hidden)throw Error('MFA sign-in required.');return api('private/trade-preview',{symbol,side,amount:String(amount),expected_version:version});},
+ async trade(symbol,side,amount,options={}){
   if(!privateState)throw Error('MFA sign-in required.');
   const sym=String(symbol||'').toUpperCase(),action=String(side||''),v=Number(amount);
-  if(!/^[A-Z0-9.\-]{1,15}$/.test(sym)||!['buy','sell'].includes(action)||!Number.isFinite(v)||v<=0)throw Error('Choose an eligible investment and a positive amount.');
-  const data=await api('private/trade',{symbol:sym,side:action,amount:String(v),expected_version:version});
-  privateState=data.portfolio;version=data.version;await loadState();return this.snapshot();
+  if(!/^[A-Z0-9./\-]{1,15}$/.test(sym)||!['buy','sell'].includes(action)||!Number.isFinite(v)||v<=0)throw Error('Choose an eligible investment and a positive amount.');
+  const data=await api('private/trade',{symbol:sym,side:action,amount:String(v),expected_version:version,request_id:options.request_id||'',reference_price:String(options.reference_price||'')});
+  privateState=data.portfolio;version=data.version;render();return this.snapshot();
  },
  async signOut(){await logout();window.dispatchEvent(new Event('qf:owner-auth-ended'));}
 });

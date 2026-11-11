@@ -114,3 +114,5 @@ jobs:
         run: python tools/smoke_rebuild_browser.py
       - name: Completed engines under real CSP in Chromium Firefox WebKit
         run: python tools/smoke_completion_browser.py
+      - name: Product picker transactions news and worked-method acceptance
+        run: python tools/smoke_product_v27.py

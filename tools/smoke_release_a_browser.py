@@ -30,19 +30,18 @@ async def assert_public(page, width: int) -> None:
     assert await page.locator("#qf-v20-financial-table tr").count() >= 3
     assert await page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
 
-    await page.locator("#qf-v20-analyze").click()
-    assert await page.locator(".qf-v20-finding").count() >= 2
+    await page.locator("#qf27-analyze").click()
+    assert await page.locator(".qf27-finding").count() >= 2
     await page.locator("#qf-v20-search").fill("Apple")
-    await page.locator('[data-qf-pick="AAPL"]').click()
+    await page.locator('#qf-v20-search-results [data-qf27-symbol="AAPL"]').click()
     assert await page.locator("#qf-v20-symbol").inner_text() == "AAPL"
-    assert await page.locator(".qf-v20-finding").count() == 0
-    await page.locator('[data-qf-range="30"]').click()
-    assert await page.locator("#qf-v20-chart svg").count() == 1
-    svg = page.locator("#qf-v20-chart svg")
+    assert await page.locator(".qf27-finding").count() == 0
+    await page.locator('[data-qf27-finance="cash"]').click()
+    svg = page.locator('#qf-v20-financial-chart svg[data-qf26-chart]')
     await svg.focus()
-    before = await page.locator("#qf-v20-cursor-value").inner_text()
-    await svg.press("ArrowLeft")
-    assert await page.locator("#qf-v20-cursor-value").inner_text() != before
+    before = await page.locator('#qf-v20-financial-chart .qf26-readout').inner_text()
+    await svg.press('ArrowLeft')
+    assert await page.locator('#qf-v20-financial-chart .qf26-readout').inner_text() != before
 
     # Regression for the customer-reported legacy Portfolio accordion.
     await page.locator('#qf-v20-navigation [data-page="portfolio"]').click()
@@ -54,8 +53,12 @@ async def assert_public(page, width: int) -> None:
     await page.locator('[data-qf-portfolio="whatif"]').click()
     assert await page.locator('#qf-v20-portfolio-whatif').is_visible()
     assert not await page.locator('#qf-v20-portfolio-overview').is_visible()
+    await page.locator('#qf-v20-navigation [data-page="methods"]').click()
+    await page.locator('[data-qf-c22-method="statistical"]').click()
+    await page.locator('[data-qf27-method="portfolio"]').click()
     await page.locator('#rebalance-submit').click()
     assert await page.locator('#rebalance-result table').count() == 1
+    await page.locator('#qf-v20-navigation [data-page="portfolio"]').click()
     await page.locator('[data-qf-portfolio="analysis"]').click()
     assert await page.locator('#qf-v20-portfolio-analysis').is_visible()
     assert await page.locator('#qf-v20-portfolio-hhi').inner_text() != '—'
@@ -97,13 +100,14 @@ async def assert_private_mock(page) -> None:
     assert "MOCKED" in await page.locator("#qf-v20-chart-source").inner_text()
     assert "unavailable" in (await page.locator("#qf-v20-news").inner_text()).lower()
     assert await page.locator("#qf-v20-financial-table tr").count() >= 3
-    await page.locator("#qf-v20-analyze").click()
+    await page.locator("#qf27-analyze").click()
     assert "observed private market risk" in await page.locator("#qf-v20-run-state").inner_text()
+    await page.locator('[data-qf27-explore="market"]').click()
     assert await page.locator("#qf-v20-benchmark-wrap").is_visible()
     await page.locator("#qf-v20-search").fill("Apple")
-    await page.locator('[data-qf-pick="AAPL"]').click()
+    await page.locator('#qf-v20-search-results [data-qf27-symbol="AAPL"]').click()
     assert await page.locator("#qf-v20-symbol").inner_text() == "AAPL"
-    assert await page.locator(".qf-v20-finding").count() == 0
+    assert await page.locator(".qf27-finding").count() == 0
     assert "Observed" in await page.locator("#qf-v20-source-badge").inner_text()
     print("Mocked private data and news outage PASS", flush=True)
 

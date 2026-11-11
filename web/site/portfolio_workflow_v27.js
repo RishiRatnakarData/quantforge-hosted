@@ -1,0 +1,72 @@
+/* Contextual virtual trading. Decimal previews and final marks remain server-authorized. */
+(function(root){
+'use strict';
+const $=id=>document.getElementById(id),bridge=()=>root.QFPrivateBridgeV23,ctx=()=>root.QFResearch20.context();
+const safe=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const usd=x=>Number.isFinite(x)?x.toLocaleString('en-US',{style:'currency',currency:'USD'}):'Not recorded';
+const qty=x=>Number.isFinite(x)?x.toLocaleString('en-US',{maximumFractionDigits:8}):'Unavailable';
+const date=x=>{const d=new Date(x);return Number.isNaN(d.valueOf())?'Date unavailable':d.toLocaleString('en-US',{dateStyle:'medium',timeStyle:'short'});};
+const panel=document.querySelector('#qf24-transactions [data-qf-v23-panel="portfolio"]');if(!panel)return;$('qf25-account-history').before($('qf24-transactions'));
+panel.innerHTML='<div class="qf27-account-kpis" id="qf27-account-summary"></div><div id="qf27-account-allocation"></div><div class="qf27-trade-shell"><div class="qf27-action-row" role="group" aria-label="Virtual transaction"><button class="btn primary" id="qf27-buy" aria-pressed="true">Buy virtually</button><button class="btn" id="qf27-sell" aria-pressed="false">Sell an owned position</button><button class="btn" id="qf27-refresh">Refresh account</button></div><h3 id="qf27-trade-heading">Choose an investment to buy</h3><label id="qf27-asset-universe-wrap">Investment universe<select id="qf27-asset-universe"><option value="all">US stocks and funds</option><option value="crypto">Supported crypto assets</option></select></label><label for="qf27-trade-query">Find by company, fund or asset name</label><input id="qf27-trade-query" type="search" autocomplete="off" placeholder="Company or fund name"><div id="qf27-trade-options"></div><div id="qf27-selected-investment"></div><div class="qf27-trade-fields"><label id="qf27-amount-label" for="qf27-trade-amount">Maximum virtual spending, including fee ($)<input id="qf27-trade-amount" type="number" min="1" step="0.01" value="100"></label><button class="btn" id="qf27-preview">Preview transaction</button></div><div id="qf27-preview-result"></div><button class="btn primary" id="qf27-confirm" hidden>Confirm virtual transaction</button><p id="qf27-trade-status" role="status" aria-live="polite"></p></div><section class="qf27-ledger"><div class="qf27-action-row"><h3>Recent virtual activity</h3><label>Activity type<select id="qf27-ledger-filter"><option value="all">All activity</option><option value="buy">Buys</option><option value="sell">Sells</option><option value="funding">Funding</option></select></label></div><div id="qf24-transaction-ledger" class="table-wrap"></div><div class="qf27-action-row"><button class="btn" id="qf27-ledger-prev">Previous</button><span id="qf27-ledger-page"></span><button class="btn" id="qf27-ledger-next">Next</button></div></section>';
+const listingNames=new Map();let metadataToken=0,metadataVersion=null;const assetName=symbol=>listingNames.get(symbol)||root.QFResearch20.assetInfo(symbol).name;
+let side='buy',selected=null,preview=null,busy=false,uncertain=false,account=null,page=0,markToken=0,markedVersion=null;
+const privateMode=()=>bridge()?.ready()&&ctx().mode==='private';
+function status(text){$('qf27-trade-status').textContent=text;}
+function invalidate(){preview=null;$('qf27-preview-result').replaceChildren();$('qf27-confirm').hidden=true;}
+function owned(){return Object.entries(account?.holdings||{}).filter(([,units])=>units>0).map(([symbol,units])=>({...root.QFResearch20.assetInfo(symbol),name:assetName(symbol),symbol,units,asset_class:symbol.includes('/')?'crypto':'us_equity',tradable:true}));}
+const input=$('qf27-trade-query'),options=$('qf27-trade-options');
+const picker=root.QFInvestmentPicker27.mount({input,panel:options,mode:()=>privateMode()?'private':'public',published:root.QFPublishedSEC.companies,search:q=>side==='sell'?Promise.resolve({licensed_private:true,items:owned()}):bridge().assets(q,$('qf27-asset-universe').value),owned:()=>side==='sell'?owned():null,assetClasses:['us_equity','crypto'],onSelect:item=>{
+ selected=item;listingNames.set(item.symbol,item.name);invalidate();input.value=item.name;$('qf27-selected-investment').innerHTML='<strong>Selected '+safe(item.symbol)+'</strong><p>'+root.QFInvestmentPicker27.describe(item,true,root.QFPublishedSEC.companies.some(c=>c.symbol===item.symbol)).map(safe).join(' · ')+(side==='sell'?' · Owned '+qty(account.holdings[item.symbol])+' units':'')+'</p>';
+}});
+// Buy uses provider discovery; sell reuses this component with owned positions only.
+input.addEventListener('input',()=>{selected=null;invalidate();$('qf27-selected-investment').replaceChildren();});$('qf27-trade-amount').addEventListener('input',invalidate);
+function mode(next){if(busy)return;side=next;$('qf27-asset-universe-wrap').hidden=side==='sell';$('qf27-buy').classList.toggle('primary',side==='buy');$('qf27-sell').classList.toggle('primary',side==='sell');selected=null;input.value='';picker.reset();invalidate();$('qf27-selected-investment').replaceChildren();$('qf27-buy').setAttribute('aria-pressed',String(side==='buy'));$('qf27-sell').setAttribute('aria-pressed',String(side==='sell'));$('qf27-trade-heading').textContent=side==='buy'?'Choose an investment to buy':'Choose a position you already own';$('qf27-amount-label').firstChild.textContent=side==='buy'?'Maximum virtual spending, including fee ($)':'Units to sell';$('qf27-trade-amount').value=side==='buy'?'100':'1';$('qf27-trade-amount').step=side==='buy'?'0.01':'0.00000001';$('qf27-trade-amount').min=side==='buy'?'1':'0.00000001';status(side==='sell'&&!owned().length?'No positions are available to sell.':'');setTimeout(()=>{input.focus();void picker.find();},0);}
+$('qf27-asset-universe').addEventListener('change',()=>{selected=null;input.value='';invalidate();picker.reset();$('qf27-selected-investment').replaceChildren();input.focus();void picker.find();});
+$('qf27-buy').addEventListener('click',()=>mode('buy'));$('qf27-sell').addEventListener('click',()=>mode('sell'));
+function disable(value){busy=value;for(const id of ['qf27-buy','qf27-sell','qf27-preview','qf27-confirm','qf27-asset-universe'])$(id).disabled=value||uncertain;input.disabled=value||uncertain;$('qf27-trade-amount').disabled=value||uncertain;}
+$('qf27-preview').addEventListener('click',async()=>{
+ if(busy||uncertain||!privateMode())return;if(!selected){status('Choose the investment from the results first.');return;}
+ const amount=$('qf27-trade-amount').value,symbol=selected.symbol,version=bridge().snapshot().version;if(!Number.isFinite(Number(amount))||Number(amount)<=0){status('Enter a positive finite amount.');return;}if(side==='buy'&&(Number(amount)<1||Number(amount)>account.cash)){status('Use a virtual budget of at least $1 and no more than available cash.');return;}
+ if(side==='sell'&&Number(amount)>Number(account.holdings[symbol]||0)){status('The sale exceeds your owned units.');return;}
+ disable(true);status('Checking a fresh quote and the account version…');invalidate();
+ try{const response=await bridge().previewTrade(symbol,side,amount);if(!privateMode())return;if(version!==bridge().snapshot().version){status('The account changed while the preview loaded. Preview again.');return;}const p=response.preview;if(!p||p.symbol!==symbol||!Number.isFinite(p.cash_after))throw Error('Preview is incomplete.');preview={...p,amount,version,request_id:root.crypto?.randomUUID?.()||'virtual-'+Date.now()+'-'+Math.random().toString(36).slice(2),expires:Date.now()+60000};$('qf27-preview-result').innerHTML='<h4>Review this virtual '+safe(side)+'</h4><dl class="qf27-preview-grid">'+[['Investment',selected.name+' ('+symbol+')'],['Quantity',qty(p.units)+' units'],['Observed price',usd(p.price)],['Virtual fee',usd(p.fee)],['Cash impact',usd(p.cash_impact)],['Resulting cash',usd(p.cash_after)],['Source',p.venue],['Price observed',date(p.observed_at)]].map(([label,value])=>'<div><dt>'+safe(label)+'</dt><dd>'+safe(value)+'</dd></div>').join('')+'</dl><p>Preview expires in 60 seconds. Confirmation uses a fresh quote; a move above 0.5% requires another preview. No real brokerage order is placed.</p>';$('qf27-confirm').hidden=false;status('Review quantity, fee and cash before confirming.');}
+ catch(e){status(e.message||'Preview unavailable. No transaction was sent.');}finally{disable(false);}
+});
+$('qf27-confirm').addEventListener('click',async()=>{
+ if(busy||uncertain||!preview||!privateMode())return;
+ if(Date.now()>preview.expires||preview.version!==bridge().snapshot().version){invalidate();status('The preview expired or the account changed. Preview again.');return;}
+ const p=preview;disable(true);status('Recording the virtual transaction once…');
+ try{const result=await bridge().trade(p.symbol,p.side,p.amount,{request_id:p.request_id,reference_price:p.price});if(!privateMode())return;paint(result);invalidate();status('Virtual '+p.side+' recorded. Holdings, cash and activity reflect the accepted server receipt.');root.dispatchEvent(new Event('qf:owner-state'));}
+ catch(e){uncertain=!e.status||e.status>=500;invalidate();status(uncertain?'The response was interrupted; the transaction may have recorded. Refresh and review activity before another attempt. No automatic retry was sent.':e.message);}
+ finally{disable(false);}
+});
+$('qf27-refresh').addEventListener('click',async()=>{if(busy||!privateMode())return;disable(true);status('Refreshing saved account…');try{const result=await bridge().refresh();uncertain=false;markedVersion=null;paint(result);invalidate();status('Saved account refreshed. Review recent activity before creating another transaction.');root.dispatchEvent(new Event('qf:owner-state'));}catch(e){status(e.message||'Refresh unavailable.');}finally{disable(false);}});
+function ledger(){
+ const filter=$('qf27-ledger-filter').value;
+ const rows=[...(account?.trades||[]).map(t=>({...t,kind:t.side})),...(account?.capital_events||[]).map(t=>({...t,kind:'funding',side:t.action,units:null,cash_impact:t.action==='deposit'?Number(t.amount):t.action==='withdraw'?-Number(t.amount):null}))].filter(t=>filter==='all'||t.kind===filter).sort((a,b)=>String(b.at).localeCompare(String(a.at)));
+ const pages=Math.max(1,Math.ceil(rows.length/8));page=Math.min(page,pages-1);
+ $('qf24-transaction-ledger').innerHTML=rows.length?'<table><thead><tr>'+['Recorded','Activity','Investment','Units','Price','Fee','Cash impact'].map(h=>'<th scope="col">'+h+'</th>').join('')+'</tr></thead><tbody>'+rows.slice(page*8,page*8+8).map(t=>'<tr><td>'+safe(date(t.at))+'</td><td>'+safe(t.side)+'</td><td>'+safe(t.symbol?assetName(t.symbol)+' ('+t.symbol+')':'Virtual funding')+'</td><td>'+safe(t.units===null?'—':qty(t.units))+'</td><td>'+safe(usd(t.price))+'</td><td>'+safe(usd(t.fee))+'</td><td>'+safe(usd(t.cash_impact??(Number.isFinite(t.price)&&Number.isFinite(t.units)&&Number.isFinite(t.fee)?(t.side==='buy'?-1:1)*t.units*t.price-t.fee:null)))+'</td></tr>').join('')+'</tbody></table>':'<p>No recorded activity matches this filter.</p>';
+ $('qf27-ledger-page').textContent='Page '+(page+1)+' of '+pages+' · '+rows.length+' saved records';$('qf27-ledger-prev').disabled=page===0;$('qf27-ledger-next').disabled=page===pages-1;
+}
+$('qf27-ledger-filter').addEventListener('change',()=>{page=0;ledger();});$('qf27-ledger-prev').addEventListener('click',()=>{page--;ledger();});$('qf27-ledger-next').addEventListener('click',()=>{page++;ledger();});
+root.addEventListener('qf:owner-valuation',event=>{
+ const {snapshot:valued,version}=event.detail||{};if(!privateMode()||!valued||version!==bridge().snapshot().version)return;markedVersion=version;
+ $('qf27-account-summary').innerHTML=[['Marked virtual value',usd(valued.total_value)],['Available cash',usd(valued.cash)],['Invested value',usd(valued.holdings_value)],['Net contributions',usd(valued.net_contributions)],['Cumulative paper P&L',usd(valued.cumulative_paper_pnl)]].map(([label,value])=>'<div><span>'+label+'</span><strong>'+value+'</strong></div>').join('');
+ $('qf27-account-allocation').innerHTML=root.QFExhibits24.bars('Current virtual allocation — marked value (USD)',[...valued.quotes.map(q=>[assetName(q.symbol),q.market_value]),['Cash',valued.cash]],usd)+'<p>Indicative quote-dependent values. Deposits remain contributed capital.</p>';
+});
+async function enrichOwnedNames(data){
+ if(metadataVersion===data.version)return;metadataVersion=data.version;const token=++metadataToken;
+ const unknown=Object.keys(data.holdings).filter(symbol=>data.holdings[symbol]>0&&!listingNames.has(symbol)&&root.QFResearch20.assetInfo(symbol).name===symbol+' · saved investment').slice(0,8);
+ const results=await Promise.allSettled(unknown.map(symbol=>bridge().assets(symbol,symbol.includes('/')?'crypto':'all')));
+ if(token!==metadataToken||!privateMode()||bridge().snapshot().version!==data.version)return;
+ results.forEach((result,index)=>{if(result.status!=='fulfilled')return;const item=result.value.items?.find(item=>item.symbol===unknown[index]);if(item&&typeof item.name==='string')listingNames.set(item.symbol,item.name);});
+ if(unknown.length){ledger();if(side==='sell'&&!selected)void picker.find();}
+}
+function paint(data){
+ if(!privateMode()||!data)return;account=data;ledger();void enrichOwnedNames(data);
+ if(markedVersion!==data.version){$('qf27-account-summary').innerHTML=[['Available virtual cash',usd(data.cash)],['Net contributions',usd(data.initial_cash)],['Saved positions',owned().length]].map(([label,value])=>'<div><span>'+label+'</span><strong>'+value+'</strong></div>').join('');markedVersion=data.version;$('qf27-account-allocation').textContent='Complete quote coverage is required for total value, allocation and P&L. Saved holdings and activity remain visible.';}
+}
+function sync(){if(privateMode())paint(bridge().snapshot());else{listingNames.clear();metadataToken++;metadataVersion=null;account=null;markToken++;markedVersion=null;uncertain=false;selected=null;invalidate();picker.reset();input.value='';$('qf27-selected-investment').replaceChildren();$('qf27-account-summary').replaceChildren();$('qf27-account-allocation').replaceChildren();$('qf24-transaction-ledger').replaceChildren();status('');disable(false);}}
+for(const event of ['qf:owner-state','qf:data-mode','qf:owner-auth-ready','qf:owner-auth-ended'])root.addEventListener(event,sync);
+root.QFPortfolioUI27=Object.freeze({paint,sync});sync();
+})(window);

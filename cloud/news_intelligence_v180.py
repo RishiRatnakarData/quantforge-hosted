@@ -43,7 +43,7 @@ def _tone(headline: str) -> tuple[str, float]:
         if any(prev in NEGATION for prev in words[max(0, i - 2):i]):
             val = -val
         balance += val
-    label = "Positive" if balance > 0 else "Negative" if balance < 0 else "Mixed / neutral"
+    label = "Uncertain" if any(w in {"may", "might", "could", "rumor", "rumour", "reportedly", "uncertain"} for w in words) else "Positive" if balance > 0 else "Negative" if balance < 0 else "Mixed / neutral"
     return label, float(balance)
 
 
@@ -119,7 +119,7 @@ def analyze_news(news: list[dict], symbols: list[str], *, as_of: str) -> dict:
         linked = [s for s in symbols if s in raw_syms]
         if not linked:
             continue
-        unique = (str(raw.get("id")), stamp, headline)
+        unique = (re.sub(r"\W+", " ", headline.casefold()).strip(), stamp[:10], tuple(sorted(linked)))
         if unique in seen:
             continue
         seen.add(unique)
@@ -164,10 +164,13 @@ def analyze_news(news: list[dict], symbols: list[str], *, as_of: str) -> dict:
                      "Mixed / neutral" if counts["Positive"] == counts["Negative"] else
                      "Mostly positive" if counts["Positive"] > counts["Negative"] else "Mostly negative",
                      "positive": counts["Positive"], "negative": counts["Negative"],
-                     "neutral": counts["Mixed / neutral"],
+                     "neutral": counts["Mixed / neutral"], "uncertain": counts["Uncertain"],
+                     "tone_counts": dict(counts), "topic_counts": dict(themes),
+                     "coverage": {"first": min((e["created_at"] for e in matched), default=None),
+                                  "last": max((e["created_at"] for e in matched), default=None)},
                      "topics": [k for k, _ in themes.most_common(2)],
                      "headlines": [{k: e[k] for k in ("headline", "created_at", "source", "url", "topic", "tone")}
-                                   for e in matched[:3]]})
+                                   for e in matched[:50]]})
     return {"as_of": as_of, "method": method,
             "topic_method": "TF-IDF cosine theme similarity (not transformer embeddings)",
             "rows": rows, "articles_analyzed": len(entries),

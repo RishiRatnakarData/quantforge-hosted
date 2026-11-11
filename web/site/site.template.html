@@ -605,7 +605,7 @@ body{font-size:15px;line-height:1.6}main{max-width:1600px;width:100%;min-width:0
     <button class="nav-btn" data-page="systems">Research methods</button>
     <button class="nav-btn" data-page="methods">Data &amp; engineering</button>
   </div>
-</nav><div class="sidenote">Historical SEC data · reproducible models<br>Personal investment research requires sign-in</div></aside>
+</nav><div class="sidenote">Historical SEC data · reproducible models<br>Personal investment research requires sign-in</div><div class="qf27-credit">Designed and developed by<strong>Rishi Ratnakar</strong></div></aside>
 <a class="skip-link" href="#main-content">Skip to content</a><main id="main-content"><div class="topbar"><span class="eyebrow">SEC filings · portfolio models · research methods</span><span class="badge">RESEARCH OVERVIEW</span></div>
 <section class="tabpage" id="page-explore" aria-labelledby="qf-v20-explore-title">
 <section id="qf-v23-landing" class="qf-v23-landing pane" hidden aria-labelledby="qf-v23-landing-title">
@@ -717,7 +717,7 @@ body{font-size:15px;line-height:1.6}main{max-width:1600px;width:100%;min-width:0
   <div class="notice">Data sources: SEC filings for company figures; simulated inputs for portfolio and valuation examples. No public model is a validated return forecast.</div>
 </section>
 <section class="tabpage" id="page-portfolio" aria-labelledby="qf-v20-portfolio-heading">
-<div class="qf-v23-portfolio-account"><button type="button" class="btn qf-v23-owner-action" data-qf-v23-open="portfolio" hidden>My virtual holdings and trades</button></div>
+<div class="qf-v23-portfolio-account"></div>
 
 <div class="qf-v20-intro"><div><div class="eyebrow">HYPOTHETICAL PORTFOLIO RESEARCH</div><h1 id="qf-v20-portfolio-heading">Portfolio</h1><p>Explore a sample virtual portfolio, test target allocations and inspect concentration. Simulated holdings and prices are illustrative, not live account data.</p></div></div>
 <nav class="qf-v20-subnav" aria-label="Portfolio views">
@@ -727,7 +727,7 @@ body{font-size:15px;line-height:1.6}main{max-width:1600px;width:100%;min-width:0
 </nav>
 <div id="qf-v20-portfolio-overview" class="qf-v20-portfolio-view" aria-label="Sample virtual portfolio overview">
 <section class="pane"><div class="eyebrow">HISTORICAL PORTFOLIO STUDY</div><h2>How a hypothetical allocation moved</h2><p class="tiny" id="qf-b21-overview-data-status">Loading a company basket…</p><div id="qf-b21-overview-chart" class="qf-b21-chart" aria-label="Historical portfolio replay">The historical illustration loads from selected companies.</div><div id="qf-b21-overview-stats" class="qf-b21-kpi-row"></div><p class="tiny">This chart is a hypothetical, daily-rebalanced allocation. It is separate from the example transaction ledger below and from owner-only virtual account balances.</p></section>
-<div class="pane" id="qf-b21-owner-account" hidden><h2>Authenticated virtual holdings</h2><p class="tiny">Private Supabase virtual balances and quantities; no public redistribution or real-money orders.</p><div id="qf-b21-owner-account-table" class="table-wrap"></div><p class="tiny" id="qf-b21-owner-account-status"></p></div>
+<div class="pane" id="qf-b21-owner-account" hidden><h2>Holdings and quote provenance</h2><p class="tiny">Private Supabase virtual balances and quantities; no public redistribution or real-money orders.</p><div id="qf-b21-owner-account-table" class="table-wrap"></div><p class="tiny" id="qf-b21-owner-account-status"></p></div>
 <div data-qf24-sample-account><div class="pane"><div class="three"><div class="metric"><span class="muted">Total value</span><strong id="portfolio-total">—</strong></div><div class="metric"><span class="muted">Cash</span><strong id="portfolio-cash">—</strong></div><div class="metric"><span class="muted">Holdings</span><strong id="portfolio-invested">—</strong></div></div><div class="section-title"><h3>Positions</h3></div><div class="table-wrap" id="portfolio-table"></div></div>
 <p class="qf-v20-section-note">These positions exist only in the sample browser session. Recording an illustrative trade changes this sample, not a brokerage account.</p>
 <div class="pane"><h3>Simulated trade</h3><div class="formgrid" style="margin-top:14px"><div class="field"><label for="trade-symbol">Investment</label><select id="trade-symbol"></select></div><div class="field"><label for="trade-action">Action</label><select id="trade-action"><option value="buy">Buy</option><option value="sell">Sell</option></select></div><div class="field"><label for="trade-amount">Amount ($)</label><input id="trade-amount" type="number" min="1" value="300"></div></div><div class="controls"><button class="btn primary" id="trade-submit">Record virtual trade</button><span class="tiny">Assumed 0.05% transaction fee; no real orders</span></div><div id="trade-message" style="margin-top:8px"></div></div>

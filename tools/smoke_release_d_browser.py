@@ -5,6 +5,7 @@ import asyncio
 import os
 from pathlib import Path
 
+from browser_product_contract import PRODUCT_TRADES, virtual_buy
 from playwright.async_api import async_playwright
 
 HTML = (Path(__file__).resolve().parents[1] / 'public/index.html').read_text(encoding='utf-8')
@@ -60,6 +61,7 @@ async def run_page(browser, width: int) -> None:
             await page.screenshot(path=os.getenv('QF_D23_PUBLIC_SCREENSHOT', '/tmp/qf_d23_public.png'))
         # Real account always requires MFA. This mock skips it only inside an isolated browser test.
         await page.evaluate(MOCK)
+        await page.evaluate(PRODUCT_TRADES)
         await page.locator('#qf-v20-mode').click()
         assert await page.locator('#private-login').is_visible()
         await page.locator('#private-email').fill('test' + '@' + 'example.invalid')
@@ -68,11 +70,12 @@ async def run_page(browser, width: int) -> None:
         await page.wait_for_function("window.QFPrivateBridgeV23 && window.QFPrivateBridgeV23.ready()")
         assert await page.locator('.tabpage.active').get_attribute('id') == 'page-explore'
         assert not await page.locator('#private-signed').is_visible()
-        assert await page.locator('#qf-v20-mode').inner_text() == 'My workspace'
+        assert await page.locator('#qf-v20-mode').inner_text() == 'Account'
         await page.evaluate("window.QFNavigate20('private')")
         assert await page.locator('.tabpage.active').get_attribute('id') == 'page-explore'
-        assert await page.locator('[data-qf-v23-open="notes"]').is_visible()
-        await page.locator('[data-qf-v23-open="notes"]').click()
+        await page.locator('#qf27-analyze').click()
+        assert await page.locator('#qf-v23-explore-content [data-qf-v23-open="notes"]').is_visible()
+        await page.locator('#qf-v23-explore-content [data-qf-v23-open="notes"]').click()
         assert not await page.locator('#qf-v23-owner-panel').is_visible()
         assert await page.locator('#qf24-notes').is_visible()
         assert await page.locator('#qf-v23-note-company').inner_text() == 'Microsoft (MSFT)'
@@ -82,13 +85,8 @@ async def run_page(browser, width: int) -> None:
         assert await page.locator('#qf-v23-note-list .qf-v23-note-entry').count() == 1
         await page.locator('#qf-v20-navigation [data-page="portfolio"]').click()
         await page.locator('[data-qf-portfolio="overview"]').click()
-        await page.wait_for_function("document.querySelector('#qf-v23-trade-symbol').options.length>0")
-        assert 'Virtual cash' in await page.locator('#qf-v23-account-overview').inner_text()
-        await page.locator('#qf-v23-trade-amount').fill('120')
-        page.once('dialog', lambda dialog: asyncio.create_task(dialog.accept()))
-        await page.locator('#qf-v23-trade-submit').click()
-        await page.locator('#qf24-trade-status').get_by_text('Virtual transaction recorded. No live order sent.', exact=True).wait_for()
-        assert await page.locator('#qf-v23-account-overview').get_by_text('$2,380.00').count() >= 1
+        await virtual_buy(page, 'MSFT', 120)
+        assert '$2,380.00' in await page.locator('#qf27-account-summary').inner_text()
         if width == 1440:
             await page.screenshot(path=os.getenv('QF_D23_PRIVATE_SCREENSHOT', '/tmp/qf_d23_private.png'))
         await page.locator('#qf-v20-mode').click()
@@ -96,7 +94,7 @@ async def run_page(browser, width: int) -> None:
         await page.wait_for_function("!window.QFPrivateBridgeV23.ready()")
         assert not await page.locator('#qf-v23-owner-panel').is_visible()
         assert await page.locator('#qf-v20-mode').inner_text() == 'Sign in'
-        assert not await page.locator('[data-qf-v23-open="notes"]').is_visible()
+        assert not await page.locator('#qf-v23-explore-content [data-qf-v23-open="notes"]').is_visible()
         assert not errors, errors[:5]
         print(f'Release D {width}px home / MFA-mock / notes / virtual trades / signout PASS', flush=True)
     finally:

@@ -16,6 +16,10 @@ function formula(key){const [label,body]=equations[key];return '<div class="qf24
 function bars(title,rows,format=pct){
  const clean=rows.filter(r=>Number.isFinite(r[1]));if(!clean.length)return '<p>No eligible observations for this exhibit.</p>';
  const max=Math.max(...clean.map(r=>Math.abs(r[1])),0.00001),h=clean.length*45+25;
+ if(root.innerWidth<740){
+  const w=Math.max(240,Math.min(360,root.innerWidth-96)),limit=Math.floor((w-100)/7.2);
+  return '<figure class="qf24-figure"><figcaption>'+safe(title)+'</figcaption><svg viewBox="0 0 '+w+' '+(clean.length*64+8)+'" role="img" aria-label="'+safe(title)+'">'+clean.map(([name,v],i)=>{const label=String(name),short=label.length>limit?label.slice(0,limit-1)+'…':label;return '<g><title>'+safe(label)+': '+safe(format(v))+'</title><text x="0" y="'+(i*64+19)+'" font-size="14">'+safe(short)+'</text><text x="'+w+'" y="'+(i*64+19)+'" text-anchor="end" font-size="14">'+safe(format(v))+'</text><rect x="0" y="'+(i*64+31)+'" width="'+Math.max(1,Math.abs(v)/max*w)+'" height="17" rx="3" fill="'+(v<0?'#8a6248':'#424e5c')+'"/></g>';}).join('')+'</svg><div class="qf24-readable">'+clean.map(([n,v])=>safe(n)+': '+safe(format(v))).join(' · ')+'</div></figure>';
+ }
  return '<figure class="qf24-figure"><figcaption>'+safe(title)+'</figcaption><svg viewBox="0 0 720 '+h+'" role="img" aria-label="'+safe(title)+'">'+clean.map(([name,v],i)=>'<g><text x="0" y="'+(i*45+22)+'" font-size="14">'+safe(name)+'</text><rect x="220" y="'+(i*45+6)+'" width="'+Math.max(1,Math.abs(v)/max*355)+'" height="25" rx="3" fill="'+(v<0?'#8a6248':'#424e5c')+'"><title>'+safe(name)+': '+safe(format(v))+'</title></rect><text x="595" y="'+(i*45+24)+'" font-size="14">'+safe(format(v))+'</text></g>').join('')+'</svg><div class="qf24-readable">'+clean.map(([n,v])=>safe(n)+': '+safe(format(v))).join(' · ')+'</div></figure>';
 }
 function calibration(p){

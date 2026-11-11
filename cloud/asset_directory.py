@@ -63,7 +63,11 @@ def _download(asset_class: str) -> list[dict[str, str]]:
         name = " ".join(str(row.get("name") or symbol).split())[:120]
         exchange = str(row.get("exchange") or "")[:30]
         items.append({"symbol": symbol, "name": name, "exchange": exchange,
-                      "asset_class": "crypto" if asset_class == "crypto" else "us_equity"})
+                      "asset_class": "crypto" if asset_class == "crypto" else "us_equity",
+                      "instrument_type": "crypto" if asset_class == "crypto" else
+                      "ETF / fund" if re.search(r"\b(etf|fund|trust|ultrapro|ultra|direxion|graniteshares|t-rex|2x|3x)\b", name, re.I) else "equity listing",
+                      "instrument_type_source": "provider asset class" if asset_class == "crypto" else "name heuristic; subtype not independently verified",
+                      "tradable": True, "history_status": "Subject to provider/feed entitlement"})
         seen.add(symbol)
     items.sort(key=lambda x: (x["name"].casefold(), x["symbol"]))
     return items
@@ -97,6 +101,10 @@ def browse(*, category: str = "popular", letter: str = "", query: str = "", page
         assets = [x for x in assets if x["name"].upper().startswith(letter.upper())]
     if query:
         assets = [x for x in assets if query in x["name"].casefold() or query in x["symbol"].casefold()]
+        assets.sort(key=lambda x: (0 if x["symbol"].casefold() == query else 1,
+                                 0 if x["name"].casefold().startswith(query) else 1,
+                                 1 if x.get("instrument_type") == "ETF / fund" else 0,
+                                 x["name"].casefold()))
     limit = 24
     total = len(assets)
     start = page * limit

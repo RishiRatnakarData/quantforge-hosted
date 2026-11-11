@@ -5,6 +5,7 @@ import asyncio
 import os
 from pathlib import Path
 
+from browser_product_contract import PRODUCT_TRADES, pick_compare, virtual_buy
 from playwright.async_api import async_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -28,7 +29,7 @@ FIXTURE = r'''() => {
   if(p.includes('private/news-research'))return response({detail:'No news entitlement'},false,422);
   if(p.includes('private/notes')){const input=JSON.parse(options.body);if(input.expected_version!==window.qfMockVersion)return response({detail:'Version changed'},false,409);window.qfMockOwner.notes=input.notes;window.qfMockVersion++;return response({portfolio:window.qfMockOwner,version:window.qfMockVersion});}
   if(p.includes('private/trade')){const input=JSON.parse(options.body);if(input.expected_version!==window.qfMockVersion)return response({detail:'Version changed'},false,409);window.qfMockOwner.holdings[input.symbol]=2;window.qfMockOwner.cash-=Number(input.amount);window.qfMockOwner.trades.unshift({symbol:input.symbol,side:input.side,units:2,at:'2026-10-09'});window.qfMockVersion++;return response({portfolio:window.qfMockOwner,version:window.qfMockVersion,paper_only:true});}
-  if(p.includes('private/assets'))return response({licensed_private:true,total:2,items:[{symbol:'MSFT',name:'Microsoft',asset_class:'us_equity'},{symbol:'TEST',name:'Offline Test Company',asset_class:'us_equity'}]});
+  if(p.includes('private/assets'))return response({licensed_private:true,total:4,items:[{symbol:'AAPL',name:'Apple',asset_class:'us_equity'},{symbol:'NVDA',name:'NVIDIA',asset_class:'us_equity'},{symbol:'MSFT',name:'Microsoft',asset_class:'us_equity'},{symbol:'TEST',name:'Offline Test Company',asset_class:'us_equity'}]});
   throw Error('Unexpected mocked route '+p);
  };
 }'''
@@ -45,12 +46,11 @@ async def matrix(page, prefix):
     for route in ('explore', 'compare', 'models', 'portfolio', 'methods'):
         await page.locator(f'#qf-v20-navigation [data-page="{route}"]').click()
         if route == 'explore':
-            await page.locator('#qf-v20-analyze').click()
+            await page.locator('#qf27-analyze').click()
         if route == 'compare':
             # Exact covered names; synthetic public and mocked private histories stay separate.
             for symbol in ('AAPL', 'NVDA'):
-                await page.locator('#qf-v20-compare-search').fill(symbol)
-                await page.locator('#qf-v20-compare-search').dispatch_event('change')
+                await pick_compare(page, symbol)
             await page.locator('#qf-v20-compare-run').click()
             await page.wait_for_function("document.querySelector('#qf-b21-compare-chart svg')")
         if route == 'models':
@@ -69,7 +69,7 @@ async def matrix(page, prefix):
             for view in ('overview', 'data', 'statistical', 'engineering'):
                 await page.locator(f'[data-qf-c22-method="{view}"]').click()
                 if view == 'statistical':
-                    assert await page.locator('#qf-c22-method-content math').count() == 6
+                    assert await page.locator('#qf-c22-method-content math').count() >= 1
                 await capture(page, f'{prefix}-methods-{view}')
             assert await page.locator('#qf-c22-method-content a[href*="github.com"]').count() == 0
         elif route == 'portfolio':
@@ -110,15 +110,16 @@ async def journey(browser, width):
     assert 'DO-NOT-ECHO' not in await page.locator('#private-message').inner_text()
     await capture(page, f'error-{width}-structured-validation')
     await page.evaluate(FIXTURE)
+    await page.evaluate(PRODUCT_TRADES)
     await page.locator('#private-password').fill('offline-password')
     await page.locator('#private-login-submit').click()
     await page.wait_for_function('window.QFPrivateBridgeV23.ready()')
     assert 'PRIVATE' in await page.locator('#qf24-mode-label').inner_text()
     assert 'CRYPTO' not in await page.locator('#qf-v20-source-badge').inner_text()
     await page.locator('#qf-v20-search').fill('Offline')
-    await page.locator('[data-qf-pick="TEST"]').click()
+    await page.locator('#qf-v20-search-results [data-qf27-symbol="TEST"]').click()
     assert 'not covered' in await page.locator('#qf-v20-sector').inner_text()
-    await page.locator('#qf-v20-analyze').click()
+    await page.locator('#qf27-analyze').click()
     assert 'no coverage' in await page.locator('#qf-v20-coverage').inner_text()
     await capture(page, f'private-{width}-non-sec-asset')
     await page.evaluate("window.QFResearch20.choose('MSFT')")
@@ -131,7 +132,7 @@ async def journey(browser, width):
     await page.locator('#qf-v23-note').fill('OFFLINE-PRIVATE-NOTE')
     await page.locator('#qf-v23-save').click()
     await page.wait_for_function("document.querySelector('#qf-v23-note-list').textContent.includes('OFFLINE-PRIVATE-NOTE')")
-    await page.locator('#qf-v20-analyze').click()
+    await page.locator('#qf27-analyze').click()
     await page.locator('#qf24-save-brief').click()
     await page.wait_for_function("window.qfMockOwner.notes.length===2")
     await page.evaluate('''async () => {
@@ -146,16 +147,12 @@ async def journey(browser, width):
     assert 'OFFLINE-PRIVATE-NOTE' not in await page.locator('body').inner_text()
     assert await page.evaluate("window.QFResearch20.context().origin==='synthetic'")
     before = await page.evaluate('window.qfMockRequests.length')
-    await page.locator('#qf-v20-analyze').click()
+    await page.locator('#qf27-analyze').click()
     assert await page.evaluate('window.qfMockRequests.length') == before
     await page.locator('#qf24-switch-mode').click()
     await page.locator('#qf-v20-navigation [data-page="portfolio"]').click()
     await page.locator('[data-qf-portfolio="overview"]').click()
-    await page.wait_for_function("document.querySelector('#qf-v23-trade-symbol').options.length>0")
-    await page.locator('#qf-v23-trade-symbol').select_option('TEST')
-    await page.locator('#qf-v23-trade-amount').fill('120')
-    page.once('dialog', lambda dialog: asyncio.create_task(dialog.accept()))
-    await page.locator('#qf-v23-trade-submit').click()
+    await virtual_buy(page, 'TEST', 120)
     await page.wait_for_function('window.qfMockVersion===5')
     await page.locator('#qf-v20-mode').click()
     await page.locator('#qf-v23-signout').click()

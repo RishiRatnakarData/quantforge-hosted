@@ -1,0 +1,243 @@
+{
+  "base_commit": "da1f755cdc784e2fbd11413aea879bf5c34acf00",
+  "review_branch": "codex/quantforge-product-rebuild",
+  "publication": "Local review only. New owner approval required before push, merge or deployment.",
+  "manifest_self_hash": "excluded",
+  "hash_basis": "sha256 uses working-tree bytes; lf_normalized_sha256 allows Windows/Git line-ending normalization.",
+  "verification": {
+    "python_passed": 592,
+    "javascript_passed": 402,
+    "new_product_browser_journeys": 6,
+    "retained_engine_browser_journeys": 6,
+    "browsers": [
+      "Chromium",
+      "Firefox",
+      "WebKit"
+    ],
+    "viewport_widths": [
+      1440,
+      390
+    ],
+    "owner_services": "isolated fixtures; live acceptance pending",
+    "preserved_flows": "A, B, C, D and complete route matrix passed",
+    "audits": "Ruff, syntax, privacy, compiled CSP, whitespace, deterministic build passed"
+  },
+  "files": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "bytes": 7087,
+      "sha256": "3070b42480dd4187ee991745926bf289dcec4afd1438e93b29c1cfee9096b7dc",
+      "lf_normalized_sha256": "3070b42480dd4187ee991745926bf289dcec4afd1438e93b29c1cfee9096b7dc"
+    },
+    {
+      "path": "README.md",
+      "bytes": 8402,
+      "sha256": "df8dc0c3363159a37e77bfaaad9d938561373d07a1d07e4b1b9e70942bd7f46c",
+      "lf_normalized_sha256": "df8dc0c3363159a37e77bfaaad9d938561373d07a1d07e4b1b9e70942bd7f46c"
+    },
+    {
+      "path": "cloud/api.py",
+      "bytes": 40827,
+      "sha256": "84ace6e537be93507dd5247b5d23c78519669202bc67f5d1794b5290d89c784a",
+      "lf_normalized_sha256": "84ace6e537be93507dd5247b5d23c78519669202bc67f5d1794b5290d89c784a"
+    },
+    {
+      "path": "cloud/asset_directory.py",
+      "bytes": 5694,
+      "sha256": "437003e9a37c89f47df1a9ea162fcc018cf87db5fd04abfdd2085985067afe5a",
+      "lf_normalized_sha256": "437003e9a37c89f47df1a9ea162fcc018cf87db5fd04abfdd2085985067afe5a"
+    },
+    {
+      "path": "cloud/news_intelligence_v180.py",
+      "bytes": 10680,
+      "sha256": "8add26209276c3b4aef4632a0b65ae13fdadca11ba7bb257e06df1cbc6c6e729",
+      "lf_normalized_sha256": "8add26209276c3b4aef4632a0b65ae13fdadca11ba7bb257e06df1cbc6c6e729"
+    },
+    {
+      "path": "docs/CODEX_REBUILD_PROGRESS.md",
+      "bytes": 22306,
+      "sha256": "2a312a747381f19db29c3cbe580c722142ad9906dd4181e5f5c79f82bdd74c79",
+      "lf_normalized_sha256": "30d649d599a0af9b9bbc733f1acc27811530021c22f0c289bc1664ce7e6c443b"
+    },
+    {
+      "path": "docs/PRODUCT_IMPROVEMENT_2026_11_10.md",
+      "bytes": 10353,
+      "sha256": "fb24a807cb0c6002c6427b780d6d488e39a5587ce937bd035b6e4dbb9bddac48",
+      "lf_normalized_sha256": "0ecf72e5b4b24dab2c6c6ea1ddd2319fb159820a5bef38473d0c9c436cf6520d"
+    },
+    {
+      "path": "public/_headers",
+      "bytes": 493,
+      "sha256": "89fcc2345642e75d1d9dc26444b5bd3390f0b6bacf7736af630905fff35474f6",
+      "lf_normalized_sha256": "89fcc2345642e75d1d9dc26444b5bd3390f0b6bacf7736af630905fff35474f6"
+    },
+    {
+      "path": "public/index.html",
+      "bytes": 1376256,
+      "sha256": "8c6f481a40c66be59b8990c039d59003a3026e45824ac87fe54e9aa07c5cd3c4",
+      "lf_normalized_sha256": "8c6f481a40c66be59b8990c039d59003a3026e45824ac87fe54e9aa07c5cd3c4"
+    },
+    {
+      "path": "tests/test_news_context_v27.py",
+      "bytes": 1583,
+      "sha256": "a5db3280a15c5c1ebf1ffc7fc4de22bc11f835de281adc2270c75b51f14ce7ae",
+      "lf_normalized_sha256": "a5db3280a15c5c1ebf1ffc7fc4de22bc11f835de281adc2270c75b51f14ce7ae"
+    },
+    {
+      "path": "tests/test_product_transactions_v27.py",
+      "bytes": 5090,
+      "sha256": "a25f44a7e40f0af17edfe4d107035adb556af6817f6c6f2ae8d5708a89e926fc",
+      "lf_normalized_sha256": "a25f44a7e40f0af17edfe4d107035adb556af6817f6c6f2ae8d5708a89e926fc"
+    },
+    {
+      "path": "tests/test_release_d_structure.py",
+      "bytes": 2561,
+      "sha256": "4b4473f20fc6b36b2a9cc7a81ed83ae2fdbb4dfd9d73defcc1b3dc0cdeb218e3",
+      "lf_normalized_sha256": "4b4473f20fc6b36b2a9cc7a81ed83ae2fdbb4dfd9d73defcc1b3dc0cdeb218e3"
+    },
+    {
+      "path": "tools/audit_v82_readiness.py",
+      "bytes": 6553,
+      "sha256": "897cf2968f95aa3da2240cdc50267ab3e98bcbeefecb3070204c9e8e6f10b381",
+      "lf_normalized_sha256": "897cf2968f95aa3da2240cdc50267ab3e98bcbeefecb3070204c9e8e6f10b381"
+    },
+    {
+      "path": "tools/browser_product_contract.py",
+      "bytes": 2239,
+      "sha256": "4072221e37dffb79cf378bd758f15dba79893bd63ab2f9f87fd9cd3b8aec451a",
+      "lf_normalized_sha256": "4072221e37dffb79cf378bd758f15dba79893bd63ab2f9f87fd9cd3b8aec451a"
+    },
+    {
+      "path": "tools/build_unified_site.py",
+      "bytes": 101794,
+      "sha256": "dd81bfc1fcd1e2d8b6dc1c49b41ea5849136c3763a1e32d2d04868b7c544c78f",
+      "lf_normalized_sha256": "dd81bfc1fcd1e2d8b6dc1c49b41ea5849136c3763a1e32d2d04868b7c544c78f"
+    },
+    {
+      "path": "tools/smoke_completion_browser.py",
+      "bytes": 14869,
+      "sha256": "1dc3ab8a9cc2a6f88967020db075721070c0fa1cb658a70db5fc327ac6d1e85d",
+      "lf_normalized_sha256": "1dc3ab8a9cc2a6f88967020db075721070c0fa1cb658a70db5fc327ac6d1e85d"
+    },
+    {
+      "path": "tools/smoke_product_v27.py",
+      "bytes": 15877,
+      "sha256": "39d2e9ff484cc0b01e4af2eee891fcab26dd897bdbcb641d721052e75b9a0ed5",
+      "lf_normalized_sha256": "632d9fd199d5ecb37514cb063e5a90a712a48c52982ab66603f502932b9c9893"
+    },
+    {
+      "path": "tools/smoke_rebuild_browser.py",
+      "bytes": 12082,
+      "sha256": "818c74676899281b746f0f77446fde88cf238ac8d86ae20c49d6606a045ac220",
+      "lf_normalized_sha256": "818c74676899281b746f0f77446fde88cf238ac8d86ae20c49d6606a045ac220"
+    },
+    {
+      "path": "tools/smoke_release_a_browser.py",
+      "bytes": 7449,
+      "sha256": "6887ae62880ac0d9e6fd8f94e90d48881a16203f873fd47cfddf5d78ab9aa6b4",
+      "lf_normalized_sha256": "6887ae62880ac0d9e6fd8f94e90d48881a16203f873fd47cfddf5d78ab9aa6b4"
+    },
+    {
+      "path": "tools/smoke_release_b_browser.py",
+      "bytes": 9719,
+      "sha256": "153a1253a1a668d64a3f7dca1182ca588260c677402b02c23c926c210f122c88",
+      "lf_normalized_sha256": "153a1253a1a668d64a3f7dca1182ca588260c677402b02c23c926c210f122c88"
+    },
+    {
+      "path": "tools/smoke_release_c_browser.py",
+      "bytes": 8668,
+      "sha256": "0a7b130eb1a1ae443911e30ed2dcd9d1ec9a2fa5bc4defeb485c0350286a5d9f",
+      "lf_normalized_sha256": "0a7b130eb1a1ae443911e30ed2dcd9d1ec9a2fa5bc4defeb485c0350286a5d9f"
+    },
+    {
+      "path": "tools/smoke_release_d_browser.py",
+      "bytes": 7057,
+      "sha256": "23a3319a8f0306288b9b63bbc3b634de6f3812bf2bce14c0b5e29c5ecb06429e",
+      "lf_normalized_sha256": "23a3319a8f0306288b9b63bbc3b634de6f3812bf2bce14c0b5e29c5ecb06429e"
+    },
+    {
+      "path": "web/site/explore_research_v27.js",
+      "bytes": 11820,
+      "sha256": "f01f1d9b82f79e390c25098aed866f8b6f1ab4c9eef936b006c16c0b72eb119a",
+      "lf_normalized_sha256": "f01f1d9b82f79e390c25098aed866f8b6f1ab4c9eef936b006c16c0b72eb119a"
+    },
+    {
+      "path": "web/site/investment_picker_v27.js",
+      "bytes": 5840,
+      "sha256": "484e8cd7e68f2baa3f460961363581a18196ce53fa3bd9bf8c9d9d06eb54439a",
+      "lf_normalized_sha256": "484e8cd7e68f2baa3f460961363581a18196ce53fa3bd9bf8c9d9d06eb54439a"
+    },
+    {
+      "path": "web/site/methods_lab_v27.js",
+      "bytes": 34174,
+      "sha256": "c78c68b56116b75a9b2fb0c74401830db70e09c46a819d05e4c16ae98dd283e2",
+      "lf_normalized_sha256": "c78c68b56116b75a9b2fb0c74401830db70e09c46a819d05e4c16ae98dd283e2"
+    },
+    {
+      "path": "web/site/news_context_v27.js",
+      "bytes": 7168,
+      "sha256": "95394dfe085ea16b61697d1574e581a96d32249a97e8ea6d5ce60e6935a8e0a1",
+      "lf_normalized_sha256": "95394dfe085ea16b61697d1574e581a96d32249a97e8ea6d5ce60e6935a8e0a1"
+    },
+    {
+      "path": "web/site/portfolio_workflow_v27.js",
+      "bytes": 14433,
+      "sha256": "8e8121d40ce4f8ac53e6cade78631368a9833c34d0ad47bf6ace345d01409b33",
+      "lf_normalized_sha256": "8e8121d40ce4f8ac53e6cade78631368a9833c34d0ad47bf6ace345d01409b33"
+    },
+    {
+      "path": "web/site/private.js",
+      "bytes": 215858,
+      "sha256": "6fc773069974c27d29ad3606c4c5f865d965248239a78422148fac95f438509d",
+      "lf_normalized_sha256": "6fc773069974c27d29ad3606c4c5f865d965248239a78422148fac95f438509d"
+    },
+    {
+      "path": "web/site/research_app_v20.js",
+      "bytes": 60138,
+      "sha256": "01a621e434fb7aacc714ff9ba5308aa1638a13cd03611ff4a19fb31f5853b190",
+      "lf_normalized_sha256": "a49e0332267ddcf7efaffd75ec330667d389c85b450ed7124e34353897898ae5"
+    },
+    {
+      "path": "web/site/research_deep_ui_v25.js",
+      "bytes": 21159,
+      "sha256": "45f8392f0c046e685ab65e2949d17c91da411f84393e9c798a992d10a876cddc",
+      "lf_normalized_sha256": "45f8392f0c046e685ab65e2949d17c91da411f84393e9c798a992d10a876cddc"
+    },
+    {
+      "path": "web/site/research_design_v27.css",
+      "bytes": 8517,
+      "sha256": "1408ab335eb76bcae657b4e03c2e41016b1d2c7e22e05228fccb7fc5f90c433d",
+      "lf_normalized_sha256": "7b7d2d78d51e4d7f53a6ec92cd3f45a6847da77e53765c47d1bc8ae603f8febf"
+    },
+    {
+      "path": "web/site/research_exhibits_v24.js",
+      "bytes": 16760,
+      "sha256": "5c28bd7833eed5388abac411353dc978ab1d375c85fb6b31022e016ed20dc865",
+      "lf_normalized_sha256": "8b944c346063e2d8f662901c05b214a50696c6767610c4fb86e1ae9cd6dca992"
+    },
+    {
+      "path": "web/site/research_models_methods_ui_v22.js",
+      "bytes": 22937,
+      "sha256": "3ba3cb0cd7918f0391b8a296c94e7ec97af041d598913ca011f98bed5a0b8c44",
+      "lf_normalized_sha256": "3ba3cb0cd7918f0391b8a296c94e7ec97af041d598913ca011f98bed5a0b8c44"
+    },
+    {
+      "path": "web/site/research_private_shell_v23.js",
+      "bytes": 13116,
+      "sha256": "db317d0b4eef53cda1beb3d9ee2318e40865718f902425e7304d54a4e6462a17",
+      "lf_normalized_sha256": "db317d0b4eef53cda1beb3d9ee2318e40865718f902425e7304d54a4e6462a17"
+    },
+    {
+      "path": "web/site/site.template.html",
+      "bytes": 172337,
+      "sha256": "c5fecc07e9bc73ba60378cf8f94941e1b0ae914ea8880ceaa84493b400262c4f",
+      "lf_normalized_sha256": "c5fecc07e9bc73ba60378cf8f94941e1b0ae914ea8880ceaa84493b400262c4f"
+    },
+    {
+      "path": "web/tests/product_v27.test.cjs",
+      "bytes": 2414,
+      "sha256": "d7c18d5bb6fe210f0363e3a3920712d370add0d37dac020269fd2136e6cd714d",
+      "lf_normalized_sha256": "d7c18d5bb6fe210f0363e3a3920712d370add0d37dac020269fd2136e6cd714d"
+    }
+  ]
+}
