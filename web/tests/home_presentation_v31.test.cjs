@@ -1,0 +1,26 @@
+'use strict';
+const test=require('node:test');
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const base=path.join(__dirname,'..','site');
+const html=fs.readFileSync(path.join(base,'site.template.html'),'utf8');
+const js=fs.readFileSync(path.join(base,'research_private_shell_v23.js'),'utf8');
+const css=fs.readFileSync(path.join(base,'research_guide_v30.css'),'utf8');
+test('Home has one company-search action and all five section descriptions',()=>{
+ const start=html.indexOf('id="qf-v23-landing"'),end=html.indexOf('</section>',start);
+ assert.ok(start>=0&&end>start);
+ const home=html.slice(start,end);
+ assert.match(home,/id="qf24-home-search"/);
+ assert.match(home,/id="qf24-home-find"/);
+ assert.doesNotMatch(home,/id="qf-v23-open-research"/);
+ assert.match(home,/research-case-study\.html/);
+ for(const name of ['Explore','Compare','Models','Portfolio','Methods'])assert.match(home,new RegExp('<strong>'+name+'</strong>'));
+});
+test('Home revenue exhibit uses published SEC figures and has honest missing-data behavior',()=>{
+ assert.match(html,/id="qf31-home-chart"/);
+ assert.match(js,/window\.QFPublishedSEC\?\.companies/);
+ assert.match(js,/Number\.isFinite\(r\?\.metrics\?\.revenue_usd\)/);
+ assert.match(js,/SEC example is unavailable/);
+ assert.match(css,/\.qf31-home-bars/);
+});
