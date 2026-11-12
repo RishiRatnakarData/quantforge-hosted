@@ -1,0 +1,38 @@
+name: Candidate generated assets and Home screenshots
+on:
+  push:
+    branches:
+      - chatgpt/home-evidence-polish-20261112
+permissions:
+  contents: read
+jobs:
+  visual_artifacts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install browser test runner
+        run: |
+          python -m pip install playwright==1.57.0
+          python -m playwright install --with-deps chromium
+      - name: Build generated website and validate CSP
+        run: |
+          python tools/build_unified_site.py
+          python tools/audit_public_bundle.py
+          python tools/prepublish_check.py
+      - name: Capture public Home at real HTTPS-root path
+        run: python tools/smoke_home_entry_v31.py
+      - name: Upload compiled public assets and screenshot evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: home-v31-${{ github.sha }}
+          path: |
+            public/index.html
+            public/_headers
+            outputs/home-v31/*.png
+            outputs/home-v31/results.json
+          retention-days: 5
