@@ -115,7 +115,7 @@ $('qf-v23-refresh').addEventListener('click',()=>void refresh());
 $('qf-v23-signout').addEventListener('click',async()=>{try{await bridge().signOut();sync();close();window.QFNavigate20('explore');}catch(_){status('Sign-out could not be completed. Try again.');}});
 window.addEventListener('qf:route-change',e=>{if(e.detail?.route==='private'&&signed()){window.QFNavigate20('explore');return;}if(e.detail?.route==='explore')home(false);sync();});
 window.addEventListener('qf:research-context',sync);window.addEventListener('qf:data-mode',sync);
-window.addEventListener('qf:owner-auth-ready',()=>{sync();window.QFNavigate20('explore');});window.addEventListener('qf:owner-auth-ended',()=>{sync();window.QFNavigate20('explore');});
+window.addEventListener('qf:owner-auth-ready',()=>{sync();if(document.querySelector('.tabpage.active')?.id==='page-private')window.QFNavigate20('explore');});window.addEventListener('qf:owner-auth-ended',()=>{sync();window.QFNavigate20('explore');});
 const legacy=$('private-signed');if(legacy)new MutationObserver(sync).observe(legacy,{attributes:true,attributeFilter:['hidden']});
 sync();window.QFUnifiedPrivate23=Object.freeze({open,home:()=>home(true),state:()=>({signedIn:signed(),landing})});
 })();
