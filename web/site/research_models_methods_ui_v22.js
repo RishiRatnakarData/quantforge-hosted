@@ -12,8 +12,8 @@ const source=(file,label)=>'<span class="qf24-source">'+safe(label)+' · <code>'
 let category='prediction',phase='results',method='overview',stamp='',cached=null;
 const categories=['prediction','risk','valuation','strategy'],phases=['results','evaluation','method'];
 function context(){return root.QFResearch20?.context?.()||null;}
-function header(ctx,detail){return '<div class="qf-c22-provenance"><span class="qf-c22-tag '+(ctx?.origin==='market'?'observed':'synthetic')+'">'+
- (ctx?.origin==='market'?'Authenticated historical market observations':ctx?.origin==='synthetic'?'Synthetic price experiment · NOT real market history':'Price history unavailable')+
+function header(ctx,detail){return '<div class="qf-c22-provenance"><span class="qf-c22-tag '+(category==='valuation'?'reported':ctx?.origin==='market'?'observed':'synthetic')+'">'+
+ (category==='valuation'?'Reported SEC cash flow · modeled growth and discount assumptions':ctx?.origin==='market'?'Authenticated historical market observations':ctx?.origin==='synthetic'?'Synthetic price experiment · NOT real market history':'Price history unavailable')+
  '</span><span>'+safe(ctx?.symbol||'No selected company')+'</span><span>'+safe(detail||'')+'</span></div>';}
 function table(headers,rows){return '<div class="table-wrap"><table><thead><tr>'+headers.map(v=>'<th scope="col">'+safe(v)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(v=>'<td>'+safe(v)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';}
 function metrics(items){return '<div class="qf-c22-metrics">'+items.map(([name,value,sub])=>'<div class="qf-c22-metric"><small>'+safe(name)+'</small><strong>'+safe(value)+'</strong>'+(sub?'<span>'+safe(sub)+'</span>':'')+'</div>').join('')+'</div>';}
@@ -82,15 +82,15 @@ function strategy(ctx,models){
 function renderModel(){
  const ctx=context(),host=$('qf-c22-model-output');if(!ctx){host.textContent='Choose a company in Explore to run a research experiment.';return;}
  const models=modelData(ctx);
- const content={prediction,risk,valuation,strategy};host.innerHTML=(root.QFMethods27?.modelEvidence(category,phase,ctx,models)||'')+content[category](ctx,models)+(root.QFExhibits24?.model(category,phase,ctx,models)||'')+(category==='strategy'?'<section class="pane"><h2>Rolling multi-asset allocation study</h2><p>Reuse the Compare basket: fit on 126 past closes, evaluate the next 21 sessions, then roll forward. Long-only weights are capped at 60%; both strategies pay modeled rebalancing costs. This restores the existing walk-forward engine in the shared workspace.</p><button type="button" class="btn primary" id="qf24-walkforward-run">Run rolling allocation study</button><div id="qf24-walkforward-output" aria-live="polite"></div></section>':'');
+ const content={prediction,risk,valuation,strategy};host.innerHTML=content[category](ctx,models)+(root.QFMethods27?.modelEvidence(category,phase,ctx,models)||'')+(root.QFExhibits24?.model(category,phase,ctx,models)||'')+(category==='strategy'?'<section class="pane"><h2>Rolling multi-asset allocation study</h2><p>Reuse the Compare basket: fit on 126 past closes, evaluate the next 21 sessions, then roll forward. Long-only weights are capped at 60%; both strategies pay modeled rebalancing costs. This restores the existing walk-forward engine in the shared workspace.</p><button type="button" class="btn primary" id="qf24-walkforward-run">Run rolling allocation study</button><div id="qf24-walkforward-output" aria-live="polite"></div></section>':'');
  host.insertAdjacentHTML('beforeend',root.QFDeepUI25?.modelSection(category,phase)||'');
- $('qf-v20-model-selected').textContent=ctx.name+' ('+ctx.symbol+') · selected in Explore · '+(ctx.origin==='market'?'observed owner prices':ctx.origin==='synthetic'?'illustrative public prices':'price data unavailable')+' · SEC snapshot '+ctx.snapshot;
+ $('qf-v20-model-selected').textContent=ctx.name+' ('+ctx.symbol+') · current research selection · '+(ctx.origin==='market'?'observed owner prices':ctx.origin==='synthetic'?'illustrative public prices':'price data unavailable')+' · SEC snapshot '+ctx.snapshot;
  document.querySelectorAll('[data-qf-model]').forEach(b=>{const on=b.dataset.qfModel===category;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));});
- document.querySelectorAll('[data-qf-c22-phase]').forEach(b=>{const on=b.dataset.qfC22Phase===phase;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1;});
+ document.querySelectorAll('[data-qf-c22-phase]').forEach(b=>{const on=b.dataset.qfC22Phase===phase;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1;if(on)$('qf-c22-model-output').setAttribute('aria-labelledby',b.id);});
 }
 function renderMethods(){
  root.QFMethods27?.beforeRender?.();
- document.querySelectorAll('[data-qf-c22-method]').forEach(b=>{const on=b.dataset.qfC22Method===method;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1;});
+ document.querySelectorAll('[data-qf-c22-method]').forEach(b=>{const on=b.dataset.qfC22Method===method;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1;if(on)$('qf-c22-method-content').setAttribute('aria-labelledby',b.id);});
  const host=$('qf-c22-method-content'),snap=root.QFPublishedSEC,n=Array.isArray(snap?.companies)?snap.companies.length:0;
  if(method==='overview'&&root.QFMethods27){host.innerHTML=root.QFMethods27.overview(context());return;}
  if(method==='statistical'&&root.QFMethods27){host.innerHTML=root.QFMethods27.statistical(context());root.QFMethods27.afterRender();return;}
@@ -109,6 +109,9 @@ document.addEventListener('click',e=>{
  const sub=e.target.closest('#page-models [data-qf-c22-phase]');if(sub&&phases.includes(sub.dataset.qfC22Phase)){phase=sub.dataset.qfC22Phase;renderModel();return;}
  const met=e.target.closest('#page-methods [data-qf-c22-method]');if(met&&['overview','data','statistical','engineering'].includes(met.dataset.qfC22Method)){method=met.dataset.qfC22Method;renderMethods();}
 });
+for(const [attribute,panel] of [['data-qf-c22-phase','qf-c22-model-output'],['data-qf-c22-method','qf-c22-method-content']]){
+ for(const tab of document.querySelectorAll('['+attribute+']')){tab.id='qf29-'+tab.getAttribute(attribute)+'-'+panel;tab.setAttribute('aria-controls',panel);}
+}
 // Re-render on source changes and route transitions, never reuse stale price experiments.
 root.addEventListener('qf:research-context',refresh);root.addEventListener('qf:data-mode',refresh);root.addEventListener('qf:owner-auth-ended',refresh);
 root.addEventListener('qf:route-change',e=>{if(e.detail?.route==='models')renderModel();if(e.detail?.route==='methods')renderMethods();});

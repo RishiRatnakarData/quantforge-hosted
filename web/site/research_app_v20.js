@@ -134,9 +134,8 @@ function drawPriceChart(price,benchmark,real){
   const y=top+(bottom-top)*i/4;
   return '<line x1="'+left+'" x2="'+right+'" y1="'+y+'" y2="'+y+'" stroke="#e0eae5"/><text x="'+(left-9)+'" y="'+(y+4)+'" font-size="10" text-anchor="end" fill="#637b70">'+(normalized||!real?value(hi-(hi-lo)*i/4,0):'$'+value(hi-(hi-lo)*i/4,0))+'</text>';
  }).join('');
- const ticks=[0,0.25,0.5,0.75,1].map(t=>{
-  const i=Math.round((series.length-1)*t);
-  return '<text x="'+X(i)+'" y="270" font-size="11" text-anchor="middle" fill="#688177">'+esc(series[i].date.slice(0,7))+'</text>';
+ const ticks=window.QFReadout29.axisTicks(series.map(r=>r.date),W).map(({index:i,label})=>{
+  return '<text class="qf29-price-tick" x="'+X(i)+'" y="270" font-size="12" text-anchor="'+(i===0?'start':i===series.length-1?'end':'middle')+'" fill="#526173">'+esc(label)+'</text>';
  }).join('');
  const mark=real?'':'<text x="'+(W/2)+'" y="55" text-anchor="middle" font-size="'+(W<500?10:19)+'" font-weight="750" fill="#d4e5dc">SYNTHETIC · NOT REAL MARKET PRICES</text>';
  $('qf-v20-chart').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" tabindex="0" role="img" aria-label="'+(real?'Observed':'Synthetic demonstration')+' close-price chart '+esc(series[0].date)+' to '+esc(series[series.length-1].date)+'. Arrow keys inspect values."><title>'+(real?'Observed, price-only historical closes':'Synthetic illustration, not actual company market prices')+'</title>'+grid+ticks+mark+'<path d="'+path(series)+'" fill="none" stroke="#19826c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>'+(bench?'<path d="'+path(bench)+'" fill="none" stroke="#b88c45" stroke-width="2" stroke-dasharray="6 5"/>':'')+'<line id="qf-v20-crosshair" x1="'+X(series.length-1)+'" x2="'+X(series.length-1)+'" y1="'+top+'" y2="'+bottom+'" stroke="#839c91" stroke-dasharray="3 4"/><circle id="qf-v20-crossdot" cx="'+X(series.length-1)+'" cy="'+Y(series[series.length-1].close)+'" r="5" fill="#155f50" stroke="#fff" stroke-width="2"/></svg><div class="qf-v20-cursor" aria-live="polite"><span id="qf-v20-cursor-value"></span><span>'+(normalized?'Indexed to 100 · common observed dates · SPY dashed':real?'Close price · hover or use arrow keys':'Illustrative index · not a stock quote')+'</span></div>';
@@ -189,6 +188,7 @@ async function loadBenchmark(){
   const days=state.range===730||state.range==='ALL'?730:365;
   const raw=await getPrivate('private/history-single?'+new URLSearchParams({symbol:'SPY',days:String(days)}));
   if(token!==state.benchToken||!state.benchmarkOn)return;
+  if(state.priceSource?.equity_feed&&raw.equity_feed!==state.priceSource.equity_feed){state.benchmark=null;renderPriceData();$('qf-v20-chart-source').textContent+=' SPY benchmark withheld because a compatible feed was not verified.';return;}
   state.benchmark=Q.priceSeries(raw.observations);renderPriceData();
  }catch(_){if(token===state.benchToken){state.benchmark=null;renderPriceData();$('qf-v20-chart-source').textContent+=' SPY benchmark unavailable; company closes still shown.';}}
 }
@@ -256,7 +256,7 @@ function percentOrNA(v){return rowsOrNull(v)?pct(v):'—';}
 function names(){return state.compare.map(s=>bySymbol.get(s)?.name||s);}
 function invalidateComparison(){
  state.compareToken++;state.comparison=null;state.compareSource=null;state.benchmarkB=null;
- state.portfolioData=null;state.portfolioWeights=null;state.portfolioBase=null;state.portfolioOrigin='';state.optimization=null;state.financeCompare=null;state.portfolioToken++;
+ state.portfolioScenario=null;state.portfolioData=null;state.portfolioWeights=null;state.portfolioBase=null;state.portfolioOrigin='';state.optimization=null;state.financeCompare=null;state.portfolioToken++;
  $('qf-b21-compare-export').disabled=true;$('qf-b21-finance-export').disabled=true;$('qf-b21-portfolio-export').disabled=true;
  $('qf-b21-compare-state').textContent='Selection changed. Click Compare to calculate results for the current companies.';
  $('qf-b21-compare-chart').textContent='Run Compare to load eligible history on common dates.';
@@ -335,11 +335,12 @@ function publicBatch(symbols,days){
 async function fetchBatch(symbols,days){
  if(mode()!=='private')return publicBatch(symbols,days);
  const data=await getPrivate('private/history?'+new URLSearchParams({symbols:symbols.join(','),days:String(days)}));
- return {aligned:B.fromBatch(data,symbols),source:String(data.source||'Alpaca owner-only split-adjusted daily closes')+' · '+String(data.coverage||''),kind:'market'};
+ return {aligned:B.fromBatch(data,symbols),source:String(data.source||'Alpaca owner-only split-adjusted daily closes')+' · '+String(data.coverage||''),kind:'market',equityFeed:data.equity_feed||null};
 }
-async function fetchBenchmark(aligned,days,kind){
+async function fetchBenchmark(aligned,days,kind,equityFeed=null){
  try{
-  const series=kind==='market'?Q.priceSeries((await getPrivate('private/history-single?'+new URLSearchParams({symbol:'SPY',days:String(days)}))).observations):Q.chartWindow(Q.syntheticPrice('SPY'),days);
+  let series;
+  if(kind==='market'){const raw=await getPrivate('private/history-single?'+new URLSearchParams({symbol:'SPY',days:String(days)}));if(equityFeed&&raw.equity_feed!==equityFeed)return null;series=Q.priceSeries(raw.observations);}else series=Q.chartWindow(Q.syntheticPrice('SPY'),days);
   const dates=new Map(series.map(row=>[row.date,row.close]));if(!aligned.dates.every(d=>dates.has(d)))return null;
   const first=dates.get(aligned.dates[0]);return {symbol:'SPY',kind,values:aligned.dates.map(d=>dates.get(d)/first*100)};
  }catch(_){return null;}
@@ -347,7 +348,10 @@ async function fetchBenchmark(aligned,days,kind){
 async function runCompare(){
  const symbols=state.compare.slice();const request=++state.compareToken;
  if(symbols.length<2||symbols.length>5){$('qf-b21-compare-state').textContent='Select 2–5 distinct companies first.';return;}
- renderFinanceComparison();
+ state.comparison=null;state.compareSource=null;state.portfolioData=null;state.portfolioScenario=null;state.benchmarkB=null;state.optimization=null;state.portfolioToken++;
+ $('qf-b21-compare-export').disabled=true;$('qf-b21-portfolio-export').disabled=true;
+ $('qf-b21-risk-table').textContent='Loading a new common-date sample…';$('qf-b21-risk-scatter').replaceChildren();$('qf-b21-distribution').replaceChildren();$('qf-b21-correlation').textContent='Waiting for the new sample.';$('qf-b21-optimizer-output').replaceChildren();
+ renderPortfolioResearch();renderFinanceComparison();
  $('qf-b21-compare-state').textContent='Aligning '+symbols.length+' company histories on shared observed dates…';
  $('qf-b21-compare-chart').textContent='Loading eligible price history…';
  try{
@@ -356,18 +360,20 @@ async function runCompare(){
   if(request!==state.compareToken||symbols.join(',')!==state.compare.join(','))return;
   const result=B.compare(batch.aligned);
   state.comparison=result;state.compareSource=batch;state.portfolioData=result;state.portfolioOrigin=batch.source;
-  const benchmark=await fetchBenchmark(batch.aligned,days,batch.kind);
+  const benchmark=await fetchBenchmark(batch.aligned,days,batch.kind,batch.equityFeed);
   if(request!==state.compareToken)return;
   state.benchmarkB=benchmark;
   $('qf-b21-compare-state').textContent=symbols.length+' companies · '+result.coverage.common_closes+' identical dated closes · '+result.coverage.first+' through '+result.coverage.last;
   const plot=result.symbols.map((s,i)=>({label:s,values:result.indexed[s]}));
   if(benchmark)plot.push({label:batch.kind==='market'?'SPY observed':'SPY illustrative',values:benchmark.values});
   linePlot('qf-b21-compare-chart',result.dates,plot);
-  $('qf-b21-compare-provenance').textContent=batch.source+' '+result.convention+' Benchmark is '+(benchmark?(batch.kind==='market'?'observed price-only':'synthetic and illustrative'):'not available for all exact dates')+'. No missing dates were filled. Each line starts at 100: a level of 110 means 10% above its first observation, not a $110 share price.';
+  $('qf-b21-compare-provenance').textContent=batch.source+' '+result.convention+' Benchmark is '+(benchmark?(batch.kind==='market'?'observed price-only':'synthetic and illustrative'):'withheld: matching dates and compatible feed were not verified')+'. No missing dates were filled. Each line starts at 100: a level of 110 means 10% above its first observation, not a $110 share price.';
   riskTable(result);renderHistogram(result);heatmap('qf-b21-correlation',result);$('qf-b21-compare-export').disabled=false;
   if($('page-portfolio').classList.contains('active'))renderPortfolioResearch();
  }catch(e){if(request!==state.compareToken)return;
-  state.comparison=null;state.compareSource=null;state.portfolioData=null;state.benchmarkB=null;
+  state.comparison=null;state.compareSource=null;state.portfolioData=null;state.portfolioScenario=null;state.benchmarkB=null;
+  $('qf-b21-compare-export').disabled=true;$('qf-b21-portfolio-export').disabled=true;
+  $('qf-b21-risk-table').textContent='Risk statistics unavailable for this request.';$('qf-b21-risk-scatter').replaceChildren();$('qf-b21-distribution').textContent='No current return sample.';$('qf-b21-correlation').textContent='No current common-date return sample.';renderPortfolioResearch();
   $('qf-b21-compare-state').textContent='History unavailable: '+String(e.message||e).slice(0,180)+' SEC comparison remains available.';
   $('qf-b21-compare-chart').textContent='No compatible common-date price history. No synthetic fallback in owner mode.';
   $('qf-b21-compare-provenance').textContent='Unavailable market history; SEC financial rows are independent.';
@@ -395,7 +401,9 @@ function weightPercentageSet(symbols,symbol,next){
  state.portfolioWeights=weights;window.dispatchEvent(new Event('qf:research-universe'));
 }
 function renderSliders(){
- const symbols=currentUniverse(),weights=state.portfolioWeights;
+ const symbols=currentUniverse(),weights=state.portfolioWeights,controls=[...$('qf-b21-weight-controls').querySelectorAll('[data-qf-b21-weight]')],keys=[...symbols,'cash'];
+ // Keep native range elements alive during drag and repeated keyboard adjustments.
+ if(controls.length===keys.length&&controls.every((control,i)=>control.dataset.qfB21Weight===keys[i])){for(const control of controls){const n=Math.round(weights[control.dataset.qfB21Weight]*100);control.value=String(n);control.closest('label').querySelector('output').textContent=n+'%';}return;}
  $('qf-b21-weight-controls').innerHTML=[...symbols,'cash'].map(s=>'<label class="qf-b21-slider-line"><span>'+esc(s==='cash'?'Cash':(bySymbol.get(s)?.name||s))+'</span><input type="range" min="0" max="100" step="1" value="'+Math.round(weights[s]*100)+'" data-qf-b21-weight="'+esc(s)+'" aria-label="'+esc(s)+' allocation percentage"/><output>'+Math.round(weights[s]*100)+'%</output></label>').join('');
  $('qf-b21-weights-total').textContent='Total 100% · '+symbols.length+' companies + cash · adjustments maintain full allocation';
 }
@@ -408,6 +416,7 @@ function renderPortfolioResearch(){
  const symbols=currentUniverse();resetWeights(symbols);renderSliders();renderConcentration();
  const result=state.portfolioData;
  if(!result||result.symbols.join(',')!==symbols.join(',')){
+  state.portfolioScenario=null;
   $('qf-b21-overview-chart').textContent='Eligible common-date history is not loaded.';
   $('qf-b21-whatif-chart').textContent='Historical chart unavailable. Allocation and concentration remain interactive.';
   $('qf-b21-overview-stats').replaceChildren();$('qf-b21-whatif-stats').replaceChildren();
@@ -417,8 +426,10 @@ function renderPortfolioResearch(){
   return;
  }
  let amount=Number($('qf-b21-amount').value);if(!Number.isFinite(amount)||amount<100||amount>1e8){
-  $('qf-b21-whatif-chart').textContent='Enter a hypothetical starting value from $100 to $100 million.';return;
+  state.portfolioScenario=null;$('qf-b21-portfolio-export').disabled=true;$('qf-b21-amount').setAttribute('aria-invalid','true');
+  $('qf-b21-whatif-chart').textContent='Enter a hypothetical starting value from $100 to $100 million.';$('qf-b21-whatif-stats').replaceChildren();$('qf-b21-analysis-stats').replaceChildren();heatmap('qf-b21-analysis-corr',null);$('qf-b21-analysis-stress').textContent='Correct the starting value to recompute this allocation study.';$('qf-b21-whatif-provenance').textContent='Scenario not calculated. Enter a valid hypothetical starting value to inspect current results.';return;
  }
+ $('qf-b21-amount').removeAttribute('aria-invalid');
  const baseline=B.scenario(result,state.portfolioBase,amount),selected=B.scenario(result,state.portfolioWeights,amount);
  state.portfolioScenario={baseline,selected};
  const benchmark=state.benchmarkB&&state.benchmarkB.values.length===result.dates.length?state.benchmarkB:null;
@@ -430,7 +441,7 @@ function renderPortfolioResearch(){
  $('qf-b21-overview-data-status').textContent=result.coverage.first+' to '+result.coverage.last+' · '+result.coverage.common_closes+' common closes · '+info;
  $('qf-b21-overview-stats').innerHTML=[['Illustrative period change',pct(baseline.summary.total_return)],['Historical annualized volatility',pct(baseline.summary.annual_volatility)],['Max drawdown',pct(baseline.summary.max_drawdown)]].map(([a,b])=>'<div><small>'+esc(a)+'</small><strong>'+esc(b)+'</strong></div>').join('');
  $('qf-b21-whatif-stats').innerHTML=[['Historical period change',pct(selected.summary.total_return)],['Annualized volatility',pct(selected.summary.annual_volatility)],['Max drawdown',pct(selected.summary.max_drawdown)],['Historical daily ES 95%',pct(selected.summary.daily_es95_loss)]].map(([a,b])=>'<div><small>'+esc(a)+'</small><strong>'+esc(b)+'</strong></div>').join('');
- $('qf-b21-whatif-provenance').textContent=info+' Historical daily constant-weight rebalancing; no fees, interest, taxes or dividends modeled. Starting value '+usd(amount)+'. '+(benchmark?'Benchmark series indexed on all matching dates.':'Benchmark withheld because its exact dates were not available.')+' Chart levels start at 100 and show relative change, not a share price. No recorded account P&L or future prediction.';
+ $('qf-b21-whatif-provenance').textContent=info+' Historical daily constant-weight rebalancing; no fees, interest, taxes or dividends modeled. Starting value '+usd(amount)+'. '+(benchmark?'Benchmark series indexed on all matching dates.':'Benchmark withheld because matching dates and compatible feed were not verified.')+' Chart levels start at 100 and show relative change, not a share price. No recorded account P&L or future prediction.';
  const split=selected.split_vol;
  $('qf-b21-analysis-stats').innerHTML=[['Annualized volatility',pct(selected.summary.annual_volatility)],['Maximum drawdown',pct(selected.summary.max_drawdown)],['Daily loss VaR 95%',pct(selected.summary.daily_var95_loss)],['Daily loss ES 95%',pct(selected.summary.daily_es95_loss)]].map(([a,b])=>'<div><small>'+esc(a)+'</small><strong>'+esc(b)+'</strong></div>').join('');
  $('qf-b21-analysis-source').textContent=info+' Common-date return matrix: '+result.coverage.common_closes+' observations. VaR/ES are daily empirical losses, not worst-case bounds.';
@@ -448,9 +459,9 @@ async function loadPortfolioResearch(){
   const batch=await fetchBatch(symbols,days);
   if(token!==state.portfolioToken||state.compare.join(',')!==key)return;
   const result=B.compare(batch.aligned);
-  state.portfolioData=result;state.portfolioOrigin=batch.source;
-  state.benchmarkB=await fetchBenchmark(batch.aligned,days,batch.kind);
-  if(token!==state.portfolioToken)return;
+  const benchmark=await fetchBenchmark(batch.aligned,days,batch.kind,batch.equityFeed);
+  if(token!==state.portfolioToken||state.compare.join(',')!==key)return;
+  state.portfolioData=result;state.portfolioOrigin=batch.source;state.benchmarkB=benchmark;
   renderPortfolioResearch();
  }catch(e){if(token!==state.portfolioToken)return;
   state.portfolioData=null;
@@ -499,7 +510,7 @@ function exportComparisonSEC(){if(!state.financeCompare)return;
  for(const r of state.financeCompare){rows.push([r.symbol,r.name,data.as_of,r.fiscal,r.revenue,r.growth,r.margin,r.fcf,r.f.annual[0]?.sources?.revenue_usd?.accession||null]);}
  csv(rows,'quantforge-reported-sec-comparison.csv');
 }
-function exportPortfolio(){if(!state.portfolioScenario||!state.portfolioData)return;
+function exportPortfolio(){const amount=Number($('qf-b21-amount').value);if(!Number.isFinite(amount)||amount<100||amount>1e8||!state.portfolioScenario||!state.portfolioData)return;
  const {selected,baseline}=state.portfolioScenario;
  csv([['date','hypothetical_selected_index','starting_weight_index','market_source_kind'],...selected.dates.map((d,i)=>[d,selected.indexed[i],baseline.indexed[i],state.compareSource?.kind|| (mode()==='private'?'market':'synthetic')])],
   'quantforge-hypothetical-portfolio-study.csv');

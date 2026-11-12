@@ -1,0 +1,336 @@
+{
+  "base": "21982d880b7408d28588fe6aba6d28e2015af05f",
+  "modules": [
+    {
+      "source": "web/site/app.js",
+      "sha256_lf": "78f59a2e1f24467e8f98224ea3f64a057f4c5199b4159eab3c0746805e5a7280",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/explore_research_v27.js",
+      "sha256_lf": "a54d48d95e47e6aab3fc0c7ee34402f91bb9d4e375bc16b4c26eb2029efa136e",
+      "relation_to_21982d8": "changed"
+    },
+    {
+      "source": "web/site/funding_workflow_v28.js",
+      "sha256_lf": "6b22598391b2332a2a6337b14050aa44076ce849002e9390cd4c197056828d2a",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/investment_picker_v27.js",
+      "sha256_lf": "cc3f2947f98e3c627853e606920f0eba98860d8b259f2d869f14bc3f40b5893b",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/methods_lab_v27.js",
+      "sha256_lf": "2fa5c767d3598de3f9759e78c700421a5972f4955a3551ab4d06edfabc53dd24",
+      "relation_to_21982d8": "changed"
+    },
+    {
+      "source": "web/site/model.js",
+      "sha256_lf": "76f8261407c2c8c3d112d3556c14a2649e8be376cfa3b267aa54e1c68cbbebec",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/news_context_v27.js",
+      "sha256_lf": "c3e8447ccca32a7b4a06305aa00f8f876dadfc7c0766ae312c5c62d360fc69d7",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/news_policy_examples_v28.js",
+      "sha256_lf": "359a40053a3e6fc90e40d07a50300fca4fc0f809973d7466515e875af6efec8f",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/portfolio_workflow_v27.js",
+      "sha256_lf": "5d2d7308c51f75db6ea1039c01c0bb67eeea4dfe88902d131f4f31f486e71172",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private.js",
+      "sha256_lf": "66a27018d6776a94b5767af07de097af6481f6b959dddf854b1d903c423a3396",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_allocation_v74.js",
+      "sha256_lf": "77f14ea15f6c1f655f94371c4a0016c0e65c0b4ad745d440147e3faa56c883f5",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_archive_quality_v100.js",
+      "sha256_lf": "bb08a6a790e1ec40ac89a8d3fcac21aa42bc3aed95f9877b98a3299a351aea7b",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_archived_sec_v99.js",
+      "sha256_lf": "9b51954059141336cb0458d8f01ad0263ba026af24db98ba340d33d94fcdcf1c",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_candidate_v85.js",
+      "sha256_lf": "512e810d2364ba1c5fc5a17a14207f7c6c30ac0a5938da5a878684ade92a0f95",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_decision_center_v84.js",
+      "sha256_lf": "580ce62f492cc0157f2e31e1110f8d09c7fccadcc25036dfd90138cceabc29df",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_decision_integrity_v130.js",
+      "sha256_lf": "4c4ef9c449708b5876a995b06274d6c0b69a1803f15380ad10eb77603cdda295",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_decision_review_v92.js",
+      "sha256_lf": "bc815e0c3e5e58189cd172eee6a87373a591a50b6711b303d36610d58eee7904",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_decision_v72.js",
+      "sha256_lf": "e25dc69ceb20b7e957468fd3c98f2f99a908c002d205242799d5c9c6a4af1f18",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_diagnostics_v66.js",
+      "sha256_lf": "4d4cebaeb1171e626f0aa5b80cef37642583f059363c90363c8044fd4b9a8d7a",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_factor_scenarios_v86.js",
+      "sha256_lf": "03f11bf52b45e084dabdc486e54a1c725a51e3a0aa52c5e98ffcd9fb86d13a05",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_forecast_v65.js",
+      "sha256_lf": "eaf258474e0721bee718a6f004e53c129ad10605dd168d9e1f434f474d2ed435",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_french_factors_v87.js",
+      "sha256_lf": "6893ecbb28ee010ce81d8932d5a4ec0cd3411814e8dfa64f478ae63c03dcc873",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_guide_v79.js",
+      "sha256_lf": "e6dc59b8bf3a1cdb9ecef684616d6fc957ab873047fcf702e454860243c044f1",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_historical_attribution_v130.js",
+      "sha256_lf": "a66474217cc5031b9f2862172822e7284046700bcd150783fdbf17723cbf812b",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_historical_panel_v110.js",
+      "sha256_lf": "b9b7a5cfee58ddf3a547fb7b1a6560f41a116a66f35aee2887735ca739e7ddb8",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_ideas_v70.js",
+      "sha256_lf": "e5fbc4b7d017860c5b0c6a804569fff80a0ff987cd7e4cc6420382fd73768f77",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_integrity_v67.js",
+      "sha256_lf": "069d766d6751b285c3fbf7f6d2ab6ef2f92555e3c77401e9372afc03e5312d40",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_investment_intelligence_v94.js",
+      "sha256_lf": "947a9cb3a91144e364967dc87eb57406b5cfeef8ae8532c3f970ee3abcc0d7d1",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_multimarket.js",
+      "sha256_lf": "427291e383f051b3d693e06183190e4785ed306ca6db86eaf176656bc0f82561",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_optimizer.js",
+      "sha256_lf": "df55697659c46d7f0e25fa487ca16de1af4c98860e9afce9251cb961349fa48c",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_pit_validation_v97.js",
+      "sha256_lf": "c61cbf067ca2dc0ac30e6c135af4b3b1feab5824acd90ff564dea24b862ad181",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_portfolio_validation_v95.js",
+      "sha256_lf": "237ed2189a552c251881cf2151895212b4b8721833de3d44284419b6848a9321",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_predictive_ml_v180.js",
+      "sha256_lf": "cd76faae990a8203ae3f0dbf755a04d2e2626a3fd727ed0d89b148857413b178",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_release_acceptance_v150.js",
+      "sha256_lf": "48fa7c9203ccbfc0f8651296608f8a3815fcd492abcf908059195255eca055de",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_research_brief_v93.js",
+      "sha256_lf": "8c76775f2df46b192cbc3e5be91442396a8b99de53d0a510b2dbd2ce6206c1bc",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_research_intelligence_v96.js",
+      "sha256_lf": "4ea9f59fc00b04e9ef0fd784f7e3fa14d3f4ae9f66b82047b9e9e7ebc1bf56b4",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_research_orchestrator_v91.js",
+      "sha256_lf": "f46e15f62205b7b658238afc48eb1156a07e5c924569f1356b12cac2c5468a3c",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_research_os_v90.js",
+      "sha256_lf": "eb1ca4b2d3d0394b4dfeb79b1dade51c3f9514ee180814d9bb61f4a7356112a6",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_robustness_v120.js",
+      "sha256_lf": "e314539edd4195628749f003873b59943d33e899f63e11d8607fc489efaf9153",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_robustness_v68.js",
+      "sha256_lf": "e233b7b603ea62d2285879626eec917dd854a19cea26d0d49d6acf89a25e1fa7",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_sec_coverage_v98.js",
+      "sha256_lf": "25774c6a8f7fe85573d2d88e0218e11714b3181fa0b596d4f47511b502340f3c",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_simple_research_v170.js",
+      "sha256_lf": "475352e8f48d3037b44eb2a5c3d3b7fba560a4eed11171140920831f0c3eb791",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_unified_decision_v160.js",
+      "sha256_lf": "31cc11a708d74d8b306cd6e3fca2222e33d2e29c8db4f58dd7f45e1aef906d47",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_value_v73.js",
+      "sha256_lf": "165a4508e438a0b96958a5b6e752de9a256b60d1c037337be68d87a8708aaca9",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_walkforward_v65.js",
+      "sha256_lf": "c3bcf982d6711f567f43b22e4bc4624de3cd7525c7340050db14057d65327210",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/private_workflow_v140.js",
+      "sha256_lf": "e582348a0e2c97b100fc89ac75d20c101ade014b48c38b0aca358f3e0afbd7a9",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/public_evidence_v76.js",
+      "sha256_lf": "de8e1328b3341452f24668706fac4fcb14b975b04b92dcf6800f3b1a52de3b04",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/public_lab_v77.js",
+      "sha256_lf": "7ac125016932891a897800f0e511ddea4676c944f8d24892a41477efa330fdab",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/public_model_evidence_v181.js",
+      "sha256_lf": "5aad3bf1a9967d1cfed98e85a877f04a9930a635891abc19cb1761156234b550",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/research_account_history_v25.js",
+      "sha256_lf": "358e2b3323d13dd2a84a96eca587522cce78ee668beba14a4cfd3bbd1eb06939",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/research_app_v20.js",
+      "sha256_lf": "649f1f45931c79d4492cce795e56d49caec2d4ae6a938bf58bebed8c7c875727",
+      "relation_to_21982d8": "changed"
+    },
+    {
+      "source": "web/site/research_compare_portfolio_v21.js",
+      "sha256_lf": "41823b34c8616e18e422dcc590d8a6fbc4971e1628d9f53449bab4b8e4f3f742",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/research_completion_v28.js",
+      "sha256_lf": "7133a3266b209dbd6b5a396ae04b8501fd505e0a3f1a038ec5b29b02c1989cc6",
+      "relation_to_21982d8": "changed"
+    },
+    {
+      "source": "web/site/research_core_v20.js",
+      "sha256_lf": "42d896cc6e98312503788ba98c2cfba545213688b95b8c3e3696a14463621b6c",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/research_deep_ui_v25.js",
+      "sha256_lf": "bf0ff8ecafafd54eaaa36fad08de645b09fc1ea7bca23ed02fe879a5c587717d",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/research_deep_v25.js",
+      "sha256_lf": "ed869b4cf689fb536b5874fdb012f2a500833540f89e9659ba603567d87906a0",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/research_errors_v24.js",
+      "sha256_lf": "a0f3bbb0dfe6254a684c9ad9e3296e53360bf019faab6275b86be821f11f7106",
+      "relation_to_21982d8": "changed"
+    },
+    {
+      "source": "web/site/research_evidence_v26.js",
+      "sha256_lf": "378562fa366ebf5bf31264cf0c9527b57639f6cc3cd2118acf6ed6e0d38064f2",
+      "relation_to_21982d8": "changed"
+    },
+    {
+      "source": "web/site/research_exhibits_v24.js",
+      "sha256_lf": "42e344085830581ab9eb5bc03d10098866ba6cb74aa0f266873d60215411bcaf",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/research_models_core_v22.js",
+      "sha256_lf": "dbc88166c151b6a2ebb7198d51d6d5849659df844cc9f461c42e4a73dc41a32e",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/research_models_methods_ui_v22.js",
+      "sha256_lf": "a364734184af41782f9e4660f07da9350d22e51dbb83e0fcffe3251502cd2a16",
+      "relation_to_21982d8": "changed"
+    },
+    {
+      "source": "web/site/research_private_shell_v23.js",
+      "sha256_lf": "80a0cb69bfe8e09418d93a25c9e77335ac88cdd2b2072c4adf459d01913888de",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/research_readout_v29.js",
+      "sha256_lf": "62594cb0fd9f04e91a7aa647adc36df16eae5fef14458c12dc4a6f4da26cd288",
+      "relation_to_21982d8": "new"
+    },
+    {
+      "source": "web/site/sec_analytics.js",
+      "sha256_lf": "623e3cc40d34e5f4d7bd212ab0347c9cbdfb42f52e9d2aa893383e641c245eb5",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/sec_peer_model.js",
+      "sha256_lf": "99d1f43db28b8c274c65e79ea5541382a8c23e8ef7f701324a97936e2d2917e2",
+      "relation_to_21982d8": "unchanged"
+    },
+    {
+      "source": "web/site/sec_visuals_v81.js",
+      "sha256_lf": "541b1bfa7c77f4928a3bdef3bf90f1b0d5e6ef67f6701bf54b6fd16ca99cd22e",
+      "relation_to_21982d8": "unchanged"
+    }
+  ],
+  "private_prefixed_modules_unchanged": 36
+}

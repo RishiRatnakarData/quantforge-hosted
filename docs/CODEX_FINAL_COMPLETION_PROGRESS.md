@@ -1,4 +1,4 @@
-# QuantForge final completion â€” living engineering record
+# QuantForge final completion — living engineering record
 
 Baseline: `94a95616618f273286a3f113dde31780e90f79ed`; clean checkout; review branch `codex/quantforge-final-24-issue-completion`. Main and the previous review branch are preserved. Latest main CI `42940896805` passed; current read-only health probe returned HTTP429/non-JSON challenge, so current API revision was not reverified. No owner credentials, real records or writes used.
 
@@ -39,7 +39,7 @@ Baseline rerun: **592 Python passed (7 warnings), 402 JavaScript passed**. Proje
 
 Machine-readable living register: `FINAL_24_ISSUE_REGISTER.json` (downloadable CSV is in the external review folder). Baseline HTML/CSP and screenshots are stored outside the repository under `QuantForge-final24-review`.
 
-## Stage A â€” account correctness and source trace
+## Stage A — account correctness and source trace
 
 Completed locally. Trace uses the original MFA bridge, fresh quote validation, Decimal calculations, optimistic concurrency and Supabase save response. No replacement numerical engine or independent provider loader. Record failing regressions and actual browser evidence here as each stage completes.
 

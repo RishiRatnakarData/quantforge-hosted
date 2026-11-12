@@ -2,14 +2,14 @@
 
 QuantForge is a financial research and software engineering project built to explore company financials, statistical uncertainty and hypothetical portfolios. It demonstrates applied statistical data science through traceable inputs, retained numerical engines, reproducible evaluation and an authenticated private experience.
 
-[Public application](https://quantforge-648.pages.dev/) Â· [Current feature parity and acceptance](docs/CODEX_REBUILD_PROGRESS.md) Â· [Research methodology](docs/methodology/QUANT_RESEARCH_METHODS.md)
+[Public application](https://quantforge-648.pages.dev/) · [Current feature parity and acceptance](docs/CODEX_REBUILD_PROGRESS.md) · [Research methodology](docs/methodology/QUANT_RESEARCH_METHODS.md)
 
 ## One application, five sections
 
 | Section | Working research flow |
 | --- | --- |
 | Explore | Name search, source-labeled interactive history, SEC financial trends and filing lineage, evidence-backed briefing, dated private news and contextual saved research |
-| Compare | 2â€“5 names, common-date normalized paths, financial contrasts, distributions, correlation, risk/return, sortable tables and safe CSV |
+| Compare | 2–5 names, common-date normalized paths, financial contrasts, distributions, correlation, risk/return, sortable tables and safe CSV |
 | Models | Prediction, Risk, Valuation and Strategy Testing; each has Results / Evaluation / Method with baselines, accessible equations, sensitivity and limitations |
 | Portfolio | Overview, What If? and Portfolio Analysis; constrained allocations, covariance, Monte Carlo scenarios and authentic recorded virtual-account marks |
 | Methods | Overview, Data, Statistical Methods and Engineering; walkthrough, SEC lineage, visual architecture and eight inspectable technical disciplines with source/test references |
@@ -37,23 +37,23 @@ Recorded virtual-account history starts only when the owner requests server-veri
 | NLP | [Sparse TF-IDF, cosine topics and negation-aware lexical tone](cloud/news_intelligence_v180.py) | [Text and endpoint fixtures](tests/test_news_intelligence_v180.py) |
 | Software and cloud | [FastAPI](cloud/api.py), [same-origin proxy](functions/api/[[path]].js), [deterministic builder](tools/build_unified_site.py) | [Owner/MFA/API](tests/test_hosted_web.py), [snapshot accounting](tests/test_valuation_snapshots.py), [three-browser acceptance](tools/smoke_completion_browser.py) |
 
-Methods â†’ Engineering presents the same evidence in the running application, without requiring repository access. The repository remains private; historical release documents are retained for traceability rather than describing the current navigation.
+Methods → Engineering presents the same evidence in the running application, without requiring repository access. The repository remains private; historical release documents are retained for traceability rather than describing the current navigation.
 
 ## Architecture and deliberate choices
 
 ```text
-SEC Company Facts â†’ validated annual snapshot â†’ public static research
-Synthetic paths  â†’ reproducible public numerical experiments
+SEC Company Facts → validated annual snapshot → public static research
+Synthetic paths  → reproducible public numerical experiments
 
-Browser â†’ Cloudflare same-origin proxy â†’ FastAPI / Render
+Browser → Cloudflare same-origin proxy → FastAPI / Render
                                       â”œâ”€ owner + authenticator verification
                                       â”œâ”€ Supabase RLS / versioned virtual state
                                       â””â”€ entitled Alpaca assets, prices and news
 
-Eligible inputs â†’ retained pure engines â†’ scoped evidence â†’ shared five-section UI
+Eligible inputs → retained pure engines → scoped evidence → shared five-section UI
 ```
 
-Native JavaScript avoids a framework rewrite; native MathML avoids an external equation script. The static build retains three CSP-hashed scripts. Provider credentials and owner state stay outside public assets. Optional revision archives and daily FF3 data are bounded, local-to-session inputs; routine research does not require uploads. ETF proxy factors are not official Famaâ€“French factors.
+Native JavaScript avoids a framework rewrite; native MathML avoids an external equation script. The static build retains three CSP-hashed scripts. Provider credentials and owner state stay outside public assets. Optional revision archives and daily FF3 data are bounded, local-to-session inputs; routine research does not require uploads. ETF proxy factors are not official Fama–French factors.
 
 ## Evaluation and limitations
 
@@ -75,10 +75,10 @@ node --test (Get-ChildItem web/tests -Filter '*.test.cjs' | ForEach-Object FullN
 .\.venv\Scripts\python.exe tools/smoke_completion_browser.py
 ```
 
-The November 12 local candidate passes 613 Python and 405 JavaScript tests, plus the original Aâ€“D journeys, full-route browser matrix and completed-engine journeys in Chromium, Firefox and WebKit at desktop/mobile widths. Private automated journeys use isolated fixtures, never real credentials or account writes. GitHub Actions and deployment evidence must be matched to the release SHA; automated tests do not certify live provider entitlement or owner persistence. Those remain separate owner checks.
+The November 12 local candidate passes 613 Python and 413 JavaScript tests, plus the original A–D journeys, full-route browser matrix and completed-engine journeys in Chromium, Firefox and WebKit at desktop/mobile widths. Private automated journeys use isolated fixtures, never real credentials or account writes. GitHub Actions and deployment evidence must be matched to the release SHA; automated tests do not certify live provider entitlement or owner persistence. Those remain separate owner checks.
 
 
-## Next major improvement â€” local review candidate
+## November 10 improvement — historical review stage
 
 [Source-grounded gap inventory, implementation and acceptance](docs/PRODUCT_IMPROVEMENT_2026_11_10.md)
 
@@ -90,3 +90,10 @@ This review stage adds a single name-first investment picker, server-calculated 
 The published baseline is 94a9561. The separate codex/quantforge-final-24-issue-completion branch adds funding preview/replay recovery, visible transaction receipts, actionable bounded errors, shared Models/scenario selection, neutral-dominance correction, SEC quality/lineage and responsive chart evidence. All existing numerical engines and security checks remain.
 
 See the [24-issue register](docs/FINAL_24_ISSUE_REGISTER.json), [verification and live-read boundaries](docs/CODEX_FINAL_COMPLETION_PROGRESS.md) and [engine parity inventory](docs/FINAL_24_ENGINE_PARITY.md). Local acceptance includes 613 Python / 405 JavaScript tests, 15 three-browser/five-width workflow combinations, 444 component checks and separate native Chrome 200% zoom evidence. Private automated writes use isolated fixtures. Read-only production inspection passed; new candidate production transactions require separate post-release acceptance. This branch is not pushed, merged or deployed.
+
+
+## Comprehensive quality review — November 12
+
+The continued local review independently reproduces and corrects stale comparison results, an invalid scenario export, a delayed private-benchmark mode race, range-slider focus loss, partial financial chart suppression, a missing-as-zero worked example and Portfolio hard-reload initialization. Shared financial findings now explain actual values and periods. Existing engines, four model categories and five sections remain.
+
+See the [functional/scientific/visual audit and conditional release recommendation](docs/QUALITY_REVIEW_2026_11_12.md), [new issue evidence](docs/QUALITY_REVIEW_ISSUES.json), [career evidence](docs/QUALITY_CAREER_EVIDENCE.md) and [66-module inventory](docs/QUALITY_ENGINE_INVENTORY.json). The current source passes 613 Python and 413 JavaScript tests; full browser/zoom evidence is recorded in the external review package. Production is still 94a9561; the review branch remains local pending explicit publication approval.

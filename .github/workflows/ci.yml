@@ -120,5 +120,7 @@ jobs:
         env:
           QF_FINAL_WIDTHS: 320,390,768,1024,1440
         run: python tools/smoke_final24_browser.py
+      - name: Independent quality, keyboard, reload and context-race regressions
+        run: python tools/smoke_quality_browser.py
       - name: All named views and component readability at five widths and zoom reflow
         run: python tools/smoke_final24_layout.py

@@ -1,0 +1,112 @@
+[
+  {
+    "id": "QA-01",
+    "area": "Compare rerun failure",
+    "baseline_evidence": "Old risk/distribution/correlation and export remained after a failed refresh.",
+    "correction": "Clear dependent market results at request start and failure; preserve independent SEC financials.",
+    "source": "web/site/research_app_v20.js",
+    "regression": "tools/smoke_quality_browser.py",
+    "screenshot": "journeys/chromium-390-failed-compare.png",
+    "status": "Locally verified; production candidate not deployed"
+  },
+  {
+    "id": "QA-02",
+    "area": "Invalid scenario export",
+    "baseline_evidence": "Zero starting value left prior statistics and export available.",
+    "correction": "Invalidate scenario state, block export defensively, clear dependent results and recover on a valid value.",
+    "source": "web/site/research_app_v20.js",
+    "regression": "tools/smoke_quality_browser.py",
+    "screenshot": "journeys/chromium-390-invalid-scenario.png",
+    "status": "Locally verified; production candidate not deployed"
+  },
+  {
+    "id": "QA-03",
+    "area": "Private-to-public asynchronous race",
+    "baseline_evidence": "A held private benchmark replaced the public benchmark after mode switching. Reproduced with isolated fixture values.",
+    "correction": "Accept portfolio data, origin and benchmark atomically only after the final generation/universe check.",
+    "source": "web/site/research_app_v20.js",
+    "regression": "tools/smoke_quality_browser.py:delayed_benchmark",
+    "screenshot": "journeys/delayed-private-benchmark-public-isolation.png",
+    "status": "Locally verified; production candidate not deployed"
+  },
+  {
+    "id": "QA-04",
+    "area": "Range-slider continuity",
+    "baseline_evidence": "Two right-arrow presses changed allocation by only one step; native input lost focus when rerendered.",
+    "correction": "Update existing range controls/output values when the basket is unchanged; retain focus and pointer capture.",
+    "source": "web/site/research_app_v20.js",
+    "regression": "tools/smoke_quality_browser.py",
+    "screenshot": "journeys/chromium-390-invalid-scenario.png",
+    "status": "Locally verified; production candidate not deployed"
+  },
+  {
+    "id": "QA-05",
+    "area": "Partial financial data",
+    "baseline_evidence": "Missing operating income suppressed available revenue/profit observations.",
+    "correction": "Retain independent series and actual fiscal dates; mark missing cells with gaps and visible points, never zero or interpolation.",
+    "source": "web/site/explore_research_v27.js; web/site/research_evidence_v26.js",
+    "regression": "web/tests/quality_readout.test.cjs; tools/smoke_quality_browser.py",
+    "screenshot": "journeys/chromium-390-missing-financial-field.png",
+    "status": "Locally verified; production candidate not deployed"
+  },
+  {
+    "id": "QA-06",
+    "area": "Methods missing numerator",
+    "baseline_evidence": "Missing operating income was divided by a billion before formatting, displaying zero in the worked transformation.",
+    "correction": "Check finiteness before scaling; show Unavailable rather than a false zero.",
+    "source": "web/site/methods_lab_v27.js",
+    "regression": "tools/smoke_quality_browser.py",
+    "screenshot": "layout/public-390-100-methods-data.png",
+    "status": "Locally verified; production candidate not deployed"
+  },
+  {
+    "id": "QA-07",
+    "area": "Portfolio hard reload",
+    "baseline_evidence": "Opening /#portfolio in a fresh document left the historical basket loading indefinitely. Models passed its baseline reload check.",
+    "correction": "Replay the resolved approved research route once after shared feature modules initialize. All five hard-reload routes are now tested.",
+    "source": "web/site/research_completion_v28.js",
+    "regression": "tools/smoke_quality_browser.py:direct_routes",
+    "screenshot": "journeys/direct-route-portfolio.png",
+    "status": "Locally verified; production candidate not deployed"
+  },
+  {
+    "id": "QA-08",
+    "area": "Benchmark source compatibility",
+    "baseline_evidence": "Batch equities and single-symbol SPY can return different entitled equity feeds.",
+    "correction": "Withhold SPY in Explore, Compare and Portfolio unless matching dates and compatible reported feed are verified. Company histories remain usable.",
+    "source": "web/site/research_app_v20.js",
+    "regression": "tools/smoke_quality_browser.py:feed_alignment",
+    "screenshot": "journeys/mismatched-feed-benchmark-withheld.png",
+    "status": "Locally verified; production candidate not deployed"
+  },
+  {
+    "id": "QA-09",
+    "area": "Chart dates, interpretation and hierarchy",
+    "baseline_evidence": "Short-window dates repeated the same month; metadata and selection space preceded useful evidence.",
+    "correction": "Use responsive date ticks; compact shared selection; show a data-derived finding before the chart and financial explanation after it. Add visible series legends.",
+    "source": "web/site/research_readout_v29.js; web/site/explore_research_v27.js; web/site/research_design_v28.css",
+    "regression": "web/tests/quality_readout.test.cjs; tools/smoke_quality_browser.py",
+    "screenshot": "journeys/chromium-1440-explore.png",
+    "status": "Locally verified; production candidate not deployed"
+  },
+  {
+    "id": "QA-10",
+    "area": "Error precedence and access labels",
+    "baseline_evidence": "A recognized provider code could override session/permission/limit recovery; model tabs lacked explicit panel relationships. Existing shared arrow-key navigation already worked.",
+    "correction": "Prioritize 401/403/429; use context-neutral provider wording; retain original keyboard handler and link tabs/panels.",
+    "source": "web/site/research_errors_v24.js; web/site/research_models_methods_ui_v22.js",
+    "regression": "web/tests/quality_readout.test.cjs; tools/smoke_quality_browser.py",
+    "screenshot": "journeys/chromium-390-prediction-evaluation.png",
+    "status": "Locally verified; production candidate not deployed"
+  },
+  {
+    "id": "QA-11",
+    "area": "Model source and mode labels",
+    "baseline_evidence": "SEC-backed Valuation used a synthetic-price badge publicly, and private Models retained a public-synthetic helper after sign-in.",
+    "correction": "Label valuation as reported SEC cash flow with modeled assumptions; refresh company/source helper in both mode directions.",
+    "source": "web/site/research_completion_v28.js; web/site/research_models_methods_ui_v22.js",
+    "regression": "tools/smoke_quality_browser.py:model_source_labels",
+    "screenshot": "journeys/public-valuation-source-label.png",
+    "status": "Locally verified; production candidate not deployed"
+  }
+]
