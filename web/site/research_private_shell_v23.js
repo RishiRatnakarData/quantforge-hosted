@@ -47,7 +47,20 @@ function renderHomeEvidence(){
  const list=document.createElement('div');list.className='qf31-home-bars';list.setAttribute('role','list');list.setAttribute('aria-label','Microsoft annual reported revenue by fiscal year');
  for(const r of rows){
   const item=document.createElement('div');item.className='qf31-home-column';item.setAttribute('role','listitem');
-  const amount='
+  const amount='$'+(r.metrics.revenue_usd/1e9).toLocaleString('en-US',{maximumFractionDigits:0})+'B';
+  item.setAttribute('aria-label','Fiscal '+r.fiscal_end.slice(0,4)+': '+amount);
+  const value=document.createElement('strong');value.className='qf31-home-value';value.textContent=amount;
+  const rail=document.createElement('div');rail.className='qf31-home-bar-rail';
+  const bar=document.createElement('span');bar.className='qf31-home-bar';bar.style.height=(Math.max(4,r.metrics.revenue_usd/maximum*100))+'%';rail.append(bar);
+  const year=document.createElement('span');year.className='qf31-home-year';year.textContent=r.fiscal_end.slice(0,4);
+  item.append(value,rail,year);list.append(item);
+ }
+ const latest=rows.at(-1);
+ const note=document.createElement('p');note.className='qf31-home-date';
+ note.textContent='Fiscal years '+rows[0].fiscal_end.slice(0,4)+'–'+latest.fiscal_end.slice(0,4)+' · USD · Latest included filing '+(latest.sources?.revenue_usd?.filed||'date unavailable');
+ host.append(list,note);
+}
+function home(value){if(value){window.QFNavigate20('explore');renderHomeEvidence();}landing=Boolean(value);$('qf-v23-landing').hidden=!landing;$('qf-v23-explore-content').hidden=landing;}
 function paint(data){
  const list=$('qf-v23-note-list');list.replaceChildren();
  if(!data)return;paintHistory(data);
