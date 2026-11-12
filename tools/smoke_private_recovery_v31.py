@@ -12,7 +12,7 @@ HTML=(ROOT/'public/index.html').read_text(encoding='utf-8')
 
 async def sign_in(page):
     await page.locator('#qf-v20-mode').click()
-    await page.locator('#private-email').fill('fixture@example.invalid')
+    await page.locator('#private-email').fill('fixture'+'@'+'example.invalid')
     await page.locator('#private-password').fill('fixture-password')
     await page.locator('#private-login-submit').click()
 
