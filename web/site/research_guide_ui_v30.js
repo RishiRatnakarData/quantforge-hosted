@@ -5,7 +5,7 @@ const $=id=>document.getElementById(id),ctx=()=>root.QFResearch20.context(),J=ro
 const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=root.QFReadout29.money,pct=v=>Number.isFinite(v)?(v*100).toFixed(1)+'%':'Unavailable';
 const healthData=root.QFHealthSnapshot30||{companies:{}};
-const guide=document.createElement('section');guide.id='qf30-guide';guide.className='pane';$('qf27-explore-brief').prepend(guide);
+const guide=document.createElement('section');guide.id='qf30-guide';guide.className='pane';const brief=$('qf27-explore-brief');const findings=brief.querySelector('.qf-v20-findings');if(findings)findings.after(guide);else brief.append(guide);
 const companyInfo=document.createElement('p');companyInfo.id='qf30-freshness';companyInfo.className='qf30-freshness';document.querySelector('.qf27-identity').append(companyInfo);
 const fields=[['cash_usd','Cash & cash equivalents'],['assets_usd','Assets'],['liabilities_usd','Liabilities'],['equity_usd','Stockholders’ equity'],['current_assets_usd','Current assets'],['current_liabilities_usd','Current liabilities'],['long_term_debt_current_usd','Current long-term debt component'],['long_term_debt_noncurrent_usd','Noncurrent long-term debt component']];
 function renderHealth(){
