@@ -31,3 +31,18 @@ test('Investment guide and thesis form are direct, visible sections rather than 
  assert.doesNotMatch(guide,/qf30-more-prompts/);
  assert.match(guide,/id="qf30-thesis-form"/);
 });
+
+test('Private session restoration requires an explicit preference and retains server MFA gate',()=>{
+ const backend=fs.readFileSync(path.join(base,'..','..','cloud','api.py'),'utf8');
+ const builder=fs.readFileSync(path.join(base,'..','..','tools','build_unified_site.py'),'utf8');
+ const client=fs.readFileSync(path.join(base,'private.js'),'utf8');
+ assert.match(builder,/id="qf31-remember-session"/);
+ assert.match(client,/REMEMBER_PRIVATE_KEY/);
+ assert.match(client,/if\(rememberPrivate\(\)/);
+ assert.match(client,/setRememberPrivate\(false\)/);
+ assert.match(client,/auth\/session/);
+ assert.match(client,/wakePrivateService\(\)/);
+ assert.match(backend,/if not auth_state\(user, token\)\["signed_in"\]/);
+ assert.match(backend,/httponly=True/);
+ assert.match(backend,/samesite="strict"/);
+});
