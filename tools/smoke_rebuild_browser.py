@@ -96,6 +96,18 @@ async def journey(browser, width):
     await page.set_content(HTML, wait_until='load')
     await matrix(page, f'public-{width}')
     await page.locator('#qf-v23-home-button').click()
+    assert await page.locator('#qf-v23-landing').is_visible()
+    assert await page.locator('#qf24-home-find').is_visible()
+    assert await page.locator('#qf-v23-open-research').count() == 0
+    bars = page.locator('#qf31-home-chart .qf31-home-column')
+    assert 2 <= await bars.count() <= 5
+    expected = await page.evaluate('''() => window.QFPublishedSEC.companies.find(c => c.symbol === 'MSFT').annual
+      .filter(r => Number.isFinite(r.metrics?.revenue_usd) && r.metrics.revenue_usd > 0)
+      .sort((a,b) => a.fiscal_end.localeCompare(b.fiscal_end)).slice(-5)
+      .map(r => r.fiscal_end.slice(0,4))''')
+    assert await page.locator('#qf31-home-chart .qf31-home-year').all_inner_texts() == expected
+    assert await page.locator('#qf31-home-chart .qf31-home-value').count() == len(expected)
+    assert await page.locator('#qf31-home-evidence-title').is_visible()
     await capture(page, f'public-{width}-home')
     await page.locator('#qf24-home-search').fill('Microsoft')
     await page.locator('#qf24-home-find').click()
