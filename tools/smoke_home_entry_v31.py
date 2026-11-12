@@ -18,7 +18,7 @@ async def visit(browser,width):
     page.on('pageerror',lambda e:errors.append(str(e)))
     await page.route('**/*',lambda route:route.fulfill(status=200,content_type='text/html',body=HTML,headers={'Content-Security-Policy':CSP}) if route.request.resource_type=='document' else route.abort())
     await page.goto('https://quantforge-preview.invalid/')
-    await page.wait_for_function("document.querySelector('#qf-v23-landing')?.hidden===false")
+    await page.locator('#qf-v23-landing').wait_for(state='visible')
     assert await page.locator('#qf-v23-explore-content').is_hidden()
     assert await page.locator('#qf31-home-chart .qf31-home-column').count()>=2
     assert await page.locator('.qf31-home-steps>div').count()==5
