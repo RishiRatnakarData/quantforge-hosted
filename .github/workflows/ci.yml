@@ -127,3 +127,7 @@ jobs:
 
       - name: Guided research health and append-only thesis workflows
         run: python tools/smoke_guided_research.py
+      - name: Private transient startup recovery and unauthorized non-retry
+        run: python tools/smoke_private_recovery_v31.py
+      - name: Fresh HTTPS Home and company search at five widths
+        run: python tools/smoke_home_entry_v31.py
