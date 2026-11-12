@@ -1155,7 +1155,7 @@ async function api(path, body){
   const init={credentials:'same-origin',cache:'no-store'};
   if(body!==undefined){init.method='POST';init.headers={'Content-Type':'application/json','X-QF-Action':'1'};init.body=JSON.stringify(body);}
   let r;try{r=await fetch('/api/'+path,init);}catch(_){throw Object.assign(Error('Could not reach the service. Check your connection and try again.'),{status:503});}
-  let data;try{data=await r.json();}catch(_){throw Error('Service unavailable. Free hosting may be waking up.');}
+  let data;try{data=await r.json();}catch(_){throw Object.assign(Error('Service unavailable. Free hosting may be waking up.'),{status:r.status});}
   if(path.startsWith('private/')&&generation!==privateGeneration)throw Error('Private session changed; the old response was discarded.');
   if(!r.ok)throw Object.assign(Error(window.QFErrors24.apiError(r.status,path,data?.code)),{status:r.status,code:typeof data?.code==='string'?data.code:''});
   return data;
