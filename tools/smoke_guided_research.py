@@ -14,8 +14,10 @@ OUT=Path(os.environ.get('QF_SCREENSHOT_DIR',str(ROOT/'outputs/guided-research'))
 HTML=(ROOT/'public/index.html').read_text(encoding='utf-8')
 CSP=next(line.strip().split(': ',1)[1] for line in (ROOT/'public/_headers').read_text().splitlines() if 'Content-Security-Policy:' in line)
 
-async def login(page):
+async def login(page, remember=False):
     await page.locator('#qf-v20-mode').click()
+    if remember:
+        await page.locator('#qf31-remember-session').check()
     await page.locator('#private-email').fill('fixture'+'@'+'example.invalid')
     await page.locator('#private-password').fill('isolated-fixture')
     await page.locator('#private-login-submit').click()
@@ -46,8 +48,7 @@ async def run():
                 await page.locator('[data-qf30-action="compare"]').click()
                 await expect(page.locator('#qf-v20-compare-chips')).to_contain_text('MSFT')
                 await page.evaluate(FIXTURE)
-                await page.locator('#qf31-remember-session').check()
-                await login(page)
+                await login(page, remember=True)
                 assert await page.evaluate("localStorage.getItem('qf-restore-verified-private-v1')") == 'yes'
                 await page.locator('[data-qf27-explore="research"]').click()
                 await page.locator('#qf30-interest').fill('Fixture thesis: investigate cash generation <script>')
