@@ -16,7 +16,7 @@ block='''<section class="tabpage" id="page-private">
     <div class="formgrid" style="margin-top:14px">
       <div class="field"><label for="private-email">Email</label><input id="private-email" type="email" autocomplete="username" placeholder="Your private account"></div>
       <div class="field"><label for="private-password">Password</label><input id="private-password" type="password" autocomplete="current-password" placeholder="Password"></div>
-    </div><div class="controls"><button class="btn primary" id="private-login-submit">Sign in</button><span class="tiny">Owner access only. Password and authenticator verification are required.</span></div>
+    </div><label class="qf31-remember-option" for="qf31-remember-session"><input type="checkbox" id="qf31-remember-session"><span>Keep me signed in on this device</span></label><p class="qf31-remember-note">Restores an existing MFA-verified session when possible. Does not save your password or bypass verification. Sign out to stop automatic restoration.</p><div class="controls"><button class="btn primary" id="private-login-submit">Sign in</button><span class="tiny">Owner access only. Password and authenticator verification are required.</span></div>
   </div>
   <div id="private-mfa" class="pane" hidden>
     <h3 id="private-mfa-title">Authenticator verification</h3>
