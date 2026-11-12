@@ -47,3 +47,7 @@ test('Private session restoration requires an explicit preference and retains se
  assert.match(backend,/httponly=True/);
  assert.match(backend,/samesite="strict"/);
 });
+test('Home is presented to fresh production visitors without hijacking deep links or local test navigation',()=>{
+ assert.match(js,/location\.protocol==='https:'[\s\S]+!location\.hash/);
+ assert.match(js,/renderHomeEvidence\(\);[\s\S]+landing=true;/);
+});
