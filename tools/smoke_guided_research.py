@@ -43,6 +43,7 @@ async def run():
                 await page.screenshot(path=str(OUT/f'{engine}-{width}-balance-sheet.png'),full_page=True)
                 await page.locator('#qf27-analyze').click()
                 await expect(page.locator('#qf30-guide')).to_contain_text('Separate price from valuation')
+                assert await page.locator('#qf27-explore-brief > section').first.get_attribute('class') == 'pane qf-v20-findings'
                 assert await page.locator('#qf30-guide details, #qf30-journal details').count() == 0
                 assert await page.locator('#qf30-step-4').is_visible()
                 await page.locator('[data-qf30-action="compare"]').click()
