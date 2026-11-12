@@ -18,7 +18,13 @@ async def visit(browser,width):
     page.on('pageerror',lambda e:errors.append(str(e)))
     await page.route('**/*',lambda route:route.fulfill(status=200,content_type='text/html',body=HTML,headers={'Content-Security-Policy':CSP}) if route.request.resource_type=='document' else route.abort())
     await page.goto('https://quantforge-preview.invalid/')
-    await page.locator('#qf-v23-landing').wait_for(state='visible')
+    await page.wait_for_timeout(350)
+    diagnostic=await page.evaluate("""() => ({url:location.href,hash:location.hash,
+      protocol:location.protocol,route:document.querySelector('.tabpage.active')?.id,
+      shell:window.QFUnifiedPrivate23?.state(),secLoaded:Boolean(window.QFPublishedSEC),
+      landingHidden:document.querySelector('#qf-v23-landing')?.hidden})""")
+    print('Home startup diagnostic',diagnostic,'errors',errors[:4],flush=True)
+    assert await page.locator('#qf-v23-landing').is_visible(),(diagnostic,errors[:4])
     assert await page.locator('#qf-v23-explore-content').is_hidden()
     assert await page.locator('#qf31-home-chart .qf31-home-column').count()>=2
     assert await page.locator('.qf31-home-steps>div').count()==5
