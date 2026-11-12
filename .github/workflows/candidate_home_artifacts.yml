@@ -16,7 +16,7 @@ jobs:
           python-version: '3.12'
       - name: Install browser test runner
         run: |
-          python -m pip install playwright==1.57.0
+          python -m pip install playwright==1.57.0 "requests>=2.31"
           python -m playwright install --with-deps chromium
       - name: Build generated website and validate CSP
         run: |
