@@ -1159,7 +1159,7 @@ async function api(path, body){
   let r;try{r=await fetch('/api/'+path,init);}catch(_){throw Error('Could not reach the service. Check your connection and try again.');}
   let data;try{data=await r.json();}catch(_){throw Error('Service unavailable. Free hosting may be waking up.');}
   if(path.startsWith('private/')&&generation!==privateGeneration)throw Error('Private session changed; the old response was discarded.');
-  if(!r.ok)throw Object.assign(Error(window.QFErrors24.apiError(r.status,path)),{status:r.status});
+  if(!r.ok)throw Object.assign(Error(window.QFErrors24.apiError(r.status,path,data?.code)),{status:r.status,code:typeof data?.code==='string'?data.code:''});
   return data;
 }
 function showStep(step){
@@ -2453,7 +2453,8 @@ window.QFPrivateBridgeV23=Object.freeze({
   trades:(privateState.trades||[]).slice(0,80).map(x=>({...x,symbol:String(x.symbol||''),side:String(x.side||''),units:Number(x.units),at:String(x.at||'')}))
  }:null,
  async recordSnapshot(){if(!privateState||$('private-signed').hidden)throw Error('MFA sign-in required.');const result=await api('private/valuation-snapshot',{expected_version:version});privateState=result.portfolio;version=result.version;render();return this.snapshot();},
- async capital(action,amount){if(!privateState||$('private-signed').hidden||!['deposit','withdraw'].includes(action))throw Error('MFA sign-in and a supported funding action are required.');const result=await api('private/capital',{action,amount:String(amount),expected_version:version});privateState=result.portfolio;version=result.version;render();return this.snapshot();},
+ async previewCapital(action,amount){if(!privateState||$('private-signed').hidden)throw Error('MFA sign-in required.');return api('private/capital-preview',{action,amount:String(amount),expected_version:version});},
+  async capital(action,amount,options={}){if(!privateState||$('private-signed').hidden||!['deposit','withdraw'].includes(action))throw Error('MFA sign-in and a supported funding action are required.');const result=await api('private/capital',{action,amount:String(amount),expected_version:version,request_id:options.request_id||''});privateState=result.portfolio;version=result.version;render();return this.snapshot();},
  async updateNote(index,text,symbol){
   if(!privateState||$('private-signed').hidden)throw Error('MFA sign-in required.');
   const notes=(privateState.notes||[]).map(n=>({...n})),value=String(text||'').trim();

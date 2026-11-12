@@ -2,14 +2,14 @@
 
 QuantForge is a financial research and software engineering project built to explore company financials, statistical uncertainty and hypothetical portfolios. It demonstrates applied statistical data science through traceable inputs, retained numerical engines, reproducible evaluation and an authenticated private experience.
 
-[Public application](https://quantforge-648.pages.dev/) · [Current feature parity and acceptance](docs/CODEX_REBUILD_PROGRESS.md) · [Research methodology](docs/methodology/QUANT_RESEARCH_METHODS.md)
+[Public application](https://quantforge-648.pages.dev/) Â· [Current feature parity and acceptance](docs/CODEX_REBUILD_PROGRESS.md) Â· [Research methodology](docs/methodology/QUANT_RESEARCH_METHODS.md)
 
 ## One application, five sections
 
 | Section | Working research flow |
 | --- | --- |
 | Explore | Name search, source-labeled interactive history, SEC financial trends and filing lineage, evidence-backed briefing, dated private news and contextual saved research |
-| Compare | 2–5 names, common-date normalized paths, financial contrasts, distributions, correlation, risk/return, sortable tables and safe CSV |
+| Compare | 2â€“5 names, common-date normalized paths, financial contrasts, distributions, correlation, risk/return, sortable tables and safe CSV |
 | Models | Prediction, Risk, Valuation and Strategy Testing; each has Results / Evaluation / Method with baselines, accessible equations, sensitivity and limitations |
 | Portfolio | Overview, What If? and Portfolio Analysis; constrained allocations, covariance, Monte Carlo scenarios and authentic recorded virtual-account marks |
 | Methods | Overview, Data, Statistical Methods and Engineering; walkthrough, SEC lineage, visual architecture and eight inspectable technical disciplines with source/test references |
@@ -37,23 +37,23 @@ Recorded virtual-account history starts only when the owner requests server-veri
 | NLP | [Sparse TF-IDF, cosine topics and negation-aware lexical tone](cloud/news_intelligence_v180.py) | [Text and endpoint fixtures](tests/test_news_intelligence_v180.py) |
 | Software and cloud | [FastAPI](cloud/api.py), [same-origin proxy](functions/api/[[path]].js), [deterministic builder](tools/build_unified_site.py) | [Owner/MFA/API](tests/test_hosted_web.py), [snapshot accounting](tests/test_valuation_snapshots.py), [three-browser acceptance](tools/smoke_completion_browser.py) |
 
-Methods → Engineering presents the same evidence in the running application, without requiring repository access. The repository remains private; historical release documents are retained for traceability rather than describing the current navigation.
+Methods â†’ Engineering presents the same evidence in the running application, without requiring repository access. The repository remains private; historical release documents are retained for traceability rather than describing the current navigation.
 
 ## Architecture and deliberate choices
 
 ```text
-SEC Company Facts → validated annual snapshot → public static research
-Synthetic paths  → reproducible public numerical experiments
+SEC Company Facts â†’ validated annual snapshot â†’ public static research
+Synthetic paths  â†’ reproducible public numerical experiments
 
-Browser → Cloudflare same-origin proxy → FastAPI / Render
-                                      ├─ owner + authenticator verification
-                                      ├─ Supabase RLS / versioned virtual state
-                                      └─ entitled Alpaca assets, prices and news
+Browser â†’ Cloudflare same-origin proxy â†’ FastAPI / Render
+                                      â”œâ”€ owner + authenticator verification
+                                      â”œâ”€ Supabase RLS / versioned virtual state
+                                      â””â”€ entitled Alpaca assets, prices and news
 
-Eligible inputs → retained pure engines → scoped evidence → shared five-section UI
+Eligible inputs â†’ retained pure engines â†’ scoped evidence â†’ shared five-section UI
 ```
 
-Native JavaScript avoids a framework rewrite; native MathML avoids an external equation script. The static build retains three CSP-hashed scripts. Provider credentials and owner state stay outside public assets. Optional revision archives and daily FF3 data are bounded, local-to-session inputs; routine research does not require uploads. ETF proxy factors are not official Fama–French factors.
+Native JavaScript avoids a framework rewrite; native MathML avoids an external equation script. The static build retains three CSP-hashed scripts. Provider credentials and owner state stay outside public assets. Optional revision archives and daily FF3 data are bounded, local-to-session inputs; routine research does not require uploads. ETF proxy factors are not official Famaâ€“French factors.
 
 ## Evaluation and limitations
 
@@ -75,11 +75,18 @@ node --test (Get-ChildItem web/tests -Filter '*.test.cjs' | ForEach-Object FullN
 .\.venv\Scripts\python.exe tools/smoke_completion_browser.py
 ```
 
-The current candidate passes 592 Python and 402 JavaScript tests, plus the original A–D journeys, full-route browser matrix and completed-engine journeys in Chromium, Firefox and WebKit at desktop/mobile widths. Private automated journeys use isolated fixtures, never real credentials or account writes. GitHub Actions and deployment evidence must be matched to the release SHA; automated tests do not certify live provider entitlement or owner persistence. Those remain separate owner checks.
+The November 12 local candidate passes 613 Python and 405 JavaScript tests, plus the original Aâ€“D journeys, full-route browser matrix and completed-engine journeys in Chromium, Firefox and WebKit at desktop/mobile widths. Private automated journeys use isolated fixtures, never real credentials or account writes. GitHub Actions and deployment evidence must be matched to the release SHA; automated tests do not certify live provider entitlement or owner persistence. Those remain separate owner checks.
 
 
-## Next major improvement — local review candidate
+## Next major improvement â€” local review candidate
 
 [Source-grounded gap inventory, implementation and acceptance](docs/PRODUCT_IMPROVEMENT_2026_11_10.md)
 
 This review stage adds a single name-first investment picker, server-calculated virtual trade previews and receipt/replay handling, owned-position sells, SEC-first public Explore, inspectable headline context, corrected peer units, a compact account view, twelve worked mathematical studies and an integrated source-backed case report. The prior published release is `da1f755`; this candidate is not pushed or deployed. Its private browser acceptance uses isolated fixtures and requires fresh owner acceptance after any approved release.
+
+
+## November 12 final-audit local candidate
+
+The published baseline is 94a9561. The separate codex/quantforge-final-24-issue-completion branch adds funding preview/replay recovery, visible transaction receipts, actionable bounded errors, shared Models/scenario selection, neutral-dominance correction, SEC quality/lineage and responsive chart evidence. All existing numerical engines and security checks remain.
+
+See the [24-issue register](docs/FINAL_24_ISSUE_REGISTER.json), [verification and live-read boundaries](docs/CODEX_FINAL_COMPLETION_PROGRESS.md) and [engine parity inventory](docs/FINAL_24_ENGINE_PARITY.md). Local acceptance includes 613 Python / 405 JavaScript tests, 15 three-browser/five-width workflow combinations, 444 component checks and separate native Chrome 200% zoom evidence. Private automated writes use isolated fixtures. Read-only production inspection passed; new candidate production transactions require separate post-release acceptance. This branch is not pushed, merged or deployed.

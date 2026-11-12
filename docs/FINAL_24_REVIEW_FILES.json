@@ -1,0 +1,249 @@
+{
+  "base_commit": "94a95616618f273286a3f113dde31780e90f79ed",
+  "branch": "codex/quantforge-final-24-issue-completion",
+  "self_excluded": "docs/FINAL_24_REVIEW_FILES.json",
+  "publication": "Local review only; no push, merge or deployment. Remote candidate CI has not run.",
+  "verification": {
+    "python_passed": 613,
+    "javascript_passed": 405,
+    "workflow_combinations": 15,
+    "component_views": 444,
+    "native_zoom_percent": 200,
+    "native_zoom_views": 26,
+    "remaining_gate": "Fresh candidate production owner writes and persistence after approved release"
+  },
+  "deterministic_build": {
+    "public/index.html": "52b52f987445af93bcb63e7e2bd81428658fe326fa0176bac80fdc7799dc38e8",
+    "public/_headers": "7cb94004434901d76f9461aa5abf8bbe29d6ebac6a3bb6cccc935721bd55ff1d"
+  },
+  "files": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "bytes": 7536,
+      "sha256": "cc124c7b810392ae7fa46416e711941c9c399c4a854da0012e1be844bdb181ff",
+      "lf_sha256": "1f9545f001c010ac10fde751f702134a9b4c7fc46ef20b718f743d84d25786e3"
+    },
+    {
+      "path": "README.md",
+      "bytes": 9618,
+      "sha256": "8091e9a536d0e7ba9ecee1637738d3a1e64f01fe954f71f8376c01a09f21f784",
+      "lf_sha256": "9635a1bc2d2ef16065f0fc55e5a654918c405eece86b54742a82f13d84662c6e"
+    },
+    {
+      "path": "cloud/api.py",
+      "bytes": 45561,
+      "sha256": "b75aa724078e942560bfa521f09c437a43d13913e3a2f01da1cdea3b4b646ad6",
+      "lf_sha256": "5695849669e68c50c68722c0bd9ce0af903fe4e9e9abdb3c2089e0ef6a39e8ec"
+    },
+    {
+      "path": "cloud/news_intelligence_v180.py",
+      "bytes": 12587,
+      "sha256": "985d89d94d3cae43e1d4fc10442c9f8716c0c22523a3cd6d5566bc1899ce2826",
+      "lf_sha256": "5af84762dd18028caffb433c4e53c7a8f87c14ff949e328af76cd1a5425ae543"
+    },
+    {
+      "path": "docs/CODEX_FINAL_COMPLETION_PROGRESS.md",
+      "bytes": 12523,
+      "sha256": "8ac37cdeeb8317e2220d6bc643c3d900b5d7e7bf1a55d4c4c940611665f7efde",
+      "lf_sha256": "b24c011c9cc4969c19c15f9b6aa48fb13ef10dc69f24e34065905c4d75ee88a6"
+    },
+    {
+      "path": "docs/FINAL_24_ENGINE_INVENTORY.json",
+      "bytes": 24889,
+      "sha256": "cde083fe2a36cffc70249362f0b63eccfae79fd6ceb7a684dc1465e470c37d17",
+      "lf_sha256": "b3609e4751cf50d4dff8494d5b6529a55317c041066be5919f929b3597dddf1f"
+    },
+    {
+      "path": "docs/FINAL_24_ENGINE_PARITY.md",
+      "bytes": 15058,
+      "sha256": "5e0e26812b7e61b90bc8295806e3cfdda9c7c5b1013b5f8d52975c7a0b9f9ebd",
+      "lf_sha256": "c17815a8a507cd120cde202cd947cd60964616cc4446e55b8301c0fbd1f6aaae"
+    },
+    {
+      "path": "docs/FINAL_24_ISSUE_REGISTER.json",
+      "bytes": 23196,
+      "sha256": "a588ce0eea0b27d34e139153c5a06747a8b18ebce75b175e0c45ea461a7f5d3a",
+      "lf_sha256": "298e0c6a5bd281d356b5cc49a661f2616e3c3b2c580e3d51783c7e2c310f0162"
+    },
+    {
+      "path": "public/_headers",
+      "bytes": 493,
+      "sha256": "7cb94004434901d76f9461aa5abf8bbe29d6ebac6a3bb6cccc935721bd55ff1d",
+      "lf_sha256": "7cb94004434901d76f9461aa5abf8bbe29d6ebac6a3bb6cccc935721bd55ff1d"
+    },
+    {
+      "path": "public/index.html",
+      "bytes": 1414972,
+      "sha256": "52b52f987445af93bcb63e7e2bd81428658fe326fa0176bac80fdc7799dc38e8",
+      "lf_sha256": "52b52f987445af93bcb63e7e2bd81428658fe326fa0176bac80fdc7799dc38e8"
+    },
+    {
+      "path": "tests/test_final24_funding.py",
+      "bytes": 6578,
+      "sha256": "97b569d2d5eec59c656dc9e4ee0dd29da1e129170c972d018fc6a4cdf961277f",
+      "lf_sha256": "95ae9fc91f436b39b40104d81721958f9a545a34569d8ef9901504dbfae01739"
+    },
+    {
+      "path": "tests/test_final24_news_policy.py",
+      "bytes": 3341,
+      "sha256": "9cf06318b62bbf1898d654e2989f06f749a2f8bc3cd990c927b6f708f4eb32fb",
+      "lf_sha256": "cc821e9d827abc5c53a669e84f9f4ded8a1975c86f8367ecff79ac0c2b84e408"
+    },
+    {
+      "path": "tools/build_news_policy_evidence.py",
+      "bytes": 2644,
+      "sha256": "aaf8988487c4a75117c5d21c15bc57938c843a5964754f524b91c372121b9aea",
+      "lf_sha256": "6056c887224c50c20c73e74127e3f2d6c701e8802c66a31b021e0ea7ecd37cb1"
+    },
+    {
+      "path": "tools/build_unified_site.py",
+      "bytes": 102864,
+      "sha256": "8ca6c3e57b0300e34dde36dcc9032543be4b1ebc203b307bf3b939d11e8dafc0",
+      "lf_sha256": "c58cb5756b0ef0f2ccf3a8a83b20807b93dfab4891ff54d317574dce1efecd8a"
+    },
+    {
+      "path": "tools/smoke_completion_browser.py",
+      "bytes": 15604,
+      "sha256": "9cb3fb7a038fbc26f88f2fe59312473fc7db80bce59c0ce5b5d8d2eb83cd66e7",
+      "lf_sha256": "bf14278f0f661ca700e27925b38baab35ce119fb1155a314a9cb81444d285dde"
+    },
+    {
+      "path": "tools/smoke_final24_browser.py",
+      "bytes": 14679,
+      "sha256": "7c62ea5af8043de5adee6b0921577b7c111f23a902aef357ee0b9afdb1a9e4f8",
+      "lf_sha256": "ae7b70763b46fbbcfd080e8f5d18800f528dcc8d156b622e162c6107c56ca328"
+    },
+    {
+      "path": "tools/smoke_final24_layout.py",
+      "bytes": 7610,
+      "sha256": "d8aed9441edd2421368bf4e8123982287cbbc29742d800837bce64d9880c331d",
+      "lf_sha256": "127cf58926f73dbcca33a5de929f64cac44aac6173a98058ee90465cbd3fdad8"
+    },
+    {
+      "path": "tools/smoke_release_b_browser.py",
+      "bytes": 9942,
+      "sha256": "9451e5df4251eab33ecf3b1b4274a3409aa5d4717b4633262efeb8290f197701",
+      "lf_sha256": "1147e7eeef89954d0211483b1c5aaf0aa879a1a51f66a8b4992ee5cbdfce7ecc"
+    },
+    {
+      "path": "web/site/explore_research_v27.js",
+      "bytes": 12553,
+      "sha256": "9e4286b9147b2672eb434b941d73d3b13eb972ca9c0d1bef01bac21fd0c7b4ec",
+      "lf_sha256": "3ac12dc60b6f19de4f407b13fa36183869af0af8201d684c48eee54001f918e4"
+    },
+    {
+      "path": "web/site/funding_workflow_v28.js",
+      "bytes": 6800,
+      "sha256": "db4c63adb483c0ff06d7ac2909b7481a5499871ab82ceda50390f8182b7a7c12",
+      "lf_sha256": "6b22598391b2332a2a6337b14050aa44076ce849002e9390cd4c197056828d2a"
+    },
+    {
+      "path": "web/site/investment_picker_v27.js",
+      "bytes": 6060,
+      "sha256": "66ddb663f70e35f6c1789305f14d0a7123f231aa6a36458a4efbd18143085d84",
+      "lf_sha256": "cc3f2947f98e3c627853e606920f0eba98860d8b259f2d869f14bc3f40b5893b"
+    },
+    {
+      "path": "web/site/methods_lab_v27.js",
+      "bytes": 34598,
+      "sha256": "b91d9c27ee72d6e0f2c16a6faa8e4ec3c1b62ac39b3590cc2892e4f24f513193",
+      "lf_sha256": "3d96bc205032bab7b1fdb7f49c094996976425795bc79317b0d01b2687ed087d"
+    },
+    {
+      "path": "web/site/news_context_v27.js",
+      "bytes": 8936,
+      "sha256": "26068e5422b455b582abd2c43c510f89af9bec33c2e04c46ed8fa7f8d1d85606",
+      "lf_sha256": "c3e8447ccca32a7b4a06305aa00f8f876dadfc7c0766ae312c5c62d360fc69d7"
+    },
+    {
+      "path": "web/site/news_policy_examples_v28.js",
+      "bytes": 6892,
+      "sha256": "28eb0b18aa6ffd883e4401f964fc275647b1c98e73d001f6e810f0d6410161c9",
+      "lf_sha256": "359a40053a3e6fc90e40d07a50300fca4fc0f809973d7466515e875af6efec8f"
+    },
+    {
+      "path": "web/site/portfolio_workflow_v27.js",
+      "bytes": 15111,
+      "sha256": "d70ffc72d044e86e296ec168c7010a604c9956ebff39514854e09087c5a1df00",
+      "lf_sha256": "5d2d7308c51f75db6ea1039c01c0bb67eeea4dfe88902d131f4f31f486e71172"
+    },
+    {
+      "path": "web/site/private.js",
+      "bytes": 218672,
+      "sha256": "4d010f88987b24444eb8cf211076dfcbedc0a885b540ff1569f789952e032ee3",
+      "lf_sha256": "66a27018d6776a94b5767af07de097af6481f6b959dddf854b1d903c423a3396"
+    },
+    {
+      "path": "web/site/research_app_v20.js",
+      "bytes": 60256,
+      "sha256": "cdc66ff997decfbd9a2edfae0d945743a29af015d7b0db4cddb29c41913be4b7",
+      "lf_sha256": "46d9a7253fdf979b556bab8a161bc34c053a3c15fa21a93a91eeb22c88f6fbec"
+    },
+    {
+      "path": "web/site/research_completion_v28.js",
+      "bytes": 13801,
+      "sha256": "a10b7ee839ea027ddbce5ba655678f01516277b00ca4f3a1c72dc2316eafe63c",
+      "lf_sha256": "241a8110a4f2ab3c327d1f34984d29a0cf3e1b97a5b71da4219c9ce38d0e11a1"
+    },
+    {
+      "path": "web/site/research_deep_ui_v25.js",
+      "bytes": 21286,
+      "sha256": "a54ad20e1b82d40261ddabc85a17293ef4a6061de01ca78af877f95532b48f35",
+      "lf_sha256": "bf0ff8ecafafd54eaaa36fad08de645b09fc1ea7bca23ed02fe879a5c587717d"
+    },
+    {
+      "path": "web/site/research_design_v27.css",
+      "bytes": 8799,
+      "sha256": "63b8d8f557305591b75bb5acca503264954d4fa0f1b8691f69029e5bdf02ff99",
+      "lf_sha256": "bc7120473ff232d2b3da7a45923a0084468bf0f970a707c8752467bb6e09ca35"
+    },
+    {
+      "path": "web/site/research_design_v28.css",
+      "bytes": 5228,
+      "sha256": "9040eed148861c702249d935e58201d4ebe05fd56de1e8e361e9062f4896d402",
+      "lf_sha256": "2bd824171b577dd87db5ab978a43d554bb34037c20d39d18eaf7735903f78b73"
+    },
+    {
+      "path": "web/site/research_errors_v24.js",
+      "bytes": 2803,
+      "sha256": "ff23b8f4d2fdbbde868b6c368accb68012dd135511d148dce3ee8272985aa8e6",
+      "lf_sha256": "99fc3b45cb81ce9af0ef0653786305c6c47cb67d8e354b08eca3aaf0fc6a9711"
+    },
+    {
+      "path": "web/site/research_evidence_v26.js",
+      "bytes": 21504,
+      "sha256": "e2c2ba8ea0203c32f0b57a9972d129151da8727a10b4262375377be3cf40c709",
+      "lf_sha256": "1444babaea5cc0acb20b1b126a935b51f195d22ee168bdd195d683c99844651e"
+    },
+    {
+      "path": "web/site/research_exhibits_v24.js",
+      "bytes": 17075,
+      "sha256": "fe08d80991536c63e18dcc1950598cce85d6fa8084cf04824f1350a1245af453",
+      "lf_sha256": "42e344085830581ab9eb5bc03d10098866ba6cb74aa0f266873d60215411bcaf"
+    },
+    {
+      "path": "web/site/research_models_methods_ui_v22.js",
+      "bytes": 23110,
+      "sha256": "ef598f6a091f1e71ced548b88a34652933311c8560d9210d9e85140415d1f8c3",
+      "lf_sha256": "eb360b98e7beba8c6d8947cdb5454a1ed2bb0c3870a4e8638439cf4d61ca7b6a"
+    },
+    {
+      "path": "web/site/research_private_shell_v23.js",
+      "bytes": 13080,
+      "sha256": "8fb0df4c1e280621244fc809fa260144ad5cce80cf6fd5ae2d061137c58e58bd",
+      "lf_sha256": "80a0cb69bfe8e09418d93a25c9e77335ac88cdd2b2072c4adf459d01913888de"
+    },
+    {
+      "path": "web/tests/final24_completion.test.cjs",
+      "bytes": 1463,
+      "sha256": "81f440bed7ceab336427c93075345111d5ecd7374dcd93bdff7fd662cd2d18b3",
+      "lf_sha256": "4c1af885216d638d9c2e6c05d8e4210be9cbb71c51abfe44999a8af09850bae2"
+    },
+    {
+      "path": "web/tests/final24_errors.test.cjs",
+      "bytes": 771,
+      "sha256": "8e86cf4ee1c07842b0537ce3c55ca0b7cd1715ca4d837da9e0922523435c75cf",
+      "lf_sha256": "710c4ef04c0e00e186a222e2da0f64ac80ab03feaaca7a86afab24439db29b88"
+    }
+  ]
+}

@@ -31,6 +31,7 @@ async def public(page, width: int) -> None:
     assert await page.locator('#qf-b21-correlation tbody tr').count() == 2
     assert not await page.locator('#qf-b21-compare-export').is_disabled()
     await page.locator('[data-qf-b21-sort="growth"]').click()
+    await page.locator('[data-qf28-compare="market"]').click()
     await page.locator('#qf-b21-compare-chart svg').focus()
     before = await page.locator('#qf-b21-compare-chart-cursor').inner_text()
     await page.locator('#qf-b21-compare-chart svg').press('ArrowLeft')

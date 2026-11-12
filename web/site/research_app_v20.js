@@ -22,7 +22,7 @@ function mode(){return state.privateMode&&state.privateReady?'private':'public';
 async function getPrivate(path,signal){
  const res=await fetch('/api/'+path,{credentials:'same-origin',cache:'no-store',signal});
  let json;try{json=await res.json();}catch(_){throw Error('Research API unavailable. Historical SEC figures remain available.');}
- if(!res.ok)throw Error(window.QFErrors24.apiError(res.status,path));
+ if(!res.ok)throw Error(window.QFErrors24.apiError(res.status,path,json?.code));
  return json;
 }
 function setAccount(){
@@ -37,7 +37,7 @@ function rememberAsset(asset){
  if(!bySymbol.has(asset.symbol)){const item={...asset,cik:null,annual:[],sector:'Provider listing · SEC financials not covered'};bySymbol.set(item.symbol,item);companies.push(item);}
  return bySymbol.get(asset.symbol);
 }
-function addAsset(asset){const c=rememberAsset(asset);if(state.compare.includes(c.symbol)){$('qf-b21-compare-state').textContent=c.name+' is already selected.';return;}if(state.compare.length>=5){$('qf-b21-compare-state').textContent='Five investments are selected. Remove one before adding another.';return;}state.compare.push(c.symbol);invalidateComparison();renderCompareChips();window.dispatchEvent(new Event('qf:research-universe'));}
+function addAsset(asset){const c=rememberAsset(asset);if(state.compare.includes(c.symbol)){$('qf-b21-compare-state').textContent=c.name+' is already selected.';return false;}if(state.compare.length>=5){$('qf-b21-compare-state').textContent='Five investments are selected. Remove one before adding another.';return false;}state.compare.push(c.symbol);invalidateComparison();renderCompareChips();window.dispatchEvent(new Event('qf:research-universe'));return true;}
 function searchAssets(query,signal){return getPrivate('private/assets?'+new URLSearchParams({category:query?'all':'popular',query:query.slice(0,60)}),signal);}
 function selectCompany(symbol){
  if(!bySymbol.has(symbol)||(mode()==='public'&&!data.companies.some(c=>c.symbol===symbol)))return;
@@ -113,7 +113,7 @@ function renderPriceData(){
  $('qf-v20-price-table').innerHTML='<p>Underlying dated closes · '+(price.length>10?'first 2 and latest 8 shown; export for all':'all available observations')+'</p><div class="table-wrap"><table><thead><tr><th>Date</th><th>'+(real?'Close (USD)':'Illustrative index')+'</th></tr></thead><tbody>'+sampled.map(p=>'<tr><td>'+esc(p.date)+'</td><td>'+esc(real?usd(p.close):value(p.close,2)+' index')+'</td></tr>').join('')+'</tbody></table></div>';
 }
 function drawPriceChart(price,benchmark,real){
- const W=Math.max(320,$('qf-v20-chart').clientWidth||720),H=292,left=55,right=W-26,top=20,bottom=247;
+ const W=Math.max(210,$('qf-v20-chart').clientWidth||720),H=292,left=55,right=W-26,top=20,bottom=247;
  let series=price,bench=null,normalized=false;
  if(benchmark?.length){
   const matches=new Map(benchmark.map(r=>[r.date,r.close]));
@@ -269,7 +269,7 @@ function invalidateComparison(){
 }
 function linePlot(target,dates,series){
  if(!dates||dates.length<2||!series.length){$(target).textContent='No eligible aligned data for this chart.';return;}
- const W=Math.max(320,$(target).clientWidth||870),H=275,left=57,right=W-15,top=20,bottom=234;
+ const W=Math.max(210,$(target).clientWidth||Math.min(870,window.innerWidth-112)),H=275,left=57,right=W-15,top=20,bottom=234;
  const numbers=series.flatMap(s=>s.values).filter(rowsOrNull);if(!numbers.length){$(target).textContent='No finite observations.';return;}
  let lo=Math.min(...numbers),hi=Math.max(...numbers);if(hi-lo<0.01){lo-=2;hi+=2;}const margin=(hi-lo)*0.10;lo-=margin;hi+=margin;
  const X=i=>left+(right-left)*i/(dates.length-1),Y=v=>bottom-(v-lo)/(hi-lo)*(bottom-top);
@@ -277,7 +277,7 @@ function linePlot(target,dates,series){
  const guide=[0,0.5,1].map(f=>{const v=lo+f*(hi-lo),y=Y(v);return '<line x1="'+left+'" x2="'+right+'" y1="'+y+'" y2="'+y+'" stroke="#dce9e4"/><text x="'+(left-9)+'" y="'+(y+4)+'" font-size="12" text-anchor="end" fill="#526e62">'+value(v,1)+'</text>';}).join('');
  const legend='<div class="qf-b21-chart-legend">'+series.map((s,i)=>'<span class="qf-b21-chart-label"><span style="color:'+colorSet[i%colorSet.length]+'">●</span> '+esc(s.label)+'</span>').join('')+'</div>';
  $(target).innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" tabindex="0" aria-label="'+esc(series.map(s=>s.label).join(', '))+' compared on '+esc(dates[0])+' through '+esc(dates.at(-1))+'; use left and right arrows to inspect values">'+guide+lines+
-  '<text x="'+left+'" y="'+(H-15)+'" fill="#526e62" font-size="13">'+esc(dates[0])+'</text><text x="'+right+'" y="'+(H-15)+'" text-anchor="end" fill="#526e62" font-size="13">'+esc(dates.at(-1))+'</text><line id="'+target+'-cross" x1="'+right+'" x2="'+right+'" y1="'+top+'" y2="'+bottom+'" stroke="#647b70" stroke-dasharray="3 4"/></svg>'+legend+'<p role="status" class="tiny" id="'+target+'-cursor"></p>';
+  '<text x="'+left+'" y="'+(H-28)+'" fill="#526e62" font-size="13">'+esc(dates[0])+'</text><text x="'+right+'" y="'+(H-10)+'" text-anchor="end" fill="#526e62" font-size="13">'+esc(dates.at(-1))+'</text><line id="'+target+'-cross" x1="'+right+'" x2="'+right+'" y1="'+top+'" y2="'+bottom+'" stroke="#647b70" stroke-dasharray="3 4"/></svg>'+legend+'<p role="status" class="tiny" id="'+target+'-cursor"></p>';
  const svg=$(target).querySelector('svg');let index=dates.length-1;
  const update=i=>{index=Math.max(0,Math.min(dates.length-1,i));const x=X(index).toFixed(1);const cross=$(target+'-cross');cross.setAttribute('x1',x);cross.setAttribute('x2',x);
   $(target+'-cursor').textContent=dates[index]+' · '+series.map(s=>s.label+': '+value(s.values[index],2)).join(' · ');};
@@ -609,7 +609,7 @@ window.QFResearch20=Object.freeze({choose:selectCompany,analyze,
   const chosen=next==='public'&&!data.companies.some(c=>c.symbol===state.symbol)?'MSFT':state.symbol;
   selectCompany(chosen);window.dispatchEvent(new Event('qf:data-mode'));return true;
  },
- exportRows:csv,chooseAsset(asset){rememberAsset(asset);selectCompany(asset.symbol);},addAssetToCompare:addAsset,assetInfo:symbol=>bySymbol.get(symbol)||{symbol,name:symbol+' · saved investment'},
+ searchAssets,reloadPortfolio:loadPortfolioResearch,exportRows:csv,chooseAsset(asset){rememberAsset(asset);selectCompany(asset.symbol);},addAssetToCompare:addAsset,assetInfo:symbol=>bySymbol.get(symbol)||{symbol,name:symbol+' · saved investment'},
  context:()=>({symbol:state.symbol,name:company().name,origin:state.priceSource?.type||null,
   mode:mode(),authenticated:state.privateReady,revision:state.priceToken,universe:state.compare.slice(),weights:state.portfolioWeights?{...state.portfolioWeights}:null,
   prices:state.price?state.price.map(p=>({date:p.date,close:p.close})):null,

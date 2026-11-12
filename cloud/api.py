@@ -106,9 +106,31 @@ async def protect(request: Request, call_next):
     return resp
 
 
+PUBLIC_ERROR_CODES = {'Portfolio changed. Reload first.': 'account_changed', 'Portfolio changed. Reload and try again.': 'account_changed', 'Quote is stale. Review the timestamp and try when fresh data is available.': 'quote_stale', 'Quote has no valid timestamp. Paper trading is blocked.': 'quote_timestamp', 'Quote timestamp is in the future.': 'quote_timestamp', 'Market provider returned a zero quote.': 'quote_missing', 'Market observation did not match the chosen investment.': 'quote_mismatch', 'Price changed by more than 0.5%. Review a fresh preview.': 'quote_moved', 'Buy budget must be at least $1 and within available cash.': 'buy_budget', 'Buy exceeds virtual funds.': 'buy_budget', 'Cannot sell more units than held.': 'sell_units', 'Withdrawal exceeds available virtual cash.': 'withdraw_cash', 'Enter $1 to $1,000,000 in virtual funds.': 'funding_amount', 'Virtual capital would exceed the allowed range.': 'funding_limit', 'Request identifier already belongs to another transaction.': 'request_reused'}
+
+
+PUBLIC_ERROR_CODES.update({
+    "Portfolio changed in another session. Reload and try again.": "account_changed",
+    "Private database rejected the write; check RLS.": "write_rejected",
+    "No IEX trade is available for this ticker.": "quote_missing",
+    "Crypto exchange returned no matching recent trade.": "quote_missing",
+    "Alpaca network request failed; check your connection and retry.": "provider_unavailable",
+    "Alpaca returned invalid JSON.": "provider_unavailable",
+    "Alpaca rejected the request or returned an unexpected result.": "provider_unavailable",
+})
+
+
+@app.exception_handler(HTTPException)
+async def public_http_error(_request: Request, exc: HTTPException):
+    body = {"detail": exc.detail}
+    if isinstance(exc.detail, str) and exc.detail in PUBLIC_ERROR_CODES:
+        body["code"] = PUBLIC_ERROR_CODES[exc.detail]
+    return JSONResponse(body, status_code=exc.status_code, headers=exc.headers)
+
+
 @app.exception_handler(DeskError)
 async def desk_error_handler(_request: Request, exc: DeskError):
-    return JSONResponse({"detail": str(exc)}, status_code=422, headers={"Cache-Control": "no-store"})
+    return JSONResponse({"detail": str(exc), "code": PUBLIC_ERROR_CODES.get(str(exc), "invalid_input")}, status_code=422, headers={"Cache-Control": "no-store"})
 
 @app.get("/api/health")
 def health():
@@ -752,12 +774,47 @@ class CapitalRequest(BaseModel):
     amount: str
     expected_version: int = Field(ge=0)
     confirmation: str = ""
+    request_id: str = Field(default="", max_length=64, pattern=r"^[a-zA-Z0-9-]*$")
+
+
+def funding_terms(current: dict, data: CapitalRequest) -> dict:
+    """Shared Decimal preview/commit arithmetic; funding is not investment profit."""
+    if data.action not in ("deposit", "withdraw"):
+        raise HTTPException(422, "Select deposit or withdraw.")
+    amount = cents(money(data.amount, "virtual capital"))
+    if amount < 1 or amount > 1_000_000:
+        raise HTTPException(422, "Enter $1 to $1,000,000 in virtual funds.")
+    cash = money(current.get("cash", 0), "cash")
+    capital = money(current.get("initial_cash", 10000), "initial cash")
+    if data.action == "withdraw" and amount > cash:
+        raise HTTPException(422, "Withdrawal exceeds available virtual cash.")
+    delta = amount if data.action == "deposit" else -amount
+    if capital + delta < 0 or capital + delta > 10_000_000:
+        raise HTTPException(422, "Virtual capital would exceed the allowed range.")
+    return {"action": data.action, "amount": float(amount), "cash_before": float(cash),
+            "cash_after": float(cents(cash + delta)), "cash_impact": float(delta),
+            "contributions_before": float(capital), "contributions_after": float(cents(capital + delta))}
+
+
+@app.post("/api/private/capital-preview")
+def preview_capital(data: CapitalRequest, request: Request, response: Response):
+    uid, token = owner(request, response)
+    current, version = read_state(uid, token)
+    if version != data.expected_version:
+        raise HTTPException(409, "Portfolio changed. Reload first.")
+    return {"preview": funding_terms(current, data), "version": version, "paper_only": True}
 
 
 @app.post("/api/private/capital")
 def private_capital(data: CapitalRequest, request: Request, response: Response):
     uid, token = owner(request, response)
     current, version = read_state(uid, token)
+    repeated = next((event for event in current.get("capital_events", [])
+                     if data.request_id and event.get("request_id") == data.request_id), None)
+    if repeated:
+        if repeated.get("action") != data.action or money(repeated.get("amount"), "original amount") != cents(money(data.amount, "virtual capital")):
+            raise HTTPException(409, "Request identifier already belongs to another transaction.")
+        return {"portfolio": current, "version": version, "paper_only": True, "reconciled": True}
     if version != data.expected_version:
         raise HTTPException(409, "Portfolio changed. Reload and try again.")
     if data.action not in ("deposit", "withdraw", "reset"):
@@ -765,8 +822,6 @@ def private_capital(data: CapitalRequest, request: Request, response: Response):
     amount = cents(money(data.amount, "virtual capital"))
     if amount < 1 or amount > 1_000_000:
         raise HTTPException(422, "Enter $1 to $1,000,000 in virtual funds.")
-    balance = money(current.get("cash", 0), "cash")
-    initial = money(current.get("initial_cash", 10000), "initial cash")
     if data.action == "reset":
         if data.confirmation != "RESET":
             raise HTTPException(422, "Type RESET to clear the virtual ledger.")
@@ -779,15 +834,12 @@ def private_capital(data: CapitalRequest, request: Request, response: Response):
         current["capital_events"] = [{"action": "reset", "amount": float(amount),
                                       "at": dt.datetime.now(dt.UTC).isoformat()}]
     else:
-        if data.action == "withdraw" and amount > balance:
-            raise HTTPException(422, "Withdrawal exceeds available virtual cash.")
-        delta = amount if data.action == "deposit" else -amount
-        if initial + delta < 0 or initial + delta > 10_000_000:
-            raise HTTPException(422, "Virtual capital would exceed the allowed range.")
-        current["cash"] = float(cents(balance + delta))
-        current["initial_cash"] = float(cents(initial + delta))
+        terms = funding_terms(current, data)
+        current["cash"] = terms["cash_after"]
+        current["initial_cash"] = terms["contributions_after"]
         events = current.get("capital_events", [])
         current["capital_events"] = ([{"action": data.action, "amount": float(amount),
+                                      "request_id": data.request_id,
                                       "at": dt.datetime.now(dt.UTC).isoformat()}] + events)[:100]
     save_state(uid, token, current, version)
     return {"portfolio": current, "version": version + 1, "paper_only": True}

@@ -90,7 +90,7 @@ jobs:
   release_a_browser:
     name: Release A–D shared-app browser journeys
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -116,3 +116,9 @@ jobs:
         run: python tools/smoke_completion_browser.py
       - name: Product picker transactions news and worked-method acceptance
         run: python tools/smoke_product_v27.py
+      - name: Final audit account and research workflows in three browsers
+        env:
+          QF_FINAL_WIDTHS: 320,390,768,1024,1440
+        run: python tools/smoke_final24_browser.py
+      - name: All named views and component readability at five widths and zoom reflow
+        run: python tools/smoke_final24_layout.py

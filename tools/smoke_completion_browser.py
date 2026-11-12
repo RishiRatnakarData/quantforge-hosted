@@ -26,6 +26,7 @@ EXTEND = r'''() => {
    window.qfMockRequests.push(path);const body=JSON.parse(options.body);
    if(body.expected_version!==window.qfMockVersion)return response({detail:'Version conflict'},false,409);
    const account=window.qfMockOwner;
+   if(path.includes('private/capital-preview')){const delta=Number(body.amount)*(body.action==='deposit'?1:-1);return response({preview:{action:body.action,amount:Number(body.amount),cash_before:account.cash,cash_after:account.cash+delta,contributions_after:account.initial_cash+delta},version:qfMockVersion});}
    if(path.includes('private/capital')){const delta=Number(body.amount)*(body.action==='deposit'?1:-1);account.cash+=delta;account.initial_cash+=delta;}
    else{const marks=account.valuations||(account.valuations=[]),value=account.cash+Object.values(account.holdings).reduce((sum,q)=>sum+q*300,0);marks.push({at:new Date(Date.UTC(2026,9,1+marks.length)).toISOString(),value,cash:account.cash,net_contributions:account.initial_cash,pnl:value-account.initial_cash,source:'MOCK server-verified mark'});}
    window.qfMockVersion++;return response({portfolio:account,version:window.qfMockVersion,paper_only:true});
@@ -110,6 +111,7 @@ async def journey(browser, engine, width):
         await page.locator('#qf-v20-navigation [data-page="compare"]').click()
         for symbol in ('AAPL', 'NVDA'):
             await pick_compare(page, symbol)
+        await page.locator('[data-qf28-compare="financial"]').click()
         await page.locator('#qf25-peers svg').first.wait_for()
         assert 'shared ratios' in await page.locator('#qf25-peers').inner_text()
         await capture(page, prefix + '-financial-peers')
@@ -162,8 +164,10 @@ async def journey(browser, engine, width):
             await page.locator('[data-qf-portfolio="overview"]').click()
             await page.locator('#qf25-record-mark').click()
             await expect(page.locator('#qf25-account-chart')).to_contain_text('1 recorded marks')
+            await page.locator('#qf28-fund').click()
             await page.locator('#qf25-capital-amount').fill('500')
             await page.locator('#qf25-capital-submit').click()
+            await page.locator('#qf28-funding-confirm').click()
             await expect(page.locator('#qf27-account-summary')).to_contain_text('$3,000.00')
             await page.locator('#qf25-record-mark').click()
             await expect(page.locator('#qf25-account-chart')).to_contain_text('2 recorded marks')

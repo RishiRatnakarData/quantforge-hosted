@@ -1,0 +1,659 @@
+{
+  "base_commit": "94a95616618f273286a3f113dde31780e90f79ed",
+  "private_modules_unchanged": 36,
+  "modules": [
+    {
+      "source": "web/site/app.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "78f59a2e1f24467e8f98224ea3f64a057f4c5199b4159eab3c0746805e5a7280",
+      "full_source_in_bundle": false,
+      "builder_reference": true,
+      "direct_test_files": []
+    },
+    {
+      "source": "web/site/explore_research_v27.js",
+      "baseline_relation": "changed",
+      "lf_sha256": "3ac12dc60b6f19de4f407b13fa36183869af0af8201d684c48eee54001f918e4",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": []
+    },
+    {
+      "source": "web/site/funding_workflow_v28.js",
+      "baseline_relation": "new",
+      "lf_sha256": "6b22598391b2332a2a6337b14050aa44076ce849002e9390cd4c197056828d2a",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": []
+    },
+    {
+      "source": "web/site/investment_picker_v27.js",
+      "baseline_relation": "changed",
+      "lf_sha256": "cc3f2947f98e3c627853e606920f0eba98860d8b259f2d869f14bc3f40b5893b",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": []
+    },
+    {
+      "source": "web/site/methods_lab_v27.js",
+      "baseline_relation": "changed",
+      "lf_sha256": "3d96bc205032bab7b1fdb7f49c094996976425795bc79317b0d01b2687ed087d",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": []
+    },
+    {
+      "source": "web/site/model.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "76f8261407c2c8c3d112d3556c14a2649e8be376cfa3b267aa54e1c68cbbebec",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/public_model_evidence_v181.test.cjs",
+        "web/tests/research_models_core_v22.test.cjs",
+        "web/tests/sec_peer_model.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/news_context_v27.js",
+      "baseline_relation": "changed",
+      "lf_sha256": "c3e8447ccca32a7b4a06305aa00f8f876dadfc7c0766ae312c5c62d360fc69d7",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": []
+    },
+    {
+      "source": "web/site/news_policy_examples_v28.js",
+      "baseline_relation": "new",
+      "lf_sha256": "359a40053a3e6fc90e40d07a50300fca4fc0f809973d7466515e875af6efec8f",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": []
+    },
+    {
+      "source": "web/site/portfolio_workflow_v27.js",
+      "baseline_relation": "changed",
+      "lf_sha256": "5d2d7308c51f75db6ea1039c01c0bb67eeea4dfe88902d131f4f31f486e71172",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": []
+    },
+    {
+      "source": "web/site/private.js",
+      "baseline_relation": "changed",
+      "lf_sha256": "66a27018d6776a94b5767af07de097af6481f6b959dddf854b1d903c423a3396",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_allocation_v74.test.cjs",
+        "web/tests/private_archived_sec_v99.test.cjs",
+        "web/tests/private_archive_quality_v100.test.cjs",
+        "web/tests/private_candidate_v85.test.cjs",
+        "web/tests/private_decision_center_v84.test.cjs",
+        "web/tests/private_decision_integrity_v130.test.cjs",
+        "web/tests/private_decision_review_v92.test.cjs",
+        "web/tests/private_decision_v72.test.cjs",
+        "web/tests/private_diagnostics_v66.test.cjs",
+        "web/tests/private_factor_scenarios_v86.test.cjs",
+        "web/tests/private_french_factors_v87.test.cjs",
+        "web/tests/private_guide_v79.test.cjs",
+        "web/tests/private_historical_panel_v110.test.cjs",
+        "web/tests/private_ideas_v70.test.cjs",
+        "web/tests/private_integrity_v67.test.cjs",
+        "web/tests/private_investment_intelligence_v94.test.cjs",
+        "web/tests/private_multimarket.test.cjs",
+        "web/tests/private_optimizer.test.cjs",
+        "web/tests/private_optimizer_chart.test.cjs",
+        "web/tests/private_pit_validation_v97.test.cjs",
+        "web/tests/private_portfolio_validation_v95.test.cjs",
+        "web/tests/private_predictive_ml_v180.test.cjs",
+        "web/tests/private_release_acceptance_v150.test.cjs",
+        "web/tests/private_research_brief_v93.test.cjs",
+        "web/tests/private_research_context_v651.test.cjs",
+        "web/tests/private_research_intelligence_v96.test.cjs",
+        "web/tests/private_research_orchestrator_v91.test.cjs",
+        "web/tests/private_research_os_v90.test.cjs",
+        "web/tests/private_research_v65.test.cjs",
+        "web/tests/private_risk_clarity_v75.test.cjs",
+        "web/tests/private_robustness_v120.test.cjs",
+        "web/tests/private_robustness_v68.test.cjs",
+        "web/tests/private_sec_coverage_v98.test.cjs",
+        "web/tests/private_simple_research_v170.test.cjs",
+        "web/tests/private_unified_decision_v160.test.cjs",
+        "web/tests/private_value_v73.test.cjs",
+        "web/tests/private_workflow_v140.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_allocation_v74.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "77f14ea15f6c1f655f94371c4a0016c0e65c0b4ad745d440147e3faa56c883f5",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_allocation_v74.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_archive_quality_v100.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "bb08a6a790e1ec40ac89a8d3fcac21aa42bc3aed95f9877b98a3299a351aea7b",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_archive_quality_v100.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_archived_sec_v99.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "9b51954059141336cb0458d8f01ad0263ba026af24db98ba340d33d94fcdcf1c",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_archived_sec_v99.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_candidate_v85.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "512e810d2364ba1c5fc5a17a14207f7c6c30ac0a5938da5a878684ade92a0f95",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_candidate_v85.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_decision_center_v84.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "580ce62f492cc0157f2e31e1110f8d09c7fccadcc25036dfd90138cceabc29df",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_decision_center_v84.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_decision_integrity_v130.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "4c4ef9c449708b5876a995b06274d6c0b69a1803f15380ad10eb77603cdda295",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_decision_integrity_v130.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_decision_review_v92.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "bc815e0c3e5e58189cd172eee6a87373a591a50b6711b303d36610d58eee7904",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_decision_review_v92.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_decision_v72.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "e25dc69ceb20b7e957468fd3c98f2f99a908c002d205242799d5c9c6a4af1f18",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_decision_v72.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_diagnostics_v66.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "4d4cebaeb1171e626f0aa5b80cef37642583f059363c90363c8044fd4b9a8d7a",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_diagnostics_v66.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_factor_scenarios_v86.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "03f11bf52b45e084dabdc486e54a1c725a51e3a0aa52c5e98ffcd9fb86d13a05",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_factor_scenarios_v86.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_forecast_v65.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "eaf258474e0721bee718a6f004e53c129ad10605dd168d9e1f434f474d2ed435",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": []
+    },
+    {
+      "source": "web/site/private_french_factors_v87.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "6893ecbb28ee010ce81d8932d5a4ec0cd3411814e8dfa64f478ae63c03dcc873",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_french_factors_v87.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_guide_v79.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "e6dc59b8bf3a1cdb9ecef684616d6fc957ab873047fcf702e454860243c044f1",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_guide_v79.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_historical_attribution_v130.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "a66474217cc5031b9f2862172822e7284046700bcd150783fdbf17723cbf812b",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": []
+    },
+    {
+      "source": "web/site/private_historical_panel_v110.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "b9b7a5cfee58ddf3a547fb7b1a6560f41a116a66f35aee2887735ca739e7ddb8",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_historical_panel_v110.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_ideas_v70.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "e5fbc4b7d017860c5b0c6a804569fff80a0ff987cd7e4cc6420382fd73768f77",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_ideas_v70.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_integrity_v67.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "069d766d6751b285c3fbf7f6d2ab6ef2f92555e3c77401e9372afc03e5312d40",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_integrity_v67.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_investment_intelligence_v94.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "947a9cb3a91144e364967dc87eb57406b5cfeef8ae8532c3f970ee3abcc0d7d1",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_investment_intelligence_v94.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_multimarket.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "427291e383f051b3d693e06183190e4785ed306ca6db86eaf176656bc0f82561",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_multimarket.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_optimizer.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "df55697659c46d7f0e25fa487ca16de1af4c98860e9afce9251cb961349fa48c",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_optimizer.test.cjs",
+        "web/tests/private_optimizer_chart.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_pit_validation_v97.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "c61cbf067ca2dc0ac30e6c135af4b3b1feab5824acd90ff564dea24b862ad181",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_pit_validation_v97.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_portfolio_validation_v95.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "237ed2189a552c251881cf2151895212b4b8721833de3d44284419b6848a9321",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_portfolio_validation_v95.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_predictive_ml_v180.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "cd76faae990a8203ae3f0dbf755a04d2e2626a3fd727ed0d89b148857413b178",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_predictive_ml_v180.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_release_acceptance_v150.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "48fa7c9203ccbfc0f8651296608f8a3815fcd492abcf908059195255eca055de",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_release_acceptance_v150.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_research_brief_v93.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "8c76775f2df46b192cbc3e5be91442396a8b99de53d0a510b2dbd2ce6206c1bc",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_research_brief_v93.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_research_intelligence_v96.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "4ea9f59fc00b04e9ef0fd784f7e3fa14d3f4ae9f66b82047b9e9e7ebc1bf56b4",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_research_intelligence_v96.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_research_orchestrator_v91.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "f46e15f62205b7b658238afc48eb1156a07e5c924569f1356b12cac2c5468a3c",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_research_orchestrator_v91.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_research_os_v90.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "eb1ca4b2d3d0394b4dfeb79b1dade51c3f9514ee180814d9bb61f4a7356112a6",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_research_os_v90.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_robustness_v120.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "e314539edd4195628749f003873b59943d33e899f63e11d8607fc489efaf9153",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_robustness_v120.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_robustness_v68.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "e233b7b603ea62d2285879626eec917dd854a19cea26d0d49d6acf89a25e1fa7",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_robustness_v68.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_sec_coverage_v98.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "25774c6a8f7fe85573d2d88e0218e11714b3181fa0b596d4f47511b502340f3c",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_sec_coverage_v98.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_simple_research_v170.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "475352e8f48d3037b44eb2a5c3d3b7fba560a4eed11171140920831f0c3eb791",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_simple_research_v170.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_unified_decision_v160.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "31cc11a708d74d8b306cd6e3fca2222e33d2e29c8db4f58dd7f45e1aef906d47",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_unified_decision_v160.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_value_v73.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "165a4508e438a0b96958a5b6e752de9a256b60d1c037337be68d87a8708aaca9",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_value_v73.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/private_walkforward_v65.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "c3bcf982d6711f567f43b22e4bc4624de3cd7525c7340050db14057d65327210",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": []
+    },
+    {
+      "source": "web/site/private_workflow_v140.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "e582348a0e2c97b100fc89ac75d20c101ade014b48c38b0aca358f3e0afbd7a9",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/private_workflow_v140.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/public_evidence_v76.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "de8e1328b3341452f24668706fac4fcb14b975b04b92dcf6800f3b1a52de3b04",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/public_evidence_v76.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/public_lab_v77.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "7ac125016932891a897800f0e511ddea4676c944f8d24892a41477efa330fdab",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/public_lab_v77.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/public_model_evidence_v181.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "5aad3bf1a9967d1cfed98e85a877f04a9930a635891abc19cb1761156234b550",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/public_model_evidence_v181.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/research_account_history_v25.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "358e2b3323d13dd2a84a96eca587522cce78ee668beba14a4cfd3bbd1eb06939",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/research_account_history_v25.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/research_app_v20.js",
+      "baseline_relation": "changed",
+      "lf_sha256": "46d9a7253fdf979b556bab8a161bc34c053a3c15fa21a93a91eeb22c88f6fbec",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": []
+    },
+    {
+      "source": "web/site/research_compare_portfolio_v21.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "41823b34c8616e18e422dcc590d8a6fbc4971e1628d9f53449bab4b8e4f3f742",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/research_compare_portfolio_v21.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/research_completion_v28.js",
+      "baseline_relation": "new",
+      "lf_sha256": "241a8110a4f2ab3c327d1f34984d29a0cf3e1b97a5b71da4219c9ce38d0e11a1",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": []
+    },
+    {
+      "source": "web/site/research_core_v20.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "42d896cc6e98312503788ba98c2cfba545213688b95b8c3e3696a14463621b6c",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/research_core_v20.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/research_deep_ui_v25.js",
+      "baseline_relation": "changed",
+      "lf_sha256": "bf0ff8ecafafd54eaaa36fad08de645b09fc1ea7bca23ed02fe879a5c587717d",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": []
+    },
+    {
+      "source": "web/site/research_deep_v25.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "ed869b4cf689fb536b5874fdb012f2a500833540f89e9659ba603567d87906a0",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/research_deep_v25.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/research_errors_v24.js",
+      "baseline_relation": "changed",
+      "lf_sha256": "99fc3b45cb81ce9af0ef0653786305c6c47cb67d8e354b08eca3aaf0fc6a9711",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/research_errors_v24.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/research_evidence_v26.js",
+      "baseline_relation": "changed",
+      "lf_sha256": "1444babaea5cc0acb20b1b126a935b51f195d22ee168bdd195d683c99844651e",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/research_evidence_v26.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/research_exhibits_v24.js",
+      "baseline_relation": "changed",
+      "lf_sha256": "42e344085830581ab9eb5bc03d10098866ba6cb74aa0f266873d60215411bcaf",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": []
+    },
+    {
+      "source": "web/site/research_models_core_v22.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "dbc88166c151b6a2ebb7198d51d6d5849659df844cc9f461c42e4a73dc41a32e",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/research_models_core_v22.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/research_models_methods_ui_v22.js",
+      "baseline_relation": "changed",
+      "lf_sha256": "eb360b98e7beba8c6d8947cdb5454a1ed2bb0c3870a4e8638439cf4d61ca7b6a",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": []
+    },
+    {
+      "source": "web/site/research_private_shell_v23.js",
+      "baseline_relation": "changed",
+      "lf_sha256": "80a0cb69bfe8e09418d93a25c9e77335ac88cdd2b2072c4adf459d01913888de",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": []
+    },
+    {
+      "source": "web/site/sec_analytics.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "623e3cc40d34e5f4d7bd212ab0347c9cbdfb42f52e9d2aa893383e641c245eb5",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/sec_analytics.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/sec_peer_model.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "99d1f43db28b8c274c65e79ea5541382a8c23e8ef7f701324a97936e2d2917e2",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": [
+        "web/tests/sec_peer_model.test.cjs"
+      ]
+    },
+    {
+      "source": "web/site/sec_visuals_v81.js",
+      "baseline_relation": "unchanged",
+      "lf_sha256": "541b1bfa7c77f4928a3bdef3bf90f1b0d5e6ef67f6701bf54b6fd16ca99cd22e",
+      "full_source_in_bundle": true,
+      "builder_reference": true,
+      "direct_test_files": []
+    }
+  ]
+}

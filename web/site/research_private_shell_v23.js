@@ -29,7 +29,7 @@ function paintHistory(data){
  }catch(_){host.textContent='Recorded history is inconsistent; performance withheld. Refresh the account.';}
 }
 $('qf25-record-mark').addEventListener('click',()=>void work(()=>bridge().recordSnapshot(),'Server-verified valuation recorded.'));
-$('qf25-capital-submit').addEventListener('click',()=>void work(()=>bridge().capital($('qf25-capital-action').value,$('qf25-capital-amount').value),'Virtual funding changed. Record a fresh valuation to update the chart.'));
+$('qf25-capital-submit').addEventListener('click',()=>void window.QFFunding28?.review());
 
 drawer.querySelector('.qf-v23-owner-tabs').remove();
 $('qf-v23-owner-title').textContent='Account';

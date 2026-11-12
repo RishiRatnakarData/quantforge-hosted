@@ -68,7 +68,7 @@
   const plots = new Map();
   function curve(title, dates, lines, options = {}) {
     if (!Array.isArray(dates) || dates.length < 2 || !lines.length || lines.some(line => line.values.length !== dates.length || line.values.some(value => !finite(value)))) return '<p>Chart unavailable: aligned finite observations are required.</p>';
-    const id = 'qf26-chart-' + (++sequence), width = Math.max(300, Math.min(850, (root.innerWidth || 1200) - ((root.innerWidth || 1200) >= 800 ? 355 : 68))), height = 310;
+    const id = 'qf26-chart-' + (++sequence), width = Math.max(210, Math.min(850, (root.innerWidth || 1200) - ((root.innerWidth || 1200) >= 800 ? 355 : 112))), height = 310;
     const left = 62, right = width - 16, top = 25, bottom = 252;
     const values = lines.flatMap(line => line.values), low = Math.min(...values), high = Math.max(...values), pad = (high - low || Math.abs(low) || 1) * .08;
     const min = low - pad, span = high - low + 2 * pad;

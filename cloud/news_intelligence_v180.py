@@ -1,4 +1,4 @@
-"""Owner-only Alpaca headline research: dated source, bounded semantic themes, transparent tone.
+"""Owner-only Alpaca headline research: dated source, bounded lexical themes, transparent tone.
 
 No forecast, no brokerage orders, no remote model download, and no stored article contents.
 """
@@ -92,6 +92,31 @@ def _local_finbert():
                     truncation=True, max_length=256)
 
 
+def summarize_tone(counts: Counter) -> dict:
+    """Descriptive thresholds, not statistical significance or future-return evidence."""
+    total = sum(counts.values())
+    shares = {label: counts[label] / total if total else 0.0
+              for label in ("Positive", "Negative", "Mixed / neutral", "Uncertain")}
+    positive, negative, neutral, uncertain = shares.values()
+    if not total:
+        label, reason = "No recent news", "No valid dated headlines were returned."
+    elif total < 5:
+        label, reason = "Limited sample", "Fewer than five valid headlines; an overall directional label is withheld."
+    elif neutral + uncertain >= .6:
+        label = "Mostly neutral" if neutral >= uncertain else "Ambiguous coverage"
+        reason = "At least 60% of returned headlines are neutral or uncertain; directional words do not dominate the sample."
+    elif positive >= .25 and negative >= .25:
+        label, reason = "Conflicting coverage", "At least 25% of headlines occur on each directional side."
+    elif positive >= .6 and negative <= .2 and uncertain <= .2:
+        label, reason = "Mostly positive", "At least 60% positive; at most 20% negative and at most 20% uncertain."
+    elif negative >= .6 and positive <= .2 and uncertain <= .2:
+        label, reason = "Mostly negative", "At least 60% negative; at most 20% positive and at most 20% uncertain."
+    else:
+        label, reason = "Mixed / neutral", "No overall dominance threshold is satisfied."
+    return {"label": label, "reason": reason, "sample_size": total, "shares": shares,
+            "policy": "Minimum 5 headlines; neutral/uncertain >=60% dominates; opposing shares >=25% conflict; directional dominance requires >=60% with opposing and uncertain shares <=20%. Descriptive rules, not calibrated probabilities or a significance test."}
+
+
 def analyze_news(news: list[dict], symbols: list[str], *, as_of: str) -> dict:
     if not 1 <= len(symbols) <= 5 or len(set(symbols)) != len(symbols) or any(
         not SYMBOL.fullmatch(s) for s in symbols
@@ -159,10 +184,9 @@ def analyze_news(news: list[dict], symbols: list[str], *, as_of: str) -> dict:
         matched = [e for e in entries if sym in e["symbols"]]
         counts = Counter(e["tone"] for e in matched)
         themes = Counter(e["topic"] for e in matched)
+        summary = summarize_tone(counts)
         rows.append({"symbol": sym, "articles": len(matched),
-                     "tone": "No recent news" if not matched else
-                     "Mixed / neutral" if counts["Positive"] == counts["Negative"] else
-                     "Mostly positive" if counts["Positive"] > counts["Negative"] else "Mostly negative",
+                     "tone": summary["label"], "tone_summary": summary,
                      "positive": counts["Positive"], "negative": counts["Negative"],
                      "neutral": counts["Mixed / neutral"], "uncertain": counts["Uncertain"],
                      "tone_counts": dict(counts), "topic_counts": dict(themes),

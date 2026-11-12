@@ -20,3 +20,5 @@ main{max-width:var(--qf-page);padding:32px clamp(16px,3vw,44px)}.pane,.qf24-cont
 @media(max-width:600px){.qf27-action-row>button{flex:1 1 170px;min-width:min(100%,160px)}.qf27-action-row>a{flex:1 1 100%;overflow-wrap:anywhere}}
 
 @media(max-width:739px){.qf24-figure svg{max-height:none}}
+
+.qf28-receipt-source{display:block;white-space:normal;font-size:13px;line-height:1.6;margin-top:7px}.qf28-source-row{font-size:14px;line-height:1.65}.qf28-investment-trade[hidden],#qf28-funding[hidden],#qf28-funding-confirm[hidden],#qf28-sell-max[hidden]{display:none!important}
