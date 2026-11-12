@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 require('../site/research_evidence_v26.js');
 test('every showcased discipline references existing implementation and reproducible checks', () => {
-  assert.equal(globalThis.QFEvidence26.catalog.length, 8);
+  assert.equal(globalThis.QFEvidence26.catalog.length, 7);
   for (const discipline of globalThis.QFEvidence26.catalog) {
     for (const file of [...discipline.files, ...discipline.tests]) {
       assert.ok(fs.statSync(path.resolve(__dirname, '../..', file)).isFile(), file);

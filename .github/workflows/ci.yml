@@ -90,7 +90,7 @@ jobs:
   release_a_browser:
     name: Release A–D shared-app browser journeys
     runs-on: ubuntu-latest
-    timeout-minutes: 18
+    timeout-minutes: 24
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -124,3 +124,6 @@ jobs:
         run: python tools/smoke_quality_browser.py
       - name: All named views and component readability at five widths and zoom reflow
         run: python tools/smoke_final24_layout.py
+
+      - name: Guided research health and append-only thesis workflows
+        run: python tools/smoke_guided_research.py

@@ -67,14 +67,14 @@ async def main():
                 await page.locator("#qf-v20-search").fill("Microsoft")
                 await page.locator('#qf-v20-search-results [data-qf27-symbol="MSFT"]').click()
                 await check("picker-selected")
-                for view in ("financials", "market", "brief", "context"):
-                    if view == "market" and not private:
+                for view in ("financials", "market", "brief", "research"):
+                    if view in ("market", "research") and not private:
                         continue
                     await page.locator(f'[data-qf27-explore="{view}"]').click()
                     if view == "brief":
                         await page.locator("#qf27-analyze").click()
                     if view == "financials":
-                        for finance in ("performance", "margin", "cash", "sources"):
+                        for finance in ("performance", "margin", "cash", "health", "sources"):
                             await page.locator(f'[data-qf27-finance="{finance}"]').click()
                             await check("explore-" + finance)
                     else:
@@ -108,7 +108,6 @@ async def main():
                     "logistic",
                     "dcf",
                     "walk",
-                    "nlp",
                 ):
                     await page.locator(f'[data-qf27-method="{method}"]').click()
                     await check("worked-" + method)

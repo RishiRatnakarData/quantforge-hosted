@@ -98,7 +98,7 @@ async def assert_private_mock(page) -> None:
     await page.wait_for_timeout(220)
     assert "Observed" in await page.locator("#qf-v20-source-badge").inner_text()
     assert "MOCKED" in await page.locator("#qf-v20-chart-source").inner_text()
-    assert "unavailable" in (await page.locator("#qf-v20-news").inner_text()).lower()
+    assert await page.locator("#qf-v20-news").count() == 0
     assert await page.locator("#qf-v20-financial-table tr").count() >= 3
     await page.locator("#qf27-analyze").click()
     assert "observed private market risk" in await page.locator("#qf-v20-run-state").inner_text()

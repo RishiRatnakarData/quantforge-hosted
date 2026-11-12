@@ -1,3 +1,5 @@
+> Historical stage record. This work was published in `4fc1a46`; publication-pending wording below describes the earlier review stage. See [current release guide](GUIDED_RESEARCH_RELEASE.md).
+
 # QuantForge final completion — living engineering record
 
 Baseline: `94a95616618f273286a3f113dde31780e90f79ed`; clean checkout; review branch `codex/quantforge-final-24-issue-completion`. Main and the previous review branch are preserved. Latest main CI `42940896805` passed; current read-only health probe returned HTTP429/non-JSON challenge, so current API revision was not reverified. No owner credentials, real records or writes used.

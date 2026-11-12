@@ -87,10 +87,8 @@ async def journey(browser, engine, width):
     await expect(page.locator("#qf28-quality")).to_contain_text("94 issuers")
     await capture(page, f"{engine}-{width}-sec-quality")
     await page.locator('[data-qf-c22-method="statistical"]').click()
-    await page.locator('[data-qf27-method="nlp"]').click()
-    await expect(page.locator("#qf28-nlp-evaluation")).to_contain_text("Mostly neutral")
-    await expect(page.locator("#qf28-nlp-evaluation")).to_contain_text("lexical")
-    await capture(page, f"{engine}-{width}-news-method-error-analysis")
+    assert await page.locator('[data-qf27-method="nlp"]').count()==0
+    await expect(page.locator('#qf27-lab-output')).to_contain_text('Calculation')
     await page.locator('#qf-v20-navigation [data-page="portfolio"]').click()
     await page.locator('[data-qf-portfolio="whatif"]').click()
     before_basket = set(await page.evaluate("QFResearch20.context().universe"))

@@ -37,6 +37,6 @@ def test_methods_reflects_deep_private_explanations():
     assert "Data and model validation" in content
     assert "Trace a result to the code" in content
     assert "Five-session up/down classification" in content
-    assert "TF-IDF weighting" in content
+    assert "TF-IDF weighting" not in content
     assert "not evidence of stock-market accuracy" in content
     assert "tests provide scoped evidence" in content

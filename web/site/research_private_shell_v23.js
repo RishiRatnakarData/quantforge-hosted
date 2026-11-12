@@ -44,7 +44,7 @@ function paint(data){
  const company=context();if(lastSymbol!==company.symbol){editing=null;$('qf-v23-note').value='';lastSymbol=company.symbol;}$('qf-v23-note-company').textContent=company.name+' ('+company.symbol+')';
  const visible=data.notes.map((n,i)=>({n,i})).filter(({n})=>n.symbol===company.symbol);
  if(!visible.length)list.textContent='No notes saved for this company yet.';
- for(const {n,i} of visible){const row=document.createElement('div');row.className='qf-v23-note-entry';const body=document.createElement('div'),p=document.createElement('p'),meta=document.createElement('small'),del=document.createElement('button');const archived=window.QFPrivateResearchIntelligenceV96?.readArchive?.(n);p.textContent=archived?'Saved historical assessment · '+archived.date+' · '+archived.universe.join(', ')+' · '+archived.covered+' completed methods. Recorded research screen: '+archived.action+'. This archive is a historical record, not a current recommendation.':n.text;meta.textContent=n.at;body.append(p,meta);del.className='btn sm';del.textContent='Delete';del.dataset.qfV23Delete=String(i);if(!archived){const edit=document.createElement('button');edit.type='button';edit.className='btn sm';edit.textContent='Edit';edit.dataset.qfV23Edit=String(i);row.append(edit);}row.prepend(body);row.append(del);list.append(row);}
+ for(const {n,i} of visible){const row=document.createElement('div');row.className='qf-v23-note-entry';const body=document.createElement('div'),p=document.createElement('p'),meta=document.createElement('small'),del=document.createElement('button');const archived=window.QFPrivateResearchIntelligenceV96?.readArchive?.(n);const thesis=window.QFResearchGuide30?.decode(n.text);p.textContent=thesis?window.QFResearchGuide30.describe(thesis):archived?'Saved historical assessment · '+archived.date+' · '+archived.universe.join(', ')+' · '+archived.covered+' completed methods. Recorded research screen: '+archived.action+'. This archive is a historical record, not a current recommendation.':n.text;meta.textContent=n.at;body.append(p,meta);del.className='btn sm';del.textContent='Delete';del.dataset.qfV23Delete=String(i);if(!archived){const edit=document.createElement('button');edit.type='button';edit.className='btn sm';edit.textContent='Edit';edit.dataset.qfV23Edit=String(i);row.append(edit);}row.prepend(body);row.append(del);list.append(row);}
  window.QFPortfolioUI27?.paint(data);
 }
 function sync(){
@@ -71,7 +71,7 @@ async function open(name){
  if(!signed()){window.QFNavigate20('private');return;}
  if(!privateMode())window.QFResearch20.switchMode('private');
  if(name==='portfolio'){window.QFNavigate20('portfolio');document.querySelector('[data-qf-portfolio="overview"]').click();account.scrollIntoView({block:'start'});}
- else{home(false);window.QFNavigate20('explore');window.QFExplore27?.show('brief');notes.scrollIntoView({block:'start'});$('qf-v23-note').focus();}
+ else{home(false);window.QFNavigate20('explore');window.QFExplore27?.show('research');notes.scrollIntoView({block:'start'});$('qf-v23-note').focus();}
  await refresh();
 }
 $('qf24-switch-mode').addEventListener('click',()=>{close();window.QFResearch20.switchMode(privateMode()?'public':'private');sync();});
@@ -82,12 +82,12 @@ $('qf24-home-find').addEventListener('click',find);$('qf24-home-search').addEven
 $('qf-v20-mode').addEventListener('click',e=>{if(signed()){e.preventDefault();e.stopImmediatePropagation();drawer.showModal();}},true);
 document.addEventListener('click',e=>{
  const action=e.target.closest('[data-qf-v23-open]');if(action){e.preventDefault();void open(action.dataset.qfV23Open);}
- const edit=e.target.closest('[data-qf-v23-edit]');if(edit&&privateMode()){editing=Number(edit.dataset.qfV23Edit);const note=bridge().snapshot()?.notes[editing];if(note&&note.symbol===context().symbol){$('qf-v23-note').value=note.text;$('qf-v23-note').focus();status('Editing saved note. Save to update it.');}else editing=null;}
+ const edit=e.target.closest('[data-qf-v23-edit]');if(edit&&privateMode()){editing=Number(edit.dataset.qfV23Edit);const note=bridge().snapshot()?.notes[editing];if(note&&note.symbol===context().symbol){$('qf-v23-note').value=note.text;$('qf-v23-note').focus();status('Revising a saved note. Save adds a new dated record and preserves the original.');}else editing=null;}
  const del=e.target.closest('[data-qf-v23-delete]');if(del&&privateMode()&&window.confirm('Delete this private note?'))void work(()=>bridge().deleteNote(Number(del.dataset.qfV23Delete)),'Research note deleted.');
 });
 $('qf-v23-close').addEventListener('click',close);
 $('qf-v23-save').addEventListener('click',()=>{const text=$('qf-v23-note').value.trim(),symbol=context().symbol;if(!text){status('Enter a research note first.');return;}void work(async()=>{const data=editing===null?await bridge().saveNote(text,symbol):await bridge().updateNote(editing,text,symbol);editing=null;$('qf-v23-note').value='';return data;},'Research note saved.');});
-saveBrief.addEventListener('click',()=>{const ctx=context(),text=$('qf-v20-findings').innerText.trim();if(!text){status('Analyze this company before saving its brief.');return;}const note=ctx.name+' ('+ctx.symbol+') · SEC snapshot '+ctx.snapshot+' · '+$('qf-v20-chart-source').textContent+'\n'+text;void work(()=>bridge().saveNote(note.slice(0,2000),ctx.symbol),'Research brief saved as a dated note.');});
+saveBrief.addEventListener('click',()=>{const ctx=context(),text=$('qf-v20-findings').innerText.trim();if(!text||!$('qf-v20-run-state').textContent.startsWith('Calculated for')){status('Analyze this company before saving its brief.');return;}const note=ctx.name+' ('+ctx.symbol+') · SEC snapshot '+ctx.snapshot+' · '+$('qf-v20-chart-source').textContent+'\n'+text;void work(()=>bridge().saveNote(note.slice(0,2000),ctx.symbol),'Research brief saved as a dated note.');});
 $('qf-v23-refresh').addEventListener('click',()=>void refresh());
 $('qf-v23-signout').addEventListener('click',async()=>{try{await bridge().signOut();sync();close();window.QFNavigate20('explore');}catch(_){status('Sign-out could not be completed. Try again.');}});
 window.addEventListener('qf:route-change',e=>{if(e.detail?.route==='private'&&signed()){window.QFNavigate20('explore');return;}if(e.detail?.route==='explore')home(false);sync();});

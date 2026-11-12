@@ -47,15 +47,7 @@ function renderNewsV180(result,selected){
  box.innerHTML='<section class="qf-v180-section"><h3>Recent headline themes</h3><p>Dated Alpaca news, grouped by financial subject and headline tone. The language method does not predict stock prices.</p>'+
   '<div class="qf-v180-cards">'+articles+'</div><p class="tiny">Tone method: '+safe(result.method)+'. Topics: '+safe(result.topic_method)+'. Coverage may be incomplete.</p></section>';
 }
-async function loadNewsV180(selected,valid){
- const box=$('qf-v180-news');if(box)box.textContent='Checking recent financial headlines…';
- try{
-  const result=await api('private/news-research?symbols='+encodeURIComponent(selected.join(',')));
-  if(!valid())return;
-  newsResultV180=result;
-  renderNewsV180(result,selected);
- }catch(e){if(valid())renderNewsV180(null,selected);}
-}
+
 function clearResearchOSV90(){
  multiResearchV170=null;
  predictiveResultV180=null;newsResultV180=null;
@@ -822,7 +814,7 @@ async function runResearchOSV90(){
    comparison:window.QFPrivateDecisionReviewV92.historicalComparison(historySeries,selected)};
   renderUnifiedDecisionV160();
   renderPredictiveV180(historySeries,selected);
-  void loadNewsV180(selected,current);
+  // Experimental headline research retired from the product request path.
   status.textContent='Complete research updated for all '+selected.length+' selected investments. Detailed method evidence remains in Advanced Research.';
   if(progress)progress.textContent='Research completed for '+selected.length+' selected investments. Review the results below.';
   message('Compared all selected investments. Models that could not run are marked incomplete; no trades were placed.');
@@ -2459,7 +2451,8 @@ window.QFPrivateBridgeV23=Object.freeze({
   if(!privateState||$('private-signed').hidden)throw Error('MFA sign-in required.');
   const notes=(privateState.notes||[]).map(n=>({...n})),value=String(text||'').trim();
   if(!Number.isInteger(index)||!notes[index]||notes[index].symbol!==symbol||!value||value.length>2000)throw Error('Note changed or input invalid. Refresh before editing.');
-  notes[index]={...notes[index],text:value,at:new Date().toISOString()};
+  if(notes.length>=100)throw Error('Research archive is full. Review saved records and explicitly remove one before adding a revision.');
+  notes.unshift({text:value,at:new Date().toISOString(),symbol}); // Append a revision; retain the original text and timestamp.
   const result=await api('private/notes',{expected_version:version,watchlist:privateState.watchlist||[],notes});privateState=result.portfolio;version=result.version;render();return this.snapshot();
  },
  async assets(query,category='all'){if(!privateState||$('private-signed').hidden)throw Error('MFA sign-in required.');return api('private/assets?'+new URLSearchParams({category,query:String(query).slice(0,60)}));},
@@ -2468,7 +2461,8 @@ window.QFPrivateBridgeV23=Object.freeze({
   if(!privateState)throw Error('MFA sign-in required.');
   const value=String(text||'').trim(),sym=String(symbol||'').toUpperCase();
   if(!value||value.length>2000||!/^[A-Z0-9.\-]{1,15}$/.test(sym))throw Error('Choose a company and enter a note of up to 2000 characters.');
-  const notes=[{text:value,at:new Date().toISOString(),symbol:sym},...(privateState.notes||[])].slice(0,100);
+  if((privateState.notes||[]).length>=100)throw Error('Research archive is full. Existing records were preserved; explicitly manage records before saving.');
+  const notes=[{text:value,at:new Date().toISOString(),symbol:sym},...(privateState.notes||[])];
   const data=await api('private/notes',{expected_version:version,watchlist:privateState.watchlist||[],notes});
   privateState=data.portfolio;version=data.version;render();return this.snapshot();
  },

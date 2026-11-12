@@ -1,3 +1,5 @@
+> Historical stage record. This work was published in `4fc1a46`; publication-pending wording below describes the earlier review stage. See [current release guide](GUIDED_RESEARCH_RELEASE.md).
+
 # QuantForge next major product improvement — local review
 
 Baseline: `da1f755cdc784e2fbd11413aea879bf5c34acf00`, clean `codex/quantforge-product-rebuild` checkout. This stage continues the locked November 9 product and the November 10 detailed request. No push, merge or deployment is authorized for this candidate; production remains the prior release until separate approval.

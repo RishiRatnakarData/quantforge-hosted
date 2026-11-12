@@ -14,10 +14,11 @@ def test_model_exhibit_is_public_while_provider_news_is_not():
     assert 'id="qf-v181-evidence"' in html
     assert "Generated prices only" in html
     assert "not evidence of stock-market accuracy" in html
-    assert "TF-IDF weighting" in html
-    assert "The default method counts" in html
+    assert "TF-IDF weighting" not in html
+    assert "Headline tone</h3>" not in html
     assert "QFPublicModelEvidenceV181" in html
-    assert "private/news-research" in code("web/site/private.js")
+    assert "private/news-research" not in code("web/site/private.js")
+    assert "tf" in code("cloud/news_intelligence_v180.py").lower()
 
 
 def test_legacy_private_sections_relocated_without_deleting_controls():
@@ -30,7 +31,7 @@ def test_legacy_private_sections_relocated_without_deleting_controls():
         assert len(re.findall(r'id="' + re.escape(control) + r'"', html)) == 1
     research = html.split('data-private-view="decision"', 1)[1].split('data-private-view="candidate"', 1)[0]
     assert 'id="private-v90-run"' in research
-    assert 'id="qf-v180-news"' in research
+    assert 'id="qf-v180-news"' not in research
     assert 'id="qf-v180-predictions"' in research
     assert 'qf-v140-launch' not in research
     assert 'id="private-guide-card-v79"' not in research

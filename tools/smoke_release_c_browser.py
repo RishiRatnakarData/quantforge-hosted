@@ -52,7 +52,8 @@ async def public(page, width: int) -> None:
     assert '94 issuers' in await page.locator('#qf-c22-method-content').inner_text()
     assert 'tools/build_public_sec_snapshot.py' in await page.locator('#qf-c22-method-content').inner_text() or await page.locator('#qf-c22-method-content a').count() >= 3
     await page.locator('[data-qf-c22-method="statistical"]').click()
-    assert 'TF-IDF' in await page.locator('#qf-c22-method-content').inner_text()
+    assert 'TF-IDF' not in await page.locator('#qf-c22-method-content').inner_text()
+    assert 'Brier' in await page.locator('#qf-c22-method-content').inner_text()
     await page.locator('[data-qf-c22-method="engineering"]').click()
     assert 'MFA' in await page.locator('#qf-c22-method-content').inner_text()
     assert await page.locator('#page-methods details:visible').count() == 0

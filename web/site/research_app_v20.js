@@ -1,4 +1,4 @@
-/* Release A shared stock-first UI. Price and news IO is owner-only; SEC is published. */
+/* Release A shared stock-first UI. Price IO is owner-only; SEC is published. */
 (function(){
 'use strict';
 const $=id=>document.getElementById(id),Q=window.QFResearchCore20;
@@ -14,7 +14,7 @@ const usd=x=>typeof x==='number'&&Number.isFinite(x)?'$'+value(x,2):'Unavailable
 const evidenceId=id=>esc(({ 'sec:revenue_growth':'Annual revenue comparison','sec:operating_margin':'Reported operating income / revenue','sec:free_cash_flow_usd':'Operating cash flow less PP&E purchases','market:drawdown':'Dated close-to-peak losses','market:volatility':'Dated close-return variability'})[id]||'Source observation');
 const safeUrl=s=>{try{const u=new URL(s);return u.protocol==='https:'&&u.hostname&&u.username===''&&u.password===''?u.href:null;}catch(_){return null;}};
 const state={symbol:bySymbol.has('MSFT')?'MSFT':companies[0].symbol,range:365,finance:'revenue_usd',price:null,priceSource:null,
- privateReady:false,privateMode:false,priceToken:0,newsToken:0,runToken:0,benchmark:null,benchmarkOn:false,benchToken:0,
+ privateReady:false,privateMode:false,priceToken:0,runToken:0,benchmark:null,benchmarkOn:false,benchToken:0,
  result:null,compare:[],model:'prediction',loadingPrice:false,compareToken:0,comparison:null,compareSource:null,financeSort:'symbol',financeSortDirection:1,financeCompare:null,portfolioToken:0,ownerToken:0,portfolioData:null,portfolioWeights:null,portfolioBase:null,portfolioKey:null,portfolioOrigin:'',portfolioScenario:null,optimization:null,benchmarkB:null};
 let resultsOpen=false;
 function company(){return bySymbol.get(state.symbol);}
@@ -42,7 +42,7 @@ function searchAssets(query,signal){return getPrivate('private/assets?'+new URLS
 function selectCompany(symbol){
  if(!bySymbol.has(symbol)||(mode()==='public'&&!data.companies.some(c=>c.symbol===symbol)))return;
 
- state.symbol=symbol;state.result=null;state.price=null;state.priceSource=null;state.benchmark=null;state.priceToken++;state.newsToken++;state.runToken++;state.benchToken++;
+ state.symbol=symbol;state.result=null;state.price=null;state.priceSource=null;state.benchmark=null;state.priceToken++;state.runToken++;state.benchToken++;
  const c=company();
  $('qf-v20-search').value=c.name+' ('+c.symbol+')';
  $('qf-v20-search-results').hidden=true;$('qf-v20-search').setAttribute('aria-expanded','false');
@@ -53,8 +53,7 @@ function selectCompany(symbol){
  $('qf-v20-findings').replaceChildren();$('qf-v20-run-state').textContent='Click Analyze company for an evidence-linked summary.';
  const f=Q.financialSummary(c,data.as_of);
  renderFinances(f);renderSource(f);renderChartEmpty('Preparing chart…');
- renderNewsEmpty(mode()==='private'?'Checking dated headlines…':'News is available only through owner-authorized market providers. No public headlines are invented.');
- setAccount();window.dispatchEvent(new Event('qf:research-context'));loadPrice();loadNews();
+ setAccount();window.dispatchEvent(new Event('qf:research-context'));loadPrice();
 }
 function renderChartEmpty(msg){$('qf-v20-chart').textContent=msg;$('qf-v20-price-stats').replaceChildren();$('qf-v20-price-table').replaceChildren();}
 function renderSource(f){
@@ -191,20 +190,6 @@ async function loadBenchmark(){
   if(state.priceSource?.equity_feed&&raw.equity_feed!==state.priceSource.equity_feed){state.benchmark=null;renderPriceData();$('qf-v20-chart-source').textContent+=' SPY benchmark withheld because a compatible feed was not verified.';return;}
   state.benchmark=Q.priceSeries(raw.observations);renderPriceData();
  }catch(_){if(token===state.benchToken){state.benchmark=null;renderPriceData();$('qf-v20-chart-source').textContent+=' SPY benchmark unavailable; company closes still shown.';}}
-}
-function renderNewsEmpty(text){$('qf-v20-news').textContent=text;}
-async function loadNews(){
- const token=++state.newsToken;
- if(mode()!=='private'){$('qf-v20-news').innerHTML=window.QFNewsContext27?.filingContext(window.QFResearch20?.context?.()||{symbol:state.symbol,financial:Q.financialSummary(company(),data.as_of)})||'Annual filing context is loading.';return;}
- const symbol=state.symbol;
- renderNewsEmpty('Checking dated provider headlines…');
- try{
-  const news=await getPrivate('private/news-research?symbols='+encodeURIComponent(symbol));
-  if(token!==state.newsToken||symbol!==state.symbol)return;
-  const row=Array.isArray(news.rows)?news.rows.find(r=>r.symbol===symbol):null;
-  if(!row||!row.headlines?.length){renderNewsEmpty('No eligible dated headlines returned. Company financial research remains available.');return;}
-  window.QFNewsContext27.render(news,row);
- }catch(e){if(token===state.newsToken)renderNewsEmpty('Headlines unavailable ('+String(e.message||e).slice(0,90)+'). Financial and price research still work.');}
 }
 function analyze(){
  const token=++state.runToken;

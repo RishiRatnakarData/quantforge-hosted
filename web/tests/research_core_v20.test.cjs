@@ -87,7 +87,7 @@ test('generated public HTML includes five visible destinations, source distincti
  assert.deepEqual([...nav.matchAll(/data-page="(\w+)"/g)].map(x=>x[1]),['explore','compare','models','portfolio','methods']);
  assert.match(html,/id="qf-v20-chart"/);
  assert.match(html,/id="qf-v20-analyze"/);
- assert.match(html,/id="qf-v20-news"/);
+ assert.doesNotMatch(html,/id="qf-v20-news"/);
  assert.match(html,/id="qf-v20-financial-table"/);
  assert.match(html,/Illustrative public chart/);
 });

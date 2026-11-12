@@ -1,3 +1,5 @@
+> Historical stage record. This work was published in `4fc1a46`; publication-pending wording below describes the earlier review stage. See [current release guide](GUIDED_RESEARCH_RELEASE.md).
+
 # QuantForge comprehensive quality review — November 12, 2026
 
 Local review branch: codex/quantforge-final-24-issue-completion. This stage starts at 21982d880b7408d28588fe6aba6d28e2015af05f and preserves its complete 24-issue work. Published main remains 94a95616618f273286a3f113dde31780e90f79ed. No upstream is configured for the review branch. No push, merge, hosting change, dependency installation or production write occurred.

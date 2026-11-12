@@ -101,7 +101,7 @@ async def journey(browser, engine, width):
             await page.locator('#private-login-submit').click()
             await expect(page.locator('#qf24-mode-label')).to_contain_text('PRIVATE')
             await expect(page.locator('#qf-v20-source-badge')).to_contain_text('Observed')
-            await expect(page.locator('#qf-v20-news')).to_contain_text('50 dated headlines')
+            assert await page.locator('#qf-v20-news').count() == 0
         prefix = f'v25-{engine}-{mode}-{width}'
         await page.locator('#qf-v20-navigation [data-page="explore"]').click()
         await page.locator('#qf27-analyze').click()
@@ -174,7 +174,7 @@ async def journey(browser, engine, width):
             assert 'paper P&L $0.00' in await page.locator('#qf25-account-chart').inner_text()
             await capture(page, prefix + '-recorded-account-history')
             await page.locator('#qf-v20-navigation [data-page="explore"]').click()
-            await page.locator('[data-qf27-explore="brief"]').click()
+            await page.locator('[data-qf27-explore="research"]').click()
             await page.locator('#qf-v23-note').fill('Original offline note')
             await page.locator('#qf-v23-save').click()
             await expect(page.locator('#qf-v23-note-list')).to_contain_text('Original offline note')
@@ -182,7 +182,8 @@ async def journey(browser, engine, width):
             await page.locator('#qf-v23-note').fill('Edited offline note')
             await page.locator('#qf-v23-save').click()
             await expect(page.locator('#qf-v23-note-list')).to_contain_text('Edited offline note')
-            assert await page.evaluate('window.qfMockOwner.notes.length') == 1
+            assert await page.evaluate('window.qfMockOwner.notes.length') == 2
+            await expect(page.locator('#qf-v23-note-list')).to_contain_text('Original offline note')
             await page.locator('#qf-v20-navigation [data-page="compare"]').click()
             await page.locator('#qf-v20-compare-search').fill('Offline')
             await expect(page.locator('#qf27-compare-options [data-qf27-symbol="TEST"]')).to_have_count(1)
@@ -197,8 +198,8 @@ async def journey(browser, engine, width):
         await page.locator('[data-qf-c22-method="overview"]').click()
         await page.locator('#qf-c22-method-content [data-qf26-tour="engineering"]').click()
         await expect(page.locator('.qf26-pipeline li')).to_have_count(4)
-        await expect(page.locator('[data-qf26-discipline]')).to_have_count(8)
-        for discipline in ('data', 'analysis', 'ml', 'statistics', 'finance', 'optimization', 'nlp', 'software'):
+        await expect(page.locator('[data-qf26-discipline]')).to_have_count(7)
+        for discipline in ('data', 'analysis', 'ml', 'statistics', 'finance', 'optimization', 'software'):
             await page.locator(f'[data-qf26-discipline="{discipline}"]').click()
             await expect(page.locator('#qf26-evidence-detail')).to_contain_text('Reproducible checks')
             assert await page.locator('#qf26-evidence-detail code').count() >= 2

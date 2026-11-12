@@ -61,8 +61,10 @@ async def journey(browser,engine,width):
     await page.locator('#qf27-analyze').click()
     await expect(page.locator('#qf-v20-findings')).to_contain_text('Why it matters')
     await capture(page,f'{engine}-{width}-public-brief')
-    await page.locator('[data-qf27-explore="context"]').click()
-    await expect(page.locator('#qf-v20-news')).to_contain_text('SEC filing context')
+    assert await page.locator('[data-qf27-explore="context"]').count()==0
+    await page.locator('[data-qf27-explore="financials"]').click()
+    await page.locator('[data-qf27-finance="sources"]').click()
+    await expect(page.locator('#qf-v20-financial-table')).to_contain_text('Accession')
     await page.locator('#qf-v20-navigation [data-page="compare"]').click()
     basket_before=await page.locator('#qf-v20-compare-chips').inner_text()
     await page.locator('#qf27-peer-scope').select_option('all')
@@ -84,7 +86,7 @@ async def journey(browser,engine,width):
         await page.locator('#qf27-case-csv').click()
     assert (await download.value).suggested_filename.endswith('.csv')
     await page.locator('[data-qf-c22-method="statistical"]').click()
-    for method in ('returns','regression','portfolio','tails','drawdown','uncertainty','logistic','brier','ratios','dcf','walk','nlp'):
+    for method in ('returns','regression','portfolio','tails','drawdown','uncertainty','logistic','brier','ratios','dcf','walk'):
         await page.locator(f'[data-qf27-method="{method}"]').click()
         assert await page.locator('#qf27-lab-output math').count() >= 1
         await capture(page,f'{engine}-{width}-method-{method}')
@@ -125,17 +127,8 @@ async def journey(browser,engine,width):
     await expect(page.locator('#qf-v20-symbol')).to_have_text('AAPL')
     await page.locator('#qf-v20-search').fill('Microsoft')
     await page.locator('#qf-v20-search-results [data-qf27-symbol="MSFT"]').click()
-    await page.locator('[data-qf27-explore="context"]').click()
-    await expect(page.locator('#qf-v20-news')).to_contain_text('24 dated headlines')
-    await page.locator('#qf27-news-tone').select_option('Negative')
-    await expect(page.locator('#qf27-news-tone')).to_be_focused()
-    await page.locator('#qf27-news-topic').select_option('Earnings')
-    await expect(page.locator('.qf27-headlines article')).to_have_count(4)
-    await page.locator('#qf27-news-topic').select_option('all')
-    await page.locator('#qf27-news-tone').select_option('all')
-    await page.locator('#qf27-news-next').click()
-    await expect(page.locator('#qf-v20-news')).to_contain_text('Page 2 of 4')
-    await capture(page,f'{engine}-{width}-private-news')
+    assert await page.locator('#qf-v20-news').count()==0
+    assert await page.locator('[data-qf27-explore="context"]').count()==0
     await page.locator('#qf-v20-navigation [data-page="portfolio"]').click()
     await page.locator('[data-qf-portfolio="overview"]').click()
     await page.evaluate("async()=>{qfMockOwner.holdings['BTC/USD']=.25;qfMockVersion++;await QFPrivateBridgeV23.refresh();window.dispatchEvent(new Event('qf:owner-state'));}")
@@ -205,7 +198,7 @@ async def journey(browser,engine,width):
     assert await page.evaluate('QFPrivateBridgeV23.snapshot()') is None
     assert await page.locator('#qf24-transactions').is_hidden()
     assert not errors,errors
-    print(f'{engine} {width}px source modes/picker/peers/news/preview/owned-sell/accepted receipt/isolation PASS',flush=True)
+    print(f'{engine} {width}px source modes/picker/peers/retired-news/preview/owned-sell/accepted receipt/isolation PASS',flush=True)
     await page.close()
 
 async def main():

@@ -2,17 +2,17 @@
 
 QuantForge is a financial research and software engineering project built to explore company financials, statistical uncertainty and hypothetical portfolios. It demonstrates applied statistical data science through traceable inputs, retained numerical engines, reproducible evaluation and an authenticated private experience.
 
-[Public application](https://quantforge-648.pages.dev/) · [Current feature parity and acceptance](docs/CODEX_REBUILD_PROGRESS.md) · [Research methodology](docs/methodology/QUANT_RESEARCH_METHODS.md)
+[Public application](https://quantforge-648.pages.dev/) · [Current release and research guide](docs/GUIDED_RESEARCH_RELEASE.md) · [Research methodology](docs/methodology/QUANT_RESEARCH_METHODS.md)
 
 ## One application, five sections
 
 | Section | Working research flow |
 | --- | --- |
-| Explore | Name search, source-labeled interactive history, SEC financial trends and filing lineage, evidence-backed briefing, dated private news and contextual saved research |
+| Explore | Name search, source-labeled interactive history, SEC financial trends and filing lineage, evidence-backed briefing, balance-sheet evidence, guided investigation and versioned private thesis journal |
 | Compare | 2–5 names, common-date normalized paths, financial contrasts, distributions, correlation, risk/return, sortable tables and safe CSV |
 | Models | Prediction, Risk, Valuation and Strategy Testing; each has Results / Evaluation / Method with baselines, accessible equations, sensitivity and limitations |
 | Portfolio | Overview, What If? and Portfolio Analysis; constrained allocations, covariance, Monte Carlo scenarios and authentic recorded virtual-account marks |
-| Methods | Overview, Data, Statistical Methods and Engineering; walkthrough, SEC lineage, visual architecture and eight inspectable technical disciplines with source/test references |
+| Methods | Overview, Data, Statistical Methods and Engineering; walkthrough, SEC lineage, visual architecture and seven inspectable technical disciplines with source/test references |
 
 The clickable brand opens a compact Home inside Explore. Company selection carries across sections. Private company notes belong in Explore; virtual funding, holdings and transactions belong in Portfolio.
 
@@ -20,7 +20,7 @@ The clickable brand opens a compact Home inside Explore. Company selection carri
 
 **Public:** Historical SEC Company Facts are real reported financial observations. Market-path demonstrations are deterministic synthetic inputs, explicitly labeled as such. They are not actual company stock prices or evidence of market predictive skill.
 
-**Private:** Owner identity and Supabase authenticator MFA gate eligible Alpaca history, quotes, asset listings and news. Provider entitlement, dates and feed conventions remain visible. Version-checked Supabase state supports notes, saved briefings and virtual transactions. **No live trading:** all transactions are virtual; there is no real-money order execution.
+**Private:** Owner identity and Supabase authenticator MFA gate eligible Alpaca history, quotes and asset listings. Provider entitlement, dates and feed conventions remain visible. Version-checked Supabase state supports notes, saved briefings and virtual transactions. **No live trading:** all transactions are virtual; there is no real-money order execution.
 
 Recorded virtual-account history starts only when the owner requests server-verified marks. Deposits and withdrawals change contributed capital; they are not gains. Unrecorded historical account values and unsupported time-weighted percentage returns are not fabricated. A missing provider disables the affected output instead of substituting simulated private data.
 
@@ -34,7 +34,7 @@ Recorded virtual-account history starts only when the owner requests server-veri
 | Statistics and risk | [Returns, volatility, VaR/ES, drawdown and moving blocks](web/site/research_models_core_v22.js) | [Numerical and input guards](web/tests/research_models_core_v22.test.cjs) |
 | Financial scenarios | [Cash-flow proxy DCF and rate sensitivity](web/site/research_models_core_v22.js) | [Scenario calculation tests](web/tests/research_models_core_v22.test.cjs) |
 | Optimization and backtesting | [Constrained optimizer](web/site/private_optimizer.js), [rolling allocation](web/site/private_walkforward_v65.js) | [Optimizer](web/tests/private_optimizer.test.cjs), [forecast/walk-forward](web/tests/private_research_v65.test.cjs) |
-| NLP | [Sparse TF-IDF, cosine topics and negation-aware lexical tone](cloud/news_intelligence_v180.py) | [Text and endpoint fixtures](tests/test_news_intelligence_v180.py) |
+| Archived experimental NLP (retired from product) | [Sparse TF-IDF, cosine topics and negation-aware lexical tone](cloud/news_intelligence_v180.py) | [Text and endpoint fixtures](tests/test_news_intelligence_v180.py) |
 | Software and cloud | [FastAPI](cloud/api.py), [same-origin proxy](functions/api/[[path]].js), [deterministic builder](tools/build_unified_site.py) | [Owner/MFA/API](tests/test_hosted_web.py), [snapshot accounting](tests/test_valuation_snapshots.py), [three-browser acceptance](tools/smoke_completion_browser.py) |
 
 Methods → Engineering presents the same evidence in the running application, without requiring repository access. The repository remains private; historical release documents are retained for traceability rather than describing the current navigation.
@@ -46,9 +46,9 @@ SEC Company Facts → validated annual snapshot → public static research
 Synthetic paths  → reproducible public numerical experiments
 
 Browser → Cloudflare same-origin proxy → FastAPI / Render
-                                      â”œâ”€ owner + authenticator verification
-                                      â”œâ”€ Supabase RLS / versioned virtual state
-                                      â””â”€ entitled Alpaca assets, prices and news
+                                      |-- owner + authenticator verification
+                                      |-- Supabase RLS / versioned virtual state
+                                      `-- entitled Alpaca assets and prices
 
 Eligible inputs → retained pure engines → scoped evidence → shared five-section UI
 ```
@@ -75,25 +75,18 @@ node --test (Get-ChildItem web/tests -Filter '*.test.cjs' | ForEach-Object FullN
 .\.venv\Scripts\python.exe tools/smoke_completion_browser.py
 ```
 
-The November 12 local candidate passes 613 Python and 413 JavaScript tests, plus the original A–D journeys, full-route browser matrix and completed-engine journeys in Chromium, Firefox and WebKit at desktop/mobile widths. Private automated journeys use isolated fixtures, never real credentials or account writes. GitHub Actions and deployment evidence must be matched to the release SHA; automated tests do not certify live provider entitlement or owner persistence. Those remain separate owner checks.
+The published baseline `4fc1a46` passed 613 Python / 413 JavaScript tests and candidate/main CI before this improvement assignment. These are historical baseline counts, not claims about an untested candidate. Current release evidence, verification scope and deployment identifiers are recorded in [the release guide](docs/GUIDED_RESEARCH_RELEASE.md) and the external release record for the final SHA. Private automated writes use isolated fixtures; real owner persistence remains separately controlled.
 
+## Guided investment research
 
-## November 10 improvement — historical review stage
+Explore separates reported annual financials, authenticated observed market history, evidence-grounded briefing and private saved research. The guided process connects business understanding, financial performance, valuation assumptions, historical risk, alternatives and a revisitable investment thesis. No score, Buy/Hold/Sell verdict or personal allocation recommendation is generated.
 
-[Source-grounded gap inventory, implementation and acceptance](docs/PRODUCT_IMPROVEMENT_2026_11_10.md)
+The balance-sheet exhibit adds cached, source-linked SEC instant facts at covered annual fiscal ends. Ratios require compatible same-accession inputs. Missing concepts remain null; current/noncurrent long-term debt components are not labeled complete total debt. Quarterly/TTM reconstruction, verified fund holdings/fees and a full diluted-share valuation bridge remain outside this release.
 
-This review stage adds a single name-first investment picker, server-calculated virtual trade previews and receipt/replay handling, owned-position sells, SEC-first public Explore, inspectable headline context, corrected peer units, a compact account view, twelve worked mathematical studies and an integrated source-backed case report. The prior published release is `da1f755`; this candidate is not pushed or deployed. Its private browser acceptance uses isolated fixtures and requires fresh owner acceptance after any approved release.
+Theses use the existing MFA-protected notes store. Revisions append records; original notes and timestamps remain. A full 100-note archive refuses new records instead of silently truncating history. Review dates do not create scheduled reminders.
 
+News/headline tone has been retired from normal public/private UI and request paths because it demonstrated limited investment decision value. SEC filing provenance remains attached to financial evidence. Experimental NLP implementations and regression fixtures remain in source; the authenticated archival API remains owner-gated for compatibility and is not called by the product.
 
-## November 12 final-audit local candidate
+## Historical engineering evidence
 
-The published baseline is 94a9561. The separate codex/quantforge-final-24-issue-completion branch adds funding preview/replay recovery, visible transaction receipts, actionable bounded errors, shared Models/scenario selection, neutral-dominance correction, SEC quality/lineage and responsive chart evidence. All existing numerical engines and security checks remain.
-
-See the [24-issue register](docs/FINAL_24_ISSUE_REGISTER.json), [verification and live-read boundaries](docs/CODEX_FINAL_COMPLETION_PROGRESS.md) and [engine parity inventory](docs/FINAL_24_ENGINE_PARITY.md). Local acceptance includes 613 Python / 405 JavaScript tests, 15 three-browser/five-width workflow combinations, 444 component checks and separate native Chrome 200% zoom evidence. Private automated writes use isolated fixtures. Read-only production inspection passed; new candidate production transactions require separate post-release acceptance. This branch is not pushed, merged or deployed.
-
-
-## Comprehensive quality review — November 12
-
-The continued local review independently reproduces and corrects stale comparison results, an invalid scenario export, a delayed private-benchmark mode race, range-slider focus loss, partial financial chart suppression, a missing-as-zero worked example and Portfolio hard-reload initialization. Shared financial findings now explain actual values and periods. Existing engines, four model categories and five sections remain.
-
-See the [functional/scientific/visual audit and conditional release recommendation](docs/QUALITY_REVIEW_2026_11_12.md), [new issue evidence](docs/QUALITY_REVIEW_ISSUES.json), [career evidence](docs/QUALITY_CAREER_EVIDENCE.md) and [66-module inventory](docs/QUALITY_ENGINE_INVENTORY.json). The current source passes 613 Python and 413 JavaScript tests; full browser/zoom evidence is recorded in the external review package. Production is still 94a9561; the review branch remains local pending explicit publication approval.
+Earlier audit documents describe their stage at the time they were written. The November 10 work and November 12 final-24/quality work were subsequently published in `4fc1a46`; their former “unpublished” labels do not describe current production. Retained records: [24-issue register](docs/FINAL_24_ISSUE_REGISTER.json), [engine parity](docs/FINAL_24_ENGINE_PARITY.md), [quality review](docs/QUALITY_REVIEW_2026_11_12.md).
