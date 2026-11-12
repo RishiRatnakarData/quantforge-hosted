@@ -60,7 +60,7 @@ function renderHomeEvidence(){
  note.textContent='Fiscal years '+rows[0].fiscal_end.slice(0,4)+'–'+latest.fiscal_end.slice(0,4)+' · USD · Latest included filing '+(latest.sources?.revenue_usd?.filed||'date unavailable');
  host.append(list,note);
 }
-function home(value){if(value){window.QFNavigate20('explore');renderHomeEvidence();}landing=Boolean(value);$('qf-v23-landing').hidden=!landing;$('qf-v23-explore-content').hidden=landing;}
+function home(value){if(value){window.QFNavigate20('explore');renderHomeEvidence();}landing=Boolean(value);$('qf-v23-landing').hidden=!landing;$('qf-v23-explore-content').hidden=landing;document.body.classList.toggle('qf31-home-active',landing);}
 function paint(data){
  const list=$('qf-v23-note-list');list.replaceChildren();
  if(!data)return;paintHistory(data);
@@ -115,7 +115,7 @@ $('qf-v23-refresh').addEventListener('click',()=>void refresh());
 $('qf-v23-signout').addEventListener('click',async()=>{try{await bridge().signOut();sync();close();window.QFNavigate20('explore');}catch(_){status('Sign-out could not be completed. Try again.');}});
 window.addEventListener('qf:route-change',e=>{if(e.detail?.route==='private'&&signed()){window.QFNavigate20('explore');return;}if(e.detail?.route==='explore')home(false);sync();});
 window.addEventListener('qf:research-context',sync);window.addEventListener('qf:data-mode',sync);
-window.addEventListener('qf:owner-auth-ready',()=>{sync();if(document.querySelector('.tabpage.active')?.id==='page-private')window.QFNavigate20('explore');});window.addEventListener('qf:owner-auth-ended',()=>{sync();window.QFNavigate20('explore');});
+window.addEventListener('qf:owner-auth-ready',()=>{if(landing)home(false);sync();if(document.querySelector('.tabpage.active')?.id==='page-private')window.QFNavigate20('explore');});window.addEventListener('qf:owner-auth-ended',()=>{sync();window.QFNavigate20('explore');});
 const legacy=$('private-signed');if(legacy)new MutationObserver(sync).observe(legacy,{attributes:true,attributeFilter:['hidden']});
 sync();
 function showFreshHome(){
@@ -125,6 +125,7 @@ function showFreshHome(){
  landing=true;
  $('qf-v23-landing').hidden=false;
  $('qf-v23-explore-content').hidden=true;
+ document.body.classList.add('qf31-home-active');
 }
 if(document.readyState==='complete')queueMicrotask(showFreshHome);
 else window.addEventListener('load',showFreshHome,{once:true});
