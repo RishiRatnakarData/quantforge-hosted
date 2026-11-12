@@ -703,13 +703,21 @@ button,input,select,textarea{font-family:inherit}h1,h2,h3,h4,p,button,label{over
 /* V31 screenshot review: prevent vertical flex-basis stretch, unclutter Home. */
 body.qf31-home-active #qf24-mode-bar{display:none}
 @media(max-width:800px){
- .side .qf27-credit{display:none}
+ .side .qf27-credit{display:none!important}
  #qf-v20-mode{min-height:44px}
 }
 @media(max-width:680px){
  .qf31-home-search-row input{flex:0 0 auto;width:100%;height:48px;min-height:48px}
  .qf31-home-search-row button{min-height:48px}
  .qf-v20-navigation .nav-btn{min-height:44px}
+}
+
+/* V31 visual QA: five navigation destinations need two legible rows at phone widths. */
+@media(max-width:420px){
+ #qf-v20-navigation{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:6px!important}
+ #qf-v20-navigation .nav-btn{min-width:0;min-height:44px!important;padding:8px 4px!important;text-align:center;font-size:12px!important;white-space:normal}
+ #qf-v20-navigation .nav-btn:nth-child(-n+3){grid-column:span 2}
+ #qf-v20-navigation .nav-btn:nth-child(n+4){grid-column:span 3}
 }
 
 
@@ -1105,7 +1113,7 @@ body.qf31-home-active #qf24-mode-bar{display:none}
    <p class="qf31-home-lead">Research reported SEC company data, compare financial performance, and examine transparent models for risk, valuation, and hypothetical portfolios.</p>
    <div class="qf31-home-search">
     <label for="qf24-home-search">Start with a company</label>
-    <div class="qf31-home-search-row"><input id="qf24-home-search" type="search" placeholder="Try Microsoft, Apple, or a ticker" autocomplete="off"><button type="button" id="qf24-home-find" class="btn primary">Research company</button></div>
+    <div class="qf31-home-search-row"><input id="qf24-home-search" type="search" placeholder="Company name or ticker" autocomplete="off"><button type="button" id="qf24-home-find" class="btn primary">Research company</button></div>
     <p class="qf31-home-hint">Select a name to inspect actual financial records and source dates.</p>
    </div>
    <a class="qf31-home-case-link" href="/research-case-study.html">View a worked SEC research case study</a>
