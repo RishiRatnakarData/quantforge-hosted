@@ -1136,6 +1136,7 @@ function runGuideV79(){
 const M=window.QFModel;
 let privateState=null, version=0, quoted={}, mfaFactorId=null, privateGeneration=0;
 const REMEMBER_PRIVATE_KEY='qf-restore-verified-private-v1';
+let authEpoch=0,loginBusy=false;
 function rememberPrivate(){try{return localStorage.getItem(REMEMBER_PRIVATE_KEY)==='yes'}catch(_){return false}}
 function setRememberPrivate(value){try{if(value)localStorage.setItem(REMEMBER_PRIVATE_KEY,'yes');else localStorage.removeItem(REMEMBER_PRIVATE_KEY)}catch(_){/* Storage unavailable in private browsing. */}}
 const rememberPrivateBox=$('qf31-remember-session');
@@ -1160,10 +1161,12 @@ async function api(path, body){
   return data;
 }
 const temporaryPrivateOutage=e=>[502,503,504].includes(Number(e?.status));
-async function wakePrivateService(){
+async function wakePrivateService(cancelled=()=>false){
  const delays=[0,2000,4000,6000,8000,10000,10000,10000];
  for(const delay of delays){
+  if(cancelled())return false;
   if(delay)await new Promise(resolve=>setTimeout(resolve,delay));
+  if(cancelled())return false;
   message('Private service is starting or reconnecting. Checking availability…');
   try{
    const response=await fetch('/api/health',{credentials:'same-origin',cache:'no-store'});
@@ -1245,6 +1248,9 @@ function render(){
   $('private-notes').innerHTML=(privateState.notes||[]).map((n,i)=>({n,i})).filter(({n})=>!window.QFPrivateResearchIntelligenceV96.readArchive(n)).map(({n,i})=>'<div class="saved-note"><div class="saved-note-body"><p>'+safe(n.text)+'</p><span class="tiny">'+safe(n.at||'Saved note')+'</span></div><button class="btn sm" type="button" data-note-delete="'+i+'" aria-label="Delete note '+(i+1)+'">Delete</button></div>').join('')||'<p class="tiny">No notes saved.</p>';
 }
 async function login(){
+ if(loginBusy)return;
+ loginBusy=true;const epoch=++authEpoch;
+ const button=$('private-login-submit');button.disabled=true;
  message('Signing in…');
  const credentials={email:$('private-email').value.trim(),password:$('private-password').value};
  try{
@@ -1252,12 +1258,18 @@ async function login(){
   try{state=await api('auth/login',credentials);}
   catch(e){
    if(!temporaryPrivateOutage(e))throw e;
-   if(!await wakePrivateService())throw Error('The private service could not reconnect. Try again shortly; check the backend service status if this continues.');
+   if(!await wakePrivateService(()=>epoch!==authEpoch)){
+    if(epoch!==authEpoch)return;
+    throw Error('The private service could not reconnect. Try again shortly; check the backend service status if this continues.');
+   }
+   if(epoch!==authEpoch)return;
    state=await api('auth/login',credentials);
   }
+  if(epoch!==authEpoch)return;
   $('private-password').value='';await handleAuthState(state);
-  message(state.signed_in?'Signed in.':'Password accepted. Authenticator verification required.');
- }catch(e){message(e.message);}
+  if(epoch===authEpoch)message(state.signed_in?'Signed in.':'Password accepted. Authenticator verification required.');
+ }catch(e){if(epoch===authEpoch)message(e.message);}
+ finally{loginBusy=false;button.disabled=false;}
 }
 async function startMFASetup(){
   message('Starting authenticator setup…');
@@ -1281,6 +1293,7 @@ async function verifyMFA(){
   }catch(e){message(e.message);}
 }
 async function logout(){
+  authEpoch++;
   setRememberPrivate(false);if(rememberPrivateBox)rememberPrivateBox.checked=false;
   privateGeneration++;
   clearImportedSECV99(); // Invalidate imported financial records and pending reads before asynchronous sign-out.
@@ -1344,6 +1357,7 @@ $('private-notes').addEventListener('click',e=>{
 let pendingSessionCheck=null;
 async function checkSession(){
  if(pendingSessionCheck)return pendingSessionCheck;
+ const epoch=authEpoch;
  pendingSessionCheck=(async()=>{
   message('Checking for a verified private session…');
   try{
@@ -1351,12 +1365,17 @@ async function checkSession(){
    try{state=await api('auth/session');}
    catch(e){
     if(!temporaryPrivateOutage(e))throw e;
-    if(!await wakePrivateService())throw Error('Private service could not reconnect. Try again shortly; check the backend service status if this continues.');
+    if(!await wakePrivateService(()=>epoch!==authEpoch)){
+     if(epoch!==authEpoch)return;
+     throw Error('Private service could not reconnect. Try again shortly; check the backend service status if this continues.');
+    }
+    if(epoch!==authEpoch)return;
     state=await api('auth/session');
    }
+   if(epoch!==authEpoch)return;
    await handleAuthState(state);
-   message(state.signed_in?'Verified session restored.':state.mfa_required?'Authenticator verification required.':'Sign in to continue private research.');
-  }catch(e){message('Private session check unavailable: '+e.message);}
+   if(epoch===authEpoch)message(state.signed_in?'Verified session restored.':state.mfa_required?'Authenticator verification required.':'Sign in to continue private research.');
+  }catch(e){if(epoch===authEpoch)message('Private session check unavailable: '+e.message);}
  })();
  try{return await pendingSessionCheck;}finally{pendingSessionCheck=null;}
 }
@@ -1384,7 +1403,7 @@ $('private-logout').addEventListener('click',logout);
 $('private-quote-submit').addEventListener('click',currentQuote);
 $('private-trade-submit').addEventListener('click',trade);
 $('private-note-submit').addEventListener('click',addNote);
-document.addEventListener('click',e=>{const b=e.target.closest('[data-page],[data-go]');if(b){queueMicrotask(updateMode);if(b.dataset.page==='private')checkSession();}});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-page],[data-go]');if(b){queueMicrotask(updateMode);if(b.dataset.page==='private'&&!privateState)checkSession();}});
 // Investment names come from private Alpaca asset discovery after MFA.
 // Do not contact the private API from the public-only pages.
 /* Private asset directory: click-to-select. Name search is optional. */
