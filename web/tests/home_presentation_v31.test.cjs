@@ -41,7 +41,8 @@ test('Private session restoration requires an explicit preference and retains se
  assert.match(client,/if\(rememberPrivate\(\)/);
  assert.match(client,/setRememberPrivate\(false\)/);
  assert.match(client,/auth\/session/);
- assert.match(client,/wakePrivateService\(\)/);
+ assert.match(client,/wakePrivateService\(/);
+ assert.match(client,/authEpoch/);
  assert.match(backend,/if not auth_state\(user, token\)\["signed_in"\]/);
  assert.match(backend,/httponly=True/);
  assert.match(backend,/samesite="strict"/);
