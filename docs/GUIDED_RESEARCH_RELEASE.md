@@ -33,3 +33,7 @@ Quarterly/TTM cash flows require reliable duration/YTD reconstruction and restat
 The repository stays private. A separate employer source sample could be useful: a small sanitized package of SEC normalization, pure ratio/risk functions, mathematical tests, architecture and the public case-study ledger. It would exclude provider adapters, owner data, deployment configuration and credentials. Publishing that separate artifact is deferred for a distinct review; this assignment does not expose the repository.
 
 Rollback baseline is `4fc1a46f9218799cc2f88e6404bf04b11004ef1d`. Deploy matching code revisions using the existing Cloudflare Pages / Render flow, confirm CI and actual production bytes/health, and preserve Supabase records. No schema or secret change is part of this release.
+
+## Live acceptance correction
+
+The initial production read-only check identified a pre-existing Portfolio refresh gap: switching from public back to private mode cleared the holdings/quote panel without reloading it until another route entry or account refresh. The mode-switch path now reloads authorized owner state when Portfolio is active. It uses the existing owner/MFA gate and generation checks; it performs no saved-account write. The guided workflow explicitly tests private → public → private on Portfolio, requiring the panel and saved holding rows to return.

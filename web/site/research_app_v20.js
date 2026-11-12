@@ -603,7 +603,7 @@ window.QFResearch20=Object.freeze({choose:selectCompany,analyze,
   state.privateMode=next==='private';if(next==='public')state.compare=state.compare.filter(s=>data.companies.some(c=>c.symbol===s));renderCompareChips();invalidateComparison();state.ownerToken++;
   $('qf-b21-owner-account').hidden=true;$('qf-b21-owner-account-table').replaceChildren();
   const chosen=next==='public'&&!data.companies.some(c=>c.symbol===state.symbol)?'MSFT':state.symbol;
-  selectCompany(chosen);window.dispatchEvent(new Event('qf:data-mode'));return true;
+  selectCompany(chosen);window.dispatchEvent(new Event('qf:data-mode'));if(next==='private'&&$('page-portfolio').classList.contains('active'))void loadOwnerVirtualState();return true;
  },
  searchAssets,reloadPortfolio:loadPortfolioResearch,exportRows:csv,chooseAsset(asset){rememberAsset(asset);selectCompany(asset.symbol);},addAssetToCompare:addAsset,assetInfo:symbol=>bySymbol.get(symbol)||{symbol,name:symbol+' · saved investment'},
  context:()=>({symbol:state.symbol,name:company().name,origin:state.priceSource?.type||null,
