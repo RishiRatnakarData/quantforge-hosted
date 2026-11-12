@@ -53,8 +53,11 @@ async def run_page(browser, width: int) -> None:
         assert await page.locator('#qf-v20-navigation [data-page]').count() == 5
         await page.locator('#qf-v23-home-button').click()
         assert await page.locator('#qf-v23-landing').is_visible()
-        await page.locator('#qf-v23-open-research').click()
+        await page.locator('#qf24-home-search').fill('Microsoft')
+        await page.locator('#qf24-home-find').click()
         assert await page.locator('#qf-v20-search').is_visible()
+        await page.locator('#qf-v20-search-results [data-qf27-symbol="MSFT"]').click()
+        assert await page.locator('#qf-v20-symbol').inner_text() == 'MSFT'
         assert await page.evaluate('document.documentElement.scrollWidth<=window.innerWidth')
         assert not errors, errors[:3]
         if width == 1440:
