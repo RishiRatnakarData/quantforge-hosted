@@ -49,3 +49,15 @@
 .qf31-remember-option{display:flex;align-items:flex-start;gap:10px;margin:18px 0 4px;font-size:15px;line-height:1.5;font-weight:600;color:#26323b;cursor:pointer}
 .qf31-remember-option input[type="checkbox"]{flex:0 0 auto;margin:3px 0 0;width:18px;height:18px;accent-color:#44535f}
 .qf31-remember-note{font-size:13px;line-height:1.55;color:#596670;max-width:68ch;margin:0 0 16px}
+
+/* V31 screenshot review: prevent vertical flex-basis stretch, unclutter Home. */
+body.qf31-home-active #qf24-mode-bar{display:none}
+@media(max-width:800px){
+ .side .qf27-credit{display:none}
+ #qf-v20-mode{min-height:44px}
+}
+@media(max-width:680px){
+ .qf31-home-search-row input{flex:0 0 auto;width:100%;height:48px;min-height:48px}
+ .qf31-home-search-row button{min-height:48px}
+ .qf-v20-navigation .nav-btn{min-height:44px}
+}
