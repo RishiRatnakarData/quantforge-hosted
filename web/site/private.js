@@ -1252,7 +1252,7 @@ async function login(){
   try{state=await api('auth/login',credentials);}
   catch(e){
    if(!temporaryPrivateOutage(e))throw e;
-   if(!await wakePrivateService())throw Error('The private service could not reconnect. Try again shortly; redeployment is not required.');
+   if(!await wakePrivateService())throw Error('The private service could not reconnect. Try again shortly; check the backend service status if this continues.');
    state=await api('auth/login',credentials);
   }
   $('private-password').value='';await handleAuthState(state);
@@ -1351,7 +1351,7 @@ async function checkSession(){
    try{state=await api('auth/session');}
    catch(e){
     if(!temporaryPrivateOutage(e))throw e;
-    if(!await wakePrivateService())throw Error('Private service could not reconnect. Try again shortly; no deployment is needed.');
+    if(!await wakePrivateService())throw Error('Private service could not reconnect. Try again shortly; check the backend service status if this continues.');
     state=await api('auth/session');
    }
    await handleAuthState(state);
