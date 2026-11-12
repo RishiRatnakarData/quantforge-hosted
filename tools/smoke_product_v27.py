@@ -49,6 +49,8 @@ async def journey(browser,engine,width):
             await request.abort()
     await page.route('**/*',route)
     await page.goto('https://quantforge.test/')
+    await expect(page.locator('#qf-v23-landing')).to_be_visible()
+    await page.locator('#qf-v20-navigation [data-page="explore"]').click()
     await expect(page.locator('#qf27-explore-financials')).to_be_visible()
     assert await page.locator('#qf-v20-chart').is_hidden()
     await expect(page.locator('#qf-v20-financial-chart svg')).to_be_visible()

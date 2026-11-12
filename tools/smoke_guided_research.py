@@ -14,8 +14,10 @@ OUT=Path(os.environ.get('QF_SCREENSHOT_DIR',str(ROOT/'outputs/guided-research'))
 HTML=(ROOT/'public/index.html').read_text(encoding='utf-8')
 CSP=next(line.strip().split(': ',1)[1] for line in (ROOT/'public/_headers').read_text().splitlines() if 'Content-Security-Policy:' in line)
 
-async def login(page):
+async def login(page, remember=False):
     await page.locator('#qf-v20-mode').click()
+    if remember:
+        await page.locator('#qf31-remember-session').check()
     await page.locator('#private-email').fill('fixture'+'@'+'example.invalid')
     await page.locator('#private-password').fill('isolated-fixture')
     await page.locator('#private-login-submit').click()
@@ -41,14 +43,17 @@ async def run():
                 await page.screenshot(path=str(OUT/f'{engine}-{width}-balance-sheet.png'),full_page=True)
                 await page.locator('#qf27-analyze').click()
                 await expect(page.locator('#qf30-guide')).to_contain_text('Separate price from valuation')
-                await page.locator('[data-qf30-action="compare"]').evaluate('(e)=>e.closest("details").open=true')
+                assert await page.locator('#qf27-explore-brief > section').first.get_attribute('class') == 'pane qf-v20-findings'
+                assert await page.locator('#qf30-guide details, #qf30-journal details').count() == 0
+                assert await page.locator('#qf30-step-4').is_visible()
                 await page.locator('[data-qf30-action="compare"]').click()
                 await expect(page.locator('#qf-v20-compare-chips')).to_contain_text('MSFT')
                 await page.evaluate(FIXTURE)
-                await login(page)
+                await login(page, remember=True)
+                assert await page.evaluate("localStorage.getItem('qf-restore-verified-private-v1')") == 'yes'
                 await page.locator('[data-qf27-explore="research"]').click()
                 await page.locator('#qf30-interest').fill('Fixture thesis: investigate cash generation <script>')
-                await page.locator('#qf30-more-prompts summary').click()
+                assert await page.locator('#qf30-concerns').is_visible()
                 await page.locator('#qf30-concerns').fill('Capital spending and missing segment evidence')
                 await page.locator('#qf30-review').fill('2027-01-15')
                 await page.locator('#qf30-save').click()
@@ -65,10 +70,20 @@ async def run():
                 assert await page.locator('#qf-v23-note-list script').count()==0
                 await page.screenshot(path=str(OUT/f'{engine}-{width}-thesis-fixture.png'),full_page=True)
                 saved=await page.evaluate('({owner:structuredClone(qfMockOwner),version:qfMockVersion})')
+                # A new document receives an isolated test-only server fixture before
+                # application scripts run. It does not connect to a real account.
+                init_script='(' + FIXTURE + ')();' + (
+                    'window.qfMockOwner=' + json.dumps(saved['owner']) + ';'
+                    'window.qfMockVersion=' + str(saved['version']) + ';'
+                    'const originalFetch=window.fetch;'
+                    'window.fetch=(url,opts)=>String(url).includes("auth/session")'
+                    '?Promise.resolve({ok:true,status:200,json:async()=>({signed_in:true,mfa_required:false})})'
+                    ':originalFetch(url,opts);'
+                )
+                await page.add_init_script(script=init_script)
                 await page.reload()
-                await page.evaluate(FIXTURE)
-                await page.evaluate('(s)=>{qfMockOwner=s.owner;qfMockVersion=s.version}',saved)
-                await login(page)
+                await expect(page.locator('#qf24-mode-label')).to_contain_text('PRIVATE')
+                assert await page.evaluate("localStorage.getItem('qf-restore-verified-private-v1')") == 'yes'
                 await page.locator('[data-qf27-explore="research"]').click()
                 await expect(page.locator('#qf-v23-note-list')).to_contain_text('revision 2')
                 await expect(page.locator('#qf-v23-note-list')).to_contain_text('revision 1')
@@ -102,6 +117,10 @@ async def run():
                 assert await page.locator('[data-qf27-method="nlp"]').count()==0
                 assert await page.locator('#qf27-lab-output math').count()>0
                 assert await page.evaluate('document.documentElement.scrollWidth<=innerWidth')
+                # Explicit sign-out removes the opt-in restoration marker.
+                await page.locator('#qf-v20-mode').click()
+                await page.locator('#qf-v23-signout').click()
+                assert await page.evaluate("localStorage.getItem('qf-restore-verified-private-v1')") is None
                 assert not errors,errors
                 results.append({'browser':engine,'width':width,'pass':True})
                 print(engine,width,'health / thesis revision / reload / full archive / isolation PASS',flush=True)

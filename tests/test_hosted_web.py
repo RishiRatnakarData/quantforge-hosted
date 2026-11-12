@@ -146,6 +146,88 @@ def test_login_sets_http_only_secure_cookies(client, monkeypatch):
     assert token not in r.text and "REFRESH" not in r.text
 
 
+@pytest.mark.parametrize("stage", ["password", "access", "refresh", "refreshed_user"])
+@pytest.mark.parametrize("provider_status,expected", [(503, 503), (502, 503), (429, 429)])
+def test_auth_provider_failure_preserves_session(client, monkeypatch, stage, provider_status, expected):
+    calls = []
+    token = fake_token("aal2")
+
+    def stub(method, path, **kw):
+        calls.append((path, kw.get("params", {}).get("grant_type")))
+        if path == "/auth/v1/token":
+            if stage in ("password", "refresh"):
+                return R({}, provider_status)
+            return R({"access_token": token, "refresh_token": "ROTATED", "user": user(True)})
+        if stage == "access" or (stage == "refreshed_user" and kw["token"] == token):
+            return R({}, provider_status)
+        return R({}, 401)
+
+    monkeypatch.setattr(service, "sb_request", stub)
+    client.cookies.set("qf_access", "EXPIRED")
+    client.cookies.set("qf_refresh", "REMEMBERED")
+    if stage == "password":
+        result = client.post("/api/auth/login", headers=h(True),
+                             json={"email": "fixture@example.com", "password": "fixture-password"})
+    else:
+        result = client.get("/api/auth/session", headers=h())
+    assert result.status_code == expected
+    assert "set-cookie" not in result.headers
+    assert "REMEMBERED" not in result.text
+    if stage == "access":
+        assert len(calls) == 1  # An unavailable verifier must not consume a refresh token.
+
+
+@pytest.mark.parametrize("aal,signed_in", [("aal1", False), ("aal2", True)])
+def test_refresh_revalidates_owner_and_mfa(client, monkeypatch, aal, signed_in):
+    token = fake_token(aal)
+
+    def stub(method, path, **kw):
+        if path == "/auth/v1/token":
+            assert kw["params"] == {"grant_type": "refresh_token"}
+            return R({"access_token": token, "refresh_token": "ROTATED"})
+        assert kw["token"] == token
+        return R(user(True))
+
+    monkeypatch.setattr(service, "sb_request", stub)
+    client.cookies.set("qf_refresh", "REMEMBERED")
+    result = client.get("/api/auth/session", headers=h())
+    assert result.status_code == 200
+    assert result.json()["signed_in"] is signed_in
+    assert result.json()["mfa_required"] is not signed_in
+    assert len(result.headers.get_list("set-cookie")) == 2
+    assert "ROTATED" not in result.text
+
+
+def test_signout_refreshes_then_revokes_current_device(client, monkeypatch):
+    token = fake_token("aal2")
+    revoked = []
+
+    def stub(method, path, **kw):
+        if path == "/auth/v1/token":
+            return R({"access_token": token, "refresh_token": "ROTATED"})
+        if path == "/auth/v1/user":
+            return R(user(True))
+        assert path == "/auth/v1/logout" and kw["params"] == {"scope": "local"}
+        revoked.append(kw["token"])
+        return R({}, 204)
+
+    monkeypatch.setattr(service, "sb_request", stub)
+    client.cookies.set("qf_refresh", "REMEMBERED")
+    result = client.post("/api/auth/logout", headers=h(True))
+    assert result.status_code == 200 and revoked == [token]
+    assert all('Max-Age=0' in item for item in result.headers.get_list("set-cookie")[-2:])
+
+
+def test_signout_provider_failure_clears_local_cookies_without_claiming_revocation(client, monkeypatch):
+    monkeypatch.setattr(service, "sb_request", lambda *args, **kwargs: R({}, 503))
+    client.cookies.set("qf_refresh", "REMEMBERED")
+    result = client.post("/api/auth/logout", headers=h(True))
+    assert result.status_code == 503
+    assert "revocation unavailable" in result.text
+    assert len(result.headers.get_list("set-cookie")) == 2
+    assert all('Max-Age=0' in item for item in result.headers.get_list("set-cookie"))
+
+
 def test_wrong_owner_cannot_read_even_with_cookie(client, monkeypatch):
     class R:
         status_code = 200

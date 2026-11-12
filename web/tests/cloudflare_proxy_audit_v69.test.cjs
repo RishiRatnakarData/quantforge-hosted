@@ -69,3 +69,26 @@ test('proxy returns safe unavailable response on upstream network failure', asyn
   assert.equal(r.headers.get('Cache-Control'), 'no-store');
   assert.equal((await r.text()).includes('private-error-with-credentials'), false);
 });
+
+test('hosting HTML is unavailable rather than an authentication result, without upstream cookies', async () => {
+  for (const status of [200, 403, 503]) {
+    const result = await callWithMock(new Request('https://quantforge-648.pages.dev/api/auth/session'),
+      async () => new Response('<html>Hosting verification / internal detail</html>', {status, headers:{
+        'Content-Type':'text/html', 'Set-Cookie':'hosting-challenge=unrelated; Path=/'}}));
+    assert.equal(result.status, 503);
+    assert.equal(result.headers.get('Content-Type'), 'application/json');
+    assert.equal(result.headers.get('Cache-Control'), 'no-store');
+    assert.equal(result.headers.get('Set-Cookie'), null);
+    assert.deepEqual(await result.json(), {error:'Private service is currently unavailable.'});
+  }
+});
+
+test('real JSON authentication denial is preserved for the non-retry gate', async () => {
+  for (const status of [401, 403, 429]) {
+    const result = await callWithMock(new Request('https://quantforge-648.pages.dev/api/auth/login'),
+      async () => new Response(JSON.stringify({detail:'Denied'}), {status,
+        headers:{'Content-Type':'application/json'}}));
+    assert.equal(result.status, status);
+    assert.deepEqual(await result.json(), {detail:'Denied'});
+  }
+});

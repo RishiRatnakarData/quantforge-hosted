@@ -31,7 +31,7 @@ async def setup(browser, width):
             await r.abort()
 
     await page.route("**/*", route)
-    await page.goto("https://quantforge.test/")
+    await page.goto("https://quantforge.test/#explore")
     return page, errors
 
 
@@ -271,7 +271,10 @@ async def beginner_walkthrough(browser):
         await page.locator(selector).fill(value)
         actions.append(label)
 
-    await fill("#qf-v20-search", "Microsoft", "Search by company name")
+    await click('#qf-v23-home-button', 'Open Home')
+    await fill('#qf24-home-search', 'Microsoft', 'Search from Home')
+    await click('#qf24-home-find', 'Research company')
+    await expect(page.locator('#qf-v20-search')).to_have_value('Microsoft')
     await click('#qf-v20-search-results [data-qf27-symbol="MSFT"]', "Select Microsoft explicitly")
     await expect(page.locator("#qf27-financial-interpretation")).to_contain_text("Revenue was")
     await click('[data-qf27-finance="cash"]', "Inspect cash generation and definition")

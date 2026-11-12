@@ -33,6 +33,14 @@ export async function onRequest(context) {
       status: 503, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }
     });
   }
+  // Hosting interstitials (including a 200/403 HTML challenge) are not API
+  // authentication decisions. Do not forward their markup or cookies.
+  if (!(result.headers.get('content-type') || '').toLowerCase().includes('application/json')) {
+    return new Response(JSON.stringify({ error: 'Private service is currently unavailable.' }), {
+      status: 503, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store',
+        'X-Content-Type-Options': 'nosniff' }
+    });
+  }
   const outgoing = new Headers();
   for (const h of ['content-type', 'content-security-policy']) {
     if (result.headers.has(h)) outgoing.set(h, result.headers.get(h));
