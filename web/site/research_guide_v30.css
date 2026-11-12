@@ -45,3 +45,7 @@
 @media(max-width:1060px){.qf31-home-hero{grid-template-columns:minmax(0,1fr)}.qf31-home h1{max-width:20ch}.qf31-home-evidence{max-width:650px}.qf31-home-steps{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:680px){.qf31-home{padding:22px 17px!important}.qf31-home h1{font-size:clamp(29px,8vw,38px)}.qf31-home-hero{gap:23px}.qf31-home-search-row{flex-direction:column}.qf31-home-search-row button{width:100%}.qf31-home-evidence{padding:18px 14px}.qf31-home-bars{gap:7px}.qf31-home-value{font-size:11px}.qf31-home-steps{grid-template-columns:minmax(0,1fr)}.qf31-home-steps>div{padding:14px}.qf31-home-route-intro{margin-top:24px}}
 
+/* Private session restoration choice: a preference only, never a credential store. */
+.qf31-remember-option{display:flex;align-items:flex-start;gap:10px;margin:18px 0 4px;font-size:15px;line-height:1.5;font-weight:600;color:#26323b;cursor:pointer}
+.qf31-remember-option input[type="checkbox"]{flex:0 0 auto;margin:3px 0 0;width:18px;height:18px;accent-color:#44535f}
+.qf31-remember-note{font-size:13px;line-height:1.55;color:#596670;max-width:68ch;margin:0 0 16px}
