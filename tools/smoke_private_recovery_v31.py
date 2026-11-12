@@ -24,6 +24,16 @@ async def main():
         page.on('pageerror',lambda e:errors.append(str(e)))
         await page.set_content(HTML,wait_until='load')
         await page.evaluate(FIXTURE)
+        # Entering the private gate performs a session check before password login.
+        # Model the anonymous response explicitly instead of turning an unhandled
+        # fixture route into a second, unrelated simulated network outage.
+        await page.evaluate("""() => {
+           const original=window.fetch;
+           window.fetch=(url,options)=>String(url).includes('auth/session')
+             ?Promise.resolve(new Response(JSON.stringify({signed_in:false,mfa_required:false}),{
+                status:200,headers:{'content-type':'application/json'}}))
+             :original(url,options);
+        }""")
         await page.evaluate("""() => {
            const original=window.fetch;
            const calls={login:0,health:0};
@@ -58,6 +68,8 @@ async def main():
            window.qfRecoveryCalls={login:0,health:0};
            window.fetch=async(url)=>{
              const p=String(url);
+             if(p.includes('auth/session'))return new Response(JSON.stringify({signed_in:false}),{
+               status:200,headers:{'content-type':'application/json'}});
              if(p.includes('api/health'))window.qfRecoveryCalls.health++;
              if(p.includes('auth/login')){window.qfRecoveryCalls.login++;
                 return new Response(JSON.stringify({code:'unauthorized'}),{

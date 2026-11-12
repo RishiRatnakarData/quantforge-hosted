@@ -129,5 +129,7 @@ jobs:
         run: python tools/smoke_guided_research.py
       - name: Private transient startup recovery and unauthorized non-retry
         run: python tools/smoke_private_recovery_v31.py
+      - name: Verified session reload expiry and sign-out races in three browsers
+        run: python tools/smoke_session_lifecycle_v31.py
       - name: Fresh HTTPS Home and company search at five widths
         run: python tools/smoke_home_entry_v31.py

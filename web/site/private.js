@@ -1136,7 +1136,8 @@ function runGuideV79(){
 const M=window.QFModel;
 let privateState=null, version=0, quoted={}, mfaFactorId=null, privateGeneration=0;
 const REMEMBER_PRIVATE_KEY='qf-restore-verified-private-v1';
-let authEpoch=0,loginBusy=false;
+let authEpoch=0,loginBusy=false,signingOut=false;
+const pendingAuthRequests=new Set();
 function rememberPrivate(){try{return localStorage.getItem(REMEMBER_PRIVATE_KEY)==='yes'}catch(_){return false}}
 function setRememberPrivate(value){try{if(value)localStorage.setItem(REMEMBER_PRIVATE_KEY,'yes');else localStorage.removeItem(REMEMBER_PRIVATE_KEY)}catch(_){/* Storage unavailable in private browsing. */}}
 const rememberPrivateBox=$('qf31-remember-session');
@@ -1150,11 +1151,21 @@ let browserRequest=0, browserDebounce;
 const usd=n=>Number(n).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2});
 const safe=s=>String(s).replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
 function message(msg){$('private-message').textContent=msg;}
+function sessionNotice(text){
+ let notice=$('qf31-session-notice');
+ if(!notice&&text){notice=document.createElement('p');notice.id='qf31-session-notice';notice.className='pane';notice.setAttribute('role','status');$('main-content').prepend(notice);}
+ if(notice){notice.textContent=text;notice.hidden=!text;}
+}
 async function api(path, body){
   const generation=privateGeneration;
   const init={credentials:'same-origin',cache:'no-store'};
   if(body!==undefined){init.method='POST';init.headers={'Content-Type':'application/json','X-QF-Action':'1'};init.body=JSON.stringify(body);}
-  let r;try{r=await fetch('/api/'+path,init);}catch(_){throw Object.assign(Error('Could not reach the service. Check your connection and try again.'),{status:503});}
+  // Bound cold-start requests. Never automatically retry account mutations.
+  if(path.startsWith('auth/'))init.signal=AbortSignal.timeout(45000);
+  let r;const request=fetch('/api/'+path,init);
+  if(path.startsWith('auth/'))pendingAuthRequests.add(request);
+  try{r=await request;}catch(_){throw Object.assign(Error('Could not reach the service. Check your connection and try again.'),{status:503});}
+  finally{pendingAuthRequests.delete(request);}
   let data;try{data=await r.json();}catch(_){throw Object.assign(Error('Service unavailable. Free hosting may be waking up.'),{status:r.status});}
   if(path.startsWith('private/')&&generation!==privateGeneration)throw Error('Private session changed; the old response was discarded.');
   if(!r.ok)throw Object.assign(Error(window.QFErrors24.apiError(r.status,path,data?.code)),{status:r.status,code:typeof data?.code==='string'?data.code:''});
@@ -1163,14 +1174,15 @@ async function api(path, body){
 const temporaryPrivateOutage=e=>[502,503,504].includes(Number(e?.status));
 async function wakePrivateService(cancelled=()=>false){
  const delays=[0,2000,4000,6000,8000,10000,10000,10000];
+ const deadline=Date.now()+90000;
  for(const delay of delays){
-  if(cancelled())return false;
+  if(cancelled()||Date.now()+delay>=deadline)return false;
   if(delay)await new Promise(resolve=>setTimeout(resolve,delay));
   if(cancelled())return false;
   message('Private service is starting or reconnecting. Checking availability…');
   try{
-   const response=await fetch('/api/health',{credentials:'same-origin',cache:'no-store'});
-   if(response.ok)return true;
+   const response=await fetch('/api/health',{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(Math.max(1,Math.min(10000,deadline-Date.now())))});
+   if(response.ok){const health=await response.json();if(health?.status==='ok')return true;continue;}
    if(![502,503,504].includes(response.status))return false;
   }catch(_){/* Cold service or temporary network failure. */}
  }
@@ -1193,8 +1205,9 @@ function clearMFA(){
   $('private-mfa-qr-wrap').hidden=true;
   $('private-mfa-setup-actions').hidden=true;
 }
-async function handleAuthState(state){
-  if(state.signed_in){if(rememberPrivateBox?.checked)setRememberPrivate(true);clearMFA();showStep('ready');await loadState();const requested=location.hash.match(/^#private\/([a-z]+)$/)?.[1];privateTab(requested&&document.querySelector('[data-private-view="'+requested+'"]')?requested:'decision',false);privatePeers();window.dispatchEvent(new Event('qf:owner-auth-ready'));return;}
+async function handleAuthState(state,epoch=authEpoch){
+  if(epoch!==authEpoch||signingOut)return;
+  if(state.signed_in){setRememberPrivate(Boolean(rememberPrivateBox?.checked));sessionNotice('');clearMFA();showStep('ready');await loadState();if(epoch!==authEpoch||signingOut)return;const requested=location.hash.match(/^#private\/([a-z]+)$/)?.[1];privateTab(requested&&document.querySelector('[data-private-view="'+requested+'"]')?requested:'decision',false);privatePeers();window.dispatchEvent(new Event('qf:owner-auth-ready'));return;}
   if(!state.mfa_required){if(rememberPrivate()){setRememberPrivate(false);if(rememberPrivateBox)rememberPrivateBox.checked=false;}clearMFA();showStep('login');privateState=null;clearResearchOSV90();renderSavedResearchV96();return;}
   showStep('mfa');
   privateState=null;clearResearchOSV90();renderSavedResearchV96();
@@ -1207,6 +1220,7 @@ async function handleAuthState(state){
   }else{
     clearMFA();
     const factors=await api('auth/mfa/factors');
+    if(epoch!==authEpoch||signingOut)return;
     mfaFactorId=factors.factor_id;
     $('private-mfa-title').textContent='Verify your authenticator';
     $('private-mfa-instructions').textContent='Enter the current code from your enrolled authenticator app.';
@@ -1248,7 +1262,7 @@ function render(){
   $('private-notes').innerHTML=(privateState.notes||[]).map((n,i)=>({n,i})).filter(({n})=>!window.QFPrivateResearchIntelligenceV96.readArchive(n)).map(({n,i})=>'<div class="saved-note"><div class="saved-note-body"><p>'+safe(n.text)+'</p><span class="tiny">'+safe(n.at||'Saved note')+'</span></div><button class="btn sm" type="button" data-note-delete="'+i+'" aria-label="Delete note '+(i+1)+'">Delete</button></div>').join('')||'<p class="tiny">No notes saved.</p>';
 }
 async function login(){
- if(loginBusy)return;
+ if(loginBusy||signingOut)return;
  loginBusy=true;const epoch=++authEpoch;
  const button=$('private-login-submit');button.disabled=true;
  message('Signing in…');
@@ -1266,39 +1280,48 @@ async function login(){
    state=await api('auth/login',credentials);
   }
   if(epoch!==authEpoch)return;
-  $('private-password').value='';await handleAuthState(state);
+  $('private-password').value='';await handleAuthState(state,epoch);
   if(epoch===authEpoch)message(state.signed_in?'Signed in.':'Password accepted. Authenticator verification required.');
  }catch(e){if(epoch===authEpoch)message(e.message);}
  finally{loginBusy=false;button.disabled=false;}
 }
 async function startMFASetup(){
+  if(signingOut)return;
+  const epoch=authEpoch;
   message('Starting authenticator setup…');
   try{
     const enroll=await api('auth/mfa/enroll',{});
+    if(epoch!==authEpoch||signingOut)return;
     mfaFactorId=enroll.factor_id;
     $('private-mfa-setup-actions').hidden=true;
     // Supabase provides SVG markup. Show it as an image, never inject HTML.
     $('private-mfa-qr').src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(enroll.qr_svg);
     $('private-mfa-qr-wrap').hidden=false;
     message('Scan the QR, then verify the current code. Keep this page open until setup is complete.');
-  }catch(e){message(e.message);}
+  }catch(e){if(epoch===authEpoch)message(e.message);}
 }
 async function verifyMFA(){
+  if(signingOut)return;
+  const epoch=authEpoch;
   const code=$('private-mfa-code').value.trim();
   if(!/^[0-9]{6}$/.test(code)){message('Enter the six-digit code.');return;}
   message('Verifying authenticator…');
   try{
     const data=await api('auth/mfa/verify',{factor_id:mfaFactorId||undefined,code});
-    await handleAuthState(data);message('Authenticator verified. Your private workspace is unlocked.');
-  }catch(e){message(e.message);}
+    if(epoch!==authEpoch||signingOut)return;
+    await handleAuthState(data,epoch);if(epoch===authEpoch)message('Authenticator verified. Your private workspace is unlocked.');
+  }catch(e){if(epoch===authEpoch)message(e.message);}
 }
 async function logout(){
+  if(signingOut)return;
+  signingOut=true;
   authEpoch++;
   setRememberPrivate(false);if(rememberPrivateBox)rememberPrivateBox.checked=false;
   privateGeneration++;
   clearImportedSECV99(); // Invalidate imported financial records and pending reads before asynchronous sign-out.
   researchSessionJournalV95=[];clearResearchOSV90();renderSavedResearchV96();
-  try{await api('auth/logout',{});}catch(_){ /* Clear visible private content regardless */ }
+  // Hide private content immediately, before waiting for the network.
+  showStep('login');privateState=null;
   ideasRunSequence++;ideaData=[];ideaFundamentals={};$('ideas-results').textContent='';$('ideas-run').disabled=false;clearDecisionBrief();
   clearImportedFrenchV87();clearGuideV79();clearMFA();showStep('login');privateState=null;renderSavedResearchV96();quoted={};historyLoadSequence++;historySeries=null;closeAssetBrowser();researchSelection=[];$('private-symbol').value='';$('private-selected-asset').textContent='No investment selected';renderResearchSelection();
   optimizerResult=null;$('private-opt-export').disabled=true;$('private-opt-output').textContent='Load market history to begin.';$('private-opt-risk').textContent='';
@@ -1307,6 +1330,11 @@ async function logout(){
   $('private-fc-output').textContent='Load SEC statements for a selected company first.';
   $('private-total').textContent='—';$('private-invested').textContent='—';
   $('private-cash').textContent='—';$('private-notes').textContent='';valuationCompanies={};$('private-valuation-company').value='';$('private-valuation-selected').textContent='No company selected';message('Signed out.');privateTab('home');
+  // An in-flight sign-in/session response may set cookies. Revoke after it settles.
+  sessionNotice('Private content cleared. Completing secure sign-out…');
+  try{await Promise.allSettled([...pendingAuthRequests]);await api('auth/logout',{});sessionNotice('');}
+  catch(_){const warning='Private content cleared. Server sign-out could not be confirmed; reconnect and sign out again before leaving a shared device.';message(warning);sessionNotice(warning);}
+  finally{signingOut=false;}
 }
 async function currentQuote(){
   message('Retrieving private market observation…');
@@ -1356,6 +1384,7 @@ $('private-notes').addEventListener('click',e=>{
 });
 let pendingSessionCheck=null;
 async function checkSession(){
+ if(signingOut)return;
  if(pendingSessionCheck)return pendingSessionCheck;
  const epoch=authEpoch;
  pendingSessionCheck=(async()=>{
@@ -1373,7 +1402,7 @@ async function checkSession(){
     state=await api('auth/session');
    }
    if(epoch!==authEpoch)return;
-   await handleAuthState(state);
+   await handleAuthState(state,epoch);
    if(epoch===authEpoch)message(state.signed_in?'Verified session restored.':state.mfa_required?'Authenticator verification required.':'Sign in to continue private research.');
   }catch(e){if(epoch===authEpoch)message('Private session check unavailable: '+e.message);}
  })();

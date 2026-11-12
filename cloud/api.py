@@ -83,6 +83,14 @@ def expire(response: Response) -> None:
     response.delete_cookie("qf_refresh", path="/api", secure=True, httponly=True, samesite="strict")
 
 
+def check_auth_availability(result: requests.Response) -> None:
+    """Provider outages must never be mistaken for invalid credentials/sessions."""
+    if result.status_code >= 500 or result.status_code == 408:
+        raise HTTPException(503, "Authentication provider temporarily unavailable.")
+    if result.status_code == 429:
+        raise HTTPException(429, "Too many authentication requests. Try again later.")
+
+
 @app.middleware("http")
 async def protect(request: Request, call_next):
     # The Render origin must only accept requests from the secret-bearing Pages proxy.
@@ -149,6 +157,7 @@ class Credentials(BaseModel):
 def login(data: Credentials, response: Response):
     r = sb_request("POST", "/auth/v1/token", params={"grant_type": "password"},
                    payload={"email": data.email, "password": data.password})
+    check_auth_availability(r)
     if r.status_code != 200:
         raise HTTPException(401, "Invalid login or account not authorized.")
     auth = r.json()
@@ -156,6 +165,7 @@ def login(data: Credentials, response: Response):
     if str(user.get("id", "")) != config("OWNER_USER_ID") or not user.get("email_confirmed_at"):
         raise HTTPException(403, "Account not authorized or email unconfirmed.")
     checked = sb_request("GET", "/auth/v1/user", token=auth["access_token"])
+    check_auth_availability(checked)
     if checked.status_code != 200 or str(checked.json().get("id", "")) != str(user["id"]):
         raise HTTPException(401, "Sign-in session could not be validated.")
     cookie(response, auth["access_token"], auth["refresh_token"])
@@ -204,15 +214,19 @@ def authenticated_owner(request: Request, response: Response) -> tuple[str, str,
     if not token and not request.cookies.get("qf_refresh"):
         raise HTTPException(401, "Sign in first.")
     r = sb_request("GET", "/auth/v1/user", token=token) if token else None
+    if r is not None:
+        check_auth_availability(r)
     if (r is None or r.status_code == 401) and request.cookies.get("qf_refresh"):
         r2 = sb_request("POST", "/auth/v1/token", params={"grant_type": "refresh_token"},
                         payload={"refresh_token": request.cookies["qf_refresh"]})
+        check_auth_availability(r2)
         if r2.status_code != 200:
             expire(response)
             raise HTTPException(401, "Session expired. Sign in again.")
         new = r2.json()
         token = new["access_token"]
         r = sb_request("GET", "/auth/v1/user", token=token)
+        check_auth_availability(r)
         if r.status_code == 200:
             cookie(response, token, new["refresh_token"])
     if r is None or r.status_code != 200:
@@ -380,13 +394,22 @@ def mfa_verify(data: MFAVerification, request: Request, response: Response):
 
 @app.post("/api/auth/logout")
 def logout(request: Request, response: Response):
-    # Explicitly revoke the current refresh session on the auth server if available.
-    token = request.cookies.get("qf_access", "")
-    if token:
-        try:
-            sb_request("POST", "/auth/v1/logout", token=token)
-        except HTTPException:
-            pass
+    # Refresh an expired access cookie so the remembered session can be revoked.
+    # Revoke this device only; another signed-in device need not be logged out.
+    try:
+        if request.cookies.get("qf_access") or request.cookies.get("qf_refresh"):
+            _uid, token, _user = authenticated_owner(request, response)
+            result = sb_request("POST", "/auth/v1/logout", token=token, params={"scope": "local"})
+            check_auth_availability(result)
+            if result.status_code not in (200, 204, 401, 403, 404):
+                raise HTTPException(503, "Session revocation could not be confirmed.")
+    except HTTPException as exc:
+        if exc.status_code not in (401, 403):
+            # Clear local cookies even when provider revocation cannot be confirmed.
+            failed = JSONResponse({"detail": "Local sign-out completed; server revocation unavailable."},
+                                  status_code=503)
+            expire(failed)
+            return failed
     expire(response)
     return {"signed_in": False}
 
