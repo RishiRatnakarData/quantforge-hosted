@@ -52,3 +52,7 @@ test('Home is presented to fresh production visitors without hijacking deep link
  assert.match(js,/window\.addEventListener\('load',showFreshHome/);
  assert.match(js,/renderHomeEvidence\(\);[\s\S]+landing=true;/);
 });
+test('Home suppresses duplicate mobile creator footer but retains normal site footer',()=>{
+ assert.match(css,/body\.qf31-home-active #qf28-mobile-credit\{display:none!important\}/);
+ assert.match(html,/class="footerline"/);
+});
