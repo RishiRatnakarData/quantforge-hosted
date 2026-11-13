@@ -107,6 +107,10 @@ async def journey(browser,engine,width):
     await page.locator('#qf32-drawdown').select_option('0.15')
     assert await page.evaluate('document.documentElement.scrollWidth<=innerWidth')
     await page.screenshot(path=str(OUT/f'{engine}-{width}-summary-fixture.png'),full_page=True)
+    await page.locator('#qf32-summary [data-qf30-action="prediction"]').click()
+    await expect(page.locator('#page-models')).to_be_visible()
+    await expect(page.locator('[data-qf-c22-phase="evaluation"]')).to_have_attribute('aria-selected','true')
+    await page.locator('#qf-v20-navigation [data-page="explore"]').click()
     await page.locator('#qf24-switch-mode').click()
     await expect(page.locator('#qf32-summary')).to_be_hidden()
     assert await page.locator('#qf32-summary').inner_text()==''
