@@ -92,3 +92,44 @@ test('real JSON authentication denial is preserved for the non-retry gate', asyn
     assert.deepEqual(await result.json(), {detail:'Denied'});
   }
 });
+
+
+test('only readiness GETs have a bounded upstream signal; writes are forwarded once', async () => {
+ for (const [route,method] of [['health','GET'],['auth/login','POST'],['private/trade','POST']]) {
+  let calls=0,seen;
+  const response=await callWithMock(new Request('https://quantforge-648.pages.dev/api/'+route,{method,...(method==='POST'?{body:'{}'}:{})}),async(_url,init)=>{calls++;seen=init;return new Response('{}',{headers:{'content-type':'application/json'}});});
+  assert.equal(response.status,200);assert.equal(calls,1);assert.equal(Boolean(seen.signal),route==='health');
+ }
+});
+test('a stalled readiness fetch returns safe 503 after abort without retrying upstream', async () => {
+ const timer=globalThis.setTimeout;let calls=0;
+ globalThis.setTimeout=(fn,delay)=>timer(fn,delay===8000?1:delay);
+ try {
+  const response=await callWithMock(new Request('https://quantforge-648.pages.dev/api/health'),async(_url,init)=>{calls++;return new Promise((_resolve,reject)=>init.signal.addEventListener('abort',()=>reject(Error('internal timeout')),{once:true}));});
+  assert.equal(response.status,503);assert.equal(calls,1);assert.equal(response.headers.get('Cache-Control'),'no-store');
+  assert.deepEqual(await response.json(),{error:'Private service is currently unavailable.'});
+ } finally {globalThis.setTimeout=timer;}
+});
+
+test('non-JSON hosting 429 is classified separately without forwarding challenge cookies',async()=>{
+ const r=await callWithMock(new Request('https://quantforge-648.pages.dev/api/health'),async()=>new Response('<html>Just a moment</html>',{status:429,headers:{'content-type':'text/html','cf-mitigated':'challenge','set-cookie':'unrelated=challenge'}}));
+ assert.equal(r.status,503);assert.equal(r.headers.get('set-cookie'),null);
+ assert.equal((await r.json()).code,'hosting_verification');
+});
+
+
+test('readiness diagnostics expose only classification and numeric status, never upstream headers or secrets', async () => {
+ const headers={'Content-Type':'text/html','cf-mitigated':'challenge','Set-Cookie':'sensitive=value','X-Internal-Trace':'private-details'};
+ for (const route of ['health','auth/session']) {
+  const r=await callWithMock(new Request('https://quantforge-648.pages.dev/api/'+route),async()=>new Response('<html>private diagnostic body</html>',{status:429,headers}));
+  assert.equal(r.status,503);
+  assert.equal(r.headers.get('X-QF-Readiness'),route==='health'?'upstream-verification':null);
+  assert.equal(r.headers.get('X-QF-Upstream-Status'),route==='health'?'429':null);
+  for(const h of ['cf-mitigated','Set-Cookie','X-Internal-Trace','x-qf-proxy-secret'])assert.equal(r.headers.get(h),null);
+  assert.deepEqual(await r.json(),{error:'Private service is currently unavailable.',code:'hosting_verification'});
+ }
+ const r=await callWithMock(new Request('https://quantforge-648.pages.dev/api/health'),async()=>{throw Error('sensitive upstream URL');});
+ assert.equal(r.headers.get('X-QF-Readiness'),'upstream-network');
+ assert.equal(r.headers.get('X-QF-Upstream-Status'),null);
+ assert.doesNotMatch(await r.text(),/sensitive/);
+});

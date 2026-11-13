@@ -20,6 +20,7 @@ FIXTURE = r'''() => {
  window.fetch=async(url,options={})=>{
   const p=String(url);window.qfMockRequests.push(p);const q=new URLSearchParams(p.split('?')[1]||'');
   const response=(data,ok=true,status=200)=>({ok,status,json:async()=>data});
+  if(p.includes('/api/health'))return response({status:'ok'});
   if(p.includes('auth/login'))return response({signed_in:true});
   if(p.includes('auth/logout'))return response({signed_in:false});
   if(p.includes('private/state'))return response({portfolio:window.qfMockOwner,version:window.qfMockVersion});
@@ -99,21 +100,14 @@ async def journey(browser, width):
     assert await page.locator('#qf-v23-landing').is_visible()
     assert await page.locator('#qf24-home-find').is_visible()
     assert await page.locator('#qf-v23-open-research').count() == 0
-    bars = page.locator('#qf31-home-chart .qf31-home-column')
-    assert 2 <= await bars.count() <= 5
-    expected = await page.evaluate('''() => window.QFPublishedSEC.companies.find(c => c.symbol === 'MSFT').annual
-      .filter(r => Number.isFinite(r.metrics?.revenue_usd) && r.metrics.revenue_usd > 0)
-      .sort((a,b) => a.fiscal_end.localeCompare(b.fiscal_end)).slice(-5)
-      .map(r => r.fiscal_end.slice(0,4))''')
-    assert await page.locator('#qf31-home-chart .qf31-home-year').all_inner_texts() == expected
-    assert await page.locator('#qf31-home-chart .qf31-home-value').count() == len(expected)
-    assert await page.locator('#qf31-home-evidence-title').is_visible()
+    assert await page.locator('#qf-v23-landing svg, #qf31-home-chart').count() == 0
+    assert await page.locator('#qf32-home-options').count() == 1
     await capture(page, f'public-{width}-home')
     await page.locator('#qf24-home-search').fill('Microsoft')
     await page.locator('#qf24-home-find').click()
-    await page.locator('#qf-v20-search-results').wait_for(state='visible')
+    assert await page.locator('#qf-v20-company').inner_text() == 'Microsoft'
     await page.locator('#qf-v20-mode').click()
-    await page.evaluate("""() => { window.fetch=async()=>({ok:false,status:422,json:async()=>({detail:[{loc:['body','password'],msg:'invalid',input:'DO-NOT-ECHO'}]})}); }""")
+    await page.evaluate("""() => { window.fetch=async(url)=>String(url).includes('/api/health')?{ok:true,json:async()=>({status:'ok'})}:({ok:false,status:422,json:async()=>({detail:[{loc:['body','password'],msg:'invalid',input:'DO-NOT-ECHO'}]})}); }""")
     await page.locator('#private-email').fill('fixture' + '@' + 'example.invalid')
     await page.locator('#private-password').fill('offline-password')
     await page.locator('#private-login-submit').click()

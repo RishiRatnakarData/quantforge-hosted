@@ -48,6 +48,8 @@ def test_generator_keeps_three_protected_scripts_and_private_modules():
     assert 'id="private-mfa-code"' in generator
     assert 'data-private-view="settings"' in generator
     compiled = source('public/index.html')
-    assert compiled.count('data-qf-c22-phase=') == 3
+    # Selector references are not additional rendered tabs. Verify the actual
+    # three-tab DOM in smoke_final_release32; this unit checks script boundaries.
+    assert compiled.count('<script>') == 3
     assert 'QFResearchModelsCore22' in compiled
     assert 'QFModelsMethods22' in compiled

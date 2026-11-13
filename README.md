@@ -2,7 +2,7 @@
 
 QuantForge is a financial research and software engineering project built to explore company financials, statistical uncertainty and hypothetical portfolios. It demonstrates applied statistical data science through traceable inputs, retained numerical engines, reproducible evaluation and an authenticated private experience.
 
-[Public application](https://quantforge-648.pages.dev/) · [Current release and research guide](docs/GUIDED_RESEARCH_RELEASE.md) · [Research methodology](docs/methodology/QUANT_RESEARCH_METHODS.md)
+[Public application](https://quantforge-648.pages.dev/) · [Current product and reliability release](docs/FINAL_RELEASE32.md) · [Research methodology](docs/methodology/QUANT_RESEARCH_METHODS.md)
 
 ## One application, five sections
 
@@ -14,7 +14,7 @@ QuantForge is a financial research and software engineering project built to exp
 | Portfolio | Overview, What If? and Portfolio Analysis; constrained allocations, covariance, Monte Carlo scenarios and authentic recorded virtual-account marks |
 | Methods | Overview, Data, Statistical Methods and Engineering; walkthrough, SEC lineage, visual architecture and seven inspectable technical disciplines with source/test references |
 
-The clickable brand opens a compact Home inside Explore. Company selection carries across sections. Private company notes belong in Explore; virtual funding, holdings and transactions belong in Portfolio.
+Fresh visitors and the clickable brand open a compact, chart-free Home inside Explore. Its shared name/ticker suggestions select a company directly. Company selection carries across sections. Private company notes belong in Explore; virtual funding, holdings and transactions belong in Portfolio.
 
 ## Honest data modes
 
@@ -90,3 +90,5 @@ News/headline tone has been retired from normal public/private UI and request pa
 ## Historical engineering evidence
 
 Earlier audit documents describe their stage at the time they were written. The November 10 work and November 12 final-24/quality work were subsequently published in `4fc1a46`; their former “unpublished” labels do not describe current production. Retained records: [24-issue register](docs/FINAL_24_ISSUE_REGISTER.json), [engine parity](docs/FINAL_24_ENGINE_PARITY.md), [quality review](docs/QUALITY_REVIEW_2026_11_12.md).
+
+Private Company briefing automatically synthesizes covered financial evidence, observed downside, existing held-out predictive evaluation and virtual-holding context. Optional tab-local research preferences frame questions without creating suitability scores. Login waits for bounded health readiness before submitting credentials once; it does not replay uncertain logins or account mutations. See [the current release guide](docs/FINAL_RELEASE32.md) for implementation and acceptance boundaries.

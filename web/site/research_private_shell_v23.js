@@ -37,30 +37,7 @@ const accountHelp=document.createElement('p');accountHelp.className='pane';accou
 account.append($('qf-b21-owner-account'));
 function status(text){$('qf-v23-owner-status').textContent=text;noteStatus.textContent=text;tradeStatus.textContent=text;$('qf25-account-status').textContent=text;}
 function close(){if(drawer.open)drawer.close();}
-function renderHomeEvidence(){
- const host=$('qf31-home-chart');if(!host)return;
- const issuer=window.QFPublishedSEC?.companies?.find(c=>c.symbol==='MSFT');
- const rows=(issuer?.annual||[]).filter(r=>typeof r?.fiscal_end==='string'&&Number.isFinite(r?.metrics?.revenue_usd)&&r.metrics.revenue_usd>0).sort((a,b)=>a.fiscal_end.localeCompare(b.fiscal_end)).slice(-5);
- host.replaceChildren();
- if(rows.length<2){host.textContent='The published SEC example is unavailable. Use Explore to inspect currently covered company financials.';return;}
- const maximum=Math.max(...rows.map(r=>r.metrics.revenue_usd));
- const list=document.createElement('div');list.className='qf31-home-bars';list.setAttribute('role','list');list.setAttribute('aria-label','Microsoft annual reported revenue by fiscal year');
- for(const r of rows){
-  const item=document.createElement('div');item.className='qf31-home-column';item.setAttribute('role','listitem');
-  const amount='$'+(r.metrics.revenue_usd/1e9).toLocaleString('en-US',{maximumFractionDigits:0})+'B';
-  item.setAttribute('aria-label','Fiscal '+r.fiscal_end.slice(0,4)+': '+amount);
-  const value=document.createElement('strong');value.className='qf31-home-value';value.textContent=amount;
-  const rail=document.createElement('div');rail.className='qf31-home-bar-rail';
-  const bar=document.createElement('span');bar.className='qf31-home-bar';bar.style.height=(Math.max(4,r.metrics.revenue_usd/maximum*100))+'%';rail.append(bar);
-  const year=document.createElement('span');year.className='qf31-home-year';year.textContent=r.fiscal_end.slice(0,4);
-  item.append(value,rail,year);list.append(item);
- }
- const latest=rows.at(-1);
- const note=document.createElement('p');note.className='qf31-home-date';
- note.textContent='Fiscal years '+rows[0].fiscal_end.slice(0,4)+'–'+latest.fiscal_end.slice(0,4)+' · USD · Latest included filing '+(latest.sources?.revenue_usd?.filed||'date unavailable');
- host.append(list,note);
-}
-function home(value){if(value){window.QFNavigate20('explore');renderHomeEvidence();}landing=Boolean(value);$('qf-v23-landing').hidden=!landing;$('qf-v23-explore-content').hidden=landing;document.body.classList.toggle('qf31-home-active',landing);}
+function home(value){if(value){window.QFNavigate20('explore');}landing=Boolean(value);$('qf-v23-landing').hidden=!landing;$('qf-v23-explore-content').hidden=landing;document.body.classList.toggle('qf31-home-active',landing);}
 function paint(data){
  const list=$('qf-v23-note-list');list.replaceChildren();
  if(!data)return;paintHistory(data);
@@ -100,8 +77,9 @@ async function open(name){
 $('qf24-switch-mode').addEventListener('click',()=>{close();window.QFResearch20.switchMode(privateMode()?'public':'private');sync();});
 $('qf-v23-home-button').addEventListener('click',()=>home(true));
 /* Home search is the sole primary action; feature navigation remains in the sidebar. */
-function find(){const query=$('qf24-home-search').value;home(false);const input=$('qf-v20-search');input.value=query;setTimeout(()=>input.dispatchEvent(new Event('input')),0);input.focus();}
-$('qf24-home-find').addEventListener('click',find);$('qf24-home-search').addEventListener('keydown',e=>{if(e.key==='Enter')find();});
+const homePicker=window.QFInvestmentPicker27.mount({input:$('qf24-home-search'),panel:$('qf32-home-options'),mode:()=>context().mode,search:window.QFResearch20.searchAssets,published:window.QFPublishedSEC.companies,onSelect:asset=>{home(false);window.QFResearch20.chooseAsset(asset);$('qf-v20-company').setAttribute('tabindex','-1');$('qf-v20-company').focus();}});
+function find(){const q=$('qf24-home-search').value.trim().toLowerCase();const matches=window.QFPublishedSEC.companies.filter(c=>c.symbol.toLowerCase()===q||c.name.toLowerCase()===q);if(matches.length===1){home(false);window.QFResearch20.choose(matches[0].symbol);}else{$('qf24-home-search').focus();void homePicker.find();}}
+$('qf24-home-find').addEventListener('click',find);$('qf24-home-search').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.defaultPrevented){e.preventDefault();find();}});
 $('qf-v20-mode').addEventListener('click',e=>{if(signed()){e.preventDefault();e.stopImmediatePropagation();drawer.showModal();}},true);
 document.addEventListener('click',e=>{
  const action=e.target.closest('[data-qf-v23-open]');if(action){e.preventDefault();void open(action.dataset.qfV23Open);}
@@ -121,7 +99,6 @@ sync();
 function showFreshHome(){
  if(location.protocol!=='https:' || !['/','/index.html'].includes(location.pathname) || location.hash || signed())return;
  if(document.querySelector('.tabpage.active')?.id!=='page-explore')return;
- renderHomeEvidence();
  landing=true;
  $('qf-v23-landing').hidden=false;
  $('qf-v23-explore-content').hidden=true;

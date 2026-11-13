@@ -18,6 +18,7 @@ MOCK = r'''() => {
     const p=String(url);window.qfMockRequests.push(p);
     const q=new URLSearchParams(p.split('?')[1]||'');
     const response=(data,ok=true)=>({ok,json:async()=>data});
+    if(p.includes('/api/health'))return response({status:'ok'});
     if(p.includes('auth/login'))return response({signed_in:true});
     if(p.includes('auth/logout'))return response({signed_in:false});
     if(p.includes('private/state'))return response({portfolio:window.qfMockOwner,version:window.qfMockVersion});
@@ -56,7 +57,7 @@ async def run_page(browser, width: int) -> None:
         await page.locator('#qf24-home-search').fill('Microsoft')
         await page.locator('#qf24-home-find').click()
         assert await page.locator('#qf-v20-search').is_visible()
-        await page.locator('#qf-v20-search-results [data-qf27-symbol="MSFT"]').click()
+        assert await page.locator('#qf-v20-company').inner_text() == 'Microsoft'
         assert await page.locator('#qf-v20-symbol').inner_text() == 'MSFT'
         assert await page.evaluate('document.documentElement.scrollWidth<=window.innerWidth')
         assert not errors, errors[:3]

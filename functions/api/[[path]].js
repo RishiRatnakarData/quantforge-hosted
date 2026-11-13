@@ -20,6 +20,15 @@ export async function onRequest(context) {
   if (!headers.has('origin') && !['GET', 'HEAD'].includes(request.method)) {
     headers.set('origin', url.origin);
   }
+  // Readiness probes must return to the browser so its bounded recovery can progress.
+  // Other requests, especially writes, are forwarded once and never replayed.
+  const probe = request.method === 'GET' && url.pathname === '/api/health';
+  const controller = probe ? new AbortController() : null;
+  const timer = controller ? setTimeout(() => controller.abort(), 8000) : null;
+  const readinessHeaders = (reason, status) => probe ? {
+    'X-QF-Readiness': reason,
+    ...(status === undefined ? {} : {'X-QF-Upstream-Status': String(status)})
+  } : {};
   let result;
   try {
     result = await fetch(upstream, {
@@ -27,18 +36,24 @@ export async function onRequest(context) {
       headers,
       body: ['GET', 'HEAD'].includes(request.method) ? undefined : request.body,
       redirect: 'manual',
+      ...(controller ? {signal: controller.signal} : {}),
     });
   } catch (_e) {
     return new Response(JSON.stringify({ error: 'Private service is currently unavailable.' }), {
-      status: 503, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }
+      status: 503, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store',
+        ...readinessHeaders(controller?.signal.aborted ? 'upstream-timeout' : 'upstream-network') }
     });
   }
+  finally { if (timer !== null) clearTimeout(timer); }
   // Hosting interstitials (including a 200/403 HTML challenge) are not API
   // authentication decisions. Do not forward their markup or cookies.
   if (!(result.headers.get('content-type') || '').toLowerCase().includes('application/json')) {
-    return new Response(JSON.stringify({ error: 'Private service is currently unavailable.' }), {
+    const verification = result.headers.get('cf-mitigated') === 'challenge' || result.status === 429;
+    return new Response(JSON.stringify({ error: 'Private service is currently unavailable.',
+      ...(verification ? {code: 'hosting_verification'} : {}) }), {
       status: 503, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store',
-        'X-Content-Type-Options': 'nosniff' }
+        'X-Content-Type-Options': 'nosniff',
+        ...readinessHeaders(verification ? 'upstream-verification' : 'upstream-non-json', result.status) }
     });
   }
   const outgoing = new Headers();
