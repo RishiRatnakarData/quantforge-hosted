@@ -118,6 +118,7 @@ async def journey(browser,engine,width):
     await page.screenshot(path=str(OUT/f'{engine}-{width}-summary-fixture.png'),full_page=True)
     await page.locator('#qf32-summary [data-qf30-action="prediction"]').click()
     await expect(page.locator('#page-models')).to_be_visible()
+    assert await page.locator('[data-qf-c22-phase]').count()==3
     await expect(page.locator('[data-qf-c22-phase="evaluation"]')).to_have_attribute('aria-selected','true')
     await page.locator('#qf-v20-navigation [data-page="explore"]').click()
     await page.locator('#qf24-switch-mode').click()
