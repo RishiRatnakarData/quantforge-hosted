@@ -1184,7 +1184,9 @@ async function wakePrivateService(cancelled=()=>false){
    const response=await fetch('/api/health',{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(Math.max(1,Math.min(10000,deadline-Date.now())))});
    if(response.ok){const health=await response.json();if(health?.status==='ok')return !cancelled();continue;}
    if(![502,503,504].includes(response.status))return false;
-  }catch(_){/* Cold service or temporary network failure. */}
+   const detail=await response.json().catch(()=>null);
+   if(detail?.code==='hosting_verification')throw Object.assign(Error('The hosting provider is blocking private API access with a verification page. Automatic startup recovery cannot resolve this. Try again later; your credentials were not resubmitted.'),{code:'hosting_verification'});
+  }catch(e){if(e?.code==='hosting_verification')throw e;/* Cold service or temporary network failure. */}
  }
  return false;
 }

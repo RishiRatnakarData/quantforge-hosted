@@ -43,7 +43,9 @@ export async function onRequest(context) {
   // Hosting interstitials (including a 200/403 HTML challenge) are not API
   // authentication decisions. Do not forward their markup or cookies.
   if (!(result.headers.get('content-type') || '').toLowerCase().includes('application/json')) {
-    return new Response(JSON.stringify({ error: 'Private service is currently unavailable.' }), {
+    const verification = result.headers.get('cf-mitigated') === 'challenge' || result.status === 429;
+    return new Response(JSON.stringify({ error: 'Private service is currently unavailable.',
+      ...(verification ? {code: 'hosting_verification'} : {}) }), {
       status: 503, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store',
         'X-Content-Type-Options': 'nosniff' }
     });

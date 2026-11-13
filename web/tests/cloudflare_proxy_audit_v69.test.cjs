@@ -110,3 +110,9 @@ test('a stalled readiness fetch returns safe 503 after abort without retrying up
   assert.deepEqual(await response.json(),{error:'Private service is currently unavailable.'});
  } finally {globalThis.setTimeout=timer;}
 });
+
+test('non-JSON hosting 429 is classified separately without forwarding challenge cookies',async()=>{
+ const r=await callWithMock(new Request('https://quantforge-648.pages.dev/api/health'),async()=>new Response('<html>Just a moment</html>',{status:429,headers:{'content-type':'text/html','cf-mitigated':'challenge','set-cookie':'unrelated=challenge'}}));
+ assert.equal(r.status,503);assert.equal(r.headers.get('set-cookie'),null);
+ assert.equal((await r.json()).code,'hosting_verification');
+});

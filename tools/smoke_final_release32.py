@@ -69,6 +69,15 @@ async def recovery(browser):
     assert not await page.evaluate('QFPrivateBridgeV23.ready()')
     assert not errors,errors
     await page.close()
+    # Hosting verification is distinct from a sleeping service and must not be hammered.
+    page,errors=await setup(browser)
+    await enter(page)
+    await page.evaluate("""() => {const original=fetch;window.challengeCalls={health:0,login:0};window.fetch=(u,o)=>{if(String(u).includes('/api/health')){challengeCalls.health++;return Promise.resolve(new Response(JSON.stringify({code:'hosting_verification'}),{status:503}));}if(String(u).includes('auth/login'))challengeCalls.login++;return original(u,o)}}""")
+    await page.locator('#private-login-submit').click()
+    await expect(page.locator('#private-message')).to_contain_text('verification page')
+    assert await page.evaluate('challengeCalls')=={'health':1,'login':0}
+    assert not errors,errors
+    await page.close()
     # A persistent outage stops at its deadline without ever sending credentials.
     page,errors=await setup(browser)
     await enter(page)
