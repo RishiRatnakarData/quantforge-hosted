@@ -116,3 +116,23 @@ test('non-JSON hosting 429 is classified separately without forwarding challenge
  assert.equal(r.status,503);assert.equal(r.headers.get('set-cookie'),null);
  assert.equal((await r.json()).code,'hosting_verification');
 });
+
+
+test('configured Vercel HTTPS origin retains the same guarded single-hop proxy',async()=>{
+ const {onRequest}=await modulePromise;
+ const previous=globalThis.fetch;let seen;
+ globalThis.fetch=async(url,init)=>{seen={url,init};return new Response('{}',{headers:{'content-type':'application/json'}});};
+ try{
+  const r=await onRequest({request:new Request('https://quantforge-648.pages.dev/api/private/state'),env:{...env,PRIVATE_API_ORIGIN:'https://quantforge-private-api-fixture.vercel.app'}});
+  assert.equal(r.status,200);assert.equal(seen.url,'https://quantforge-private-api-fixture.vercel.app/api/private/state');
+  assert.equal(seen.init.headers.get('x-qf-proxy-secret'),env.QF_PROXY_SECRET);
+  assert.equal(r.headers.get('x-qf-proxy-secret'),null);
+ }finally{globalThis.fetch=previous;}
+});
+test('alternative origins do not admit credentials ports HTTP or lookalike domains',async()=>{
+ const {onRequest}=await modulePromise;
+ for(const origin of ['http://quantforge.vercel.app','https://user:password@quantforge.vercel.app','https://quantforge.vercel.app:443','https://quantforge.vercel.app.example.org','https://vercel.app']){
+  const r=await onRequest({request:new Request('https://quantforge-648.pages.dev/api/health'),env:{...env,PRIVATE_API_ORIGIN:origin}});
+  assert.equal(r.status,503,origin);
+ }
+});
