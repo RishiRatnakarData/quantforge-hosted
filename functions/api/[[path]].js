@@ -3,7 +3,7 @@ export async function onRequest(context) {
   const { request, env } = context;
   const origin = String(env.PRIVATE_API_ORIGIN || '').replace(/\/$/, '');
   const secret = String(env.QF_PROXY_SECRET || '');
-  if (!/^https:\/\/[a-zA-Z0-9.-]+$/.test(origin) || !secret || !['.onrender.com', '.vercel.app'].some(suffix => origin.endsWith(suffix))) {
+  if (!/^https:\/\/[a-zA-Z0-9.-]+$/.test(origin) || !secret || !origin.endsWith('.onrender.com')) {
     return new Response(JSON.stringify({ error: 'Private API not configured' }), {
       status: 503, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }
     });

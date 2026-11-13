@@ -142,8 +142,7 @@ async def desk_error_handler(_request: Request, exc: DeskError):
 
 @app.get("/api/health")
 def health():
-    revision = (os.getenv("RENDER_GIT_COMMIT") or os.getenv("VERCEL_GIT_COMMIT_SHA")
-                or os.getenv("QF_RELEASE_COMMIT", ""))
+    revision = os.getenv("RENDER_GIT_COMMIT", "")
     return {"status": "ok", "mode": "single-owner-hosted", "paper_only": True,
             "api_contract": "shared-research-v25",
             "revision": revision if re.fullmatch(r"[0-9a-f]{40}", revision) else "not-reported"}
