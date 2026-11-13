@@ -20,3 +20,18 @@ test('concentration reconciles marked cash and positions and withholds incomplet
  const r=J.concentration({A:2,B:1},100,{A:100,B:200});assert.equal(r.total,500);assert.equal(r.cash_weight,.2);assert.ok(Math.abs(r.hhi-.36)<1e-12);assert.equal(r.positions,2);
  assert.equal(J.concentration({A:1},100,{}),null);assert.equal(J.concentration({},0,{}),null);
 });
+
+
+test('decision synthesis withholds simulated signals and preserves missing financials',()=>{
+ const d=J.decisionSummary({financial:{metrics:{}},observed:false,prediction:{ready:true}});
+ assert.equal(d.disposition,'Current evidence is incomplete');
+ assert.equal(d.favorable.length,0);
+ assert.match(d.model,/No validated/);
+ assert.match(d.concerns.join(' '),/not zero/);
+});
+test('optional loss boundary frames historical evidence without a trading verdict',()=>{
+ const d=J.decisionSummary({financial:{metrics:{revenue_growth:-.1,operating_margin:.2,free_cash_flow_usd:12}},observed:true,risk:{max_drawdown:-.4},held:true,preferences:{drawdown:'.3',horizon:'long'},prediction:{ready:true,evaluatedAccuracy:.5,baselineAccuracy:.6,evaluatedBrier:.27,baselineBrier:.24,testWindows:18,qualified:false}});
+ assert.match(d.disposition,/exceeded/);assert.match(d.model,/Signal withheld/);
+ assert.match(d.context,/Already held/);assert.match(d.concerns.join(' '),/fell 10.0%/);
+ assert.doesNotMatch(d.disposition,/buy|sell|hold/i);
+});

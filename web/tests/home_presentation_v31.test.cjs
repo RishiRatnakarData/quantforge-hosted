@@ -17,13 +17,13 @@ test('Home has one company-search action and all five section descriptions',()=>
  assert.match(home,/research-case-study\.html/);
  for(const name of ['Explore','Compare','Models','Portfolio','Methods'])assert.match(home,new RegExp('<strong>'+name+'</strong>'));
 });
-test('Home revenue exhibit uses published SEC figures and has honest missing-data behavior',()=>{
- assert.match(html,/id="qf31-home-chart"/);
- assert.match(js,/window\.QFPublishedSEC\?\.companies/);
- assert.match(js,/Number\.isFinite\(r\?\.metrics\?\.revenue_usd\)/);
- assert.match(js,/SEC example is unavailable/);
- assert.match(css,/\.qf31-home-bars/);
+test('Home contains direct suggestions and no financial exhibit or chart builder',()=>{
+ assert.match(html,/id="qf32-home-options"/);
+ assert.doesNotMatch(html,/id="qf31-home-chart"/);
+ assert.doesNotMatch(js,/function renderHomeEvidence/);
+ assert.match(js,/QFInvestmentPicker27.mount/);
 });
+
 test('Investment guide and thesis form are direct, visible sections rather than accordions',()=>{
  const guide=fs.readFileSync(path.join(base,'research_guide_ui_v30.js'),'utf8');
  assert.match(guide,/class="qf30-step"/);
@@ -50,7 +50,7 @@ test('Private session restoration requires an explicit preference and retains se
 test('Home is presented to fresh production visitors without hijacking deep links or local test navigation',()=>{
  assert.match(js,/function showFreshHome\(/);
  assert.match(js,/window\.addEventListener\('load',showFreshHome/);
- assert.match(js,/renderHomeEvidence\(\);[\s\S]+landing=true;/);
+ assert.match(js,/landing=true;/);
 });
 test('Home suppresses duplicate mobile creator footer but retains normal site footer',()=>{
  assert.match(css,/body\.qf31-home-active #qf28-mobile-credit\{display:none!important\}/);

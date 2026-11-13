@@ -1,3 +1,5 @@
+> Historical PR1-stage acceptance record. PR1 was subsequently merged as 9261bde. Its candidate-stage or unchanged-production statements below describe that earlier inspection. Current follow-up implementation and acceptance boundaries: [FINAL_RELEASE32.md](FINAL_RELEASE32.md).
+
 # PR #1 session and Home acceptance — 2026-11-12
 
 This continues `chatgpt/home-evidence-polish-20261112` from `c4dbd33`.

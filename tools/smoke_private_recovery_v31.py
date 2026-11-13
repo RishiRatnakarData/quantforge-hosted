@@ -42,11 +42,11 @@ async def main():
              const p=String(url);
              if(p.includes('auth/login')){
                calls.login++;
-               if(calls.login===1)return new Response('<html>Service waking up</html>',{
-                 status:503,headers:{'content-type':'text/html'}});
+
              }
              if(p.includes('api/health')){
                calls.health++;
+               if(calls.health===1)return new Response('<html>Service waking up</html>',{status:503,headers:{'content-type':'text/html'}});
                return new Response(JSON.stringify({status:'ok'}),{
                  status:200,headers:{'content-type':'application/json'}});
              }
@@ -56,7 +56,7 @@ async def main():
         await sign_in(page)
         await expect(page.locator('#qf24-mode-label')).to_contain_text('PRIVATE',timeout=8000)
         counts=await page.evaluate('window.qfRecoveryCalls')
-        assert counts=={'login':2,'health':1},counts
+        assert counts=={'login':1,'health':2},counts
         assert not errors,errors
         await page.close()
 
@@ -70,7 +70,7 @@ async def main():
              const p=String(url);
              if(p.includes('auth/session'))return new Response(JSON.stringify({signed_in:false}),{
                status:200,headers:{'content-type':'application/json'}});
-             if(p.includes('api/health'))window.qfRecoveryCalls.health++;
+             if(p.includes('api/health')){window.qfRecoveryCalls.health++;return new Response(JSON.stringify({status:'ok'}),{headers:{'content-type':'application/json'}});}
              if(p.includes('auth/login')){window.qfRecoveryCalls.login++;
                 return new Response(JSON.stringify({code:'unauthorized'}),{
                   status:401,headers:{'content-type':'application/json'}});}
@@ -79,11 +79,11 @@ async def main():
         }""")
         await sign_in(page)
         await expect(page.locator('#private-message')).to_contain_text('Sign-in could not be verified',timeout=5000)
-        assert await page.evaluate('window.qfRecoveryCalls')=={'login':1,'health':0}
+        assert await page.evaluate('window.qfRecoveryCalls')=={'login':1,'health':1}
         assert not errors,errors
         await page.close()
         await browser.close()
-    print('HTML 503 wake/retry and unauthorized-no-retry browser recovery PASS')
+    print('Readiness-first HTML 503 recovery and unauthorized-no-replay browser recovery PASS')
 
 if __name__=='__main__':
     asyncio.run(main())

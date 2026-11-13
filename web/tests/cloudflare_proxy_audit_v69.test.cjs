@@ -92,3 +92,21 @@ test('real JSON authentication denial is preserved for the non-retry gate', asyn
     assert.deepEqual(await result.json(), {detail:'Denied'});
   }
 });
+
+
+test('only readiness GETs have a bounded upstream signal; writes are forwarded once', async () => {
+ for (const [route,method] of [['health','GET'],['auth/login','POST'],['private/trade','POST']]) {
+  let calls=0,seen;
+  const response=await callWithMock(new Request('https://quantforge-648.pages.dev/api/'+route,{method,...(method==='POST'?{body:'{}'}:{})}),async(_url,init)=>{calls++;seen=init;return new Response('{}',{headers:{'content-type':'application/json'}});});
+  assert.equal(response.status,200);assert.equal(calls,1);assert.equal(Boolean(seen.signal),route==='health');
+ }
+});
+test('a stalled readiness fetch returns safe 503 after abort without retrying upstream', async () => {
+ const timer=globalThis.setTimeout;let calls=0;
+ globalThis.setTimeout=(fn,delay)=>timer(fn,delay===8000?1:delay);
+ try {
+  const response=await callWithMock(new Request('https://quantforge-648.pages.dev/api/health'),async(_url,init)=>{calls++;return new Promise((_resolve,reject)=>init.signal.addEventListener('abort',()=>reject(Error('internal timeout')),{once:true}));});
+  assert.equal(response.status,503);assert.equal(calls,1);assert.equal(response.headers.get('Cache-Control'),'no-store');
+  assert.deepEqual(await response.json(),{error:'Private service is currently unavailable.'});
+ } finally {globalThis.setTimeout=timer;}
+});

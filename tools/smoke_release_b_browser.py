@@ -76,6 +76,7 @@ async def private_mock(page) -> None:
       window.qfTestRequests=[];
       window.fetch=async url=>{
         const path=String(url);window.qfTestRequests.push(path);
+        if(path.includes('/api/health'))return {ok:true,json:async()=>({status:'ok'})};
         if(path.includes('auth/login'))return {ok:true,json:async()=>({signed_in:true})};
         if(path.includes('private/assets'))return {ok:true,json:async()=>({licensed_private:true,items:QFPublishedSEC.companies.filter(c=>['MSFT','AAPL','NVDA'].includes(c.symbol)).map(c=>({symbol:c.symbol,name:c.name,asset_class:'us_equity'}))})};
         const params=new URLSearchParams((path.split('?')[1]||''));

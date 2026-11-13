@@ -26,14 +26,15 @@ async def visit(browser,width):
     print('Home startup diagnostic',diagnostic,'errors',errors[:4],flush=True)
     assert await page.locator('#qf-v23-landing').is_visible(),(diagnostic,errors[:4])
     assert await page.locator('#qf-v23-explore-content').is_hidden()
-    assert await page.locator('#qf31-home-chart .qf31-home-column').count()>=2
+    assert await page.locator('#qf-v23-landing svg, #qf31-home-chart').count()==0
     assert await page.locator('.qf31-home-steps>div').count()==5
     assert await page.evaluate('document.documentElement.scrollWidth<=innerWidth')
     await page.screenshot(path=str(OUT/f'home-{width}.png'),full_page=True)
     await page.locator('#qf24-home-search').fill('Microsoft')
     await page.locator('#qf24-home-find').click()
     assert await page.locator('#qf-v23-explore-content').is_visible()
-    assert await page.locator('#qf-v20-search').input_value()=='Microsoft'
+    assert 'Microsoft' in await page.locator('#qf-v20-search').input_value()
+    assert await page.locator('#qf-v20-company').inner_text()=='Microsoft'
     await page.locator('#qf-v23-home-button').click()
     assert await page.locator('#qf-v23-landing').is_visible()
     await page.locator('#qf-v20-navigation [data-page="compare"]').click()

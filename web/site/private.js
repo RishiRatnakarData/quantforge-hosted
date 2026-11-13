@@ -1161,7 +1161,7 @@ async function api(path, body){
   const init={credentials:'same-origin',cache:'no-store'};
   if(body!==undefined){init.method='POST';init.headers={'Content-Type':'application/json','X-QF-Action':'1'};init.body=JSON.stringify(body);}
   // Bound cold-start requests. Never automatically retry account mutations.
-  if(path.startsWith('auth/'))init.signal=AbortSignal.timeout(45000);
+  if(path.startsWith('auth/'))init.signal=AbortSignal.timeout(path==='auth/session'?10000:45000);
   let r;const request=fetch('/api/'+path,init);
   if(path.startsWith('auth/'))pendingAuthRequests.add(request);
   try{r=await request;}catch(_){throw Object.assign(Error('Could not reach the service. Check your connection and try again.'),{status:503});}
@@ -1173,16 +1173,16 @@ async function api(path, body){
 }
 const temporaryPrivateOutage=e=>[502,503,504].includes(Number(e?.status));
 async function wakePrivateService(cancelled=()=>false){
- const delays=[0,2000,4000,6000,8000,10000,10000,10000];
- const deadline=Date.now()+90000;
+ const delays=[0,2000,4000,6000,8000,...Array(10).fill(10000)];
+ const deadline=Date.now()+120000;
  for(const delay of delays){
   if(cancelled()||Date.now()+delay>=deadline)return false;
   if(delay)await new Promise(resolve=>setTimeout(resolve,delay));
   if(cancelled())return false;
-  message('Private service is starting or reconnecting. Checking availability…');
+  message('Private service is starting or reconnecting. This can take up to two minutes; your credentials have not been resubmitted.');
   try{
    const response=await fetch('/api/health',{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(Math.max(1,Math.min(10000,deadline-Date.now())))});
-   if(response.ok){const health=await response.json();if(health?.status==='ok')return true;continue;}
+   if(response.ok){const health=await response.json();if(health?.status==='ok')return !cancelled();continue;}
    if(![502,503,504].includes(response.status))return false;
   }catch(_){/* Cold service or temporary network failure. */}
  }
@@ -1268,17 +1268,15 @@ async function login(){
  message('Signing in…');
  const credentials={email:$('private-email').value.trim(),password:$('private-password').value};
  try{
-  let state;
-  try{state=await api('auth/login',credentials);}
-  catch(e){
-   if(!temporaryPrivateOutage(e))throw e;
-   if(!await wakePrivateService(()=>epoch!==authEpoch)){
-    if(epoch!==authEpoch)return;
-    throw Error('The private service could not reconnect. Try again shortly; check the backend service status if this continues.');
-   }
+  // Wake through an idempotent health read BEFORE submitting credentials.
+  // A timed-out login can already have succeeded: never replay that POST.
+  if(!await wakePrivateService(()=>epoch!==authEpoch||signingOut)){
    if(epoch!==authEpoch)return;
-   state=await api('auth/login',credentials);
+   throw Error('Private service is still unavailable. Please try again shortly. No login was resubmitted.');
   }
+  if(epoch!==authEpoch||signingOut)return;
+  message('Private service is ready. Signing in…');
+  const state=await api('auth/login',credentials);
   if(epoch!==authEpoch)return;
   $('private-password').value='';await handleAuthState(state,epoch);
   if(epoch===authEpoch)message(state.signed_in?'Signed in.':'Password accepted. Authenticator verification required.');
@@ -1361,7 +1359,8 @@ async function trade(){
 async function addNote(){
   if(!privateState)return;
   const t=$('private-note').value.trim();if(!t)return;
-  const notes=[{text:t,at:new Date().toISOString(),symbol:$('private-symbol').value},...(privateState.notes||[])].slice(0,100);
+  if((privateState.notes||[]).length>=100){message('Research archive is full. No records were removed; export or review existing notes before saving.');return;}
+  const notes=[{text:t,at:new Date().toISOString(),symbol:$('private-symbol').value},...(privateState.notes||[])];
   try{
     const d=await api('private/notes',{expected_version:version,watchlist:privateState.watchlist||[],notes});
     privateState=d.portfolio;version=d.version;$('private-note').value='';render();message('Private note saved.');

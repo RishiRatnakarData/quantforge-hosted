@@ -28,6 +28,24 @@ function concentration(holdings,cash,quotes){
  const values=positions.map(([symbol,u])=>({symbol,value:u*quotes[symbol]})),total=cash+values.reduce((a,b)=>a+b.value,0);if(total<=0)return null;
  return {total,cash_weight:cash/total,largest:values.sort((a,b)=>b.value-a.value)[0]||null,hhi:values.reduce((a,b)=>a+(b.value/total)**2,0)+(cash/total)**2,positions:values.length};
 }
-root.QFResearchGuide30=Object.freeze({prompts,encode,decode,describe,health,concentration});
+function decisionSummary({financial,observed=false,risk=null,prediction=null,held=false,preferences={}}={}){
+ const m=financial?.metrics||{},favorable=[],concerns=[];
+ const pct=x=>(100*x).toFixed(1)+'%';
+ if(finite(m.revenue_growth))(m.revenue_growth>=0?favorable:concerns).push('Reported annual revenue '+(m.revenue_growth>=0?'grew ':'fell ')+pct(Math.abs(m.revenue_growth))+'.');
+ if(finite(m.operating_margin))(m.operating_margin>0?favorable:concerns).push('Operating margin was '+pct(m.operating_margin)+' — operating income per dollar of sales.');
+ if(finite(m.free_cash_flow_usd))(m.free_cash_flow_usd>0?favorable:concerns).push('The latest annual cash-flow proxy was '+(m.free_cash_flow_usd>0?'positive':'non-positive')+' after reported PP&E purchases.');
+ const missing=['revenue_growth','operating_margin','free_cash_flow_usd'].filter(k=>!finite(m[k]));
+ if(missing.length)concerns.push('Financial comparisons are incomplete ('+missing.length+' key measures unavailable); absent data is not zero.');
+ if(!observed||!risk)concerns.push('Eligible observed market risk is unavailable. Public simulations do not describe this investment.');
+ const boundary=Number(preferences.drawdown);
+ const elevated=observed&&risk&&finite(risk.max_drawdown)&&[0.15,0.30,0.50].includes(boundary)&&Math.abs(risk.max_drawdown)>boundary;
+ if(observed&&risk)concerns.push('Largest observed peak-to-trough decline: '+pct(Math.abs(risk.max_drawdown))+'. Future loss can be larger.');
+ const model=observed&&prediction?.ready?'Five-session direction: held-out accuracy '+pct(prediction.evaluatedAccuracy)+' versus '+pct(prediction.baselineAccuracy)+' baseline; Brier error '+prediction.evaluatedBrier.toFixed(3)+' versus '+prediction.baselineBrier.toFixed(3)+' over '+prediction.testWindows+' later windows. '+(prediction.qualified?'Exploratory screen passed; profitability and future reliability remain unproven.':'Signal withheld: this evaluation does not support using it as a decision signal.'):'No validated company-specific predictive evidence is available here. Inspect Prediction Evaluation before using a model; probability, a scenario and expected return are different quantities.';
+ return {disposition:elevated?'Historical loss exceeded your review boundary':missing.length||!observed?'Current evidence is incomplete':'Further investigation required',favorable,concerns,model,
+ context:(held?'Already held in your virtual portfolio: adding could increase single-company concentration. ':'Not identified as an existing virtual holding; this does not establish diversification. ')+(elevated?'The sampled drawdown exceeded your chosen review boundary; test allocation scenarios before revising your thesis. ':'A review boundary is a reflection prompt, not a forecast or suitability assessment. ')+(preferences.horizon==='long'?'A multi-year horizon still requires updated filings, valuation assumptions and liquidity planning.':preferences.horizon==='short'?'Short-term objectives can be sensitive to drawdown and liquidity; annual statements alone do not resolve them.':'Choose an optional horizon to frame the next questions.'),
+ next:'Read the latest official Business and risk-factor disclosures, check whether newer filings exist, compare compatible peers and stress-test valuation assumptions. No supported fair-share-price conclusion is inferred from the cash-flow proxy.',
+ invalidation:'Revisit your thesis if revenue or margins deteriorate, cash generation weakens, portfolio concentration rises, or updated out-of-sample model error loses its baseline advantage. These are questions to investigate, not automatic trade rules.'};
+}
+root.QFResearchGuide30=Object.freeze({prompts,encode,decode,describe,health,concentration,decisionSummary});
 if(typeof module==='object'&&module.exports)module.exports=root.QFResearchGuide30;
 })(typeof window!=='undefined'?window:globalThis);

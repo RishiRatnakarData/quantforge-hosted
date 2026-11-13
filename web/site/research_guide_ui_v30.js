@@ -21,7 +21,24 @@ function renderHealth(){
  $('qf29-financial-explanation').innerHTML='<p>These instant facts share a fiscal end; they are not annual cash-flow totals. Banks, insurers and other issuers may not report a classified balance sheet, making liquidity ratios unavailable or inappropriate for cross-sector comparison. Negative equity is preserved.</p><p><strong>Investigate next:</strong> Read debt maturities, covenants, restricted cash and contractual commitments in the official filing. These facts alone do not establish solvency.</p>'+(data?'<p><a target="_blank" rel="noopener noreferrer" href="'+safe(data.source_url)+'">SEC Company Facts · CIK '+safe(data.cik)+'</a> · extraction cutoff '+safe(data.cutoff)+'. Latest eligible annual facts only; no TTM or quarterly inference.</p>':'');
  document.querySelectorAll('[data-qf27-finance]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.qf27Finance==='health')));
 }
+const summary=document.createElement('section');summary.id='qf32-summary';summary.className='qf32-summary';guide.before(summary);
+let preferences={};
+function drawSummary(c){
+ const existing=brief.querySelector('section.qf-v20-findings');if(existing)existing.hidden=c.mode==='private'&&!$('qf-v20-run-state').textContent.startsWith('Calculated for '+c.name);
+ summary.hidden=c.mode!=='private';if(summary.hidden){summary.replaceChildren();return;}
+ const risk=c.origin==='market'?root.QFResearchCore20.priceStatistics(c.prices||[]):null;
+ const prediction=c.origin==='market'?root.QFModelsMethods22?.evidence?.()?.prediction:null;
+ const held=Number(root.QFPrivateBridgeV23.snapshot()?.holdings?.[c.symbol])>0;
+ const d=J.decisionSummary({financial:c.financial,observed:c.origin==='market',risk,prediction,held,preferences});
+ summary.innerHTML='<h2>Investment research summary</h2><p><strong>'+safe(d.disposition)+'</strong> · '+safe(c.name)+' · fiscal '+safe(c.financial.source.period||'unavailable')+'</p><div class="qf32-preferences"><label>Research horizon (optional)<select id="qf32-horizon"><option value="">Choose a horizon</option><option value="short">Under three years</option><option value="long">Three years or longer</option></select></label><label>Drawdown review boundary (optional)<select id="qf32-drawdown"><option value="">No boundary set</option><option value="0.15">15% peak-to-trough loss</option><option value="0.3">30% peak-to-trough loss</option><option value="0.5">50% peak-to-trough loss</option></select></label></div><p class="tiny">Optional reflection preferences stay in this tab and clear on sign-out. They do not determine investment suitability.</p>'+[['What looks favorable?',d.favorable.join(' ')||'No supported favorable finding from the covered measures.'],['What needs caution?',d.concerns.join(' ')],['What do the models suggest?',d.model],['How does this relate to my objectives?',d.context],['What should I investigate next?',d.next],['What would change the conclusion?',d.invalidation]].map(([t,b])=>'<h3>'+safe(t)+'</h3><p>'+safe(b)+'</p>').join('');
+ const actions=document.createElement('div');actions.className='qf27-action-row';actions.innerHTML='<button class="btn" data-qf30-action="risk">Models &amp; evaluation</button><button class="btn" data-qf30-action="compare">Compare alternatives</button><button class="btn" data-qf30-action="research">My saved research</button>';summary.append(actions);
+ $('qf32-horizon').value=preferences.horizon||'';$('qf32-drawdown').value=preferences.drawdown||'';
+}
+summary.addEventListener('change',e=>{if(e.target.id==='qf32-horizon')preferences.horizon=e.target.value;if(e.target.id==='qf32-drawdown')preferences.drawdown=e.target.value;const focus=e.target.id;drawSummary(ctx());$(focus).focus();});
+root.addEventListener('qf:owner-auth-ended',()=>{preferences={};drawSummary(ctx());});
 function drawGuide(){
+ drawSummary(ctx());
+ guide.hidden=ctx().mode==='private';
  const c=ctx(),issuer=root.QFPublishedSEC.companies.find(x=>x.symbol===c.symbol),f=c.financial,dates=f.annual.flatMap(r=>Object.values(r.sources).map(s=>s.filed)).filter(Boolean).sort(),market=c.origin==='market'&&c.prices?.length?c.prices.at(-1).date:null;
  companyInfo.textContent='SEC cutoff '+(issuer?.as_of||c.snapshot)+' · financial period '+(f.source.period||'unavailable')+' · latest included filing '+(dates.at(-1)||'unavailable')+(market?' · observed market close '+market+' (provider details below)':' · no observed market close loaded')+'.';
  const q=root.QFResearchCore20.priceStatistics(c.origin==='market'?c.prices||[]:[]);
@@ -60,13 +77,15 @@ $('qf30-thesis-form').addEventListener('submit',async event=>{
   clear();root.dispatchEvent(new Event('qf:research-context'));status('Thesis saved. Earlier records and their timestamps were preserved.');
  }catch(e){if(token===generation)status(e.message||'Save unavailable. Refresh before retrying an uncertain result.');}finally{busy=false;$('qf30-save').disabled=false;}
 });
-guide.addEventListener('click',event=>{const action=event.target.closest('[data-qf30-action]')?.dataset.qf30Action;if(!action)return;
+function researchAction(event){const action=event.target.closest('[data-qf30-action]')?.dataset.qf30Action;if(!action)return;
  if(action==='case-study'){root.QFNavigate20('methods');document.querySelector('[data-qf-c22-method="overview"]').click();$('qf27-case-study').scrollIntoView({block:'start'});return;}
  if(action==='compare'){$('qf-v20-add-compare').click();return;}
  if(['risk','valuation'].includes(action)){root.QFNavigate20('models');document.querySelector('[data-qf-model="'+action+'"]').click();return;}
  if(action==='research'){if(ctx().mode==='private')root.QFExplore27.show('research');return;}
  root.QFExplore27.show('financials');if(action==='cash')document.querySelector('[data-qf27-finance="cash"]').click();
-});
+}
+guide.addEventListener('click',researchAction);summary.addEventListener('click',researchAction);
+root.addEventListener('qf:analyze-company',()=>{const existing=brief.querySelector('section.qf-v20-findings');if(existing)existing.hidden=false;});
 function sync(){drawGuide();if(ctx().mode!=='private'||lastSymbol!==ctx().symbol){generation++;clear();status('');}lastSymbol=ctx().symbol;}
 for(const event of ['qf:research-context','qf:data-mode','qf:owner-auth-ended'])root.addEventListener(event,sync);
 function migrate(){if(/^#(?:(?:explore|private)[\/-])?(?:news|context|sentiment|filings)(?:[\/-].*)?$/.test(location.hash)){history.replaceState(null,'','#explore');root.QFNavigate20('explore');root.QFExplore27.show('financials');}}
