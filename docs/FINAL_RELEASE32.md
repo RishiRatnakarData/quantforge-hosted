@@ -29,3 +29,9 @@ A wholesale SEC refresh, quarterly/TTM reconstruction, complete debt/share-value
 Run full pytest/Node, Ruff, privacy/CSP/deterministic build, existing browser CI and tools/smoke_final_release32.py. Inspect Home and fixture-only private summary screenshots across five widths and three browsers. The new final suite covers simulated cold starts and private-content isolation; existing lifecycle tests preserve MFA and sign-out assurance.
 
 Known-good rollback source is 9261bdedb8254d700d6bf30a2f666c0713f3513e. No migration or owner write is required for rollout or rollback. The FastAPI/backend source is unchanged from 9261bde; the release is frontend/proxy-only and can retain that compatible backend. Render Auto Deploy is disabled; if a backend rollout is performed, explicitly deploy and verify its revision. Final deployment IDs and CI links belong in the external release record after actual verification.
+
+## Public release with external Private availability blocker
+
+The November 13 master request authorizes publishing independently functioning Public improvements while provider investigation continues. A concise site-wide notice discloses intermittent Private availability. Private functions and security gates remain intact; no fake success, reset or migration is introduced.
+
+Only the idempotent readiness endpoint exposes sanitized diagnostic headers: X-QF-Readiness classifies timeout, network failure, non-JSON or verification; X-QF-Upstream-Status reports a numeric status when available. No upstream body, cookies, trace identifiers or credentials are exposed. These diagnostics do not fix the provider problem.

@@ -116,3 +116,20 @@ test('non-JSON hosting 429 is classified separately without forwarding challenge
  assert.equal(r.status,503);assert.equal(r.headers.get('set-cookie'),null);
  assert.equal((await r.json()).code,'hosting_verification');
 });
+
+
+test('readiness diagnostics expose only classification and numeric status, never upstream headers or secrets', async () => {
+ const headers={'Content-Type':'text/html','cf-mitigated':'challenge','Set-Cookie':'sensitive=value','X-Internal-Trace':'private-details'};
+ for (const route of ['health','auth/session']) {
+  const r=await callWithMock(new Request('https://quantforge-648.pages.dev/api/'+route),async()=>new Response('<html>private diagnostic body</html>',{status:429,headers}));
+  assert.equal(r.status,503);
+  assert.equal(r.headers.get('X-QF-Readiness'),route==='health'?'upstream-verification':null);
+  assert.equal(r.headers.get('X-QF-Upstream-Status'),route==='health'?'429':null);
+  for(const h of ['cf-mitigated','Set-Cookie','X-Internal-Trace','x-qf-proxy-secret'])assert.equal(r.headers.get(h),null);
+  assert.deepEqual(await r.json(),{error:'Private service is currently unavailable.',code:'hosting_verification'});
+ }
+ const r=await callWithMock(new Request('https://quantforge-648.pages.dev/api/health'),async()=>{throw Error('sensitive upstream URL');});
+ assert.equal(r.headers.get('X-QF-Readiness'),'upstream-network');
+ assert.equal(r.headers.get('X-QF-Upstream-Status'),null);
+ assert.doesNotMatch(await r.text(),/sensitive/);
+});
