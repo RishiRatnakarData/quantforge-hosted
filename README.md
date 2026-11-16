@@ -45,7 +45,7 @@ Methods → Engineering presents the same evidence in the running application, w
 SEC Company Facts → validated annual snapshot → public static research
 Synthetic paths  → reproducible public numerical experiments
 
-Browser → Cloudflare same-origin proxy → FastAPI / Render
+Browser → Cloudflare same-origin proxy → FastAPI / Vercel Hobby (recovered API)
                                       |-- owner + authenticator verification
                                       |-- Supabase RLS / versioned virtual state
                                       `-- entitled Alpaca assets and prices
@@ -92,3 +92,5 @@ News/headline tone has been retired from normal public/private UI and request pa
 Earlier audit documents describe their stage at the time they were written. The November 10 work and November 12 final-24/quality work were subsequently published in `4fc1a46`; their former “unpublished” labels do not describe current production. Retained records: [24-issue register](docs/FINAL_24_ISSUE_REGISTER.json), [engine parity](docs/FINAL_24_ENGINE_PARITY.md), [quality review](docs/QUALITY_REVIEW_2026_11_12.md).
 
 Private Company briefing automatically synthesizes covered financial evidence, observed downside, existing held-out predictive evaluation and virtual-holding context. Optional tab-local research preferences frame questions without creating suitability scores. Login waits for bounded health readiness before submitting credentials once; it does not replay uncertain logins or account mutations. See [the current release guide](docs/FINAL_RELEASE32.md) for implementation and acceptance boundaries.
+
+Current deployment source and rollback: [Vercel recovery guide](docs/VERCEL_RECOVERY_DEPLOYMENT.md). Historical Render availability documents do not describe the recovered routing.

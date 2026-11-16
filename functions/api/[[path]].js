@@ -1,9 +1,9 @@
 /** Same-origin API proxy for Cloudflare Pages. No quote caching. */
 export async function onRequest(context) {
   const { request, env } = context;
-  const origin = String(env.PRIVATE_API_ORIGIN || '').replace(/\/$/, '');
+  const origin = String(env.PRIVATE_API_ORIGIN || '').trim().replace(/\/$/, '');
   const secret = String(env.QF_PROXY_SECRET || '');
-  if (!/^https:\/\/[a-zA-Z0-9.-]+$/.test(origin) || !secret || !origin.endsWith('.onrender.com')) {
+  if (!/^https:\/\/[a-zA-Z0-9.-]+$/.test(origin) || !secret || !['https://quantforge-private-api.onrender.com','https://quantforge-api-recovery.vercel.app'].includes(origin)) {
     return new Response(JSON.stringify({ error: 'Private API not configured' }), {
       status: 503, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }
     });
