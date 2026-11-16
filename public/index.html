@@ -9383,9 +9383,11 @@ const temporaryPrivateOutage=e=>[502,503,504].includes(Number(e?.status));
 async function wakePrivateService(cancelled=()=>false){
  const delays=[0,2000,4000,6000,8000,...Array(10).fill(10000)];
  const deadline=Date.now()+120000;
+ let rateLimitedReads=0,nextReadAt=0;
  for(const delay of delays){
-  if(cancelled()||Date.now()+delay>=deadline)return false;
-  if(delay)await new Promise(resolve=>setTimeout(resolve,delay));
+  const wait=Math.max(delay,nextReadAt-Date.now(),0);
+  if(cancelled()||Date.now()+wait>=deadline)return false;
+  if(wait)await new Promise(resolve=>setTimeout(resolve,wait));
   if(cancelled())return false;
   message('Private service is starting or reconnecting. This can take up to two minutes; your credentials have not been resubmitted.');
   try{
@@ -9394,6 +9396,12 @@ async function wakePrivateService(cancelled=()=>false){
    if(![502,503,504].includes(response.status))return false;
    const detail=await response.json().catch(()=>null);
    if(detail?.code==='hosting_verification')throw Object.assign(Error('The hosting provider is blocking private API access with a verification page. Automatic startup recovery cannot resolve this. Try again later; your credentials were not resubmitted.'),{code:'hosting_verification'});
+   if(detail?.code==='hosting_rate_limited'){
+    if(++rateLimitedReads>=3)return false;
+    const seconds=Number(detail.retry_after_seconds);
+    nextReadAt=Date.now()+Math.max(30000,Number.isFinite(seconds)&&seconds>=0?seconds*1000:30000);
+    message('Private hosting has requested a pause. Waiting within the availability deadline; credentials have not been submitted.');
+   }
   }catch(e){if(e?.code==='hosting_verification')throw e;/* Cold service or temporary network failure. */}
  }
  return false;

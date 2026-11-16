@@ -160,6 +160,17 @@ test('health distinguishes confirmed challenge headers from unmarked 429 without
   const r=await callWithMock(new Request('https://quantforge-648.pages.dev/api/health'),async()=>new Response('<html>upstream</html>',{status:429,headers}));
   assert.equal(r.headers.get('X-QF-Upstream-Challenge'),marked?'confirmed':'not-reported');
   assert.equal(r.headers.get('cf-mitigated'),null);
-  assert.equal((await r.json()).code,'hosting_verification');
+  assert.equal((await r.json()).code,marked?'hosting_verification':'hosting_rate_limited');
+ }
+});
+
+
+test('unmarked hosting rate limits respect provider waits without replaying requests',async()=>{
+ for(const [value,minimum] of [['5',30],['90',90],['180',180],['invalid',30],[new Date(Date.now()+90000).toUTCString(),88]]){
+  let calls=0;
+  const r=await callWithMock(new Request('https://quantforge-648.pages.dev/api/health'),async()=>{calls++;return new Response('<html>rate limited</html>',{status:429,headers:{'content-type':'text/html','retry-after':value}});});
+  const body=await r.json();assert.equal(calls,1);assert.equal(r.status,503);
+  assert.equal(body.code,'hosting_rate_limited');assert.ok(body.retry_after_seconds>=minimum);
+  assert.equal(r.headers.get('X-QF-Readiness'),'upstream-rate-limit');
  }
 });

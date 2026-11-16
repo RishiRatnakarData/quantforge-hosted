@@ -91,6 +91,53 @@ async def recovery(browser):
     assert not errors,errors
     await page.close()
 
+
+    # An unmarked hosting rate limit waits before another readiness GET, then submits login once.
+    page,errors=await setup(browser)
+    await enter(page)
+    await page.clock.install()
+    await page.evaluate("""() => {const original=fetch;window.rateCalls={health:0,login:0};window.fetch=(u,o)=>{
+      if(String(u).includes('/api/health')){rateCalls.health++;return Promise.resolve(rateCalls.health===1?{ok:false,status:503,json:async()=>({code:'hosting_rate_limited',retry_after_seconds:30})}:{ok:true,status:200,json:async()=>({status:'ok'})});}
+      if(String(u).includes('auth/login'))rateCalls.login++;return original(u,o);
+    }}""")
+    await page.locator('#private-login-submit').click()
+    await expect(page.locator('#private-message')).to_contain_text('requested a pause')
+    await page.clock.run_for(29000)
+    assert await page.evaluate('rateCalls')=={'health':1,'login':0}
+    await page.clock.run_for(4000)
+    await expect(page.locator('#qf24-mode-label')).to_contain_text('PRIVATE')
+    assert await page.evaluate('rateCalls')=={'health':2,'login':1}
+    assert not errors,errors
+    await page.close()
+    # Persistent rate limits stop after three reads and never transmit credentials.
+    page,errors=await setup(browser)
+    await enter(page)
+    await page.clock.install()
+    await page.evaluate("""() => {const original=fetch;window.rateCalls={health:0,login:0};window.fetch=(u,o)=>{
+      if(String(u).includes('/api/health')){rateCalls.health++;return Promise.resolve({ok:false,status:503,json:async()=>({code:'hosting_rate_limited',retry_after_seconds:30})});}
+      if(String(u).includes('auth/login'))rateCalls.login++;return original(u,o);
+    }}""")
+    await page.locator('#private-login-submit').click()
+    await page.clock.run_for(121000)
+    await expect(page.locator('#private-message')).to_contain_text('still unavailable')
+    assert await page.evaluate('rateCalls')=={'health':3,'login':0},await page.evaluate('rateCalls')
+    assert not errors,errors
+    await page.close()
+    # A provider pause longer than the remaining deadline must not be shortened.
+    page,errors=await setup(browser)
+    await enter(page)
+    await page.clock.install()
+    await page.evaluate("""() => {const original=fetch;window.rateCalls={health:0,login:0};window.fetch=(u,o)=>{
+      if(String(u).includes('/api/health')){rateCalls.health++;return Promise.resolve({ok:false,status:503,json:async()=>({code:'hosting_rate_limited',retry_after_seconds:180})});}
+      if(String(u).includes('auth/login'))rateCalls.login++;return original(u,o);
+    }}""")
+    await page.locator('#private-login-submit').click()
+    await page.clock.run_for(121000)
+    await expect(page.locator('#private-message')).to_contain_text('still unavailable')
+    assert await page.evaluate('rateCalls')=={'health':1,'login':0}
+    assert not errors,errors
+    await page.close()
+
 async def journey(browser,engine,width):
     page,errors=await setup(browser,width)
     await expect(page.locator('#qf-v23-landing')).to_be_visible()
