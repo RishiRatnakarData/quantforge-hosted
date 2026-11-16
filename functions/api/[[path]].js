@@ -48,12 +48,17 @@ export async function onRequest(context) {
   // Hosting interstitials (including a 200/403 HTML challenge) are not API
   // authentication decisions. Do not forward their markup or cookies.
   if (!(result.headers.get('content-type') || '').toLowerCase().includes('application/json')) {
-    const verification = result.headers.get('cf-mitigated') === 'challenge' || result.status === 429;
+    const verification = result.headers.get('cf-mitigated') === 'challenge';
+    const limited = !verification && result.status === 429;
+    const retryHeader = result.headers.get('retry-after') || '';
+    const retrySeconds = /^\d+$/.test(retryHeader) ? Number(retryHeader) : Math.ceil((Date.parse(retryHeader) - Date.now()) / 1000);
+    // Never retry earlier than the provider requests; long waits exhaust the client deadline.
+    const retryAfter = Number.isFinite(retrySeconds) && retrySeconds >= 0 ? Math.max(30, Math.min(86400, retrySeconds)) : 30;
     return new Response(JSON.stringify({ error: 'Private service is currently unavailable.',
-      ...(verification ? {code: 'hosting_verification'} : {}) }), {
+      ...(verification ? {code: 'hosting_verification'} : limited ? {code: 'hosting_rate_limited', retry_after_seconds: retryAfter} : {}) }), {
       status: 503, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store',
         'X-Content-Type-Options': 'nosniff',
-        ...readinessHeaders(verification ? 'upstream-verification' : 'upstream-non-json', result.status),
+        ...readinessHeaders(verification ? 'upstream-verification' : limited ? 'upstream-rate-limit' : 'upstream-non-json', result.status),
         ...(probe ? {'X-QF-Upstream-Challenge': result.headers.get('cf-mitigated') === 'challenge' ? 'confirmed' : 'not-reported'} : {}) }
     });
   }

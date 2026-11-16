@@ -9,3 +9,9 @@ Proxy readiness GET now has a 70-second bound; the browser allows 75 seconds, ca
 To conserve the user's near-exhausted GitHub allowance, the existing workflow gains an explicitly selected repair_only dispatch. Default full CI behavior and tests remain unchanged. The focused run verifies generated CSP/publication boundaries, full JS regressions and hosted authentication/ledger security; local browser recovery and final three-engine acceptance also run. Use the supported skip-checks trailer only to avoid duplicate push/PR runs; run focused CI explicitly against the exact candidate.
 
 Production rollout remains a repair experiment, not a declaration of reliability. Require observed idle and published-route recovery without direct Render traffic, preferably twice; stop on a hosting challenge. Keep the availability notice until real acceptance. Baseline Cloudflare deployment 193cebc1-435b-4c42-a7a6-cc72cbc21762 is the rollback artifact; no database migration or backend deploy is needed.
+
+## Correct challenge classification and provider backoff
+
+After actual idle shutdown at 13:28:15 UTC, a single published readiness GET at 13:29:21 returned upstream429 in 0.312 seconds with no cf-mitigated challenge header. The previous rule classified every non-JSON429 as a confirmed challenge and aborted recovery. Cloudflare documents cf-mitigated: challenge as its reliable challenge-page indicator.
+
+Explicit challenges remain a hard stop. Unmarked non-JSON429 is classified separately as hosting_rate_limited; readiness waits at least30seconds and respects valid Retry-After seconds or HTTP dates. At most three rate-limited health reads occur within the unchanged120second deadline. A provider pause longer than the deadline stops rather than being shortened. JSON401/403/429 authentication results remain unchanged, and login/MFA/mutations are not replayed.
