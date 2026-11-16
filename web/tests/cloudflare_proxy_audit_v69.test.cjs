@@ -103,7 +103,7 @@ test('only readiness GETs have a bounded upstream signal; writes are forwarded o
 });
 test('a stalled readiness fetch returns safe 503 after abort without retrying upstream', async () => {
  const timer=globalThis.setTimeout;let calls=0;
- globalThis.setTimeout=(fn,delay)=>timer(fn,delay===8000?1:delay);
+ globalThis.setTimeout=(fn,delay)=>timer(fn,delay===70000?1:delay);
  try {
   const response=await callWithMock(new Request('https://quantforge-648.pages.dev/api/health'),async(_url,init)=>{calls++;return new Promise((_resolve,reject)=>init.signal.addEventListener('abort',()=>reject(Error('internal timeout')),{once:true}));});
   assert.equal(response.status,503);assert.equal(calls,1);assert.equal(response.headers.get('Cache-Control'),'no-store');
@@ -132,4 +132,34 @@ test('readiness diagnostics expose only classification and numeric status, never
  assert.equal(r.headers.get('X-QF-Readiness'),'upstream-network');
  assert.equal(r.headers.get('X-QF-Upstream-Status'),null);
  assert.doesNotMatch(await r.text(),/sensitive/);
+});
+
+
+test('readiness permits a slow cold start without replay and stays inside the browser budget', async () => {
+ const originalTimer=globalThis.setTimeout;let calls=0,budget;
+ globalThis.setTimeout=(fn,delay)=>{budget=delay;return originalTimer(fn,delay/1000);};
+ try {
+  const r=await callWithMock(new Request('https://quantforge-648.pages.dev/api/health'),async(_url,init)=>{
+   calls++;return new Promise((resolve,reject)=>{
+    init.signal.addEventListener('abort',()=>reject(Error('premature abort')),{once:true});
+    originalTimer(()=>resolve(new Response('{"status":"ok"}',{headers:{'content-type':'application/json'}})),32);
+   });
+  });
+  assert.equal(budget,70000);assert.equal(calls,1);assert.equal(r.status,200);
+  assert.deepEqual(await r.json(),{status:'ok'});
+  const client=fs.readFileSync(path.join(__dirname,'../site/private.js'),'utf8');
+  assert.match(client,/Math\.min\(75000,deadline-Date\.now\(\)\)/);
+  assert.match(client,/const deadline=Date\.now\(\)\+120000/);
+ } finally {globalThis.setTimeout=originalTimer;}
+});
+
+
+test('health distinguishes confirmed challenge headers from unmarked 429 without exposing raw values',async()=>{
+ for(const marked of [true,false]){
+  const headers={'content-type':'text/html',...(marked?{'cf-mitigated':'challenge'}:{})};
+  const r=await callWithMock(new Request('https://quantforge-648.pages.dev/api/health'),async()=>new Response('<html>upstream</html>',{status:429,headers}));
+  assert.equal(r.headers.get('X-QF-Upstream-Challenge'),marked?'confirmed':'not-reported');
+  assert.equal(r.headers.get('cf-mitigated'),null);
+  assert.equal((await r.json()).code,'hosting_verification');
+ }
 });

@@ -20,11 +20,11 @@ export async function onRequest(context) {
   if (!headers.has('origin') && !['GET', 'HEAD'].includes(request.method)) {
     headers.set('origin', url.origin);
   }
-  // Readiness probes must return to the browser so its bounded recovery can progress.
+  // Allow a normal Render Free cold start within the browser readiness deadline.
   // Other requests, especially writes, are forwarded once and never replayed.
   const probe = request.method === 'GET' && url.pathname === '/api/health';
   const controller = probe ? new AbortController() : null;
-  const timer = controller ? setTimeout(() => controller.abort(), 8000) : null;
+  const timer = controller ? setTimeout(() => controller.abort(), 70000) : null;
   const readinessHeaders = (reason, status) => probe ? {
     'X-QF-Readiness': reason,
     ...(status === undefined ? {} : {'X-QF-Upstream-Status': String(status)})
@@ -53,7 +53,8 @@ export async function onRequest(context) {
       ...(verification ? {code: 'hosting_verification'} : {}) }), {
       status: 503, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store',
         'X-Content-Type-Options': 'nosniff',
-        ...readinessHeaders(verification ? 'upstream-verification' : 'upstream-non-json', result.status) }
+        ...readinessHeaders(verification ? 'upstream-verification' : 'upstream-non-json', result.status),
+        ...(probe ? {'X-QF-Upstream-Challenge': result.headers.get('cf-mitigated') === 'challenge' ? 'confirmed' : 'not-reported'} : {}) }
     });
   }
   const outgoing = new Headers();

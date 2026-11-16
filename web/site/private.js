@@ -1181,7 +1181,7 @@ async function wakePrivateService(cancelled=()=>false){
   if(cancelled())return false;
   message('Private service is starting or reconnecting. This can take up to two minutes; your credentials have not been resubmitted.');
   try{
-   const response=await fetch('/api/health',{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(Math.max(1,Math.min(10000,deadline-Date.now())))});
+   const response=await fetch('/api/health',{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(Math.max(1,Math.min(75000,deadline-Date.now())))});
    if(response.ok){const health=await response.json();if(health?.status==='ok')return !cancelled();continue;}
    if(![502,503,504].includes(response.status))return false;
    const detail=await response.json().catch(()=>null);
