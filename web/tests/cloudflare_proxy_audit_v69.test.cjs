@@ -152,3 +152,14 @@ test('readiness permits a slow cold start without replay and stays inside the br
   assert.match(client,/const deadline=Date\.now\(\)\+120000/);
  } finally {globalThis.setTimeout=originalTimer;}
 });
+
+
+test('health distinguishes confirmed challenge headers from unmarked 429 without exposing raw values',async()=>{
+ for(const marked of [true,false]){
+  const headers={'content-type':'text/html',...(marked?{'cf-mitigated':'challenge'}:{})};
+  const r=await callWithMock(new Request('https://quantforge-648.pages.dev/api/health'),async()=>new Response('<html>upstream</html>',{status:429,headers}));
+  assert.equal(r.headers.get('X-QF-Upstream-Challenge'),marked?'confirmed':'not-reported');
+  assert.equal(r.headers.get('cf-mitigated'),null);
+  assert.equal((await r.json()).code,'hosting_verification');
+ }
+});

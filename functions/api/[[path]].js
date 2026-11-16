@@ -53,7 +53,8 @@ export async function onRequest(context) {
       ...(verification ? {code: 'hosting_verification'} : {}) }), {
       status: 503, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store',
         'X-Content-Type-Options': 'nosniff',
-        ...readinessHeaders(verification ? 'upstream-verification' : 'upstream-non-json', result.status) }
+        ...readinessHeaders(verification ? 'upstream-verification' : 'upstream-non-json', result.status),
+        ...(probe ? {'X-QF-Upstream-Challenge': result.headers.get('cf-mitigated') === 'challenge' ? 'confirmed' : 'not-reported'} : {}) }
     });
   }
   const outgoing = new Headers();
