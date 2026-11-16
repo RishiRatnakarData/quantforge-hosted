@@ -16,6 +16,8 @@ export async function onRequest(context) {
     if (request.headers.has(h)) headers.set(h, request.headers.get(h));
   }
   headers.set('x-qf-proxy-secret', secret);
+  // Identify the actual intermediary software, without forwarding a browser identity.
+  headers.set('user-agent', 'QuantForge/2.0 (Cloudflare Pages API proxy)');
   // Render expects Origin to be exactly the Pages site for state-changing calls.
   if (!headers.has('origin') && !['GET', 'HEAD'].includes(request.method)) {
     headers.set('origin', url.origin);

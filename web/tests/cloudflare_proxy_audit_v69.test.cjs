@@ -174,3 +174,13 @@ test('unmarked hosting rate limits respect provider waits without replaying requ
   assert.equal(r.headers.get('X-QF-Readiness'),'upstream-rate-limit');
  }
 });
+
+
+test('proxy identifies its actual service without adopting browser or forged routing headers',async()=>{
+ let seen;
+ const r=await callWithMock(new Request('https://quantforge-648.pages.dev/api/health',{headers:{'User-Agent':'Mozilla/5.0 fixture browser','X-Forwarded-For':'fixture-address','Authorization':'fixture-owner-token'}}),async(_url,init)=>{seen=init.headers;return new Response('{"status":"ok"}',{headers:{'content-type':'application/json'}});});
+ assert.equal(r.status,200);
+ assert.equal(seen.get('user-agent'),'QuantForge/2.0 (Cloudflare Pages API proxy)');
+ for(const h of ['authorization','x-forwarded-for','host'])assert.equal(seen.get(h),null);
+ assert.equal(r.headers.get('user-agent'),null);
+});
