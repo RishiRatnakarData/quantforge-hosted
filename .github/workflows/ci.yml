@@ -3,11 +3,17 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+    inputs:
+      repair_only:
+        description: Run focused proxy and authentication validation to conserve free minutes
+        type: boolean
+        default: false
 permissions:
   contents: read
 
 jobs:
   validate:
+    if: ${{ !inputs.repair_only }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -88,7 +94,8 @@ jobs:
           PY
 
   release_a_browser:
-    name: Release A–D shared-app browser journeys
+    if: ${{ !inputs.repair_only }}
+    name: Release Aâ€“D shared-app browser journeys
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -136,3 +143,28 @@ jobs:
 
       - name: Readiness before credentials and final Home research workflows
         run: python tools/smoke_final_release32.py
+
+  readiness_repair:
+    name: Focused readiness and security validation
+    if: ${{ inputs.repair_only }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      PYTHONPATH: src
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install hosted security test dependencies
+        run: python -m pip install -r cloud/requirements.txt pytest httpx
+      - name: Build and verify publication boundaries
+        run: |
+          python tools/build_unified_site.py
+          python tools/audit_public_bundle.py
+          python tools/prepublish_check.py
+          git diff --exit-code -- public
+      - name: Full JavaScript regression suite
+        run: node --test web/tests/*.test.cjs
+      - name: Hosted authentication and ledger security regressions
+        run: python -m pytest -q tests/test_hosted_web.py
