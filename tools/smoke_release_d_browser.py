@@ -78,8 +78,8 @@ async def run_page(browser, width: int) -> None:
         await page.evaluate("window.QFNavigate20('private')")
         assert await page.locator('.tabpage.active').get_attribute('id') == 'page-explore'
         await page.locator('#qf27-analyze').click()
-        assert await page.locator('#qf-v23-explore-content [data-qf-v23-open="notes"]').is_visible()
-        await page.locator('#qf-v23-explore-content [data-qf-v23-open="notes"]').click()
+        assert await page.locator('[data-qf27-explore="research"]').is_visible()
+        await page.locator('[data-qf27-explore="research"]').click()
         assert not await page.locator('#qf-v23-owner-panel').is_visible()
         assert await page.locator('#qf24-notes').is_visible()
         assert await page.locator('#qf-v23-note-company').inner_text() == 'Microsoft (MSFT)'
@@ -98,7 +98,7 @@ async def run_page(browser, width: int) -> None:
         await page.wait_for_function("!window.QFPrivateBridgeV23.ready()")
         assert not await page.locator('#qf-v23-owner-panel').is_visible()
         assert await page.locator('#qf-v20-mode').inner_text() == 'Sign in'
-        assert not await page.locator('#qf-v23-explore-content [data-qf-v23-open="notes"]').is_visible()
+        assert not await page.locator('[data-qf27-explore="research"]').is_visible()
         assert not errors, errors[:5]
         print(f'Release D {width}px home / MFA-mock / notes / virtual trades / signout PASS', flush=True)
     finally:
