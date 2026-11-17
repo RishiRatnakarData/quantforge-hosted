@@ -2,7 +2,7 @@
 
 QuantForge is a financial research and software engineering project built to explore company financials, statistical uncertainty and hypothetical portfolios. It demonstrates applied statistical data science through traceable inputs, retained numerical engines, reproducible evaluation and an authenticated private experience.
 
-[Public application](https://quantforge-648.pages.dev/) · [Current product and reliability release](docs/FINAL_RELEASE32.md) · [Research methodology](docs/methodology/QUANT_RESEARCH_METHODS.md)
+[Public application](https://quantforge-648.pages.dev/) · [Current quality candidate and verification](docs/MASTER_QUALITY_CANDIDATE_2026_11_16.md) · [Research methodology](docs/methodology/QUANT_RESEARCH_METHODS.md)
 
 ## One application, five sections
 
@@ -45,7 +45,7 @@ Methods → Engineering presents the same evidence in the running application, w
 SEC Company Facts → validated annual snapshot → public static research
 Synthetic paths  → reproducible public numerical experiments
 
-Browser → Cloudflare same-origin proxy → FastAPI / Render
+Browser → Cloudflare same-origin proxy → FastAPI / Vercel Hobby (recovered API)
                                       |-- owner + authenticator verification
                                       |-- Supabase RLS / versioned virtual state
                                       `-- entitled Alpaca assets and prices
@@ -63,16 +63,16 @@ DCF discounts an operating-cash-flow-minus-capex proxy under explicit assumption
 
 ## Verification
 
-Use this checkout's configured `.venv`, not an interpreter from an older checkout:
+Use an existing Python 3.12 environment with the project's dependencies. The recovery checkout does not contain its own `.venv`; the commands below assume an activated environment:
 
 ```powershell
-.\.venv\Scripts\python.exe -m ruff check .
-.\.venv\Scripts\python.exe -m pytest -q
+python -m ruff check .
+python -m pytest -q
 node --test (Get-ChildItem web/tests -Filter '*.test.cjs' | ForEach-Object FullName)
-.\.venv\Scripts\python.exe tools/build_unified_site.py
-.\.venv\Scripts\python.exe tools/audit_public_bundle.py
-.\.venv\Scripts\python.exe tools/prepublish_check.py
-.\.venv\Scripts\python.exe tools/smoke_completion_browser.py
+python tools/build_unified_site.py
+python tools/audit_public_bundle.py
+python tools/prepublish_check.py
+python tools/smoke_completion_browser.py
 ```
 
 The published baseline `4fc1a46` passed 613 Python / 413 JavaScript tests and candidate/main CI before this improvement assignment. These are historical baseline counts, not claims about an untested candidate. Current release evidence, verification scope and deployment identifiers are recorded in [the release guide](docs/GUIDED_RESEARCH_RELEASE.md) and the external release record for the final SHA. Private automated writes use isolated fixtures; real owner persistence remains separately controlled.
@@ -92,3 +92,7 @@ News/headline tone has been retired from normal public/private UI and request pa
 Earlier audit documents describe their stage at the time they were written. The November 10 work and November 12 final-24/quality work were subsequently published in `4fc1a46`; their former “unpublished” labels do not describe current production. Retained records: [24-issue register](docs/FINAL_24_ISSUE_REGISTER.json), [engine parity](docs/FINAL_24_ENGINE_PARITY.md), [quality review](docs/QUALITY_REVIEW_2026_11_12.md).
 
 Private Company briefing automatically synthesizes covered financial evidence, observed downside, existing held-out predictive evaluation and virtual-holding context. Optional tab-local research preferences frame questions without creating suitability scores. Login waits for bounded health readiness before submitting credentials once; it does not replay uncertain logins or account mutations. See [the current release guide](docs/FINAL_RELEASE32.md) for implementation and acceptance boundaries.
+
+Current deployment source and rollback: [Vercel recovery guide](docs/VERCEL_RECOVERY_DEPLOYMENT.md). Historical Render availability documents do not describe the recovered routing.
+
+Candidate goal assessment and remaining limits: [Public versus Private](docs/MASTER_QUALITY_GOAL_ASSESSMENT_2026_11_16.md). [Career evidence and interview demonstration](docs/CAREER_EVIDENCE_2026_11_16.md). Candidate tests and screenshots are local review evidence, not a claim of production publication.

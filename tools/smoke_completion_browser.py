@@ -105,6 +105,8 @@ async def journey(browser, engine, width):
         prefix = f'v25-{engine}-{mode}-{width}'
         await page.locator('#qf-v20-navigation [data-page="explore"]').click()
         await page.locator('#qf27-analyze').click()
+        if mode == 'private':
+            await page.locator('#qf33-evidence-tab').click()
         await page.locator('#qf25-company table').first.wait_for()
         assert 'undefined' not in await page.locator('#qf25-company').inner_text()
         await capture(page, prefix + '-connected-research')

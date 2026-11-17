@@ -69,3 +69,39 @@ body.qf31-home-active #qf28-mobile-credit{display:none!important}
 .qf32-preferences{display:flex;gap:16px;flex-wrap:wrap;margin:18px 0}.qf32-preferences label{display:grid;gap:6px;flex:1 1 200px;font-size:14px}.qf32-preferences select{min-height:44px}
 @media(max-width:1060px){.qf31-home-steps{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:680px){.qf31-home{padding:22px 17px!important}.qf31-home h1{font-size:clamp(29px,8vw,38px)}.qf31-home-search-row{flex-direction:column}.qf31-home-search-row button{width:100%}.qf31-home-steps{grid-template-columns:1fr}.qf32-summary{padding:16px}}
+
+/* Current assessment: interpretation first, inspectable evidence second. */
+.qf32-summary{background:#fff;padding:clamp(20px,2.5vw,32px);border-color:#c8ced4}
+.qf33-kicker{font-size:12px!important;font-weight:750;letter-spacing:.07em;color:#58616a}
+.qf33-conclusion{font-size:16px!important;line-height:1.7;border-left:3px solid #454d55;padding:14px 18px;background:#f4f5f6;margin:20px 0}
+.qf33-conclusion strong{display:inline-block;margin-bottom:7px;font-size:19px}
+.qf33-assessment-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin:24px 0}
+.qf33-assessment-card{border-top:1px solid #d8dde1;padding-top:16px;min-width:0}
+.qf33-assessment-card h3{font-size:18px;margin:0 0 12px}.qf33-assessment-card p,.qf33-assessment-card li{font-size:15px!important;line-height:1.7}
+.qf33-assessment-card ul{padding-left:20px;margin:0}.qf33-assessment-card li+li{margin-top:10px}
+.qf32-summary .table-wrap{margin:18px 0}.qf32-summary caption{text-align:left;font-weight:650;margin-bottom:12px}
+@media(max-width:760px){.qf33-assessment-grid{grid-template-columns:minmax(0,1fr);gap:18px}.qf33-conclusion{padding:12px}.qf32-summary .qf27-action-row .btn{width:100%}}
+
+/* Home establishes the research process without decorative price charts. */
+.qf31-home-hero{grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);align-items:start;gap:40px}
+.qf31-home-main{min-width:0}.qf31-home h1{max-width:19ch;font-size:clamp(32px,3.6vw,50px);line-height:1.12}
+.qf33-home-data{font-size:13px!important;line-height:1.6!important;color:#5a636c;margin-top:20px!important;max-width:65ch}
+.qf33-home-proof{background:#f2f3f4;border:1px solid #d8dce0;border-radius:12px;padding:26px;min-width:0}
+.qf33-home-proof h2{font-size:26px;line-height:1.2;margin:10px 0 24px}.qf33-home-proof ol{padding-left:22px;margin:0 0 22px}
+.qf33-home-proof li{padding:0 0 18px 6px}.qf33-home-proof li:last-child{padding-bottom:0}
+.qf33-home-proof strong,.qf33-home-proof li span{display:block}.qf33-home-proof li span{font-size:14px;line-height:1.6;color:#56616b;margin-top:6px}
+.qf33-home-proof a,.qf33-text-action{font-size:14px;line-height:1.6;font-weight:650;color:#303a43;text-underline-offset:4px}
+.qf33-text-action{display:block;background:none;border:0;text-decoration:underline;text-align:left;padding:12px 0 0;cursor:pointer;min-height:44px}
+.qf33-home-route{border:0;background:none;color:#28313a;display:flex;align-items:center;justify-content:space-between;width:100%;min-height:44px;padding:0;cursor:pointer;text-align:left;gap:10px}
+.qf31-home-steps .qf33-home-route span{font-size:19px}.qf31-home-steps>div{padding-top:12px}.qf31-home-steps>div>span{font-size:14px;line-height:1.65}
+.qf-c22-metric strong,.qf-v20-kpis strong,.qf27-account-kpis strong{font-variant-numeric:tabular-nums}
+@media(max-width:1100px){.qf31-home-hero{grid-template-columns:minmax(0,1fr)}.qf33-home-proof{padding:22px}.qf33-home-proof ol{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}}
+@media(max-width:680px){.qf33-home-proof ol{display:block}.qf33-home-proof{padding:20px}.qf31-home h1{max-width:18ch}.qf31-home-hero{gap:28px}.qf33-home-route{font-size:16px}}
+
+.qf-v20-findings #qf-v20-analyze[hidden]{display:none!important}
+#qf-release-availability[hidden]{display:none!important}
+
+.qf33-evidence-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 20px}.qf33-evidence-tabs[hidden],#qf33-evidence-details[hidden],#qf32-summary[hidden]{display:none!important}
+.qf33-evidence-tabs button{font:inherit;font-weight:650;min-height:44px;background:#fff;border:1px solid #c5cdd5;border-radius:8px;padding:10px 16px;cursor:pointer;color:#303b46}
+.qf33-evidence-tabs button[aria-selected=true]{background:#29313a;color:#fff;border-color:#29313a}
+#qf33-evidence-details .qf-v20-findings{margin-bottom:24px}

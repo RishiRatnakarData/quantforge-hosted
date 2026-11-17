@@ -31,6 +31,8 @@ from cloud import (
     asset_directory,
     crypto_history,
     news_intelligence_v180,
+    paper_accounting,
+    release_identity,
     sec_fundamentals,
     valuation_market_v73,
 )
@@ -130,6 +132,14 @@ PUBLIC_ERROR_CODES.update({
 
 @app.exception_handler(HTTPException)
 async def public_http_error(_request: Request, exc: HTTPException):
+    if isinstance(exc.detail, dict) and exc.detail.get("code") == "quote_stale":
+        info = exc.detail.get("observation", {})
+        return JSONResponse({
+            "detail": "The available observation is too old for a virtual transaction.",
+            "code": "quote_stale",
+            "observation": {key: info.get(key) for key in
+                            ("observed_at", "age_seconds", "max_age_seconds", "source")},
+        }, status_code=exc.status_code)
     body = {"detail": exc.detail}
     if isinstance(exc.detail, str) and exc.detail in PUBLIC_ERROR_CODES:
         body["code"] = PUBLIC_ERROR_CODES[exc.detail]
@@ -142,7 +152,7 @@ async def desk_error_handler(_request: Request, exc: DeskError):
 
 @app.get("/api/health")
 def health():
-    revision = os.getenv("RENDER_GIT_COMMIT", "")
+    revision = release_identity.revision()
     return {"status": "ok", "mode": "single-owner-hosted", "paper_only": True,
             "api_contract": "shared-research-v25",
             "revision": revision if re.fullmatch(r"[0-9a-f]{40}", revision) else "not-reported"}
@@ -416,7 +426,8 @@ def logout(request: Request, response: Response):
 
 def default_state():
     return {"cash": 10000.0, "holdings": {}, "cost_basis": {}, "trades": [],
-            "watchlist": [], "notes": [], "initial_cash": 10000.0}
+            "watchlist": [], "notes": [], "initial_cash": 10000.0,
+            "basis_accounting": paper_accounting.initial_book()}
 
 
 def read_state(uid: str, token: str) -> tuple[dict, int]:
@@ -517,7 +528,14 @@ def trade_terms(current: dict, data: TradeRequest, observation: dict) -> dict:
     sym = data.symbol.strip().upper()
     if not SYMBOL_RE.fullmatch(sym) or data.side not in ("buy", "sell"):
         raise HTTPException(422, "Invalid trade.")
-    q = valid_quote(observation, require_fresh=True)
+    q = valid_quote(observation, require_fresh=False)
+    if not q["fresh_for_paper"]:
+        raise HTTPException(422, {
+            "code": "quote_stale",
+            "observation": {"observed_at": q["timestamp"], "age_seconds": q["age_seconds"],
+                            "max_age_seconds": q["max_age_seconds"],
+                            "source": str(q.get("venue") or "Provider not specified")[:100]},
+        })
     if q["symbol"] != sym:
         raise HTTPException(422, "Market observation did not match the chosen investment.")
     amount = money(data.amount, "trade amount")
@@ -549,11 +567,14 @@ def trade_terms(current: dict, data: TradeRequest, observation: dict) -> dict:
         fee = cents(gross * FEE_RATE)
         cash_after = cash+gross-fee
         held_after = old-units
-    return {"symbol": sym, "side": data.side, "units": float(units),
+    result = {"symbol": sym, "side": data.side, "units": float(units),
             "gross": float(gross), "fee": float(fee), "price": q["price"],
             "cash_before": float(cash), "cash_after": float(cents(cash_after)),
             "cash_impact": float(cents(cash_after-cash)), "held_after": float(held_after),
             "venue": q["venue"], "observed_at": q["timestamp"], "paper_only": True}
+    effect = paper_accounting.accounting_effect(current, result)
+    result.update({key: effect[key] for key in ("cost_basis_allocated", "realized_pnl")})
+    return result
 
 
 @app.post("/api/private/trade-preview")
@@ -585,12 +606,13 @@ def trade(data: TradeRequest, request: Request, response: Response):
     if not SYMBOL_RE.fullmatch(sym) or data.side not in ("buy", "sell"):
         raise HTTPException(422, "Invalid investment or transaction side.")
     terms = trade_terms(current, data, quote(sym))
+    current["basis_accounting"] = paper_accounting.accounting_effect(current, terms)["accounting"]
     if terms["held_after"]:
         current["holdings"][sym] = terms["held_after"]
     else:
         current["holdings"].pop(sym, None)
     current["cash"] = terms["cash_after"]
-    receipt = {k: terms[k] for k in ("symbol", "side", "units", "price", "fee", "gross", "cash_impact", "venue", "observed_at")}
+    receipt = {k: terms[k] for k in ("symbol", "side", "units", "price", "fee", "gross", "cash_impact", "venue", "observed_at", "cost_basis_allocated", "realized_pnl")}
     receipt.update({"at": dt.datetime.now(dt.UTC).isoformat(), "request_id": data.request_id, "request_amount": data.amount})
     current["trades"] = ([receipt] + current.get("trades", []))[:80]
     save_state(uid, token, current, version)

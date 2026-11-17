@@ -79,6 +79,11 @@ async def main():
                             await check("explore-" + finance)
                     else:
                         await check("explore-" + view)
+                        if view == "brief" and private:
+                            await page.locator('#qf33-evidence-tab').click()
+                            await check("explore-supporting-evidence")
+                            await page.locator('#qf33-assessment-tab').click()
+
                 await page.locator('#qf-v20-navigation [data-page="compare"]').click()
                 await pick_compare(page, "AAPL")
                 await page.locator("#qf-v20-compare-run").click()

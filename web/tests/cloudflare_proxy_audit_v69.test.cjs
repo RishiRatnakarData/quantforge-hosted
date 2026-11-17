@@ -174,3 +174,18 @@ test('unmarked hosting rate limits respect provider waits without replaying requ
   assert.equal(r.headers.get('X-QF-Readiness'),'upstream-rate-limit');
  }
 });
+
+test('only the two reviewed provider origins are accepted, never arbitrary hosting tenants', async () => {
+ const {onRequest}=await modulePromise;const original=globalThis.fetch;let calls=0;
+ globalThis.fetch=async()=>{calls++;return new Response('{"status":"ok"}',{headers:{'content-type':'application/json'}});};
+ try {
+  for(const origin of ['https://quantforge-private-api.onrender.com','https://quantforge-api-recovery.vercel.app',' https://quantforge-api-recovery.vercel.app/ ']){
+   const r=await onRequest({request:new Request('https://quantforge-648.pages.dev/api/health'),env:{...env,PRIVATE_API_ORIGIN:origin}});assert.equal(r.status,200);
+  }
+  assert.equal(calls,3);
+  for(const origin of ['https://other.vercel.app','https://other.onrender.com','https://quantforge-api-recovery.vercel.app.evil.test','http://quantforge-api-recovery.vercel.app','https://user@quantforge-api-recovery.vercel.app','https://quantforge-api-recovery.vercel.app:443','https://quantforge-api-recovery.vercel.app/path','https://quantforge-api-recovery.vercel.app?x=1']){
+   const r=await onRequest({request:new Request('https://quantforge-648.pages.dev/api/health'),env:{...env,PRIVATE_API_ORIGIN:origin}});assert.equal(r.status,503);
+  }
+  assert.equal(calls,3);
+ } finally {globalThis.fetch=original;}
+});

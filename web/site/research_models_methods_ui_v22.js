@@ -29,7 +29,7 @@ function modelData(ctx){
  const id=[ctx.symbol,ctx.origin,ctx.prices?.length||0,ctx.prices?.[0]?.date||'',ctx.prices?.at(-1)?.date||''].join('|');
  if(stamp===id&&cached)return cached;
  stamp=id;cached={};
- cached.risk=ctx.prices&&ctx.prices.length?C.risk(ctx.prices):{ready:false,reason:'No authorized or clearly labeled illustrative historical price series is loaded.'};
+ cached.risk=ctx.prices&&ctx.prices.length?C.risk(ctx.prices,ctx.symbol.includes('/')?365:252):{ready:false,reason:'No authorized or clearly labeled illustrative historical price series is loaded.'};
  cached.valuation=C.valuation(ctx.financial);
  cached.strategy=ctx.prices&&ctx.prices.length?C.strategy(ctx.prices):{ready:false,reason:'No eligible price history is loaded.'};
  if(ctx.prices?.length){
@@ -54,13 +54,13 @@ function prediction(ctx,models){
 }
 function risk(ctx,models){
  const r=models.risk;if(!r.ready)return outputUnavailable(r.reason);
- const m=metrics([['Realized annualized volatility',percent(r.annual_volatility),'Daily price-only returns × √252'],['Maximum drawdown',percent(r.max_drawdown),'Historical peak to trough'],['1-day VaR (95%)',percent(r.daily_var95_loss),'Observed 5th-percentile loss'],['1-day Expected Shortfall',percent(r.daily_es95_loss),'Average of observed worst 5% tail']]);
+ const m=metrics([['Realized annualized volatility',percent(r.annual_volatility),'Sample daily deviation × √'+r.sessions_per_year],['Maximum drawdown',percent(r.max_drawdown),'Historical peak to trough'],['1-day VaR (95%)',percent(r.daily_var95_loss),'Observed 5th-percentile loss'],['1-day Expected Shortfall',percent(r.daily_es95_loss),'Average of observed worst 5% tail']]);
  if(phase==='results')return header(ctx,r.first+' to '+r.last)+m+'<section class="pane"><h2>60-session rolling volatility</h2>'+line(r.rolling.map(x=>x.volatility),r.rolling.map(x=>x.date),'Rolling annualized historical volatility')+'<p class="tiny">Historical close-to-close variation; no projected future risk band.</p></section>';
  if(phase==='evaluation')return header(ctx,r.observations+' observed daily returns')+'<section class="pane"><h2>Historical stability and uncertainty</h2>'+
   metrics([['Earlier half volatility',percent(r.split_volatility[0])],['Later half volatility',percent(r.split_volatility[1])],['Worst observed day',percent(r.worst_day)],['Positive-return sessions',percent(r.positive_share)]])+
   (r.bootstrap?'<p>Moving-block bootstrap (300 deterministic resamples, '+r.bootstrap.block_length+'-session blocks): '+percent(r.bootstrap.low)+' to '+percent(r.bootstrap.high)+' for realized annualized volatility <strong>sample sensitivity</strong>.</p>':'<p>Moving-block bootstrap withheld: fewer than 180 daily returns.</p>')+
   '<p class="tiny">Blocks preserve some local dependence, but stationary-block assumptions and short windows can still fail. These bounds are not calibrated future volatility, VaR, or portfolio return intervals.</p></section>';
- return '<section class="pane"><h2>How risk is measured</h2><p>Simple daily return = close(t) / close(t−1) − 1. Volatility is the sample standard deviation × √252. Historical 95% VaR is the nonnegative loss at the 5th percentile; Expected Shortfall averages returns at or below that cutoff. Maximum drawdown is the most negative close / preceding peak − 1.</p><p>All estimates depend on dates, adjustment convention, sample and future market behavior. Market benchmark/factor regression remains in Portfolio Analysis and the retained private research engines where aligned sources permit.</p><p>'+source('web/site/research_models_core_v22.js','Risk implementation')+' · '+source('web/tests/research_models_core_v22.test.cjs','Numerical tests')+'</p></section>';
+ return '<section class="pane"><h2>How risk is measured</h2><p>Simple daily return = close(t) / close(t−1) − 1. Volatility is the sample standard deviation × √'+r.sessions_per_year+'. Historical 95% VaR is the nonnegative loss at the 5th percentile; Expected Shortfall averages returns at or below that cutoff. Maximum drawdown is the most negative close / preceding peak − 1.</p><p>All estimates depend on dates, adjustment convention, sample and future market behavior. Market benchmark/factor regression remains in Portfolio Analysis and the retained private research engines where aligned sources permit.</p><p>'+source('web/site/research_models_core_v22.js','Risk implementation')+' · '+source('web/tests/research_models_core_v22.test.cjs','Numerical tests')+'</p></section>';
 }
 function valuation(ctx,models){
  const v=models.valuation,real=v.scenarios.filter(s=>s.ready);

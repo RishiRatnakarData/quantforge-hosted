@@ -32,3 +32,7 @@ build/
 .dev.vars
 **/.dev.vars
 *.env.local
+
+# Local provider linkage, account cache and deployment state
+.wrangler/
+.vercel/

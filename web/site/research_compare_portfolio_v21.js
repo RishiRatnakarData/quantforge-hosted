@@ -178,8 +178,15 @@ function ownerSnapshot(portfolio,quotes,nowIso){
   return {symbol:s,units:q,price:quote.price,market_value:q*quote.price,timestamp:quote.timestamp};
  });
  const holdingsValue=valued.reduce((v,r)=>v+r.market_value,0),totalValue=cash+holdingsValue;
+ const book=portfolio.basis_accounting,validBook=book?.version===1;
+ let basisComplete=validBook,totalBasis=0;
+ for(const row of valued){const basis=book?.positions?.[row.symbol];const valid=validBook&&isFiniteNumber(basis?.units)&&Math.abs(basis.units-row.units)<=1e-9&&isFiniteNumber(basis?.total_basis)&&basis.total_basis>=0;row.total_basis=valid?basis.total_basis:null;row.unrealized_pnl=valid?row.market_value-basis.total_basis:null;if(valid)totalBasis+=basis.total_basis;else basisComplete=false;}
+ const realized=validBook&&isFiniteNumber(book.realized_pnl)?book.realized_pnl:null;
+
  return {cash,net_contributions:capital,total_value:totalValue,holdings_value:holdingsValue,
   cumulative_paper_pnl:totalValue-capital,quotes:valued,
+  unrealized_pnl:basisComplete?holdingsValue-totalBasis:null,
+  realized_pnl:realized,realized_complete:validBook&&book.realized_complete===true,
   note:'Indicative mark-to-last-available authorized trade. Net contributions include recorded deposits/withdrawals; cumulative paper P&L is NOT time-weighted or money-weighted return. Asynchronous/after-hours prices, fees, trade history limits and tax treatment may affect interpretation.'};
 }
 root.QFResearchB21=Object.freeze({requireUniverse,align,fromBatch,compare,histogram,validWeights,suggestedWeights,concentration,scenario,minimumVariance,projectCapped,ownerSnapshot});

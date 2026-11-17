@@ -20,9 +20,10 @@ function chartWindow(points,days){
  const cutoff=new Date(end-days*86400000).toISOString().slice(0,10);
  return points.filter(x=>x.date>=cutoff);
 }
-function priceStatistics(points){
+function priceStatistics(points,sessionsPerYear=252){
+ if(![252,365].includes(sessionsPerYear))throw Error('Unsupported observation calendar.');
  const p=priceSeries(points);
- if(p.length<15)return null;
+ if(p.length<15||sessionsPerYear===365&&p.some((v,i)=>i>0&&Date.parse(v.date)-Date.parse(p[i-1].date)!==86400000))return null;
  let peak=p[0].close, drawdown=0;
  const returns=[];
  for(let i=1;i<p.length;i++){
@@ -33,8 +34,8 @@ function priceStatistics(points){
  const mean=returns.reduce((a,b)=>a+b,0)/returns.length;
  const variance=returns.reduce((a,b)=>a+(b-mean)**2,0)/(returns.length-1);
  return {sessions:p.length,first:p[0].date,last:p[p.length-1].date,
-  change:p[p.length-1].close/p[0].close-1,annual_volatility:Math.sqrt(variance*252),max_drawdown:drawdown,
-  convention:'Consecutive close-to-close log returns; 252-session annualization. Price-only, excluding dividends and fees.'};
+  change:p[p.length-1].close/p[0].close-1,annual_volatility:Math.sqrt(variance*sessionsPerYear),max_drawdown:drawdown,
+  sessions_per_year:sessionsPerYear,convention:'Consecutive close-to-close log returns; '+sessionsPerYear+'-observation annualization. Price-only, excluding dividends and fees.'};
 }
 // Product interaction fixture: stable across refreshes; NEVER an actual company price.
 function syntheticPrice(symbol){
@@ -89,7 +90,7 @@ function researchResult(financial,prices,priceSource){
  const findings=financial.findings.slice();const evidence=financial.evidence.slice();const limitations=financial.limitations.slice();
  let price=null;
  if(priceSource?.type==='market'&&Array.isArray(prices)){
-  price=priceStatistics(prices);
+  price=priceStatistics(prices,String(financial.symbol||'').includes('/')?365:252);
   if(price){evidence.push({id:'market:drawdown',kind:'derived',metric:'max_drawdown',value:price.max_drawdown,unit:'fraction',period:{first:price.first,last:price.last}});
    evidence.push({id:'market:volatility',kind:'derived',metric:'annual_volatility',value:price.annual_volatility,unit:'fraction',period:{first:price.first,last:price.last}});
    findings.push({kind:'caution',text:`On ${price.sessions} observed sessions, maximum price drawdown was ${(100*price.max_drawdown).toFixed(1)}% and annualized close-return volatility ${(100*price.annual_volatility).toFixed(1)}%. Neither predicts future loss.`,evidence_ids:['market:drawdown','market:volatility']});

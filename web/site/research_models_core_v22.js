@@ -18,12 +18,14 @@ function series(points){
 }
 function returns(points){const p=series(points);return p.slice(1).map((r,i)=>r.close/p[i].close-1);}
 function drawdown(levels){let peak=levels[0],lowest=0;for(const p of levels){peak=Math.max(peak,p);lowest=Math.min(lowest,p/peak-1);}return lowest;}
-function risk(points){
+function risk(points,sessionsPerYear=252){
+ if(![252,365].includes(sessionsPerYear))throw Error('Unsupported observation calendar.');
  const p=series(points);if(p.length<91)return {ready:false,reason:'Risk needs at least 91 consecutive eligible dated closes; no replacement data are used.'};
+ if(sessionsPerYear===365&&p.some((v,i)=>i>0&&Date.parse(v.date)-Date.parse(p[i-1].date)!==86400000))return {ready:false,reason:'Crypto annualization requires consecutive daily observations; calendar gaps are not filled.'};
  const r=returns(p),sorted=[...r].sort((a,b)=>a-b),cut=percentile(sorted,0.05),tail=sorted.filter(x=>x<=cut+1e-12);
- const rolling=[];for(let end=60;end<=r.length;end+=5){const window=r.slice(end-60,end);rolling.push({date:p[end].date,volatility:Math.sqrt(variance(window)*252)});}
+ const rolling=[];for(let end=60;end<=r.length;end+=5){const window=r.slice(end-60,end);rolling.push({date:p[end].date,volatility:Math.sqrt(variance(window)*sessionsPerYear)});}
  const halves=[r.slice(0,Math.floor(r.length/2)),r.slice(Math.floor(r.length/2))];
- const historyVol=Math.sqrt(variance(r)*252);
+ const historyVol=Math.sqrt(variance(r)*sessionsPerYear);
  // A deterministic circular moving-block bootstrap estimates sample-volatility sensitivity.
  // The interval is NOT a predictive VaR bound or confidence band on future returns.
  let bootstrap=null;
@@ -32,7 +34,7 @@ function risk(points){
   const block=Math.max(5,Math.ceil(Math.sqrt(r.length))),draws=[];
   for(let rep=0;rep<300;rep++){
    const draw=[];while(draw.length<r.length){const at=Math.floor(rand()*r.length);for(let k=0;k<block&&draw.length<r.length;k++)draw.push(r[(at+k)%r.length]);}
-   draws.push(Math.sqrt(variance(draw)*252));
+   draws.push(Math.sqrt(variance(draw)*sessionsPerYear));
   }
   draws.sort((a,b)=>a-b);
   bootstrap={low:percentile(draws,0.025),high:percentile(draws,0.975),replicates:300,block_length:block,scope:'Historical realized-volatility sample sensitivity; not a calibrated future volatility interval.'};
@@ -41,8 +43,8 @@ function risk(points){
   annual_volatility:historyVol,max_drawdown:drawdown(p.map(x=>x.close)),
   daily_var95_loss:Math.max(0,-cut),daily_es95_loss:Math.max(0,-avg(tail)),
   worst_day:Math.min(...r),positive_share:r.filter(v=>v>0).length/r.length,
-  rolling,split_volatility:halves.map(h=>Math.sqrt(variance(h)*252)),bootstrap,
-  convention:'Close-to-close simple daily returns; 252 US equity sessions/year. Historical 5th percentile loss and tail-average loss over ONE session. No dividends, fees or prediction.'};
+  rolling,split_volatility:halves.map(h=>Math.sqrt(variance(h)*sessionsPerYear)),bootstrap,
+  sessions_per_year:sessionsPerYear,convention:'Close-to-close simple daily returns; '+sessionsPerYear+' observations/year on the stated calendar. Historical 5th percentile loss and tail-average loss over ONE session. No dividends, fees or prediction.'};
 }
 function dcfProxy(financial,assumptions={}){
  const a=Number(assumptions.growth??0.04),d=Number(assumptions.discount??0.10),t=Number(assumptions.terminal??0.02),h=5;

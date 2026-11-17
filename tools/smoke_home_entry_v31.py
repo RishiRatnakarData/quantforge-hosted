@@ -27,7 +27,7 @@ async def visit(browser,width):
     assert await page.locator('#qf-v23-landing').is_visible(),(diagnostic,errors[:4])
     assert await page.locator('#qf-v23-explore-content').is_hidden()
     assert await page.locator('#qf-v23-landing svg, #qf31-home-chart').count()==0
-    assert await page.locator('.qf31-home-steps>div').count()==5
+    assert await page.locator('.qf31-home-steps button[data-qf33-home]').count()==5
     assert await page.evaluate('document.documentElement.scrollWidth<=innerWidth')
     await page.screenshot(path=str(OUT/f'home-{width}.png'),full_page=True)
     await page.locator('#qf24-home-search').fill('Microsoft')
