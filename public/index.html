@@ -782,6 +782,9 @@ body.qf31-home-active #qf28-mobile-credit{display:none!important}
 
 .qf34-shortlist h3,.qf34-priorities h3{font-size:17px;line-height:1.45}
 
+/* Column actions must not inherit the shared 170px horizontal flex basis. */
+.qf33-home-proof .qf27-action-row>*{flex:0 0 auto;min-height:44px;display:inline-flex;align-items:center}
+
 
 /* V9 private operating system: public site remains visually unchanged. */
 #private-signed .qf-v9-shell h2{margin:8px 0 10px;font-size:24px}

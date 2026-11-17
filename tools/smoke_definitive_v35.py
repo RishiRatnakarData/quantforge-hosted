@@ -55,7 +55,11 @@ async def private_journey(browser, engine, width):
     await page.evaluate('(symbol)=>window.qf35Failed=symbol', picks[1])
     await page.evaluate('(symbol)=>window.qf35Partial=symbol', picks[0])
     await page.locator('#qf35-analyze-shortlist').dblclick()
-    await page.wait_for_function("() => document.querySelectorAll('.qf35-result').length===3&&[...document.querySelectorAll('.qf35-result')].every(e=>/Completed|Incomplete|Failed/.test(e.textContent))")
+    try:
+        await page.wait_for_function("() => document.querySelectorAll('.qf35-result').length===3&&[...document.querySelectorAll('.qf35-result')].every(e=>/Completed|Incomplete|Failed/.test(e.textContent))", timeout=90000)
+    except Exception:
+        print(engine, width, 'isolated fixture timeout diagnostics', await page.locator('.qf35-result').all_text_contents(), errors, flush=True)
+        raise
     await expect(page.locator('#qf35-analyze-shortlist')).to_be_enabled(timeout=60000)
     states = await page.locator('.qf35-result').all_text_contents()
     assert len(states) == 3

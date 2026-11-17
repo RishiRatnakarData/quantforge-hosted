@@ -23,3 +23,6 @@
 .qf35-selection input{accent-color:#37474f}.qf34-briefing #qf35-filters{margin-bottom:1rem}.qf34-briefing #qf34-reviewed article{padding:.65rem 0;border-bottom:1px solid #d5dce1}
 
 .qf34-shortlist h3,.qf34-priorities h3{font-size:17px;line-height:1.45}
+
+/* Column actions must not inherit the shared 170px horizontal flex basis. */
+.qf33-home-proof .qf27-action-row>*{flex:0 0 auto;min-height:44px;display:inline-flex;align-items:center}
