@@ -120,3 +120,13 @@ Headline NLP describes covered text with source/topic/tone limitations. A lexica
 - What evidence would be needed before calling this a complete valuation, suitability or profitable trading system?
 
 Good answers identify an implementation, a test and a remaining limitation. They do not replace missing empirical evidence with stronger wording.
+
+## Explain bounded research orchestration
+
+Demonstrate the Public five-minute flow first. In an isolated Private fixture, select three financial-screen matches and run Analyze shortlisted companies. Explain why a positive annual business filter does not yet establish valuation, downside or portfolio fit. Point to each study's dates, coverage and opposing evidence; demonstrate a single-company failure preserving the others. Open full research and expand detailed evidence. Do not show real owner records to an employer.
+
+The central design decision is one assessment authority: batch and individual orchestration build the same evidence contract and invoke Decision34. Sequential work bounds provider load; generation/version checks prevent stale results crossing account, mode or universe transitions. Session results are not saved owner recommendations. Tests exercise partial failures, timeout, repeat clicks and late responses without accessing real accounts.
+
+Defend the annual earnings multiple precisely: price × dated instant common shares / positive compatible annual net income. It is neither diluted-EPS P/E nor a fair stock-price estimate. Missing TTM quarters and missing enterprise claims are shown explicitly. Distinguish implemented hosted classifier/risk/valuation analyses from retained offline GARCH, options, forecasting, NLP and optimization. No market-beating claim follows from passing engineering tests.
+
+A concrete UI engineering regression is a chart calculated in a transient 1-pixel pane: its old 210-pixel SVG grew to roughly 1,393 pixels tall after reopening. A safe fallback plus visible-width observation redraws from current state, preserving the numerical series and avoiding extra provider calls. The rendered regression checks chart bounds, orphan sections and selected-method contrast. For security, explain why a protected authorization rejection clears client evidence immediately, while an upstream 503 must not silently revoke a valid owner session.

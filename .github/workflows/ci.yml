@@ -23,8 +23,10 @@ jobs:
       matrix:
         python-version: ['3.11', '3.12']
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
@@ -99,13 +101,21 @@ jobs:
 
   release_a_browser:
     if: ${{ !inputs.repair_only }}
-    name: Release A-D shared-app browser journeys
+    name: Release A-D shared-app browser journeys (${{ matrix.group }})
     # Playwright 1.57 predates the ubuntu-latest move to 26.04.
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    # The complete suite exceeds one 30-minute runner slot. Each script runs
+    # once across two balanced groups; numerical and security gates stay intact.
+    strategy:
+      fail-fast: false
+      matrix:
+        group: [core, research]
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: '3.12'
       - name: Install offline browser test dependency
@@ -115,45 +125,66 @@ jobs:
       - name: Build generated public site with deterministic CSP
         run: python tools/build_unified_site.py
       - name: Verify desktop, mobile, keyboard, routing and mocked private outage
+        if: ${{ matrix.group == 'core' }}
         run: python tools/smoke_release_a_browser.py
       - name: Verify Release B Compare, Portfolio, owner accounting and provider-failure isolation
+        if: ${{ matrix.group == 'core' }}
         run: python tools/smoke_release_b_browser.py
       - name: Verify Release C Models, Methods, source scope and private gating
+        if: ${{ matrix.group == 'core' }}
         run: python tools/smoke_release_c_browser.py
       - name: Verify unified private shell, mocked MFA, notes, virtual trades and logout
+        if: ${{ matrix.group == 'core' }}
         run: python tools/smoke_release_d_browser.py
       - name: Product rebuild desktop and mobile acceptance
+        if: ${{ matrix.group == 'core' }}
         run: python tools/smoke_rebuild_browser.py
       - name: Completed engines under real CSP in Chromium Firefox WebKit
+        if: ${{ matrix.group == 'core' }}
         run: python tools/smoke_completion_browser.py
       - name: Product picker transactions news and worked-method acceptance
+        if: ${{ matrix.group == 'core' }}
         run: python tools/smoke_product_v27.py
       - name: Final audit account and research workflows in three browsers
+        if: ${{ matrix.group == 'core' }}
         env:
           QF_FINAL_WIDTHS: 320,390,768,1024,1440
         run: python tools/smoke_final24_browser.py
       - name: Independent quality, keyboard, reload and context-race regressions
+        if: ${{ matrix.group == 'core' }}
         run: python tools/smoke_quality_browser.py
       - name: All named views and component readability at five widths and zoom reflow
+        if: ${{ matrix.group == 'research' }}
         run: python tools/smoke_final24_layout.py
 
       - name: Guided research health and append-only thesis workflows
+        if: ${{ matrix.group == 'research' }}
         run: python tools/smoke_guided_research.py
       - name: Private transient startup recovery and unauthorized non-retry
+        if: ${{ matrix.group == 'research' }}
         run: python tools/smoke_private_recovery_v31.py
       - name: Verified session reload expiry and sign-out races in three browsers
+        if: ${{ matrix.group == 'research' }}
         run: python tools/smoke_session_lifecycle_v31.py
       - name: Fresh HTTPS Home and company search at five widths
+        if: ${{ matrix.group == 'research' }}
         run: python tools/smoke_home_entry_v31.py
 
       - name: Readiness before credentials and final Home research workflows
+        if: ${{ matrix.group == 'research' }}
         run: python tools/smoke_final_release32.py
 
       - name: Integrated assessment and safe stale-preview acceptance
+        if: ${{ matrix.group == 'research' }}
         run: python tools/smoke_master_quality_v33.py
 
       - name: Owner briefing universe comparability and current-assessment acceptance
+        if: ${{ matrix.group == 'research' }}
         run: python tools/smoke_consolidation_v34.py
+
+      - name: Bounded batch research and source-isolation acceptance
+        if: ${{ matrix.group == 'research' }}
+        run: python tools/smoke_definitive_v35.py
 
   readiness_repair:
     name: Focused readiness and security validation
@@ -163,8 +194,10 @@ jobs:
     env:
       PYTHONPATH: src
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: '3.12'
       - name: Install hosted security test dependencies

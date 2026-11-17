@@ -48,6 +48,7 @@ async def run():
                 await page.screenshot(
                     path=str(OUT / f"{engine}-{width}-briefing.png"), full_page=True
                 )
+                await page.locator('#qf35-assumptions > summary').click()
                 await page.locator('[data-qf34-rule="maxWeight"]').fill("15")
                 await page.locator('#qf34-rules button[type="submit"]').click()
                 assert await page.evaluate("QFWorkspace34.rules().maxWeight") == 0.15

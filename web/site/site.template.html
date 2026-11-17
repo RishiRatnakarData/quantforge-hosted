@@ -613,29 +613,28 @@ body{font-size:15px;line-height:1.6}main{max-width:1600px;width:100%;min-width:0
  <div class="qf31-home-hero">
   <div class="qf31-home-main">
    <p class="qf-v23-label">QUANTFORGE · FINANCIAL RESEARCH</p>
-   <h1 id="qf-v23-landing-title">Research the business. Test the assumptions.</h1>
-   <p class="qf31-home-lead">Start with reported company financials, investigate risk and valuation, then test the implications for a hypothetical portfolio. Every conclusion stays connected to its inputs and limits.</p>
+   <h1 id="qf-v23-landing-title">Financial research, grounded in evidence.</h1>
+   <p class="qf31-home-lead">Explore SEC-reported company financials, compare businesses, evaluate statistical models and test hypothetical portfolio decisions.</p>
    <div class="qf31-home-search">
     <label for="qf24-home-search">Start with a company</label>
     <div class="qf31-home-search-row"><input id="qf24-home-search" type="search" placeholder="Company name or ticker" autocomplete="off"><button type="button" id="qf24-home-find" class="btn primary">Research company</button></div>
     <div id="qf32-home-options"></div><p class="qf31-home-hint">Search a name or ticker. Try Microsoft, Apple or NVIDIA.</p>
    </div>
-   <p class="qf33-home-data">Real SEC financials. Clearly labeled public market simulations. Observed market data requires authorized Private access.</p>
+
   </div>
- <aside class="qf33-home-proof" aria-label="Inspectable research workflow">
-  <p class="qf33-kicker">FOLLOW A RESEARCH QUESTION</p><h2>From a filing to a finding.</h2>
-  <ol><li><strong>Trace the facts</strong><span>Inspect fiscal periods, filing dates and SEC accession records.</span></li><li><strong>Challenge the result</strong><span>Compare model baselines, historical loss and valuation assumptions.</span></li><li><strong>Review the implications</strong><span>Investigate cash generation, concentration and missing evidence.</span></li></ol>
-  <a href="/research-case-study.html">Open the four-company SEC case study →</a>
-  <button type="button" class="qf33-text-action" data-qf33-home="methods">Inspect the methods and engineering →</button>
- </aside>
+
  </div>
 
- <div class="qf31-home-route-intro"><h2>One research process, five connected views.</h2><p>Choose a company once. Carry the question through the evidence.</p></div>
+ <div class="qf31-home-route-intro"><h2>From a company to a research case.</h2></div>
  <div class="qf31-home-steps">
   <div><button class="qf33-home-route" type="button" data-qf33-home="explore"><strong>Understand the business</strong><span aria-hidden="true">↗</span></button><span>Read reported financial trends and trace each observation to its SEC filing.</span></div>
   <div><button class="qf33-home-route" type="button" data-qf33-home="compare"><strong>Compare the evidence</strong><span aria-hidden="true">↗</span></button><span>Investigate compatible peers, cash generation, historical variability and uncertainty.</span></div>
   <div><button class="qf33-home-route" type="button" data-qf33-home="models"><strong>Test your assumptions</strong><span aria-hidden="true">↗</span></button><span>Inspect model baselines, valuation sensitivities and hypothetical portfolio outcomes.</span></div>
  </div>
+ <section class="qf33-home-proof" aria-label="Inspectable research workflow">
+  <h2>Research you can inspect.</h2><p>Genuine SEC financials. Reproducible statistical and fitted ML experiments. Filing lineage, baselines and numerical tests make the reasoning visible.</p>
+  <div class="qf27-action-row"><a href="/research-case-study.html">Open the worked SEC case study →</a><button type="button" class="qf33-text-action" data-qf33-home="methods">Inspect Methods &amp; engineering →</button></div>
+ </section>
  <p class="qf31-home-disclosure">Public research uses authentic SEC financial statements. Market-path demonstrations are explicitly simulated. Signed-in research may show eligible observed market data. QuantForge provides research tools, not investment recommendations.</p>
 </section>
 <div id="qf-v23-explore-content">
@@ -673,14 +672,14 @@ body{font-size:15px;line-height:1.6}main{max-width:1600px;width:100%;min-width:0
  <button type="button" class="btn primary" id="qf-v20-compare-run">Compare</button></div>
  <p id="qf-b21-compare-state" role="status" class="tiny">Choose at least two distinct companies to compare.</p></section>
  <div id="qf-v20-compare-output" aria-live="polite">
+
+ <section class="pane"><div class="qf-b21-inline-head"><div><div class="eyebrow">SEC COMPANY FACTS</div><h2>Company fundamentals</h2></div><button type="button" id="qf-b21-finance-export" class="btn sm" disabled>Export financials</button></div>
+ <p class="tiny">Financial rows are the most recent available annual periods for each issuer. Fiscal dates and accounting comparability differ.</p><div id="qf24-financial-contrast"></div><div class="table-wrap" id="qf-b21-finance-table">Select companies to see SEC metrics.</div><div id="qf24-compare-brief" aria-live="polite"></div></section>
  <section class="pane"><div class="qf-b21-inline-head"><div><div class="eyebrow">SHARED OBSERVATION WINDOW</div><h2>Historical performance</h2><p class="tiny">Each close series starts at an index of 100 on the first shared date; this is price change, not dividend-adjusted total return.</p></div><button class="btn sm" type="button" id="qf-b21-compare-export" disabled>Export aligned data</button></div>
  <div id="qf-b21-compare-chart" class="qf-b21-chart" aria-label="Indexed historical company prices">Compare companies to load this chart.</div>
  <p id="qf-b21-compare-provenance" class="tiny">No real public stock-price feed is claimed.</p></section>
- <section class="pane"><div class="qf-b21-inline-head"><div><div class="eyebrow">SEC COMPANY FACTS</div><h2>Reported financial comparison</h2></div><button type="button" id="qf-b21-finance-export" class="btn sm" disabled>Export financials</button></div>
- <p class="tiny">Financial rows are the most recent available annual periods for each issuer. Fiscal dates and accounting comparability differ.</p><div id="qf24-financial-contrast"></div><div class="table-wrap" id="qf-b21-finance-table">Select companies to see SEC metrics.</div></section>
- <section class="pane" id="qf24-compare-brief" aria-live="polite"></section><div class="qf-b21-two"><section class="pane"><h2>Historical risk &amp; return</h2><div class="table-wrap" id="qf-b21-risk-table">No shared history loaded.</div><div id="qf-b21-risk-scatter" class="qf-b21-chart-sm"></div></section>
- <section class="pane"><h2>Daily return distributions</h2><p class="tiny">Common-dated close-to-close percentage returns; not fitted probability forecasts.</p><div id="qf-b21-distribution" class="qf-b21-chart-sm"></div></section></div>
- <section class="pane"><h2>Correlation of historical daily returns</h2><p class="tiny">Pearson correlation of common-date simple returns; unstable across samples and not a prediction of diversification.</p><div id="qf-b21-correlation" class="qf-b21-heat-wrap">No common return history loaded.</div></section>
+ <section class="pane"><h2>Historical risk</h2><div class="qf-b21-two"><div><h3>Risk and price change</h3><div class="table-wrap" id="qf-b21-risk-table">No shared history loaded.</div><div id="qf-b21-risk-scatter" class="qf-b21-chart-sm"></div></div><div><h3>Daily return distributions</h3><p class="tiny">Common-dated close-to-close percentage returns; not fitted probability forecasts.</p><div id="qf-b21-distribution" class="qf-b21-chart-sm"></div></div></div></section>
+ <section class="pane"><h2>Relationship between investments</h2><p class="tiny">Pearson correlation of common-date simple returns; unstable across samples and not a prediction of diversification.</p><div id="qf-b21-correlation" class="qf-b21-heat-wrap">No common return history loaded.</div></section>
  </div>
 </section>
 <section class="tabpage" id="page-models" aria-labelledby="qf-v20-models-title">

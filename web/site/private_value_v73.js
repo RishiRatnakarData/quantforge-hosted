@@ -29,8 +29,13 @@ function build(company,capital,quote,nowISO){
  const valid=problems.length===0;
  const marketCap=valid?price*shares:null;
  const usableAnnual=annualAge!==null&&annualAge<=550;
- const usableFcf=usableAnnual&&finite(fcf);
- const usableRevenue=usableAnnual&&finite(revenue)&&revenue>0;
+ const sources=fiscal?.sources||{};
+ const sourced=key=>{const s=sources[key];return Boolean(s?.accession&&s?.filed&&dateAge(s.filed,asOf)!==null&&(!s.end||s.end===fiscal.fiscal_end));};
+ const cashCompatible=sourced('operating_cash_flow_usd')&&sourced('capex_usd')&&sources.operating_cash_flow_usd.accession===sources.capex_usd.accession&&(!sources.operating_cash_flow_usd.start||!sources.capex_usd.start||sources.operating_cash_flow_usd.start===sources.capex_usd.start);
+ const usableFcf=usableAnnual&&finite(fcf)&&cashCompatible;
+ const usableRevenue=usableAnnual&&finite(revenue)&&revenue>0&&sourced('revenue_usd');
+ const usableEarnings=usableAnnual&&finite(money.net_income_usd)&&money.net_income_usd>0&&sourced('net_income_usd')&&usableRevenue&&sources.net_income_usd.accession===sources.revenue_usd.accession;
+ const pEarnings=marketCap&&usableEarnings?marketCap/money.net_income_usd:null;
  const yieldFcf=marketCap&&usableFcf?fcf/marketCap:null;
  const pFcf=marketCap&&usableFcf&&fcf>0?marketCap/fcf:null;
  const pSales=marketCap&&usableRevenue?marketCap/revenue:null;
@@ -39,15 +44,15 @@ function build(company,capital,quote,nowISO){
   &&finite(capital.cash?.value)&&balanceAge!==null&&balanceAge<=550;
  const approximateEV=marketCap&&components?marketCap+capital.reportedDebtComponentsTotal-capital.cash.value:null;
  if(!usableAnnual)problems.push('Latest reported annual financials are unavailable or stale.');
- if(!usableFcf)problems.push('Annual SEC operating-cash-flow-minus-capex data are missing.');
+ if(!usableFcf)problems.push('Compatible, same-filing annual operating-cash-flow and capex facts are missing or stale.');
  if(!components)problems.push('Compatible same-filing SEC cash and long-term debt components are incomplete; enterprise approximation is omitted.');
  return {symbol,valid,price:valid?price:null,priceTime:quote.timestamp,venue:quote.venue||'Unspecified',
   shares:valid?shares:null,sharesTime:shareObj?.periodEnd||null,sharesTag:shareObj?.tag||null,
   fiscalEnd:fiscal?.fiscal_end||null,reportedFcf:usableFcf?fcf:null,
-  marketCap,pFcf,fcfYield:yieldFcf,pSales,
+  marketCap,pFcf,fcfYield:yieldFcf,pSales,pEarnings,earningsBasis:'Approximate market capitalization / compatible annual net income. Not diluted-EPS P/E or a price target.',earningsAccession:usableEarnings?sources.net_income_usd.accession:null,
   annualDilutedShares:capital.annualDilutedShares||null,shareBasisDisclosure:capital.shareBasisDisclosure||'Diluted-share evidence is unavailable; instant common shares are not a fully diluted equity bridge.',
   approximateEV,enterpriseComplete:false, // Approximation omits many enterprise claims.
-  source:capital.source,secUrl:capital.sourceUrl,
+  source:capital.source,secUrl:capital.sourceUrl,fullValuationMissing:['Complete unlevered cash-flow forecast','Other borrowing and lease claims','Preferred stock and noncontrolling claims','Noncash investments and other enterprise adjustments','Point-in-time fully diluted equity share count'],ttmStatus:'Unavailable: no verified four-quarter roll-forward is loaded in the annual research contract.',
   warnings:problems,
   limitations:[
    'Market cap approximates point-in-time price times reported common shares, not a fully reconciled diluted equity value.',

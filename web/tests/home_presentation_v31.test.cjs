@@ -28,7 +28,10 @@ test('Home contains direct suggestions and no financial exhibit or chart builder
 test('Investment guide and thesis form are direct, visible sections rather than accordions',()=>{
  const guide=fs.readFileSync(path.join(base,'research_guide_ui_v30.js'),'utf8');
  assert.match(guide,/class="qf30-step"/);
- assert.doesNotMatch(guide,/<details/);
+ const publicGuide=guide.slice(guide.indexOf('function drawGuide()'));
+ assert.doesNotMatch(publicGuide,/<details/);
+ assert.match(guide,/<details id="qf35-company-details">/);
+ assert.doesNotMatch(guide,/<details id="qf35-company-details" open/);
  assert.doesNotMatch(guide,/qf30-more-prompts/);
  assert.match(guide,/id="qf30-thesis-form"/);
 });

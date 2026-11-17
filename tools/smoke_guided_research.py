@@ -42,6 +42,7 @@ async def run():
                 await expect(page.locator('#qf-v20-financial-chart')).to_contain_text('Current ratio')
                 await expect(page.locator('#qf-v20-financial-chart')).to_contain_text('0001193125-26-323660')
                 await page.screenshot(path=str(OUT/f'{engine}-{width}-balance-sheet.png'),full_page=True)
+                await expect(page.locator('#qf-v20-analyze')).to_be_hidden()
                 await page.locator('#qf27-analyze').click()
                 await expect(page.locator('#qf30-guide')).to_contain_text('Separate price from valuation')
                 await expect(page.locator('#qf33-evidence-details .qf-v20-findings')).to_be_visible()

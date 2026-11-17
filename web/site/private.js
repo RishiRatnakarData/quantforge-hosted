@@ -1320,9 +1320,7 @@ async function verifyMFA(){
     await handleAuthState(data,epoch);if(epoch===authEpoch)message('Authenticator verified. Your private workspace is unlocked.');
   }catch(e){if(epoch===authEpoch)message(e.message);}
 }
-async function logout(){
-  if(signingOut)return;
-  signingOut=true;
+function clearPrivateClientState(status='Signed out.'){
   authEpoch++;
   setRememberPrivate(false);if(rememberPrivateBox)rememberPrivateBox.checked=false;
   privateGeneration++;
@@ -1337,7 +1335,12 @@ async function logout(){
   $('private-wf-output').textContent='Load price history in Market data to begin.';$('private-wf-export').disabled=true;walkforwardResult=null;clearV66Walkforward();clearV66Forecast();
   $('private-fc-output').textContent='Load SEC statements for a selected company first.';
   $('private-total').textContent='—';$('private-invested').textContent='—';
-  $('private-cash').textContent='—';$('private-notes').textContent='';valuationCompanies={};$('private-valuation-company').value='';$('private-valuation-selected').textContent='No company selected';message('Signed out.');privateTab('home');
+  $('private-cash').textContent='—';$('private-notes').textContent='';valuationCompanies={};$('private-valuation-company').value='';$('private-valuation-selected').textContent='No company selected';message(status);privateTab('home');
+}
+async function logout(){
+  if(signingOut)return;
+  signingOut=true;
+  clearPrivateClientState();
   // An in-flight sign-in/session response may set cookies. Revoke after it settles.
   sessionNotice('Private content cleared. Completing secure sign-out…');
   try{await Promise.allSettled([...pendingAuthRequests]);await api('auth/logout',{});sessionNotice('');}
@@ -2534,6 +2537,14 @@ $('private-capital-submit').addEventListener('click',changeCapital);
 // Shared UI bridge: use the existing MFA-gated API and versioned state writers.
 // This exposes NO credentials, provider tokens, or bypass of owner() checks.
 window.QFPrivateBridgeV23=Object.freeze({
+ invalidateSession(){
+  if(!privateState&&$('private-signed').hidden)return;
+  // An authorization rejection clears client evidence immediately. This makes
+  // no revocation/write request and does not alter server cookies or records.
+  clearPrivateClientState('Private authorization must be verified again.');
+  sessionNotice('Private authorization could not be verified. Sign in and complete MFA before continuing.');
+  window.dispatchEvent(new Event('qf:owner-auth-ended'));
+ },
  ready:()=>Boolean(privateState&&!$('private-signed').hidden),
  snapshot:()=>privateState&&!$('private-signed').hidden?{
   cash:Number(privateState.cash),initial_cash:Number(privateState.initial_cash),

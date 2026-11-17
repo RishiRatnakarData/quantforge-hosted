@@ -30,6 +30,10 @@ async def visit(browser,width):
     assert await page.locator('.qf31-home-steps button[data-qf33-home]').count()==3
     assert await page.locator('#qf-v20-navigation [data-page]').count()==5
     assert await page.evaluate('document.documentElement.scrollWidth<=innerWidth')
+    actions = await page.locator('.qf33-home-proof .qf27-action-row > *').evaluate_all('(els)=>els.map(e=>{const r=e.getBoundingClientRect();return {height:r.height,top:r.top,bottom:r.bottom};})')
+    assert all(44 <= a['height'] <= 64 for a in actions), (width, actions)
+    if width <= 680:
+        assert actions[1]['top'] - actions[0]['bottom'] <= 28, (width, actions)
     await page.screenshot(path=str(OUT/f'home-{width}.png'),full_page=True)
     await page.locator('#qf24-home-search').fill('Microsoft')
     await page.locator('#qf24-home-find').click()
