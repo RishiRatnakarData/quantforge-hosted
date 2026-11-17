@@ -48,7 +48,8 @@ def _fact(facts: dict, taxonomy: str, tag: str, unit: str, *,
         return None
     _, _, best = max(matches, key=lambda row: (row[0], row[1]))
     return {"value": best["val"], "periodEnd": best["end"], "filed": best["filed"],
-            "tag": tag, "taxonomy": taxonomy, "unit": unit, "form": best["form"]}
+            "tag": tag, "taxonomy": taxonomy, "unit": unit, "form": best["form"],
+            "accession": str(best.get("accn") or "")}
 
 
 def _first(facts: dict, options: list[tuple[str, str, str]], as_of: dt.date,
@@ -59,6 +60,31 @@ def _first(facts: dict, options: list[tuple[str, str, str]], as_of: dt.date,
         if row is not None:
             eligible.append((row["periodEnd"], row["filed"], -order, row))
     return max(eligible, key=lambda entry: entry[:3])[3] if eligible else None
+
+
+def _annual_diluted_shares(facts: dict, as_of: dt.date) -> dict | None:
+    """Annual weighted diluted EPS denominator; never an instant share count."""
+    tag = "WeightedAverageNumberOfDilutedSharesOutstanding"
+    rows = (facts.get("us-gaap") or {}).get(tag, {}).get("units", {}).get("shares", [])
+    eligible = []
+    for row in rows:
+        if not isinstance(row, dict) or row.get("form") not in {"10-K", "10-K/A"}:
+            continue
+        try:
+            start = dt.date.fromisoformat(row["start"])
+            end = dt.date.fromisoformat(row["end"])
+            filed = dt.date.fromisoformat(row["filed"])
+        except (KeyError, TypeError, ValueError):
+            continue
+        value = row.get("val")
+        if (isinstance(value, bool) or not isinstance(value, (int, float))
+                or not math.isfinite(value) or value <= 0 or not 300 <= (end-start).days <= 400
+                or not end <= filed <= as_of or not 0 <= (as_of-end).days <= 550):
+            continue
+        eligible.append({"value": value, "start": start.isoformat(), "periodEnd": end.isoformat(),
+                         "filed": filed.isoformat(), "accession": str(row.get("accn") or ""),
+                         "tag": tag, "unit": "shares", "basis": "annual weighted diluted EPS denominator"})
+    return max(eligible, key=lambda r: (r["periodEnd"], r["filed"])) if eligible else None
 
 
 def extract(raw: Any, *, symbol: str, cik: int, as_of: dt.date) -> dict:
@@ -91,7 +117,9 @@ def extract(raw: Any, *, symbol: str, cik: int, as_of: dt.date) -> dict:
                         end=balance_end) if balance_end else None
     # Deliberately do NOT combine potentially inclusive 'LongTermDebt' with current debt.
     # Short-term borrowing, debt leases, minority interest, investments remain unmodeled.
-    debt = current["value"] + noncurrent["value"] if current and noncurrent else None
+    compatible = bool(cash and current and noncurrent and cash.get("accession")
+                      and cash["accession"] == current.get("accession") == noncurrent.get("accession"))
+    debt = current["value"] + noncurrent["value"] if compatible else None
     return {
         "symbol": symbol, "cik": cik,
         "source": "SEC EDGAR companyfacts (reported instant facts)",
@@ -100,6 +128,11 @@ def extract(raw: Any, *, symbol: str, cik: int, as_of: dt.date) -> dict:
         "currentLongTermDebt": current, "noncurrentLongTermDebt": noncurrent,
         "reportedDebtComponentsTotal": debt,
         "debtCashSamePeriod": bool(cash and current and noncurrent),
+        "debtCashSameFiling": compatible,
+        "annualDilutedShares": _annual_diluted_shares(facts, as_of),
+        "shareBasisDisclosure": ("Instant common shares approximate dated capitalization. Annual weighted diluted shares "
+                                 "are an EPS denominator, not current fully diluted equity shares. Do not substitute "
+                                 "one basis for the other or infer a share-price target."),
         "disclosure": ("Common shares may not reflect every share class or subsequent issuance. "
                        "Balance sheet cash excludes investments. Debt components exclude certain "
                        "borrowings, leases and other enterprise-value adjustments. "

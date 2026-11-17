@@ -33,6 +33,7 @@ from cloud import (
     news_intelligence_v180,
     paper_accounting,
     release_identity,
+    research_universe,
     sec_fundamentals,
     valuation_market_v73,
 )
@@ -483,6 +484,16 @@ def private_assets(request: Request, response: Response,
         return asset_directory.browse(category=category, letter=letter, query=query, page=page)
     except ValueError as exc:
         raise HTTPException(422, str(exc)) from exc
+
+
+@app.get("/api/private/research-universe")
+def private_research_universe(request: Request, response: Response):
+    """Exact owner-only eligible coverage; no price ranking, order or state mutation."""
+    owner(request, response)
+    try:
+        return research_universe.get_universe()
+    except (ValueError, asset_directory.AssetDirectoryError) as exc:
+        raise HTTPException(422, "Eligible research universe unavailable; existing company research remains available.") from exc
 
 
 @app.get("/api/private/valuation-capital")

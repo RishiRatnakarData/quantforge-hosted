@@ -16,7 +16,7 @@ const safeUrl=s=>{try{const u=new URL(s);return u.protocol==='https:'&&u.hostnam
 const state={symbol:bySymbol.has('MSFT')?'MSFT':companies[0].symbol,range:365,finance:'revenue_usd',price:null,priceSource:null,
  privateReady:false,privateMode:false,priceToken:0,runToken:0,benchmark:null,benchmarkOn:false,benchToken:0,
  result:null,compare:[],model:'prediction',loadingPrice:false,compareToken:0,comparison:null,compareSource:null,financeSort:'symbol',financeSortDirection:1,financeCompare:null,portfolioToken:0,ownerToken:0,portfolioData:null,portfolioWeights:null,portfolioBase:null,portfolioKey:null,portfolioOrigin:'',portfolioScenario:null,optimization:null,benchmarkB:null};
-let resultsOpen=false;
+let resultsOpen=false,pendingPrice=Promise.resolve();
 function company(){return bySymbol.get(state.symbol);}
 function mode(){return state.privateMode&&state.privateReady?'private':'public';}
 async function getPrivate(path,signal){
@@ -53,7 +53,7 @@ function selectCompany(symbol){
  $('qf-v20-findings').replaceChildren();$('qf-v20-run-state').textContent='Click Analyze company for an evidence-linked summary.';
  const f=Q.financialSummary(c,data.as_of);
  renderFinances(f);renderSource(f);renderChartEmpty('Preparing chart…');
- setAccount();window.dispatchEvent(new Event('qf:research-context'));loadPrice();
+ setAccount();window.dispatchEvent(new Event('qf:research-context'));pendingPrice=loadPrice();
 }
 function renderChartEmpty(msg){$('qf-v20-chart').textContent=msg;$('qf-v20-price-stats').replaceChildren();$('qf-v20-price-table').replaceChildren();}
 function renderSource(f){
@@ -191,8 +191,10 @@ async function loadBenchmark(){
   state.benchmark=Q.priceSeries(raw.observations);renderPriceData();
  }catch(_){if(token===state.benchToken){state.benchmark=null;renderPriceData();$('qf-v20-chart-source').textContent+=' SPY benchmark unavailable; company closes still shown.';}}
 }
-function analyze(){
- const token=++state.runToken;
+async function analyze(){
+ const token=++state.runToken,selected=state.symbol,kind=mode(),ownerVersion=window.QFPrivateBridgeV23?.snapshot()?.version;
+ if(kind==='private')await pendingPrice;
+ if(token!==state.runToken||selected!==state.symbol||kind!==mode()||ownerVersion!==window.QFPrivateBridgeV23?.snapshot()?.version)return;
  const f=Q.financialSummary(company(),data.as_of);
  const result=Q.researchResult(f,state.price,state.priceSource);
  if(token!==state.runToken)return;
@@ -525,7 +527,7 @@ function init(){
   const range=e.target.closest('[data-qf-range]');if(range){
    const next=range.dataset.qfRange==='ALL'?'ALL':Number(range.dataset.qfRange);
    state.range=next;document.querySelectorAll('[data-qf-range]').forEach(b=>b.classList.toggle('active',b===range));
-   if(mode()==='private'&&(next===730||next==='ALL')&&state.priceSource?.type==='market'&&state.price.length<340)loadPrice();else renderPriceData();return;
+   if(mode()==='private'&&(next===730||next==='ALL')&&state.priceSource?.type==='market'&&state.price.length<340)pendingPrice=loadPrice();else renderPriceData();return;
   }
   const financial=e.target.closest('[data-qf-financial]');if(financial){state.finance=financial.dataset.qfFinancial;renderFinances(Q.financialSummary(company(),data.as_of));return;}
   const rm=e.target.closest('[data-qf-remove]');if(rm){state.compare=state.compare.filter(s=>s!==rm.dataset.qfRemove);invalidateComparison();renderCompareChips();return;}
@@ -575,7 +577,7 @@ window.QFResearch20=Object.freeze({choose:selectCompany,analyze,
   const selected=state.symbol,kind=mode(),token=state.priceToken,universe=state.compare.join(',');
   const market=selected==='SPY'?'VTI':'SPY';
   const ownerAtStart=kind==='private'?window.QFPrivateBridgeV23?.snapshot():null;
-  const heldForStudy=Object.entries(ownerAtStart?.holdings||{}).filter(([,units])=>Number.isFinite(units)&&units>0).map(([symbol])=>symbol).slice(0,3);
+  const heldForStudy=Object.entries(ownerAtStart?.holdings||{}).filter(([symbol,units])=>!symbol.includes('/')&&Number.isFinite(units)&&units>0).map(([symbol])=>symbol).slice(0,3);
   let symbols=scope==='factors'?[selected,market,'IWM','IVE']:scope==='company'?[selected,market,...heldForStudy]:(state.compare.length>=2?state.compare.slice():[selected,market]);
   symbols=[...new Set(symbols)];if(!symbols.includes(selected))symbols=[selected,...symbols].slice(0,5);
   const batch=scope==='valuation'?{aligned:{symbols:[],dates:[],closes:{}},source:'SEC capital and independently dated market quote; no historical price path required',kind:kind==='private'?'market':'synthetic'}:await fetchBatch(symbols,730);

@@ -2,7 +2,9 @@
 
 QuantForge is a financial research and software engineering project built to explore company financials, statistical uncertainty and hypothetical portfolios. It demonstrates applied statistical data science through traceable inputs, retained numerical engines, reproducible evaluation and an authenticated private experience.
 
-[Public application](https://quantforge-648.pages.dev/) · [Current quality candidate and verification](docs/MASTER_QUALITY_CANDIDATE_2026_11_16.md) · [Research methodology](docs/methodology/QUANT_RESEARCH_METHODS.md)
+[Public application](https://quantforge-648.pages.dev/) · [Current product](docs/current/PRODUCT.md) · [Architecture](docs/current/ARCHITECTURE.md) · [Research methodology](docs/current/METHODOLOGY.md) · [Technical interview guide](docs/current/TECHNICAL_INTERVIEW_GUIDE.md) · [Release status](docs/current/RELEASE_STATUS.md)
+
+The seven authoritative current documents are this README and the six documents in [docs/current](docs/current/ARCHITECTURE.md). Start with [Product](docs/current/PRODUCT.md), [Methodology](docs/current/METHODOLOGY.md) and [Deployment/security/rollback](docs/current/DEPLOYMENT_SECURITY_ROLLBACK.md). [Documentation index](docs/README.md) identifies historical development records. Repository visibility remains private; no public-source licensing or market-data redistribution permission is implied.
 
 ## One application, five sections
 
@@ -14,7 +16,7 @@ QuantForge is a financial research and software engineering project built to exp
 | Portfolio | Overview, What If? and Portfolio Analysis; constrained allocations, covariance, Monte Carlo scenarios and authentic recorded virtual-account marks |
 | Methods | Overview, Data, Statistical Methods and Engineering; walkthrough, SEC lineage, visual architecture and seven inspectable technical disciplines with source/test references |
 
-Fresh visitors and the clickable brand open a compact, chart-free Home inside Explore. Its shared name/ticker suggestions select a company directly. Company selection carries across sections. Private company notes belong in Explore; virtual funding, holdings and transactions belong in Portfolio.
+Fresh visitors and the clickable brand open a compact, chart-free Home inside Explore. Its shared name/ticker suggestions select a company directly. Company selection carries across sections. Private opens My Briefing, with Research an Investment and My Portfolio as the three primary tasks. Its financial shortlist discloses exact SEC/provider coverage and source-comparability exclusions; individual assessments apply only explicitly selected conditions. Private company notes belong beside company research; virtual funding, holdings and transactions belong in Portfolio.
 
 ## Honest data modes
 
@@ -75,24 +77,16 @@ python tools/prepublish_check.py
 python tools/smoke_completion_browser.py
 ```
 
-The published baseline `4fc1a46` passed 613 Python / 413 JavaScript tests and candidate/main CI before this improvement assignment. These are historical baseline counts, not claims about an untested candidate. Current release evidence, verification scope and deployment identifiers are recorded in [the release guide](docs/GUIDED_RESEARCH_RELEASE.md) and the external release record for the final SHA. Private automated writes use isolated fixtures; real owner persistence remains separately controlled.
+Local consolidation acceptance passed 651 Python and 466 JavaScript tests, lint/privacy/CSP/determinism checks and all 17 browser scripts. The new workflow matrix uses three engines and five widths with zero fixture-account writes. Exact-head CI and production acceptance remain separate release gates; current evidence is linked from [Release status](docs/current/RELEASE_STATUS.md). Private automated writes elsewhere in retained tests use isolated fixtures; live owner verification is read-only.
 
-## Guided investment research
+## Research and limits
 
-Explore separates reported annual financials, authenticated observed market history, evidence-grounded briefing and private saved research. The guided process connects business understanding, financial performance, valuation assumptions, historical risk, alternatives and a revisitable investment thesis. No score, Buy/Hold/Sell verdict or personal allocation recommendation is generated.
+One current assessment connects compatible annual financials, observed downside, held-out model diagnostics, observed-price ratios and actual virtual exposure. Optional explicit conditions can produce conditional research actions; they do not infer suitability, demonstrate profitable investing or execute a transaction. The universe screen is a disclosed financial filter, with at most five principal candidates and inspectable exclusions. It has no validated whole-market investment advantage.
 
-The balance-sheet exhibit adds cached, source-linked SEC instant facts at covered annual fiscal ends. Ratios require compatible same-accession inputs. Missing concepts remain null; current/noncurrent long-term debt components are not labeled complete total debt. Quarterly/TTM reconstruction, verified fund holdings/fees and a full diluted-share valuation bridge remain outside this release.
+Balance-sheet ratios require compatible filing accessions. Missing concepts remain null. Annual diluted weighted-average EPS shares are distinguished from instant common shares; complete enterprise claims, quarterly/TTM reconstruction, verified fund look-through and full diluted per-share valuation remain unsupported.
 
-Theses use the existing MFA-protected notes store. Revisions append records; original notes and timestamps remain. A full 100-note archive refuses new records instead of silently truncating history. Review dates do not create scheduled reminders.
+Thesis revisions append records and preserve earlier text/timestamps. A full 100-note archive refuses additions rather than silently truncating. Review dates are on-demand prompts, not scheduled alerts. Recorded virtual-account values are owner-requested marks; capital contributions are separate from gains.
 
-News/headline tone has been retired from normal public/private UI and request paths because it demonstrated limited investment decision value. SEC filing provenance remains attached to financial evidence. Experimental NLP implementations and regression fixtures remain in source; the authenticated archival API remains owner-gated for compatibility and is not called by the product.
+Headline NLP is retained as tested archival/offline research, not a current recommendation input or normal product view. The original statistical, ML, optimization, backtesting and NLP engines remain in source. Their execution boundaries are explained in [Methodology](docs/current/METHODOLOGY.md) and the [Interview guide](docs/current/TECHNICAL_INTERVIEW_GUIDE.md).
 
-## Historical engineering evidence
-
-Earlier audit documents describe their stage at the time they were written. The November 10 work and November 12 final-24/quality work were subsequently published in `4fc1a46`; their former “unpublished” labels do not describe current production. Retained records: [24-issue register](docs/FINAL_24_ISSUE_REGISTER.json), [engine parity](docs/FINAL_24_ENGINE_PARITY.md), [quality review](docs/QUALITY_REVIEW_2026_11_12.md).
-
-Private Company briefing automatically synthesizes covered financial evidence, observed downside, existing held-out predictive evaluation and virtual-holding context. Optional tab-local research preferences frame questions without creating suitability scores. Login waits for bounded health readiness before submitting credentials once; it does not replay uncertain logins or account mutations. See [the current release guide](docs/FINAL_RELEASE32.md) for implementation and acceptance boundaries.
-
-Current deployment source and rollback: [Vercel recovery guide](docs/VERCEL_RECOVERY_DEPLOYMENT.md). Historical Render availability documents do not describe the recovered routing.
-
-Candidate goal assessment and remaining limits: [Public versus Private](docs/MASTER_QUALITY_GOAL_ASSESSMENT_2026_11_16.md). [Career evidence and interview demonstration](docs/CAREER_EVIDENCE_2026_11_16.md). Candidate tests and screenshots are local review evidence, not a claim of production publication.
+Historical development records remain in [the documentation index](docs/README.md). Current operations use [Deployment, security and rollback](docs/current/DEPLOYMENT_SECURITY_ROLLBACK.md); older Render or candidate descriptions do not override it. Repository visibility remains private pending a separate authorized decision on history metadata, licensing, provider rights and untrusted preview isolation.

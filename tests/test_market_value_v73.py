@@ -14,7 +14,7 @@ TODAY = dt.date(2026, 10, 27)
 
 def make_raw(shares=7_500_000_000):
     def row(value, end, form="10-K", filed="2026-08-01", start=None):
-        data = {"val": value, "end": end, "form": form, "filed": filed}
+        data = {"val": value, "end": end, "form": form, "filed": filed, "accn": "0000789019-26-000001"}
         if start:
             data["start"] = start
         return data

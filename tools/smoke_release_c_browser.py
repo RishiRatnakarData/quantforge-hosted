@@ -26,7 +26,7 @@ async def public(page, width: int) -> None:
     assert 'Synthetic' in await page.locator('#qf-c22-model-output').inner_text()
     assert 'Brier score' in await page.locator('#qf-c22-model-output').inner_text()
     await page.locator('[data-qf-c22-phase="evaluation"]').click()
-    assert await page.get_by_role('heading',name='Chronological held-out evaluation',exact=True).locator('..').locator('tbody tr').count() == 3
+    assert await page.get_by_role('heading',name='Chronological held-out evaluation',exact=True).locator('..').locator('table').first.locator('tbody tr').count() == 3
     assert 'calibration' in (await page.locator('#qf-c22-model-output').inner_text()).lower()
     await page.locator('[data-qf-c22-phase="method"]').click()
     assert 'L2-regularized' in await page.locator('#qf-c22-model-output').inner_text()

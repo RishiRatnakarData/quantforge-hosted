@@ -1,3 +1,5 @@
+> Historical recovery record. For current operations and verified source identity use [Deployment, security and rollback](current/DEPLOYMENT_SECURITY_ROLLBACK.md) and [Release status](current/RELEASE_STATUS.md).
+
 # Recovered API: source and release boundary
 
 The active API is `https://quantforge-api-recovery.vercel.app`. The Cloudflare proxy accepts exactly this origin and the former named Render origin; arbitrary Vercel/Render tenants, credentials, ports, paths and lookalike hosts are rejected. Changing the configured provider is an explicit deployment operation, not an automatic fallback.

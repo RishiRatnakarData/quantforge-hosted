@@ -152,6 +152,9 @@ jobs:
       - name: Integrated assessment and safe stale-preview acceptance
         run: python tools/smoke_master_quality_v33.py
 
+      - name: Owner briefing universe comparability and current-assessment acceptance
+        run: python tools/smoke_consolidation_v34.py
+
   readiness_repair:
     name: Focused readiness and security validation
     if: ${{ inputs.repair_only }}

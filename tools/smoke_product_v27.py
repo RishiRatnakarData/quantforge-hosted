@@ -110,6 +110,7 @@ async def journey(browser,engine,width):
     await page.locator('#private-password').fill('offline-fixture')
     await page.locator('#private-login-submit').click()
     await expect(page.locator('#qf24-mode-label')).to_contain_text('PRIVATE')
+    await page.locator('#qf34-workspace-nav [data-qf34-workspace="research"]').click()
     await page.evaluate("""() => {
       const original=fetch;let first=true;
       window.fetch=async(url,options={})=>{

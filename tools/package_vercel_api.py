@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RUNTIME_FILES = (
     "cloud/__init__.py", "cloud/api.py", "cloud/paper_accounting.py", "cloud/asset_directory.py",
     "cloud/crypto_history.py", "cloud/news_intelligence_v180.py", "cloud/release_identity.py",
-    "cloud/sec_fundamentals.py", "cloud/valuation_market_v73.py",
+    "cloud/sec_fundamentals.py", "cloud/valuation_market_v73.py", "cloud/research_universe.py",
     "src/quantforge/__init__.py", "src/quantforge/desk/__init__.py",
     "src/quantforge/desk/catalog.py", "src/quantforge/desk/engine.py",
     "src/quantforge/desk/market.py", "src/quantforge/live/__init__.py",

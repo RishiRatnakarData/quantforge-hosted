@@ -122,6 +122,7 @@ async def journey(browser, width):
     await page.wait_for_function('window.QFPrivateBridgeV23.ready()')
     assert 'PRIVATE' in await page.locator('#qf24-mode-label').inner_text()
     assert 'CRYPTO' not in await page.locator('#qf-v20-source-badge').inner_text()
+    await page.locator('#qf34-workspace-nav [data-qf34-workspace="research"]').click()
     await page.locator('#qf-v20-search').fill('Offline')
     await page.locator('#qf-v20-search-results [data-qf27-symbol="TEST"]').click()
     assert 'not covered' in await page.locator('#qf-v20-sector').inner_text()

@@ -5,7 +5,7 @@ const $=id=>document.getElementById(id),safe=x=>String(x??'').replace(/[&<>"']/g
 const pct=x=>Number.isFinite(x)?(100*x).toFixed(1)+'%':'Unavailable',num=x=>Number.isFinite(x)?x.toFixed(3):'Unavailable',usd=x=>Number.isFinite(x)?'$'+x.toLocaleString('en-US',{maximumFractionDigits:2}):'Unavailable';
 const table=(heads,rows)=>'<div class="table-wrap"><table><thead><tr>'+heads.map(h=>'<th scope="col">'+safe(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(v=>'<td>'+safe(v)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
 const bars=(title,rows,fmt=pct)=>root.QFExhibits24.bars(title,rows,fmt);
-let archive=null,factors=null,sequence=0,cache=new Map(),chartSequence=0;const charts=new Map();
+let archive=null,factors=null,sequence=0,cache=new Map(),chartSequence=0;const inFlight=new Map();const charts=new Map();
 function stamp(){const c=root.QFResearch20.context();return [c.symbol,c.mode,c.revision,JSON.stringify(c.universe),JSON.stringify(c.weights)].join('|');}
 function unavailable(r){return '<p class="qf25-unavailable">'+safe(r?.reason||'Eligible evidence is unavailable.')+'</p>';}
 function curve(title,dates,lines){
@@ -36,9 +36,7 @@ function summary(packet){
  const R=packet.results,policy=R.policy;
  let html='<p><strong>'+(packet.origin==='market'?'Private historical observations':'Synthetic market-path experiment')+'</strong> · '+safe(packet.symbol)+'</p>';
  if(R.candidate.ready){const c=R.candidate;html+='<p>Historical downside: maximum drawdown '+pct(c.metrics.maxDrawdown)+', one-day tail-average loss '+pct(c.metrics.dailyES95)+'. These describe the loaded sample.</p>';}
- if(policy.ready){html+='<p>Completed calculations and decision evidence are separate: an engine can run on historical inputs while a current conclusion is withheld by freshness or coverage gates.</p><p>Evidence state: '+safe(policy.review.readiness)+'. '+safe(policy.assessment.reason)+'</p>'+table(['Method','Outcome','Scope'],policy.ledger.map(l=>[l.title,l.status,l.detail]));}
- if(packet.results.unified?.ready)html+=table(['Evidence domain','Status','Reason'],packet.results.unified.domains.map(d=>[d.name||d.key,d.label||d.status,d.detail]));
- if(packet.results.comparative?.ready)html+='<h3>Research-screen sensitivity</h3>'+table(['Assumed risk screen','Evidence state'],packet.results.comparative.policies.rows.map(r=>[r.risk,r.readiness]))+'<p>'+safe(packet.results.comparative.policies.note)+'</p>';
+ if(policy.ready)html+='<p>Specialist calculations below support the current assessment above. Completion of a calculation does not establish current suitability or a validated trading advantage.</p>'+table(['Method','Calculation','Scope'],policy.ledger.map(l=>[l.title,l.status,l.detail]));
  return html+'<p>No automatic trade or suitability decision follows from these screens. Open Models for evaluations and Methods → Data for filing-coverage diagnostics.</p>';
 }
 function strategy(packet){
@@ -58,7 +56,10 @@ function factorResult(packet){
  else html+=unavailable(f)+'<p>Load an optional extracted daily factor CSV in Methods → Data. No upload is required for ETF-proxy analysis.</p>';
  return html;
 }
-function observedValue(packet){const r=packet.results.value;if(!r.ready)return unavailable(r);return table(['Observed quantity','Value','Source period'],[['Market cap (price × shares)',usd(r.marketCap),r.priceTime],['Price / annual revenue',num(r.pSales)+'×',r.fiscalEnd],['FCF-proxy yield',pct(r.fcfYield),r.fiscalEnd],['Reported share count',Number(r.shares).toLocaleString('en-US'),r.sharesTime]])+'<p>'+r.warnings.map(safe).join(' ')+'</p><p>'+r.limitations.map(safe).join(' ')+'</p>'; }
+function observedValue(packet){
+ const r=packet.results.value;if(!r.ready)return unavailable(r);
+ return table(['Observed quantity','Value','Source period'],[['Market cap (price × shares)',usd(r.marketCap),r.priceTime],['Price / annual revenue',num(r.pSales)+'×',r.fiscalEnd],['FCF-proxy yield',pct(r.fcfYield),r.fiscalEnd],['Reported instant common shares',Number(r.shares).toLocaleString('en-US'),r.sharesTime]])+'<h3>Share basis and valuation bridge</h3><p>'+safe(r.shareBasisDisclosure)+'</p><p>Annual diluted weighted-average shares: '+(Number.isFinite(r.annualDilutedShares?.value)?Number(r.annualDilutedShares.value).toLocaleString('en-US')+' · annual period '+safe(r.annualDilutedShares.periodEnd)+' · accession '+safe(r.annualDilutedShares.accession):'Unavailable')+'. This EPS denominator is distinct from instant common shares. A complete diluted equity-value / per-share bridge remains withheld.</p><p>'+r.warnings.map(safe).join(' ')+'</p><p>'+r.limitations.map(safe).join(' ')+'</p>';
+}
 function portfolio(packet){
  const r=packet.results,o=r.optimization,s=r.simulation;
  let html=o.ready?bars('Constrained fitted weights',o.symbols.map((sym,i)=>[sym,o.chosen[i]]))+'<p>Fitted annual volatility '+pct(o.optimized.annualVolatility)+' versus equal weights '+pct(o.equal.annualVolatility)+'. This is an in-sample covariance fit, separate from the rolling evaluation in Models.</p>':unavailable(o);
@@ -76,7 +77,12 @@ function data(packet){
  if(R.integrity.ready)html+=table(['Integrity gate','Status','Evidence'],R.integrity.gates.map(g=>[g.key,g.status,g.detail]));
  return html;
 }
-async function execute(scope){
+function execute(scope){
+ const key=[scope,stamp(),root.QFPrivateBridgeV23?.snapshot()?.version??'public'].join('|');
+ if(inFlight.has(key))return inFlight.get(key);
+ const promise=compute(scope).finally(()=>{if(inFlight.get(key)===promise)inFlight.delete(key);});inFlight.set(key,promise);return promise;
+}
+async function compute(scope){
  const target=$('qf25-'+scope);if(!target)return;
  const token=++sequence,signature=stamp();target.textContent='Loading eligible inputs and running retained research engines…';
  try{
@@ -97,7 +103,7 @@ async function execute(scope){
 
  }catch(_){if(token===sequence&&signature===stamp()&&target.isConnected)target.textContent='Research unavailable for these inputs. Check history coverage or provider access; SEC financials remain independent.';}
 }
-function clear(){sequence++;cache.clear();charts.clear();document.querySelectorAll('.qf25-output').forEach(n=>{if(n.textContent)n.textContent='Research context changed. Run this view again for the current inputs.';});peers();}
+function clear(){sequence++;inFlight.clear();cache.clear();charts.clear();document.querySelectorAll('.qf25-output').forEach(n=>{if(n.textContent)n.textContent='Research context changed. Run this view again for the current inputs.';});peers();}
 function inspectChart(svg,index){const c=charts.get(svg.dataset.qf25Chart);if(!c)return;c.index=Math.max(0,Math.min(c.dates.length-1,index));const cursor=$(svg.dataset.qf25Chart+'-cursor');if(cursor)cursor.textContent=c.dates[c.index]+' · '+c.lines.map(l=>l.name+': '+num(l.values[c.index])).join(' · ');}
 document.addEventListener('pointermove',e=>{const svg=e.target.closest('svg[data-qf25-chart]');if(!svg)return;const c=charts.get(svg.dataset.qf25Chart);if(!c)return;const box=svg.getBoundingClientRect();inspectChart(svg,Math.round((((e.clientX-box.left)/box.width)*c.width-c.left)/(c.right-c.left)*(c.dates.length-1)));});
 document.addEventListener('keydown',e=>{const svg=e.target.closest('svg[data-qf25-chart]'),c=svg&&charts.get(svg.dataset.qf25Chart);if(!c)return;const index=e.key==='ArrowLeft'?c.index-1:e.key==='ArrowRight'?c.index+1:e.key==='Home'?0:e.key==='End'?c.dates.length-1:null;if(index!==null){e.preventDefault();inspectChart(svg,index);}});

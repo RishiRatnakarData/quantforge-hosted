@@ -22,6 +22,7 @@ async def login(page, remember=False):
     await page.locator('#private-password').fill('isolated-fixture')
     await page.locator('#private-login-submit').click()
     await expect(page.locator('#qf24-mode-label')).to_contain_text('PRIVATE')
+    await page.locator('#qf34-workspace-nav [data-qf34-workspace="research"]').click()
 
 async def run():
     OUT.mkdir(parents=True,exist_ok=True)
@@ -84,6 +85,8 @@ async def run():
                 await page.add_init_script(script=init_script)
                 await page.reload()
                 await expect(page.locator('#qf24-mode-label')).to_contain_text('PRIVATE')
+                await expect(page.locator('#qf34-briefing')).to_be_visible()
+                await page.locator('#qf34-workspace-nav [data-qf34-workspace="research"]').click()
                 assert await page.evaluate("localStorage.getItem('qf-restore-verified-private-v1')") == 'yes'
                 await page.locator('[data-qf27-explore="research"]').click()
                 await expect(page.locator('#qf-v23-note-list')).to_contain_text('revision 2')
