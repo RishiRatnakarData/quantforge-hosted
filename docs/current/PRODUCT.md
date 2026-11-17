@@ -25,3 +25,11 @@ Each individually calculated assessment gives one current proposal with supporti
 Observed annual ratios, estimates, scenarios and judgment are distinguished. The valuation display separates instant common shares from annual diluted weighted-average EPS shares; incomplete enterprise claims continue to withhold a full equity/per-share valuation. Model deterioration is described only from adequate chronological held-out evidence; a missing diagnostic is not a positive signal.
 
 Saved thesis revisions and review dates remain genuine persisted records. The briefing reads them without modifying earlier text. Live acceptance is read-only; numerical write and replay tests use isolated fixture accounts.
+
+## Final company-study workflow
+
+My Briefing orders at most three priorities, investment opportunities, a concise virtual portfolio overview and recent research. Financial filters and optional personal research assumptions are disclosures. The batch action accepts one to five shortlist names, defaulting to three, and runs one company at a time. Waiting, Loading evidence, Analyzing, Completed, Incomplete and Failed are distinct states. All-source failure is a failure; missing domains remain incomplete. A company failure does not erase other dated results.
+
+Batch cards give the full company name/ticker, disposition, support, caution, financial/market dates and coverage. Open full research selects the requested name and refreshes its evidence. Its primary assessment shows at most three supporting and three opposing findings, a next question and invalidation conditions. Detailed evidence starts collapsed; public guide steps and the thesis form stay directly accessible. No second recommendation engine or navigation destination is added.
+
+Changing assumptions, eligible universe, owner version, authentication or data mode clears session studies. Cancel prevents late responses from restoring them. Existing owner records are untouched. This is on-demand research, not continuous monitoring or a claim of profitable investment selection.

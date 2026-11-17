@@ -119,7 +119,7 @@ function analyze(history,sym){
   'Held-out Brier error, directional accuracy, or sample size did not clear the conservative baseline screen.';
  return {ready:true,symbol:sym,asOf:dates[n-1],forecastHorizon:H,
   model:'L2-regularized logistic regression',features:['5-session return','20-session return','60-session return','20-session volatility','40-session drawdown'],
-  trainingExamples:train.length,testWindows:tests.length,firstTestDate:tests[0].date,lastTestDate:tests.at(-1).date,
+  trainingFirstDate:dates[train[0].t],lastMaturedTrainingFeatureDate:dates[train.at(-1).t],lastMaturedTrainingOutcomeDate:dates[train.at(-1).t+H],trainingExamples:train.length,testWindows:tests.length,firstTestDate:tests[0].date,lastTestDate:tests.at(-1).date,
   evaluatedAccuracy:modelAccuracy,baselineAccuracy:baseAccuracy,
   evaluatedBrier:modelBrier,baselineBrier:baseBrier,
   testPositiveRate,calibration,diagnostics:diagnostic,validation:{horizon:H,first:tests[0].date,last:tests.at(-1).date,

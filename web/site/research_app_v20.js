@@ -16,7 +16,8 @@ const safeUrl=s=>{try{const u=new URL(s);return u.protocol==='https:'&&u.hostnam
 const state={symbol:bySymbol.has('MSFT')?'MSFT':companies[0].symbol,range:365,finance:'revenue_usd',price:null,priceSource:null,
  privateReady:false,privateMode:false,priceToken:0,runToken:0,benchmark:null,benchmarkOn:false,benchToken:0,
  result:null,compare:[],model:'prediction',loadingPrice:false,compareToken:0,comparison:null,compareSource:null,financeSort:'symbol',financeSortDirection:1,financeCompare:null,portfolioToken:0,ownerToken:0,portfolioData:null,portfolioWeights:null,portfolioBase:null,portfolioKey:null,portfolioOrigin:'',portfolioScenario:null,optimization:null,benchmarkB:null};
-let resultsOpen=false,pendingPrice=Promise.resolve();
+let resultsOpen=false,pendingPrice=Promise.resolve(),studyEpoch=0;
+for(const event of ['qf:owner-auth-ended','qf:owner-state','qf:data-mode'])window.addEventListener(event,()=>{studyEpoch++;});
 function company(){return bySymbol.get(state.symbol);}
 function mode(){return state.privateMode&&state.privateReady?'private':'public';}
 async function getPrivate(path,signal){
@@ -285,7 +286,7 @@ function renderFinanceComparison(){
  $('qf-b21-finance-table').innerHTML='<table><thead><tr>'+entries.map(([key,label])=>'<th scope="col"><button type="button" class="qf-b21-sort" data-qf-b21-sort="'+key+'" aria-label="Sort by '+label+'">'+label+'</button></th>').join('')+'</tr></thead><tbody>'+body+'</tbody></table><p class="tiny">SEC snapshot '+esc(data.as_of)+' · FCF is operating cash flow minus cash PPE purchases. Fiscal periods differ; ratios may not be comparable for banks and operating companies. — means unavailable, not zero.</p>';
  $('qf-b21-finance-export').disabled=false;
  const chart=$('qf24-financial-contrast');if(chart)chart.innerHTML=window.QFExhibits24.bars('Reported operating margin by issuer (latest covered fiscal year)',raw.map(r=>[r.symbol,r.margin]));
- const brief=$('qf24-compare-brief');if(brief)brief.innerHTML='<h2>How these companies differ</h2>'+raw.map(r=>'<p><strong>'+esc(r.name)+'</strong> · fiscal '+esc(r.fiscal||'period unavailable')+': '+(rowsOrNull(r.growth)?'revenue '+(r.growth>=0?'grew ':'fell ')+esc(pct(Math.abs(r.growth))):'revenue growth is unavailable')+'; '+(rowsOrNull(r.margin)?'operating margin '+esc(pct(r.margin)):'operating margin unavailable')+'; '+(rowsOrNull(r.fcf)?'cash-flow proxy '+esc(money(r.fcf)):'cash-flow proxy unavailable')+'.</p>').join('')+'<p>These are accounting comparisons, not a ranking of investments. Fiscal periods and industry definitions differ; bank ratios need particular care.</p>';
+ const brief=$('qf24-compare-brief');if(brief)brief.innerHTML='<h3>How these companies differ</h3>'+raw.map(r=>'<p><strong>'+esc(r.name)+'</strong> · fiscal '+esc(r.fiscal||'period unavailable')+': '+(rowsOrNull(r.growth)?'revenue '+(r.growth>=0?'grew ':'fell ')+esc(pct(Math.abs(r.growth))):'revenue growth is unavailable')+'; '+(rowsOrNull(r.margin)?'operating margin '+esc(pct(r.margin)):'operating margin unavailable')+'; '+(rowsOrNull(r.fcf)?'cash-flow proxy '+esc(money(r.fcf)):'cash-flow proxy unavailable')+'.</p>').join('')+'<p>These are accounting comparisons, not a ranking of investments. Fiscal periods and industry definitions differ; bank ratios need particular care.</p>';
 
 }
 function riskTable(result){
@@ -295,7 +296,7 @@ function riskTable(result){
  const maxX=Math.max(0.01,...result.symbols.map(s=>m[s].annual_volatility))*1.17;
  const lowY=Math.min(0,...result.symbols.map(s=>m[s].total_return))*1.12-0.01,highY=Math.max(0.01,...result.symbols.map(s=>m[s].total_return))*1.12+0.01;
  const X=v=>x0+(x1-x0)*v/maxX,Y=v=>y1-(y1-y0)*(v-lowY)/(highY-lowY);
- $('qf-b21-risk-scatter').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Historical return versus annualized price volatility scatter"><line x1="'+x0+'" x2="'+x1+'" y1="'+y1+'" y2="'+y1+'" stroke="#9db4aa"/><line x1="'+x0+'" x2="'+x0+'" y1="'+y0+'" y2="'+y1+'" stroke="#9db4aa"/>'+result.symbols.map((s,i)=>'<circle cx="'+X(m[s].annual_volatility)+'" cy="'+Y(m[s].total_return)+'" r="6" fill="'+colorSet[i]+'"><title>'+esc(s)+': '+esc(pct(m[s].total_return))+' total price return; '+esc(pct(m[s].annual_volatility))+' annualized volatility</title></circle>').join('')+'<text x="'+(x1-8)+'" y="'+(H-6)+'" text-anchor="end" font-size="12">Historical annualized volatility →</text><text x="6" y="16" font-size="12">Total return ↑</text></svg><p class="tiny">'+result.symbols.map((s,i)=>'<span style="display:inline-block;margin-right:16px"><span style="color:'+colorSet[i]+'" aria-hidden="true">●</span> '+esc(s)+'</span>').join('')+'</p>';
+ $('qf-b21-risk-scatter').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Historical return versus annualized price volatility scatter"><line x1="'+x0+'" x2="'+x1+'" y1="'+y1+'" y2="'+y1+'" stroke="#9db4aa"/><line x1="'+x0+'" x2="'+x0+'" y1="'+y0+'" y2="'+y1+'" stroke="#9db4aa"/>'+result.symbols.map((s,i)=>'<circle cx="'+X(m[s].annual_volatility)+'" cy="'+Y(m[s].total_return)+'" r="6" fill="'+colorSet[i]+'"><title>'+esc(s)+': '+esc(pct(m[s].total_return))+' price change; '+esc(pct(m[s].annual_volatility))+' annualized volatility</title></circle>').join('')+'<text x="'+(x1-8)+'" y="'+(H-6)+'" text-anchor="end" font-size="12">Historical annualized volatility →</text><text x="6" y="16" font-size="12">Price change ↑</text></svg><p class="tiny">'+result.symbols.map((s,i)=>'<span style="display:inline-block;margin-right:16px"><span style="color:'+colorSet[i]+'" aria-hidden="true">●</span> '+esc(s)+'</span>').join('')+'</p>';
 }
 function heatmap(target,result){
  if(!result){$(target).textContent='No common-dated risk sample available.';return;}
@@ -573,6 +574,14 @@ function init(){
 }
 init();
 window.QFResearch20=Object.freeze({choose:selectCompany,analyze,
+ async loadCompanyStudy(symbol,{signal}={}){
+  const portfolio=window.QFPrivateBridgeV23?.snapshot(),epoch=studyEpoch;
+  const valid=()=>mode()==='private'&&state.privateReady&&portfolio&&window.QFPrivateBridgeV23?.snapshot()?.version===portfolio.version&&epoch===studyEpoch&&!signal?.aborted;
+  if(!valid())throw Error('An MFA-verified owner session is required.');
+  const read=async(path,requestSignal)=>{if(!valid())throw Error('Research authorization changed.');const value=await getPrivate(path,requestSignal);if(!valid())throw Error('Research context changed.');return value;};
+  const input=await window.QFCompanyStudy35.load({symbol,snapshot:data,portfolio,read,signal});
+  if(!valid())throw Error('Research context changed.');return input;
+ },
  async acquireStudy(scope){
   const selected=state.symbol,kind=mode(),token=state.priceToken,universe=state.compare.join(',');
   const market=selected==='SPY'?'VTI':'SPY';
@@ -582,18 +591,19 @@ window.QFResearch20=Object.freeze({choose:selectCompany,analyze,
   symbols=[...new Set(symbols)];if(!symbols.includes(selected))symbols=[selected,...symbols].slice(0,5);
   const batch=scope==='valuation'?{aligned:{symbols:[],dates:[],closes:{}},source:'SEC capital and independently dated market quote; no historical price path required',kind:kind==='private'?'market':'synthetic'}:await fetchBatch(symbols,730);
   if(kind!==mode()||selected!==state.symbol||token!==state.priceToken||universe!==state.compare.join(','))throw Error('Research context changed.');
-  let quote=null,quotes=null,portfolio=null,capital=null,studyCompany=company();
+  let quote=null,quotes=null,portfolio=null,capital=null,studyCompany=company(),readFailures=[];
   if(kind==='private'&&['company','valuation'].includes(scope)){
    portfolio=window.QFPrivateBridgeV23?.snapshot();
    const names=[...new Set([selected,...Object.keys(portfolio?.holdings||{})])].slice(0,8);
    const requests=await Promise.allSettled([getPrivate('private/quotes?'+new URLSearchParams({symbols:names.join(',')})),getPrivate('private/valuation-capital?'+new URLSearchParams({symbol:selected})),getPrivate('private/sec/company?'+new URLSearchParams({symbol:selected}))]);
+   readFailures=requests.flatMap((r,i)=>r.status==='rejected'?[['quotes','capital','company'][i]]:[]);
    if(requests[0].status==='fulfilled'){const response=requests[0].value;quote=response.quotes?.find(q=>q.symbol===selected)||null;quotes=Object.fromEntries((response.quotes||[]).map(q=>[q.symbol,q]));}
    if(requests[1].status==='fulfilled')capital=requests[1].value;
    if(requests[2].status==='fulfilled'&&requests[2].value.symbol===selected&&Array.isArray(requests[2].value.annual))studyCompany=requests[2].value;
   }
   if(kind!==mode()||selected!==state.symbol||token!==state.priceToken||universe!==state.compare.join(','))throw Error('Research context changed.');
   if(kind==='private'&&window.QFPrivateBridgeV23?.snapshot()?.version!==ownerAtStart?.version)throw Error('The account changed during research. Analyze again.');
-  return {scope,symbol:selected,company:studyCompany,capital,snapshot:data,history:{...batch.aligned,sessions_per_year:252,source:batch.source,calendar:'equity_sessions'},origin:batch.kind,asOf:new Date().toISOString(),quote,quotes,portfolio,weights:scope==='portfolio'?state.portfolioWeights:null};
+  return {scope,symbol:selected,company:studyCompany,capital,snapshot:data,assessmentPrices:state.price?state.price.map(r=>({...r})):[],assessmentSource:state.priceSource?.source,readFailures,history:{...batch.aligned,sessions_per_year:252,source:batch.source,calendar:'equity_sessions'},origin:batch.kind,asOf:new Date().toISOString(),quote,quotes,portfolio,weights:scope==='portfolio'?state.portfolioWeights:null};
  },
  async walkforward(){
   const symbols=currentUniverse(),kind=mode(),selection=state.symbol,token=state.compareToken;

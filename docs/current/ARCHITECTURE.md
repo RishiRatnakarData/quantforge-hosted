@@ -28,3 +28,9 @@ Supabase records preserve notes, thesis revisions, holdings, basis, transactions
 The hosted API package is deliberately small. `tools/package_vercel_api.py` permits named runtime files and records clean Git revision and file hashes. Offline Python forecasting, GARCH, options and integrated research remain available in the repository and CLI; they are not all server-hosted models.
 
 Source: [browser orchestration](../../web/site/research_app_v20.js), [deep adapter](../../web/site/research_deep_v25.js), [assessment](../../web/site/research_decision_v34.js), [API](../../cloud/api.py), [proxy](../../functions/api/[[path]].js), [package manifest builder](../../tools/package_vercel_api.py).
+
+## Company-study isolation
+
+`research_study_v35.js` assembles independent single-company inputs: observed single-name history, common-date history, dated quotes, SEC capital and annual facts. Protected reads check the verified owner version and mode before and after acquisition. Partial responses retain usable observed evidence and disclose failed refreshes; there is no synthetic Private fallback. The adapter calls the retained deep research engines and builds the same input contract used by individual research before calling `QFDecision34.assess()`.
+
+The sequential batch controller guards generation, owner version, per-company abort/timeout and repeated submissions. Earlier success survives an individual failure; context invalidation clears all session results. It never changes active company selection or calls account writers. Shared assessment policy remains in Decision34, display in Workspace34/Guide30, orchestration in Study35. Legacy specialist engines remain available for supporting analyses and offline workflows; they do not override the primary disposition.

@@ -8,3 +8,18 @@
 
 .qf31-home-steps{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media(max-width:680px){.qf31-home-steps{grid-template-columns:1fr}}
+
+/* Focused final hierarchy; existing grayscale controls and charts are retained. */
+#qf34-workspace-nav [aria-current="page"]{background:#272d32!important;color:#fff!important;border-color:#272d32!important}
+.qf34-priorities{margin:12px 0;gap:18px}.qf34-priorities article{padding:14px 0}.qf34-briefing>header{margin-bottom:20px}.qf34-briefing .pane{margin-bottom:22px}
+.qf35-batch-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:22px 0 12px}.qf35-batch-actions>span{font-size:13px;color:#5f6972}.qf35-selection{display:flex!important;align-items:center;gap:8px;font-size:13px;margin-bottom:12px}.qf35-selection input[type=checkbox]{width:18px!important;height:18px!important;min-height:18px!important;flex:0 0 18px}.qf35-result{border-top:1px solid #d4dade;padding-top:15px;margin-top:15px}.qf35-status{font-weight:700}.qf35-assumptions{display:block;margin-top:24px}.qf35-assumptions summary{font-size:18px;min-height:44px;padding:10px 0}.qf35-assumptions .qf34-controls small{font-weight:400;color:#5f6972;font-size:13px;line-height:1.5}
+#qf34-reviewed article+article{margin-top:20px;padding-top:20px;border-top:1px solid #dce0e3}#qf35-company-details{border-top:1px solid #d7dde1;margin-top:24px;padding-top:16px}#qf35-company-details>summary{font-weight:700;font-size:17px;cursor:pointer;min-height:44px}.qf35-primary-evidence{margin-top:20px}.qf35-next-action{border-top:1px solid #d7dde1;padding-top:20px;margin-top:20px}.qf35-next-action h3{font-size:18px}
+.qf31-home-hero{grid-template-columns:minmax(0,1fr)!important}.qf31-home-main{max-width:880px}.qf31-home h1{max-width:23ch}.qf31-home-search{max-width:780px}.qf33-home-proof{border:0!important;border-top:1px solid #d6dce1!important;background:transparent!important;padding:24px 0!important;margin-top:28px}.qf33-home-proof h2{font-size:23px}.qf33-home-proof p{max-width:850px}.qf33-home-proof .qf27-action-row{margin:12px 0 0}.qf33-home-proof .qf33-text-action{padding:0;display:inline}.qf31-home-route-intro{margin-top:24px!important;padding-top:12px!important}.qf31-home-disclosure{margin-top:20px!important}
+.qf35-company-summary{margin:14px 0;padding:16px 20px;background:#f4f6f7;border-left:3px solid #b7c1c9}.qf35-company-summary p{margin:0}.qf35-public-findings{margin:24px 0}.qf35-public-findings ul{line-height:1.8}.qf35-report-actions{display:flex;gap:12px;flex-wrap:wrap}
+@media(max-width:680px){.qf35-batch-actions>*{width:100%}.qf35-batch-actions .btn{min-height:46px}.qf31-home h1{max-width:22ch!important;font-size:34px!important}.qf31-home .qf31-home-lead{font-size:16px}.qf33-home-proof .qf27-action-row{align-items:flex-start;flex-direction:column}.qf35-company-summary{padding:14px}}
+
+.qf35-company-summary{grid-column:1/-1}
+
+.qf35-selection input{accent-color:#37474f}.qf34-briefing #qf35-filters{margin-bottom:1rem}.qf34-briefing #qf34-reviewed article{padding:.65rem 0;border-bottom:1px solid #d5dce1}
+
+.qf34-shortlist h3,.qf34-priorities h3{font-size:17px;line-height:1.45}

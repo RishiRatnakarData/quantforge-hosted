@@ -76,6 +76,7 @@ function assess(input={},guide=root.QFResearchGuide30){
    }
   }
  }
+ if(Array.isArray(input.readFailures)&&input.readFailures.length){result.coverage.push({domain:'Requested source refresh',status:'incomplete',detail:'Incomplete evidence requests: '+input.readFailures.join(', ')});missing.push('Refresh the incomplete source requests before treating this as a complete assessment.');}
  const incomplete=result.coverage.filter(r=>r.status!=='covered').map(r=>r.domain);
  const comparableEvidence=comparable(input.financial);
  const financialPositive=[f.revenue_growth,f.operating_margin,f.free_cash_flow_usd].every(finite)&&f.revenue_growth>=0&&f.operating_margin>0&&f.free_cash_flow_usd>0&&!(finite(input.healthRow?.metrics?.equity_usd)&&input.healthRow.metrics.equity_usd<0);
@@ -91,7 +92,18 @@ function assess(input={},guide=root.QFResearchGuide30){
  else if(explicitEntry&&(!quoteFresh||oldMarks)){label='Wait for a current observation';code='execution-observation-stale';reason='Current transaction-quality observations are unavailable. Historical research remains useful; a fresh server preview is required before any virtual transaction.';}
  else if(explicitEntry&&scenario&&observed){label='Consider an entry under specified conditions';code='conditions-met';reason='The dated evidence meets the explicitly selected financial, valuation, drawdown, cash and concentration rules. This is conditional research, not proof of investment merit or an instruction to trade.';}
  const modelLimited=!input.prediction?.ready||input.prediction.qualified!==true;
- return {...result,authoritative:true,schema:'quantforge.current-assessment.v34',policyVersion,
+ const next=missing[0]||({
+  'invalid-conditions':'Correct the highlighted optional research conditions and calculate again.',
+  'selected-rule-breach':'Inspect the breached condition in detailed evidence, then test a smaller hypothetical allocation or compare another issuer. No transaction has been prepared.',
+  'evidence-incomplete':'Load or inspect the missing evidence domains: '+incomplete.join(', ')+'. Rerun the assessment when compatible observations are available.',
+  'model-deterioration':'Open Models → Prediction → Evaluation and compare recent held-out Brier error with the baseline before using the model.',
+  'financial-comparability':'Open the financial-source lineage and reconcile revenue concepts, filing accessions and fiscal periods before comparing ratios.',
+  'financial-cautions':'Inspect the latest annual revenue, operating profit and cash-generation trends; read the relevant filing for the weakest reported measure.',
+  'execution-observation-stale':'Refresh the dated observations. Any later virtual transaction still needs its own fresh server preview.',
+  'conditions-met':'Stress-test growth and discount-rate assumptions, and compare a peer before making an independent investment decision.'
+ }[code]||result.next);
+
+ return {...result,next,authoritative:true,schema:'quantforge.current-assessment.v34',policyVersion,
   snapshot:{symbol:input.financial?.symbol||'',asOf:now,financialPeriod:input.financial?.source?.period||null,marketThrough:input.risk?.last||null,priceTime:value?.priceTime||null,ownerVersion:input.ownerVersion??null,revision:input.revision??null},
   proposal:{label,code,reason,conditions,missing,breaches,scenario,explicitEntry,modelLimited,quoteFresh},
   evidenceKinds:['Observed facts','Derived calculations','Statistical estimates','Scenarios','Research judgment'],
@@ -126,7 +138,7 @@ function screen({snapshot,health,eligible,filters={},asOf=new Date().toISOString
  return {ready:true,schema:'quantforge.financial-shortlist.v34',rows,shortlist:rows.slice(0,Math.min(5,Math.max(0,limit))),excluded,
   universe:eligible.items.map(x=>x.symbol),eligibleCount:eligible.items.length,passed:rows.length,asOf,order,
   conditions:{minGrowth,positiveOperatingMargin:true,positiveCashFlowProxy:true,financialReviewDays:550},
-  explanation:'A transparent financial filter over the stated eligible SEC coverage, ordered by '+order+'. It is not a score, whole-market ranking, forecast or completed investment recommendation. Zero candidates is a valid result.'};
+  explanation:'A transparent financial filter over the stated eligible SEC coverage, ordered by '+({cashMargin:'cash-flow proxy / revenue',growth:'annual revenue growth',margin:'operating margin'}[order])+'. This is not a score, whole-market ranking or investment recommendation.'};
 }
 function briefing({portfolio,valuation,notes=[],rules={},asOf=new Date().toISOString()}={},guide=root.QFResearchGuide30){
  const selected=policy(rules),actions=[],positions=Object.entries(portfolio?.holdings||{}).filter(([,u])=>finite(u)&&u>0);
@@ -138,7 +150,7 @@ function briefing({portfolio,valuation,notes=[],rules={},asOf=new Date().toISOSt
  if(!marked&&positions.length)actions.unshift({kind:'marks-missing',label:'Refresh dated holding marks',detail:'Current portfolio exposure cannot be inferred from cash and units alone. No values or gains have been fabricated.'});
  if(selected.maxWeight===null&&positions.length)actions.push({kind:'rules-missing',label:'Choose a concentration boundary',detail:'Set an optional personal research limit to identify exposure breaches. Risk tolerance is not inferred from your activity.'});
  if(!actions.length)actions.push({kind:'investigate',label:'Find your next research question',detail:'Screen supported issuers or investigate an investment. No unobserved market changes or favorable candidates are implied.'});
- return {schema:'quantforge.owner-briefing.v34',actions:actions.slice(0,5),positionCount:positions.length,savedTheses:latest.size,asOf,continuousMonitoring:false,accountWrites:0};
+ return {schema:'quantforge.owner-briefing.v34',actions:actions.slice(0,3),positionCount:positions.length,savedTheses:latest.size,asOf,continuousMonitoring:false,accountWrites:0};
 }
 const api=Object.freeze({policy,assess,screen,briefing,comparable,policyVersion});
 root.QFDecision34=api;if(typeof module==='object'&&module.exports)module.exports=api;

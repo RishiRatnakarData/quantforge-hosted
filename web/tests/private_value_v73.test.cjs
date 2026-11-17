@@ -2,7 +2,7 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const {build}=require('../site/private_value_v73.js');
 const TODAY='2026-10-27T12:00:00Z';
-const company={symbol:'MSFT',annual:[{fiscal_end:'2026-06-30',metrics:{revenue_usd:331839000000,free_cash_flow_usd:66987000000}}]};
+const company={symbol:'MSFT',annual:[{fiscal_end:'2026-06-30',metrics:{revenue_usd:331839000000,free_cash_flow_usd:66987000000,net_income_usd:50000000000},sources:Object.fromEntries(['revenue_usd','net_income_usd','operating_cash_flow_usd','capex_usd'].map(k=>[k,{accession:'same-annual-filing',filed:'2026-07-29',start:'2025-07-01',end:'2026-06-30'}]))}]};
 const capital={symbol:'MSFT',shares:{value:7500000000,periodEnd:'2026-07-31',tag:'EntityCommonStockSharesOutstanding'},cash:{value:30000000000,periodEnd:'2026-06-30'},reportedDebtComponentsTotal:47000000000,debtCashSamePeriod:true,debtCashSameFiling:true,source:'SEC EDGAR',sourceUrl:'https://data.sec.gov/api/xbrl/companyfacts/CIK0000789019.json'};
 const quote={symbol:'MSFT',price:400,venue:'IEX',timestamp:'2026-10-26T19:59:00Z'};
 test('price to cash flow and yield use SEC shares and observed quote',()=>{
@@ -42,3 +42,7 @@ test('stale SEC shares or annual data are unavailable',()=>{
 });
 
  test('same dates without a matched filing cannot create enterprise evidence',()=>{const m=build(company,{...capital,debtCashSameFiling:false},quote,TODAY);assert.equal(m.approximateEV,null);assert.equal(m.marketCap,3e12);});
+
+test('earnings multiple uses compatible positive annual net income, not a diluted EPS denominator',()=>{const m=build(company,capital,quote,TODAY);assert.equal(m.pEarnings,60);assert.match(m.earningsBasis,/Not diluted-EPS/);assert.equal(m.earningsAccession,'same-annual-filing');});
+test('different or future cash-flow accessions withhold yield and multiples',()=>{for(const source of [{...company.annual[0].sources.capex_usd,accession:'different'},{...company.annual[0].sources.capex_usd,filed:'2027-01-01'}]){const c=structuredClone(company);c.annual[0].sources.capex_usd=source;const m=build(c,capital,quote,TODAY);assert.equal(m.pFcf,null);assert.equal(m.fcfYield,null);assert.equal(m.marketCap,3e12);}});
+test('negative or unmatched annual earnings cannot create an earnings multiple',()=>{const c=structuredClone(company);c.annual[0].metrics.net_income_usd=-1;assert.equal(build(c,capital,quote,TODAY).pEarnings,null);c.annual[0].metrics.net_income_usd=100;c.annual[0].sources.net_income_usd.accession='different';assert.equal(build(c,capital,quote,TODAY).pEarnings,null);});
