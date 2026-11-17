@@ -53,6 +53,20 @@ function score(model,x){
  for(let j=0;j<x.length;j++)z+=model.weights[j+1]*clamp((x[j]-model.mu[j])/model.scale[j],-5,5);
  return sig(z);
 }
+function diagnostics(samples){
+ const unavailable=reason=>({state:'insufficient',reason,minimumPerPeriod:12});
+ if(!Array.isArray(samples)||samples.length>400||samples.some((r,i)=>!Number.isInteger(r?.t)||
+  !Number.isFinite(Date.parse(r.date))||![0,1].includes(r.y)||
+  !finite(r.prediction)||r.prediction<0||r.prediction>1||!finite(r.baseline)||r.baseline<0||r.baseline>1||
+  (i>0&&(r.t-samples[i-1].t<H||r.date<=samples[i-1].date))))return unavailable('Matching, disjoint chronological held-out outcomes are required.');
+ const cut=Math.floor(samples.length/2),early=samples.slice(0,cut),recent=samples.slice(cut);
+ if(early.length<12||recent.length<12)return unavailable('At least 12 matured test windows in both the early and recent periods are needed.');
+ const period=rows=>{const model=mean(rows.map(r=>(r.prediction-r.y)**2)),base=mean(rows.map(r=>(r.baseline-r.y)**2));return {windows:rows.length,first:rows[0].date,last:rows.at(-1).date,modelBrier:model,baselineBrier:base,pairedLossDifference:model-base};};
+ const before=period(early),after=period(recent),deteriorating=before.pairedLossDifference<-.005&&after.pairedLossDifference>.005;
+ return {schema:'quantforge.chronological-model-review.v34',state:deteriorating?'deteriorating':'no-clear-deterioration',early:before,recent:after,minimumPerPeriod:12,
+  interpretation:deteriorating?'The earlier Brier advantage reversed in the recent held-out period. The direction screen is withheld.':'These two descriptive periods do not show the defined reversal; that does not establish future stability.',
+  limitation:'A predeclared descriptive 0.005 Brier-difference review rule on existing matured chronological tests. Not a significance test, calibrated future probability or investment-performance backtest.'};
+}
 function analyze(history,sym){
  const input=prepare(history,sym);
  const unavailable=reason=>({ready:false,symbol:sym,reason});
@@ -96,10 +110,11 @@ function analyze(history,sym){
    observed_positive:group.length?mean(group.map(v=>v.y)):null};
  });
  const testPositiveRate=mean(tests.map(v=>v.y));
- const qualified=modelBrier<baseBrier-0.005&&modelAccuracy>=baseAccuracy&&tests.length>=12;
- const status=qualified?'Exploratory signal (limited validation)':'No consistent advantage over the simple baseline';
+ const diagnostic=diagnostics(tests);
+ const qualified=modelBrier<baseBrier-0.005&&modelAccuracy>=baseAccuracy&&tests.length>=12&&diagnostic.state!=='deteriorating';
+ const status=diagnostic.state==='deteriorating'?'Recent held-out deterioration; direction withheld':qualified?'Exploratory signal (limited validation)':'No consistent advantage over the simple baseline';
  const direction=current>=0.55?'Upward tilt':current<=0.45?'Downward tilt':'No clear direction';
- const reasons=qualified?
+ const reasons=diagnostic.state==='deteriorating'?'Earlier held-out Brier advantage reversed in the recent descriptive period. The direction screen is withheld; this is not a significance test.':qualified?
   'The model improved the Brier score and matched or exceeded baseline directional accuracy across held-out windows. This remains exploratory, not statistical proof.':
   'Held-out Brier error, directional accuracy, or sample size did not clear the conservative baseline screen.';
  return {ready:true,symbol:sym,asOf:dates[n-1],forecastHorizon:H,
@@ -107,7 +122,7 @@ function analyze(history,sym){
   trainingExamples:train.length,testWindows:tests.length,firstTestDate:tests[0].date,lastTestDate:tests.at(-1).date,
   evaluatedAccuracy:modelAccuracy,baselineAccuracy:baseAccuracy,
   evaluatedBrier:modelBrier,baselineBrier:baseBrier,
-  testPositiveRate,calibration,validation:{horizon:H,first:tests[0].date,last:tests.at(-1).date,
+  testPositiveRate,calibration,diagnostics:diagnostic,validation:{horizon:H,first:tests[0].date,last:tests.at(-1).date,
    disjoint_test_windows:tests.length,baseline:'Expanding historical positive-outcome frequency',
    label_maturity:'Training labels end no later than each test feature date',
    calibration_limit:'Three descriptive score bins; no post-hoc probability recalibration or claimed future calibration'},
@@ -120,7 +135,7 @@ function all(history,selection){
   selection.some(s=>!symbol(s)))return {ready:false,reason:'Choose 2–5 eligible companies.'};
  return {ready:true,rows:selection.map(s=>analyze(history,s))};
 }
-const api=Object.freeze({analyze,all,prepare,features});
+const api=Object.freeze({analyze,all,prepare,features,diagnostics});
 if(typeof module==='object'&&module.exports)module.exports=api;
 root.QFPrivatePredictiveMLV180=api;
 })(typeof window!=='undefined'?window:globalThis);

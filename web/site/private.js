@@ -2555,6 +2555,7 @@ window.QFPrivateBridgeV23=Object.freeze({
   notes.unshift({text:value,at:new Date().toISOString(),symbol}); // Append a revision; retain the original text and timestamp.
   const result=await api('private/notes',{expected_version:version,watchlist:privateState.watchlist||[],notes});privateState=result.portfolio;version=result.version;render();return this.snapshot();
  },
+ async universe(){if(!privateState||$('private-signed').hidden)throw Error('MFA sign-in required.');return api('private/research-universe');},
  async assets(query,category='all'){if(!privateState||$('private-signed').hidden)throw Error('MFA sign-in required.');return api('private/assets?'+new URLSearchParams({category,query:String(query).slice(0,60)}));},
  async refresh(){if(!privateState)throw Error('MFA sign-in required.');await loadState();return this.snapshot();},
  async saveNote(text,symbol){

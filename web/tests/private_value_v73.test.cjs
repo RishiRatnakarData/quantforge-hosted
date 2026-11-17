@@ -3,7 +3,7 @@ const assert=require('node:assert/strict');
 const {build}=require('../site/private_value_v73.js');
 const TODAY='2026-10-27T12:00:00Z';
 const company={symbol:'MSFT',annual:[{fiscal_end:'2026-06-30',metrics:{revenue_usd:331839000000,free_cash_flow_usd:66987000000}}]};
-const capital={symbol:'MSFT',shares:{value:7500000000,periodEnd:'2026-07-31',tag:'EntityCommonStockSharesOutstanding'},cash:{value:30000000000,periodEnd:'2026-06-30'},reportedDebtComponentsTotal:47000000000,debtCashSamePeriod:true,source:'SEC EDGAR',sourceUrl:'https://data.sec.gov/api/xbrl/companyfacts/CIK0000789019.json'};
+const capital={symbol:'MSFT',shares:{value:7500000000,periodEnd:'2026-07-31',tag:'EntityCommonStockSharesOutstanding'},cash:{value:30000000000,periodEnd:'2026-06-30'},reportedDebtComponentsTotal:47000000000,debtCashSamePeriod:true,debtCashSameFiling:true,source:'SEC EDGAR',sourceUrl:'https://data.sec.gov/api/xbrl/companyfacts/CIK0000789019.json'};
 const quote={symbol:'MSFT',price:400,venue:'IEX',timestamp:'2026-10-26T19:59:00Z'};
 test('price to cash flow and yield use SEC shares and observed quote',()=>{
  const m=build(company,capital,quote,TODAY);
@@ -40,3 +40,5 @@ test('stale SEC shares or annual data are unavailable',()=>{
  const m=build(old,capital,quote,TODAY);
  assert.equal(m.marketCap,3e12);assert.equal(m.fcfYield,null);assert.equal(m.pSales,null);
 });
+
+ test('same dates without a matched filing cannot create enterprise evidence',()=>{const m=build(company,{...capital,debtCashSameFiling:false},quote,TODAY);assert.equal(m.approximateEV,null);assert.equal(m.marketCap,3e12);});

@@ -45,6 +45,7 @@ async def run():
                 await enter(page)
                 await page.locator('#private-login-submit').click()
                 await page.wait_for_function("QFPrivateBridgeV23.ready()&&QFResearch20.context().origin==='market'")
+                await page.locator('#qf34-workspace-nav [data-qf34-workspace="research"]').click()
                 await page.locator('[data-qf27-explore="brief"]').click()
                 await page.locator('#qf27-analyze').click()
                 await expect(page.locator('#qf32-summary')).to_contain_text('Price / annual cash-flow proxy:', timeout=30000)

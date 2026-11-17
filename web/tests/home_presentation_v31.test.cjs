@@ -7,7 +7,7 @@ const base=path.join(__dirname,'..','site');
 const html=fs.readFileSync(path.join(base,'site.template.html'),'utf8');
 const js=fs.readFileSync(path.join(base,'research_private_shell_v23.js'),'utf8');
 const css=fs.readFileSync(path.join(base,'research_guide_v30.css'),'utf8');
-test('Home has one company-search action and all five section descriptions',()=>{
+test('Home has one company-search action, three research steps and five retained routes',()=>{
  const start=html.indexOf('id="qf-v23-landing"'),end=html.indexOf('</section>',start);
  assert.ok(start>=0&&end>start);
  const home=html.slice(start,end);
@@ -15,7 +15,8 @@ test('Home has one company-search action and all five section descriptions',()=>
  assert.match(home,/id="qf24-home-find"/);
  assert.doesNotMatch(home,/id="qf-v23-open-research"/);
  assert.match(home,/research-case-study\.html/);
- for(const name of ['Explore','Compare','Models','Portfolio','Methods'])assert.match(home,new RegExp('<strong>'+name+'</strong>'));
+ for(const name of ['Understand the business','Compare the evidence','Test your assumptions'])assert.match(home,new RegExp('<strong>'+name+'</strong>'));
+ for(const route of ['explore','compare','models','portfolio','methods'])assert.ok(html.includes('data-page="'+route+'"'));
 });
 test('Home contains direct suggestions and no financial exhibit or chart builder',()=>{
  assert.match(html,/id="qf32-home-options"/);

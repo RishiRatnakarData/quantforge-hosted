@@ -1,0 +1,19 @@
+# Deployment, security and rollback
+
+The active architecture is Cloudflare Pages → Vercel Hobby FastAPI → Supabase and entitled providers. Render remains historical infrastructure with unresolved ingress evidence; switching back or restarting it is not an approved recovery procedure. No new Render support disclosure is authorized.
+
+Release work uses a separate Git branch. Run the complete numerical/security and JavaScript suites, deterministic site build, publication scan, CSP audit and retained browser matrix before releasing. Use one full GitHub CI dispatch for the reviewed head and preserve $0 spending caps. Do not turn a queue into repeated duplicate runs or increase billing. Verify the actual check result and head SHA before merging.
+
+The Pages production branch is main and Git-connected. Merge triggers its deployment; do not create a duplicate manual production build. A deployment listed as Active may still be building. Require a successful Cloudflare check and matching normalized canonical HTML, not a dashboard label alone.
+
+Build the API package only from clean committed source with `tools/package_vercel_api.py` into a new empty ignored output directory. It contains an explicit runtime allowlist and source manifest. Use the existing Vercel project and Hobby account. Stage without assigning the production domain, inspect Ready state, and retain the previous production deployment. Preview protection can legitimately return an authentication redirect or denial; do not invent a bypass to test it. Never print, package or create protection-bypass secrets.
+
+After promotion verify direct and same-origin health, expected API contract and clean manifest source identity, signed-out session behavior and unauthorized Private denial. Then compare Pages canonical content and verify all five Public routes, charts, mobile reflow and browser errors. Existing authenticated owner acceptance is read-only: data loading, saved research visibility, Portfolio return flow and Models/Methods. Authentication and MFA entry remain under the user's control.
+
+The pre-consolidation rollback pair is API deployment `dpl_A3NA1MxPS4nSTVWfqXpKNV6wkTp4` and Pages deployment `af32a88a-fba4-40ac-b43d-0d1c4c26afe4`, source main `07bed6b809f97ad00712e44d407af2cca24ef4ce`, with API package source `f707b6e4e50561789501c71b20afbf48ebd1b5d8` (verified tree parity). Record the new deployment IDs outside runtime secrets. Use existing provider rollback/promotion controls to restore this pair if new acceptance fails. Confirm current provider rollback limitations before executing. No Supabase migration or record reset is required.
+
+Protection boundary: exact upstream allowlist; owner identity and MFA; httpOnly/same-site session protections; no-store private responses; strict generated CSP; version-checked writes and replay protection; explicit transaction previews; safe error classification. A remembered-session preference does not store passwords or bypass MFA. The research-universe endpoint invokes the same owner guard before reading the provider catalogue.
+
+Public-repository readiness is a separate decision. Do not change visibility automatically. History inspection found personal author email metadata requiring a privacy decision, and some old Actions logs were unavailable. No confirmed credential was discovered in the completed source and available-archive scans. That is bounded evidence, not an absolute certification. Review provider redistribution rights, source licensing and untrusted fork/preview isolation before visibility changes. Provider tokens, owner records and licensed observations must never enter source, screenshots or build artifacts.
+
+An existing unused Vercel automation-bypass entry was observed by count only; its value was not read or used. Removing it would change authentication settings and is outside this release's authorization. Repository and deployment account settings remain unchanged.

@@ -96,11 +96,13 @@ function evaluate(input){
  const portfolio=d.portfolio,holdings=portfolio?.holdings,quotes=d.quotes;
  let portfolioImpact=null;
  if(portfolio&&finite(portfolio.cash)&&portfolio.cash>=0&&holdings&&typeof holdings==='object'&&!Array.isArray(holdings)&&quotes&&typeof quotes==='object'){
-  let total=portfolio.cash,holdingValue=0,complete=true;
+  let total=portfolio.cash,holdingValue=0,complete=true,oldestMarkAgeSeconds=0,transactionQualityMarks=true;
   for(const [sym,qty] of Object.entries(holdings)){
    const quote=quotes[sym],age=Date.parse(d.now)-Date.parse(quote?.timestamp);
    if(!finite(qty)||qty<0||(qty>0&&(!finite(quote?.price)||quote.price<=0||!Number.isFinite(age)||age<0||age>7*86400000))){complete=false;break;}
    if(qty===0)continue;
+   oldestMarkAgeSeconds=Math.max(oldestMarkAgeSeconds,age/1000);
+   if(age/1000>(sym.includes('/')?300:900))transactionQualityMarks=false;
    const val=qty*quotes[sym].price;
    if(!finite(val)){complete=false;break;}
    total+=val;
@@ -108,7 +110,7 @@ function evaluate(input){
   }
   if(complete&&total>0){
    const present=holdingValue/total,cashPct=portfolio.cash/total;
-   portfolioImpact={currentWeight:present,existingCandidateShock20:present===0?0:-.20*present,
+   portfolioImpact={currentWeight:present,oldestMarkAgeSeconds,transactionQualityMarks,existingCandidateShock20:present===0?0:-.20*present,
     cashWeight:cashPct,
     additional5:cashPct>=.05-1e-12?-.20*(present+.05):null,
     additional10:cashPct>=.10-1e-12?-.20*(present+.10):null};

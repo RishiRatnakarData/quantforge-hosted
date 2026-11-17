@@ -77,6 +77,7 @@ async def run_page(browser, width: int) -> None:
         assert await page.locator('#qf-v20-mode').inner_text() == 'Account'
         await page.evaluate("window.QFNavigate20('private')")
         assert await page.locator('.tabpage.active').get_attribute('id') == 'page-explore'
+        await page.locator('#qf34-workspace-nav [data-qf34-workspace="research"]').click()
         await page.locator('#qf27-analyze').click()
         assert await page.locator('[data-qf27-explore="research"]').is_visible()
         await page.locator('[data-qf27-explore="research"]').click()

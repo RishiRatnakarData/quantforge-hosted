@@ -35,16 +35,17 @@ function build(company,capital,quote,nowISO){
  const pFcf=marketCap&&usableFcf&&fcf>0?marketCap/fcf:null;
  const pSales=marketCap&&usableRevenue?marketCap/revenue:null;
  const balanceAge=dateAge(capital.cash?.periodEnd,asOf);
- const components=capital.debtCashSamePeriod===true && finite(capital.reportedDebtComponentsTotal)
+ const components=capital.debtCashSamePeriod===true && capital.debtCashSameFiling===true && finite(capital.reportedDebtComponentsTotal)
   &&finite(capital.cash?.value)&&balanceAge!==null&&balanceAge<=550;
  const approximateEV=marketCap&&components?marketCap+capital.reportedDebtComponentsTotal-capital.cash.value:null;
  if(!usableAnnual)problems.push('Latest reported annual financials are unavailable or stale.');
  if(!usableFcf)problems.push('Annual SEC operating-cash-flow-minus-capex data are missing.');
- if(!components)problems.push('Comparable SEC cash and both long-term debt components are incomplete; enterprise value is omitted.');
+ if(!components)problems.push('Compatible same-filing SEC cash and long-term debt components are incomplete; enterprise approximation is omitted.');
  return {symbol,valid,price:valid?price:null,priceTime:quote.timestamp,venue:quote.venue||'Unspecified',
   shares:valid?shares:null,sharesTime:shareObj?.periodEnd||null,sharesTag:shareObj?.tag||null,
   fiscalEnd:fiscal?.fiscal_end||null,reportedFcf:usableFcf?fcf:null,
   marketCap,pFcf,fcfYield:yieldFcf,pSales,
+  annualDilutedShares:capital.annualDilutedShares||null,shareBasisDisclosure:capital.shareBasisDisclosure||'Diluted-share evidence is unavailable; instant common shares are not a fully diluted equity bridge.',
   approximateEV,enterpriseComplete:false, // Approximation omits many enterprise claims.
   source:capital.source,secUrl:capital.sourceUrl,
   warnings:problems,
