@@ -22,8 +22,9 @@ function company(){return bySymbol.get(state.symbol);}
 function mode(){return state.privateMode&&state.privateReady?'private':'public';}
 async function getPrivate(path,signal){
  const res=await fetch('/api/'+path,{credentials:'same-origin',cache:'no-store',signal});
+ if([401,403].includes(res.status))window.QFPrivateBridgeV23?.invalidateSession?.();
  let json;try{json=await res.json();}catch(_){throw Error('Research API unavailable. Historical SEC figures remain available.');}
- if(!res.ok)throw Error(window.QFErrors24.apiError(res.status,path,json?.code));
+ if(!res.ok)throw Object.assign(Error(window.QFErrors24.apiError(res.status,path,json?.code)),{status:res.status});
  return json;
 }
 function setAccount(){
@@ -257,7 +258,8 @@ function invalidateComparison(){
 }
 function linePlot(target,dates,series){
  if(!dates||dates.length<2||!series.length){$(target).textContent='No eligible aligned data for this chart.';return;}
- const W=Math.max(210,$(target).clientWidth||Math.min(870,window.innerWidth-112)),H=275,left=57,right=W-15,top=20,bottom=234;
+ const measured=$(target).clientWidth;
+ const W=Math.max(210,measured>=210?measured:Math.min(870,window.innerWidth-112)),H=275,left=57,right=W-15,top=20,bottom=234;
  const numbers=series.flatMap(s=>s.values).filter(rowsOrNull);if(!numbers.length){$(target).textContent='No finite observations.';return;}
  let lo=Math.min(...numbers),hi=Math.max(...numbers);if(hi-lo<0.01){lo-=2;hi+=2;}const margin=(hi-lo)*0.10;lo-=margin;hi+=margin;
  const X=i=>left+(right-left)*i/(dates.length-1),Y=v=>bottom-(v-lo)/(hi-lo)*(bottom-top);
@@ -570,6 +572,19 @@ function init(){
   if(e.detail.route==='portfolio'){loadPortfolioResearch();if(mode()==='private')loadOwnerVirtualState();}
   if(e.detail.route==='explore')setAccount();
  });
+ // A chart can be calculated while its pane is hidden or moving between
+ // Public/Private layouts. Redraw from current state when its visible width
+ // changes; retain no separate market-data cache and make no provider reads.
+ if(window.ResizeObserver){
+  const widths=new WeakMap();let queued=false;
+  const observer=new ResizeObserver(entries=>{
+   let changed=false;
+   for(const entry of entries){const width=Math.round(entry.contentRect.width),prior=widths.get(entry.target);widths.set(entry.target,width);if(width>=210&&width!==prior)changed=true;}
+   if(!changed||queued||!state.portfolioData||!$('page-portfolio').classList.contains('active'))return;
+   queued=true;requestAnimationFrame(()=>{queued=false;if(state.portfolioData&&$('page-portfolio').classList.contains('active'))renderPortfolioResearch();});
+  });
+  for(const id of ['qf-b21-overview-chart','qf-b21-whatif-chart'])observer.observe($(id));
+ }
  selectCompany(state.symbol);renderCompareChips();authUpdate();
 }
 init();

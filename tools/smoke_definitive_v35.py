@@ -13,10 +13,13 @@ from smoke_master_quality_v33 import FIXED
 ROOT = Path(__file__).resolve().parents[1]
 OUT = Path(os.environ.get('QF_DEFINITIVE_SCREENSHOTS', str(ROOT / 'outputs/definitive-v35')))
 FAULTS = r'''() => {
- const original=fetch;window.qf35Failed='';window.qf35Partial='';window.qf35Held='';window.qf35Started=false;
+ const original=fetch;window.qf35Failed='';window.qf35Partial='';window.qf35Held='';window.qf35Started=false;window.qf35AuthFailure='';window.qf35ReadSymbols=[];window.qf35Revocations=0;
  window.fetch=async(u,o={})=>{
   const path=String(u),q=new URLSearchParams(path.split('?')[1]||''),symbol=q.get('symbol')||(q.get('symbols')||'').split(',')[0];
-  if(symbol&&symbol===qf35Failed)throw new TypeError('Isolated provider failure');
+  if(path.includes('auth/logout'))qf35Revocations++;
+  if(path.includes('history-single'))qf35ReadSymbols.push(symbol);
+  if(symbol&&symbol===qf35AuthFailure)return {ok:false,status:401,json:async()=>({code:'session_expired'})};
+  if(symbol&&symbol===qf35Failed)return {ok:false,status:503,json:async()=>({code:'provider_unavailable'})};
   if(symbol===qf35Partial&&path.includes('valuation-capital'))throw new TypeError('Isolated capital-data failure');
   if(symbol===qf35Held&&path.includes('history-single')){qf35Started=true;await new Promise(resolve=>window.qf35Release=resolve);}
   return original(u,o);
@@ -98,6 +101,31 @@ async def private_journey(browser, engine, width):
     await page.close()
     return {'engine': engine, 'width': width, 'independentSelection': True, 'partialFailurePreserved': True, 'cancelledOnPublic': True, 'writes': 0}
 
+async def auth_rejection(browser, engine):
+    page, errors = await setup(browser, 390)
+    for fixture in [EXTEND, FIXED, EXTRA, FAULTS]:
+        await page.evaluate(fixture)
+    await enter(page)
+    await page.locator('#private-login-submit').click()
+    await expect(page.locator('#qf34-universe-status')).to_contain_text('transparent financial filter')
+    picks = await page.locator('[data-qf35-select]:checked').evaluate_all('(els)=>els.map(e=>e.dataset.qf35Select)')
+    await page.evaluate('(symbol)=>{qf35AuthFailure=symbol;qf35ReadSymbols=[];}', picks[1])
+    await page.locator('#qf35-analyze-shortlist').click()
+    await page.wait_for_function('() => !QFPrivateBridgeV23.ready()', timeout=90000)
+    await expect(page.locator('#qf34-briefing')).to_be_empty()
+    assert await page.locator('.qf35-result').count() == 0
+    assert await page.evaluate('QFPrivateBridgeV23.snapshot()') is None
+    await expect(page.locator('#private-positions')).to_be_empty()
+    await expect(page.locator('#private-notes')).to_be_empty()
+    await expect(page.locator('#qf31-session-notice')).to_contain_text('authorization could not be verified')
+    assert picks[2] not in await page.evaluate('qf35ReadSymbols')
+    assert await page.evaluate('qf35Revocations') == 0
+    assert await page.evaluate('qf34Writes') == 0
+    assert not errors, errors
+    await page.close()
+    print(engine, 'mid-batch authorization rejection clears all results and stops later companies PASS', flush=True)
+    return {'engine': engine, 'authRejected': True, 'privateCleared': True, 'laterCompanyPrevented': True, 'writes': 0}
+
 async def run():
     OUT.mkdir(parents=True, exist_ok=True)
     rows = []
@@ -107,6 +135,7 @@ async def run():
             for width in [int(x) for x in os.environ.get('QF_DEFINITIVE_WIDTHS', '320,390,768,1024,1440').split(',')]:
                 rows.append(await private_journey(browser, engine, width))
                 print(engine, width, 'isolated shortlist / partial failure / assessment / rules / cancellation PASS', flush=True)
+            rows.append(await auth_rejection(browser, engine))
             await browser.close()
     (OUT / 'results.json').write_text(json.dumps(rows, indent=2))
 

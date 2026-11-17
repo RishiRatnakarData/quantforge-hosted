@@ -785,6 +785,12 @@ body.qf31-home-active #qf28-mobile-credit{display:none!important}
 /* Column actions must not inherit the shared 170px horizontal flex basis. */
 .qf33-home-proof .qf27-action-row>*{flex:0 0 auto;min-height:44px;display:inline-flex;align-items:center}
 
+/* The shared research tab bar owns the single visible Analyze action. */
+#qf-v20-analyze{display:none!important}
+
+/* Keep selected worked-method labels readable while the pointer remains over them. */
+.qf27-lab-selector button[aria-pressed=true],.qf27-lab-selector button[aria-pressed=true]:hover{background:#272d32!important;color:#fff!important;border-color:#272d32!important}
+
 
 /* V9 private operating system: public site remains visually unchanged. */
 #private-signed .qf-v9-shell h2{margin:8px 0 10px;font-size:24px}
@@ -4061,8 +4067,9 @@ function company(){return bySymbol.get(state.symbol);}
 function mode(){return state.privateMode&&state.privateReady?'private':'public';}
 async function getPrivate(path,signal){
  const res=await fetch('/api/'+path,{credentials:'same-origin',cache:'no-store',signal});
+ if([401,403].includes(res.status))window.QFPrivateBridgeV23?.invalidateSession?.();
  let json;try{json=await res.json();}catch(_){throw Error('Research API unavailable. Historical SEC figures remain available.');}
- if(!res.ok)throw Error(window.QFErrors24.apiError(res.status,path,json?.code));
+ if(!res.ok)throw Object.assign(Error(window.QFErrors24.apiError(res.status,path,json?.code)),{status:res.status});
  return json;
 }
 function setAccount(){
@@ -4296,7 +4303,8 @@ function invalidateComparison(){
 }
 function linePlot(target,dates,series){
  if(!dates||dates.length<2||!series.length){$(target).textContent='No eligible aligned data for this chart.';return;}
- const W=Math.max(210,$(target).clientWidth||Math.min(870,window.innerWidth-112)),H=275,left=57,right=W-15,top=20,bottom=234;
+ const measured=$(target).clientWidth;
+ const W=Math.max(210,measured>=210?measured:Math.min(870,window.innerWidth-112)),H=275,left=57,right=W-15,top=20,bottom=234;
  const numbers=series.flatMap(s=>s.values).filter(rowsOrNull);if(!numbers.length){$(target).textContent='No finite observations.';return;}
  let lo=Math.min(...numbers),hi=Math.max(...numbers);if(hi-lo<0.01){lo-=2;hi+=2;}const margin=(hi-lo)*0.10;lo-=margin;hi+=margin;
  const X=i=>left+(right-left)*i/(dates.length-1),Y=v=>bottom-(v-lo)/(hi-lo)*(bottom-top);
@@ -4609,6 +4617,19 @@ function init(){
   if(e.detail.route==='portfolio'){loadPortfolioResearch();if(mode()==='private')loadOwnerVirtualState();}
   if(e.detail.route==='explore')setAccount();
  });
+ // A chart can be calculated while its pane is hidden or moving between
+ // Public/Private layouts. Redraw from current state when its visible width
+ // changes; retain no separate market-data cache and make no provider reads.
+ if(window.ResizeObserver){
+  const widths=new WeakMap();let queued=false;
+  const observer=new ResizeObserver(entries=>{
+   let changed=false;
+   for(const entry of entries){const width=Math.round(entry.contentRect.width),prior=widths.get(entry.target);widths.set(entry.target,width);if(width>=210&&width!==prior)changed=true;}
+   if(!changed||queued||!state.portfolioData||!$('page-portfolio').classList.contains('active'))return;
+   queued=true;requestAnimationFrame(()=>{queued=false;if(state.portfolioData&&$('page-portfolio').classList.contains('active'))renderPortfolioResearch();});
+  });
+  for(const id of ['qf-b21-overview-chart','qf-b21-whatif-chart'])observer.observe($(id));
+ }
  selectCompany(state.symbol);renderCompareChips();authUpdate();
 }
 init();
@@ -9930,9 +9951,7 @@ async function verifyMFA(){
     await handleAuthState(data,epoch);if(epoch===authEpoch)message('Authenticator verified. Your private workspace is unlocked.');
   }catch(e){if(epoch===authEpoch)message(e.message);}
 }
-async function logout(){
-  if(signingOut)return;
-  signingOut=true;
+function clearPrivateClientState(status='Signed out.'){
   authEpoch++;
   setRememberPrivate(false);if(rememberPrivateBox)rememberPrivateBox.checked=false;
   privateGeneration++;
@@ -9947,7 +9966,12 @@ async function logout(){
   $('private-wf-output').textContent='Load price history in Market data to begin.';$('private-wf-export').disabled=true;walkforwardResult=null;clearV66Walkforward();clearV66Forecast();
   $('private-fc-output').textContent='Load SEC statements for a selected company first.';
   $('private-total').textContent='—';$('private-invested').textContent='—';
-  $('private-cash').textContent='—';$('private-notes').textContent='';valuationCompanies={};$('private-valuation-company').value='';$('private-valuation-selected').textContent='No company selected';message('Signed out.');privateTab('home');
+  $('private-cash').textContent='—';$('private-notes').textContent='';valuationCompanies={};$('private-valuation-company').value='';$('private-valuation-selected').textContent='No company selected';message(status);privateTab('home');
+}
+async function logout(){
+  if(signingOut)return;
+  signingOut=true;
+  clearPrivateClientState();
   // An in-flight sign-in/session response may set cookies. Revoke after it settles.
   sessionNotice('Private content cleared. Completing secure sign-out…');
   try{await Promise.allSettled([...pendingAuthRequests]);await api('auth/logout',{});sessionNotice('');}
@@ -11144,6 +11168,14 @@ $('private-capital-submit').addEventListener('click',changeCapital);
 // Shared UI bridge: use the existing MFA-gated API and versioned state writers.
 // This exposes NO credentials, provider tokens, or bypass of owner() checks.
 window.QFPrivateBridgeV23=Object.freeze({
+ invalidateSession(){
+  if(!privateState&&$('private-signed').hidden)return;
+  // An authorization rejection clears client evidence immediately. This makes
+  // no revocation/write request and does not alter server cookies or records.
+  clearPrivateClientState('Private authorization must be verified again.');
+  sessionNotice('Private authorization could not be verified. Sign in and complete MFA before continuing.');
+  window.dispatchEvent(new Event('qf:owner-auth-ended'));
+ },
  ready:()=>Boolean(privateState&&!$('private-signed').hidden),
  snapshot:()=>privateState&&!$('private-signed').hidden?{
   cash:Number(privateState.cash),initial_cash:Number(privateState.initial_cash),
@@ -11872,7 +11904,7 @@ picker('qf28-scenario-search',$('qf-v20-portfolio-whatif'),item=>{const c=ctx();
 $('qf-v20-explore-title').closest('.qf-v20-intro').querySelector('p').textContent='Investigate reported sales, profit and cash generation, then inspect the evidence behind a company briefing.';
 document.querySelector('label[for="qf-b21-compare-range"]').textContent='Market-history window';
 $('qf-v20-models-title').closest('.qf-v20-intro').querySelector('p').textContent='Choose a company here, then test a model against its baseline, assumptions and limitations.';
-const compare=$('qf-v20-compare-output'),financial=$('qf-b21-finance-table').closest('section'),market=$('qf-b21-compare-chart').closest('section'),risk=$('qf-b21-risk-scatter').closest('.qf-b21-two'),correlation=$('qf-b21-correlation').closest('section'),brief=$('qf24-compare-brief'),peer=$('qf25-peers')?.closest('section');
+const compare=$('qf-v20-compare-output'),financial=$('qf-b21-finance-table').closest('section'),market=$('qf-b21-compare-chart').closest('section'),risk=$('qf-b21-risk-scatter').closest('section'),correlation=$('qf-b21-correlation').closest('section'),brief=$('qf24-compare-brief'),peer=$('qf25-peers')?.closest('section');
 const tabs=document.createElement('div');tabs.className='qf27-view-tabs';tabs.id='qf28-compare-tabs';tabs.setAttribute('role','group');tabs.setAttribute('aria-label','Comparison evidence');
 tabs.innerHTML=[['financial','Reported financials'],['market','Market / model histories'],['risk','Historical risk & dependence']].map(([key,label])=>'<button class="btn" type="button" data-qf28-compare="'+key+'" aria-pressed="false">'+label+'</button>').join('');compare.before(tabs);
 const views={};for(const key of ['financial','market','risk']){const host=document.createElement('div');host.id='qf28-compare-'+key;host.className='qf28-compare-view';compare.append(host);views[key]=host;}

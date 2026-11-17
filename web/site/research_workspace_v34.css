@@ -26,3 +26,9 @@
 
 /* Column actions must not inherit the shared 170px horizontal flex basis. */
 .qf33-home-proof .qf27-action-row>*{flex:0 0 auto;min-height:44px;display:inline-flex;align-items:center}
+
+/* The shared research tab bar owns the single visible Analyze action. */
+#qf-v20-analyze{display:none!important}
+
+/* Keep selected worked-method labels readable while the pointer remains over them. */
+.qf27-lab-selector button[aria-pressed=true],.qf27-lab-selector button[aria-pressed=true]:hover{background:#272d32!important;color:#fff!important;border-color:#272d32!important}
