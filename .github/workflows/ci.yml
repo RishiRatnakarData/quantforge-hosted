@@ -8,12 +8,16 @@ on:
         description: Run focused proxy and authentication validation to conserve free minutes
         type: boolean
         default: false
+      browser_only:
+        description: Run browser acceptance only after unchanged application code passed numerical CI
+        type: boolean
+        default: false
 permissions:
   contents: read
 
 jobs:
   validate:
-    if: ${{ !inputs.repair_only }}
+    if: ${{ !inputs.repair_only && !inputs.browser_only }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -96,7 +100,8 @@ jobs:
   release_a_browser:
     if: ${{ !inputs.repair_only }}
     name: Release A-D shared-app browser journeys
-    runs-on: ubuntu-latest
+    # Playwright 1.57 predates the ubuntu-latest move to 26.04.
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v5
@@ -143,6 +148,9 @@ jobs:
 
       - name: Readiness before credentials and final Home research workflows
         run: python tools/smoke_final_release32.py
+
+      - name: Integrated assessment and safe stale-preview acceptance
+        run: python tools/smoke_master_quality_v33.py
 
   readiness_repair:
     name: Focused readiness and security validation
