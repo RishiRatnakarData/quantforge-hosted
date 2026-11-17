@@ -82,6 +82,7 @@ function find(){const q=$('qf24-home-search').value.trim().toLowerCase();const m
 $('qf24-home-find').addEventListener('click',find);$('qf24-home-search').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.defaultPrevented){e.preventDefault();find();}});
 $('qf-v20-mode').addEventListener('click',e=>{if(signed()){e.preventDefault();e.stopImmediatePropagation();drawer.showModal();}},true);
 document.addEventListener('click',e=>{
+ const destination=e.target.closest('[data-qf33-home]')?.dataset.qf33Home;if(['explore','compare','models','portfolio','methods'].includes(destination)){home(false);window.QFNavigate20(destination);return;}
  const action=e.target.closest('[data-qf-v23-open]');if(action){e.preventDefault();void open(action.dataset.qfV23Open);}
  const edit=e.target.closest('[data-qf-v23-edit]');if(edit&&privateMode()){editing=Number(edit.dataset.qfV23Edit);const note=bridge().snapshot()?.notes[editing];if(note&&note.symbol===context().symbol){$('qf-v23-note').value=note.text;$('qf-v23-note').focus();status('Revising a saved note. Save adds a new dated record and preserves the original.');}else editing=null;}
  const del=e.target.closest('[data-qf-v23-delete]');if(del&&privateMode()&&window.confirm('Delete this private note?'))void work(()=>bridge().deleteNote(Number(del.dataset.qfV23Delete)),'Research note deleted.');

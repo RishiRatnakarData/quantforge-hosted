@@ -36,8 +36,8 @@ function summary(packet){
  const R=packet.results,policy=R.policy;
  let html='<p><strong>'+(packet.origin==='market'?'Private historical observations':'Synthetic market-path experiment')+'</strong> · '+safe(packet.symbol)+'</p>';
  if(R.candidate.ready){const c=R.candidate;html+='<p>Historical downside: maximum drawdown '+pct(c.metrics.maxDrawdown)+', one-day tail-average loss '+pct(c.metrics.dailyES95)+'. These describe the loaded sample.</p>';}
- if(policy.ready){html+='<p>Evidence state: '+safe(policy.review.readiness)+'. '+safe(policy.assessment.reason)+'</p>'+table(['Method','Outcome','Scope'],policy.ledger.map(l=>[l.title,l.status,l.detail]));}
- if(packet.results.unified?.ready)html+=table(['Evidence domain','Status'],packet.results.unified.domains.map(d=>[d.name||d.key,d.status]));
+ if(policy.ready){html+='<p>Completed calculations and decision evidence are separate: an engine can run on historical inputs while a current conclusion is withheld by freshness or coverage gates.</p><p>Evidence state: '+safe(policy.review.readiness)+'. '+safe(policy.assessment.reason)+'</p>'+table(['Method','Outcome','Scope'],policy.ledger.map(l=>[l.title,l.status,l.detail]));}
+ if(packet.results.unified?.ready)html+=table(['Evidence domain','Status','Reason'],packet.results.unified.domains.map(d=>[d.name||d.key,d.label||d.status,d.detail]));
  if(packet.results.comparative?.ready)html+='<h3>Research-screen sensitivity</h3>'+table(['Assumed risk screen','Evidence state'],packet.results.comparative.policies.rows.map(r=>[r.risk,r.readiness]))+'<p>'+safe(packet.results.comparative.policies.note)+'</p>';
  return html+'<p>No automatic trade or suitability decision follows from these screens. Open Models for evaluations and Methods → Data for filing-coverage diagnostics.</p>';
 }
@@ -86,6 +86,15 @@ async function execute(scope){
   const renderer={company:summary,strategy,factors:factorResult,portfolio,data,valuation:observedValue}[scope];
   const html='<p class="qf25-source">'+safe(input.history.source)+' · '+(input.history.dates.length?safe(input.history.dates[0])+' through '+safe(input.history.dates.at(-1)):'No historical-price path required for these ratios')+'</p>'+renderer(packet);
   cache.set(scope,{stamp:signature,html});target.innerHTML=html;
+  if(scope==='company'&&input.origin==='market'){
+   let overlap=[];
+   try{
+    const comparison=root.QFResearchB21.compare(input.history),index=comparison.symbols.indexOf(input.symbol);
+    overlap=comparison.symbols.filter(s=>s!==input.symbol&&Number(input.portfolio?.holdings?.[s])>0).map(symbol=>({symbol,correlation:comparison.correlation_matrix[index][comparison.symbols.indexOf(symbol)],observations:comparison.dates.length-1,first:comparison.dates[0],last:comparison.dates.at(-1)}));
+   }catch(_){/* Missing aligned observations do not establish diversification. */}
+   root.dispatchEvent(new CustomEvent('qf:company-evidence',{detail:{symbol:input.symbol,revision:root.QFResearch20.context().revision,ownerVersion:input.portfolio?.version,packet,overlap,financial:root.QFResearchCore20.financialSummary(input.company,input.asOf)}}));
+  }
+
  }catch(_){if(token===sequence&&signature===stamp()&&target.isConnected)target.textContent='Research unavailable for these inputs. Check history coverage or provider access; SEC financials remain independent.';}
 }
 function clear(){sequence++;cache.clear();charts.clear();document.querySelectorAll('.qf25-output').forEach(n=>{if(n.textContent)n.textContent='Research context changed. Run this view again for the current inputs.';});peers();}
@@ -114,7 +123,7 @@ document.addEventListener('change',async e=>{
   sequence++;cache.clear();host.textContent=(archive?'Validated revision archive in session. ':'')+(factors?'Parsed independent factor CSV in session. ':'')+'Run the relevant audit or factor study to evaluate exact-date coverage.';
  }catch(e){host.textContent='Evidence not loaded: '+String(e.message||'Invalid file.').slice(0,180);}
 });
-root.addEventListener('qf:research-context',clear);root.addEventListener('qf:research-universe',clear);
+root.addEventListener('qf:owner-state',clear);root.addEventListener('qf:research-context',clear);root.addEventListener('qf:research-universe',clear);
 root.addEventListener('qf:data-mode',()=>{archive=null;factors=null;for(const id of ['qf25-archive-file','qf25-factor-file'])if($(id))$(id).value='';if($('qf25-import-status'))$('qf25-import-status').textContent='Optional evidence cleared for this data mode.';clear();});
 root.addEventListener('qf:owner-auth-ended',()=>{archive=null;factors=null;clear();});
 root.addEventListener('qf:analyze-company',()=>void execute('company'));

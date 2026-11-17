@@ -1168,7 +1168,7 @@ async function api(path, body){
   finally{pendingAuthRequests.delete(request);}
   let data;try{data=await r.json();}catch(_){throw Object.assign(Error('Service unavailable. Free hosting may be waking up.'),{status:r.status});}
   if(path.startsWith('private/')&&generation!==privateGeneration)throw Error('Private session changed; the old response was discarded.');
-  if(!r.ok)throw Object.assign(Error(window.QFErrors24.apiError(r.status,path,data?.code)),{status:r.status,code:typeof data?.code==='string'?data.code:''});
+  if(!r.ok)throw Object.assign(Error(window.QFErrors24.apiError(r.status,path,data?.code,data?.observation)),{status:r.status,code:typeof data?.code==='string'?data.code:''});
   return data;
 }
 const temporaryPrivateOutage=e=>[502,503,504].includes(Number(e?.status));
@@ -2539,6 +2539,7 @@ window.QFPrivateBridgeV23=Object.freeze({
   cash:Number(privateState.cash),initial_cash:Number(privateState.initial_cash),
   valuations:(privateState.valuations||[]).map(p=>({at:String(p.at||''),value:Number(p.value),cash:Number(p.cash),net_contributions:Number(p.net_contributions),pnl:Number(p.pnl),source:String(p.source||'')})),
   holdings:{...(privateState.holdings||{})},
+  basis_accounting:privateState.basis_accounting?structuredClone(privateState.basis_accounting):null,
   notes:(privateState.notes||[]).map(x=>({text:String(x.text||''),at:String(x.at||''),symbol:String(x.symbol||'')})),
   version,capital_events:(privateState.capital_events||[]).map(x=>({...x})),
   trades:(privateState.trades||[]).slice(0,80).map(x=>({...x,symbol:String(x.symbol||''),side:String(x.side||''),units:Number(x.units),at:String(x.at||'')}))
