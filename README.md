@@ -4,7 +4,7 @@ QuantForge is a financial research and software engineering project built to exp
 
 [Public application](https://quantforge-648.pages.dev/) · [Current product](docs/current/PRODUCT.md) · [Architecture](docs/current/ARCHITECTURE.md) · [Research methodology](docs/current/METHODOLOGY.md) · [Technical interview guide](docs/current/TECHNICAL_INTERVIEW_GUIDE.md) · [Release status](docs/current/RELEASE_STATUS.md)
 
-The seven authoritative current documents are this README and the six documents in [docs/current](docs/current/ARCHITECTURE.md). Start with [Product](docs/current/PRODUCT.md), [Methodology](docs/current/METHODOLOGY.md) and [Deployment/security/rollback](docs/current/DEPLOYMENT_SECURITY_ROLLBACK.md). [Documentation index](docs/README.md) identifies historical development records. Repository visibility remains private; no public-source licensing or market-data redistribution permission is implied.
+The authoritative current documents are this README and the product, engineering and policy documents in [docs/current](docs/current/ARCHITECTURE.md). Start with [Product](docs/current/PRODUCT.md), [Methodology](docs/current/METHODOLOGY.md) and [Deployment/security/rollback](docs/current/DEPLOYMENT_SECURITY_ROLLBACK.md). [Documentation index](docs/README.md) identifies historical development records. The source repository is public by owner authorization on November 18, 2026. No new source license or market-data redistribution permission is implied; entitled observations and owner records remain authenticated.
 
 ## One application, five sections
 
@@ -39,7 +39,7 @@ Recorded virtual-account history starts only when the owner requests server-veri
 | Archived experimental NLP (retired from product) | [Sparse TF-IDF, cosine topics and negation-aware lexical tone](cloud/news_intelligence_v180.py) | [Text and endpoint fixtures](tests/test_news_intelligence_v180.py) |
 | Software and cloud | [FastAPI](cloud/api.py), [same-origin proxy](functions/api/[[path]].js), [deterministic builder](tools/build_unified_site.py) | [Owner/MFA/API](tests/test_hosted_web.py), [snapshot accounting](tests/test_valuation_snapshots.py), [three-browser acceptance](tools/smoke_completion_browser.py) |
 
-Methods → Engineering presents the same evidence in the running application, without requiring repository access. The repository remains private; historical release documents are retained for traceability rather than describing the current navigation.
+Methods → Engineering presents the same evidence in the running application, without requiring repository access. The repository is public; historical release documents are retained for traceability rather than describing the current navigation.
 
 ## Architecture and deliberate choices
 
@@ -89,7 +89,7 @@ Thesis revisions append records and preserve earlier text/timestamps. A full 100
 
 Headline NLP is retained as tested archival/offline research, not a current recommendation input or normal product view. The original statistical, ML, optimization, backtesting and NLP engines remain in source. Their execution boundaries are explained in [Methodology](docs/current/METHODOLOGY.md) and the [Interview guide](docs/current/TECHNICAL_INTERVIEW_GUIDE.md).
 
-Historical development records remain in [the documentation index](docs/README.md). Current operations use [Deployment, security and rollback](docs/current/DEPLOYMENT_SECURITY_ROLLBACK.md); older Render or candidate descriptions do not override it. Repository visibility remains private pending a separate authorized decision on history metadata, licensing, provider rights and untrusted preview isolation.
+Historical development records remain in [the documentation index](docs/README.md). Current operations use [Deployment, security and rollback](docs/current/DEPLOYMENT_SECURITY_ROLLBACK.md); older Render or candidate descriptions do not override it. The owner authorized public repository visibility on November 18, 2026. A refreshed reachable-history scan found no tested credential signatures; historical author metadata and available Actions history are public. Earlier source-readiness reports describe the prior private state. Source licensing and provider redistribution rights remain separate decisions; no additional rights are granted by this release.
 
 ## Bounded company research
 
