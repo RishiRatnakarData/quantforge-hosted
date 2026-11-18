@@ -7,4 +7,4 @@
 - Private Alpaca and Supabase data remain in the existing MFA-secured owner workflow; no new authentication or database migration.
 - **Before publishing actual real-company figures**, generate `web/site/sec_snapshot.json` from the SEC, review it, and rebuild `public/index.html`. Without the file, the public page shows a truthful unavailable-data state.
 
-See [complete SEC public-demo runbook](docs/PUBLIC_SEC_DEMO_V5_7.md).
+See [complete SEC public-demo runbook](../../PUBLIC_SEC_DEMO_V5_7.md).

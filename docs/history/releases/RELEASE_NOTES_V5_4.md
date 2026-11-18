@@ -6,7 +6,7 @@
 - Robust-scaled Euclidean nearest peers, peer feature comparison, missing-value audit, and leave-one-feature-out neighbor stability.
 - Exploratory IsolationForest rank for **at least 12** valid issuers; no buy/sell ratings or predictive-accuracy claims.
 - Doesn't change any paper trades, saved allocation targets, portfolio history, or existing Alpaca data.
-- Detailed technical method: [`docs/methodology/SEC_FUNDAMENTAL_ML_V5_4.md`](docs/methodology/SEC_FUNDAMENTAL_ML_V5_4.md).
+- Detailed technical method: [`docs/methodology/SEC_FUNDAMENTAL_ML_V5_4.md`](../../methodology/SEC_FUNDAMENTAL_ML_V5_4.md).
 
 ## Windows upgrade from V5.3.1
 

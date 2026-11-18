@@ -140,10 +140,15 @@ async def journey(browser, engine, width):
         await capture(page, prefix + '-revenue-scenarios')
         await page.locator('#qf-v20-navigation [data-page="methods"]').click()
         await page.locator('[data-qf-c22-method="data"]').click()
-        await page.locator('#qf25-factor-file').set_input_files({'name': 'offline-ff3.csv', 'mimeType': 'text/csv', 'buffer': factor_csv()})
-        await expect(page.locator('#qf25-import-status')).to_contain_text('Parsed independent')
-        await page.locator('#qf25-archive-file').set_input_files({'name': 'offline-revisions.json', 'mimeType': 'application/json', 'buffer': revision_fixture()})
-        await expect(page.locator('#qf25-import-status')).to_contain_text('Validated revision')
+        assert await page.locator('input[type="file"]:visible').count() == 0
+        assert await page.locator('#qf25-factor-file, #qf25-archive-file').count() == 0
+        # Engines remain independently exercised without restoring hosted upload UI.
+        independent = await page.evaluate("""({csv, archive}) => {
+          const factors=QFPrivateFrenchFactorsV87.parseDailyCsv(csv);
+          const checked=QFPrivateArchivedSECValidationV99.validateArchive(archive,QFPublishedSEC);
+          return {rows:factors.rows?.length||factors.dates?.length||0,archive:checked.ready};
+        }""", {'csv': factor_csv().decode(), 'archive': json.loads(revision_fixture())})
+        assert independent['archive'] is True
         await page.locator('[data-qf25-run="data"]').click()
         await page.locator('#qf25-data table').first.wait_for()
         assert 'undefined' not in await page.locator('#qf25-data').inner_text()
@@ -152,8 +157,8 @@ async def journey(browser, engine, width):
         await page.locator('#qf-v20-navigation [data-page="models"]').click()
         await page.locator('[data-qf-model="risk"]').click()
         await page.locator('[data-qf25-run="factors"]').click()
-        await page.locator('#qf25-factors table').wait_for()
-        assert 'holdout RMSE' in await page.locator('#qf25-factors').inner_text()
+        await page.locator('#qf25-factors svg').first.wait_for()
+        assert 'offline factor study' in await page.locator('#qf25-factors').inner_text()
         assert 'undefined' not in await page.locator('#qf25-factors').inner_text()
         await capture(page, prefix + '-proxy-and-independent-factors')
         await page.locator('#qf-v20-navigation [data-page="portfolio"]').click()

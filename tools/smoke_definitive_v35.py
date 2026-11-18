@@ -35,7 +35,7 @@ async def private_journey(browser, engine, width):
     await enter(page)
     await page.locator('#private-login-submit').click()
     await expect(page.locator('#qf34-briefing')).to_be_visible()
-    await expect(page.locator('#qf34-universe-status')).to_contain_text('transparent financial filter')
+    await expect(page.locator('#qf34-universe-status')).to_contain_text('Financial screen ready.')
     assert await page.locator('[data-qf35-select]:checked').count() == 3
     assert not await page.locator('#qf35-assumptions').get_attribute('open')
     for i in range(3):
@@ -53,28 +53,61 @@ async def private_journey(browser, engine, width):
     await page.keyboard.press('Space')
     assert await page.locator('[data-qf35-select]:checked').count() == 3
 
+    await expect(page.locator('#qf35-opportunities')).to_contain_text('Companies worth investigating')
+    await expect(page.locator('#qf36-order-description')).to_contain_text('cash-flow proxy margin')
+    assert await page.locator('#qf36-history').get_attribute('open') is None
+    assert await page.locator('input[type="file"]:visible').count() == 0
+    await page.locator('#qf35-filters > summary').click()
+    for order, label in [('growth', 'annual revenue growth'), ('margin', 'operating margin'), ('cashMargin', 'cash-flow proxy margin')]:
+        await page.locator('#qf34-order').select_option(order)
+        await expect(page.locator('#qf36-order-description')).to_contain_text(label)
+        expected = await page.evaluate("order => QFDecision34.screen({snapshot:QFPublishedSEC,health:QFHealthSnapshot30,eligible:{schema:'quantforge.research-universe.v34',licensed_private:true,items:QFPublishedSEC.companies.map(c=>({symbol:c.symbol}))},filters:{minGrowth:0,order}}).shortlist.map(r=>r.symbol)", order)
+        assert await page.locator('[data-qf35-select]').evaluate_all('(els)=>els.map(e=>e.dataset.qf35Select)') == expected
+    await page.locator('#qf34-min-growth').fill('20')
+    await page.locator('#qf34-min-growth').dispatch_event('change')
+    await expect(page.locator('#qf35-opportunities')).to_contain_text('20.0% minimum')
+    await page.locator('#qf34-min-growth').fill('0')
+    await page.locator('#qf34-min-growth').dispatch_event('change')
+    await page.locator('#qf35-filters > summary').click()
+    await page.locator('#qf36-selection-why > summary').click()
+    await expect(page.locator('#qf36-selection-why')).to_contain_text('550 days')
+    await expect(page.locator('#qf36-selection-why')).to_contain_text('not the best five investments')
+    await page.locator('#qf36-selection-why > summary').click()
+
     symbol_before = await page.evaluate('QFResearch20.context().symbol')
     picks = await page.locator('[data-qf35-select]:checked').evaluate_all('(els)=>els.map(e=>e.dataset.qf35Select)')
     await page.evaluate('(symbol)=>window.qf35Failed=symbol', picks[1])
     await page.evaluate('(symbol)=>window.qf35Partial=symbol', picks[0])
     await page.locator('#qf35-analyze-shortlist').dblclick()
     try:
-        await page.wait_for_function("() => document.querySelectorAll('.qf35-result').length===3&&[...document.querySelectorAll('.qf35-result')].every(e=>/Completed|Incomplete|Failed/.test(e.textContent))", timeout=90000)
+        await page.wait_for_function("() => document.querySelectorAll('.qf35-result').length===3&&[...document.querySelectorAll('.qf35-result')].every(e=>/Complete coverage|Partial coverage|Outdated evidence|Provider unavailable|Research failed/.test(e.textContent))", timeout=90000)
     except Exception:
         print(engine, width, 'isolated fixture timeout diagnostics', await page.locator('.qf35-result').all_text_contents(), errors, flush=True)
         raise
     await expect(page.locator('#qf35-analyze-shortlist')).to_be_enabled(timeout=60000)
     states = await page.locator('.qf35-result').all_text_contents()
     assert len(states) == 3
-    assert 'Failed' in states[1], states
-    assert 'Incomplete' in states[0]
-    assert 'Completed' in states[2] or 'Incomplete' in states[2]
+    assert 'Provider unavailable' in states[1], states
+    assert 'Provider unavailable' in states[0]
+    assert 'Complete coverage' in states[2] or 'Partial coverage' in states[2] or 'Outdated evidence' in states[2]
+    assert await page.locator('.qf34-shortlist .qf35-result').count() == 0
+    assert await page.locator('#qf36-results .qf35-result').count() == 3
+    await expect(page.locator('#qf36-results')).to_contain_text('Research coverage')
+    await expect(page.locator('#qf36-results')).to_contain_text('Research disposition')
     assert await page.evaluate('QFResearch20.context().symbol') == symbol_before
     assert '[object Object]' not in await page.locator('#qf34-briefing').inner_text()
     assert await page.evaluate('qf34Writes') == 0
     assert await page.evaluate('document.documentElement.scrollWidth<=innerWidth')
     await page.screenshot(path=str(OUT / f'{engine}-{width}-batch-partial.png'), full_page=True)
     await page.evaluate('window.qf35Failed="";window.qf35Partial=""')
+    if width == 390:
+        for i in range(5):
+            await page.locator('[data-qf35-select]').nth(i).check()
+        await page.locator('#qf35-analyze-shortlist').click()
+        await expect(page.locator('#qf35-analyze-shortlist')).to_be_enabled(timeout=90000)
+        assert await page.locator('#qf36-results .qf35-result').count() == 5
+        assert await page.evaluate('qf34Writes') == 0
+        await page.screenshot(path=str(OUT / f'{engine}-{width}-five-results.png'), full_page=True)
     await page.locator('[data-qf34-symbol="'+picks[0]+'"]').first.click()
     await expect(page.locator('#qf32-summary')).to_contain_text('Investment research summary', timeout=30000)
     await expect(page.locator('#qf35-company-details')).not_to_have_attribute('open', '')
@@ -107,7 +140,7 @@ async def auth_rejection(browser, engine):
         await page.evaluate(fixture)
     await enter(page)
     await page.locator('#private-login-submit').click()
-    await expect(page.locator('#qf34-universe-status')).to_contain_text('transparent financial filter')
+    await expect(page.locator('#qf34-universe-status')).to_contain_text('Financial screen ready.')
     picks = await page.locator('[data-qf35-select]:checked').evaluate_all('(els)=>els.map(e=>e.dataset.qf35Select)')
     await page.evaluate('(symbol)=>{qf35AuthFailure=symbol;qf35ReadSymbols=[];}', picks[1])
     await page.locator('#qf35-analyze-shortlist').click()

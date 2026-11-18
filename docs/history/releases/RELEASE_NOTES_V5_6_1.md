@@ -7,4 +7,4 @@
 - AAL1 sessions can access only MFA enrollment, factor lookup, verification, session introspection and logout.
 - **Unverified deployment:** authenticated Supabase/Cloudflare/Render integration requires live manual validation before storing sensitive data.
 
-- See [`docs/MFA_UPGRADE_V5_6_1.md`](docs/MFA_UPGRADE_V5_6_1.md) for deployment and acceptance testing.
+- See [`docs/MFA_UPGRADE_V5_6_1.md`](../../MFA_UPGRADE_V5_6_1.md) for deployment and acceptance testing.
