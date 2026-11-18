@@ -25,7 +25,7 @@ function modelSection(category,phase){
  if(category==='valuation')return section('valuation','Observed-price financial ratios','Authenticated quotes and dated SEC shares support observed market-cap multiples. Missing capital or stale inputs withhold ratios; this is separate from the hypothetical cash-flow model.')+'<section class="pane qf25-panel"><h2>Revenue and cash-generation scenarios</h2><p>Start from the selected company’s SEC annual revenue. Growth and cash-flow margin below are explicit assumptions, not estimates learned from future results.</p><div class="qf24-assumptions"><label>Assumed annual growth (%)<input id="qf25-growth" type="number" min="-30" max="40" value="6"></label><label>Assumed cash-flow margin (%)<input id="qf25-margin" type="number" min="-25" max="60" value="12"></label><button class="btn primary" id="qf25-forecast-run">Build scenarios</button></div><div id="qf25-forecast" aria-live="polite"></div></section>';
  return '';
 }
-function dataSection(){return section('data','Filing availability and revision diagnostics','Audit the selected research basket at historical decision dates. The current snapshot is not a complete archive of original filings.')+'<section class="pane"><h2>Optional independent evidence</h2><p>Routine research works without either file. These inputs are parsed locally in this browser session and are cleared on sign-out or data-mode changes. Schema validation does not independently authenticate a file as SEC or factor-library data.</p><label for="qf25-archive-file">SEC filing-revision archive JSON (optional, up to 5 MB)</label><input id="qf25-archive-file" type="file" accept=".json,application/json"><label for="qf25-factor-file">Extracted daily Fama–French three-factor CSV (optional, up to 2 MB)</label><input id="qf25-factor-file" type="file" accept=".csv,text/csv"><p id="qf25-import-status" role="status">No optional evidence loaded. ETF proxies are not official Fama–French factors.</p></section>';}
+function dataSection(){return section('data','Filing availability and revision diagnostics','Audit filing coverage at historical decision dates. The current snapshot does not contain a complete archive of original filings. Independent revision and official factor studies remain available in the offline research tools.');}
 function peers(){
  const host=$('qf25-peers');if(!host)return;
  const c=root.QFResearch20.context(),broad=$('qf27-peer-scope')?.value==='all';
@@ -53,7 +53,7 @@ function factorResult(packet){
  else html=unavailable(r.ready?r.market:r);
  html+='<h3>Independent daily FF3 study</h3>';
  if(f.ready)html+=table(['Coefficient','Estimate'],[['Daily alpha',num(f.model.alphaDaily)],...f.model.factorBetas.map((b,i)=>[['Market excess','SMB','HML'][i],num(b)])])+'<p>Aligned dates '+safe(f.from)+' to '+safe(f.to)+', '+f.aligned+' returns; holdout RMSE '+num(f.holdout.rmse)+' versus prior-mean baseline '+num(f.holdout.baselineRmse)+'. '+safe(f.holdout.interpretation)+'</p><p>'+f.limitations.map(safe).join(' ')+'</p>';
- else html+=unavailable(f)+'<p>Load an optional extracted daily factor CSV in Methods → Data. No upload is required for ETF-proxy analysis.</p>';
+ else html+=unavailable(f)+'<p>Official daily factor inputs are not loaded in the hosted application. Use the retained offline factor study for independent FF3 evaluation; the ETF-proxy analysis above remains available.</p>';
  return html;
 }
 function observedValue(packet){
@@ -116,21 +116,9 @@ document.addEventListener('click',e=>{
   }catch(_){host.textContent='At least two compatible reported annual revenues and bounded growth/margin assumptions are required.';}
  }
 });
-document.addEventListener('change',async e=>{
- if(e.target.id==='qf27-peer-scope')peers();
- if(!['qf25-archive-file','qf25-factor-file'].includes(e.target.id))return;
- const file=e.target.files?.[0],host=$('qf25-import-status'),signature=stamp();if(!file)return;
- if(e.target.id==='qf25-archive-file')archive=null;else factors=null;sequence++;cache.clear();document.querySelectorAll('.qf25-output').forEach(n=>{if(n.textContent)n.textContent='Independent evidence changed. Run this view again.';});
- try{
-  const isArchive=e.target.id==='qf25-archive-file';if(file.size>(isArchive?5:2)*1024*1024)throw Error('Evidence file exceeds its size limit.');
-  const text=await file.text();if(signature!==stamp()||!host.isConnected)return;
-  if(isArchive){const value=JSON.parse(text),checked=root.QFPrivateArchivedSECValidationV99.validateArchive(value,root.QFPublishedSEC);if(!checked.ready)throw Error(checked.reason);archive=value;}
-  else factors=root.QFPrivateFrenchFactorsV87.parseDailyCsv(text);
-  sequence++;cache.clear();host.textContent=(archive?'Validated revision archive in session. ':'')+(factors?'Parsed independent factor CSV in session. ':'')+'Run the relevant audit or factor study to evaluate exact-date coverage.';
- }catch(e){host.textContent='Evidence not loaded: '+String(e.message||'Invalid file.').slice(0,180);}
-});
+document.addEventListener('change',e=>{if(e.target.id==='qf27-peer-scope')peers();});
 root.addEventListener('qf:owner-state',clear);root.addEventListener('qf:research-context',clear);root.addEventListener('qf:research-universe',clear);
-root.addEventListener('qf:data-mode',()=>{archive=null;factors=null;for(const id of ['qf25-archive-file','qf25-factor-file'])if($(id))$(id).value='';if($('qf25-import-status'))$('qf25-import-status').textContent='Optional evidence cleared for this data mode.';clear();});
+root.addEventListener('qf:data-mode',()=>{archive=null;factors=null;clear();});
 root.addEventListener('qf:owner-auth-ended',()=>{archive=null;factors=null;clear();});
 root.addEventListener('qf:analyze-company',()=>void execute('company'));
 root.addEventListener('qf:route-change',e=>{if(e.detail?.route==='compare')peers();});

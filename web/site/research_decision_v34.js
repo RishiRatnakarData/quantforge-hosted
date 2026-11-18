@@ -4,7 +4,7 @@
 const finite=Number.isFinite;
 const dayAge=(value,now)=>{const a=Date.parse(value),b=Date.parse(now);return finite(a)&&finite(b)&&b>=a?(b-a)/86400000:null;};
 const percent=v=>(v*100).toFixed(1)+'%';
-const policyVersion='research-conditions-2026-11-17';
+const policyVersion='research-conditions-2026-11-18';
 function policy(raw={}){
  raw=raw&&typeof raw==='object'&&!Array.isArray(raw)?raw:{};
  const out={},errors=[];
@@ -31,6 +31,35 @@ function deterioration(prediction){
  const valid=p=>p&&Number.isInteger(p.windows)&&p.windows>=12&&[p.modelBrier,p.baselineBrier,p.pairedLossDifference].every(finite)&&p.modelBrier>=0&&p.modelBrier<=1&&p.baselineBrier>=0&&p.baselineBrier<=1&&Math.abs(p.modelBrier-p.baselineBrier-p.pairedLossDifference)<1e-10&&finite(Date.parse(p.first))&&finite(Date.parse(p.last))&&p.first<=p.last;
  return prediction?.ready===true&&d?.schema==='quantforge.chronological-model-review.v34'&&d.state==='deteriorating'&&valid(d.early)&&valid(d.recent)&&d.early.last<d.recent.first&&d.early.pairedLossDifference<-.005&&d.recent.pairedLossDifference>.005;
 }
+
+// Evidence coverage is independent of the investment disposition. No new scoring policy.
+function researchCoverage(input={},report={coverage:[]}){
+ const now=input.asOf||new Date().toISOString(),v=input.valuation;
+ const expired=(date,days)=>{const age=dayAge(date,now);return age!==null&&age>days;};
+ const gaps=(report.coverage||[]).filter(r=>r.status!=='covered').map(row=>{
+  let cause='missing',detail=row.detail,action='Inspect the missing source requirements; a different verified source may be needed.';
+  if(row.domain==='Company financials'||row.domain==='Financial health'){
+   if(expired(input.financial?.source?.period,550)){cause='stale';detail='Financial evidence exceeds the 550-day review policy.';action='Load a newer eligible annual filing.';}
+  }
+  if(row.domain==='Observed market risk'&&expired(input.risk?.last,7)){cause='stale';detail='Observed market history exceeds the seven-day research review policy.';action='Refresh observed market history.';}
+  if(row.domain==='Observed-price valuation'){
+   const outdated=expired(v?.priceTime,7)||expired(v?.sharesTime,550);
+   cause=outdated?'stale':'missing';
+   detail=outdated?'Price or reported-share evidence exceeds its research review window.':
+    (v?.warnings?.length?v.warnings.join(' '):v?.reason||'Compatible price, reported shares and annual financial evidence are unavailable through the current source.');
+   if(!outdated&&v?.symbol&&v.symbol!==input.financial?.symbol)detail='Returned valuation evidence belongs to a different issuer; it cannot support this company assessment.';
+   else if(!outdated&&v?.fiscalEnd&&v.fiscalEnd!==input.financial?.source?.period)detail='Price/share evidence and the selected annual financial period do not match.';
+   action=outdated?'Refresh dated price/share evidence and check the fiscal bridge.':'Inspect price, reported-share dates and filing compatibility. A missing capital input may require another verified source; waiting alone may not resolve it.';
+  }
+  if(row.domain==='Requested source refresh'){const contractOnly=(input.readFailures||[]).every(k=>input.readIssueKinds?.[k]==='incompatible');cause=contractOnly?'incompatible':'unavailable';detail=(contractOnly?'Returned evidence did not match the required company or data contract: ':'Required evidence requests could not be completed: ')+(input.readFailures||[]).join(', ')+'. Available results are retained.';action=contractOnly?'Inspect the returned company identifier and source contract before using these inputs.':'Retry the failed source requests when access is available; inspect service status if the problem persists.';}
+  return {...row,cause,detail,action};
+ });
+ const unavailable=gaps.find(r=>r.cause==='unavailable'),stale=gaps.find(r=>r.cause==='stale');
+ const state=unavailable?'Provider unavailable':stale?'Outdated evidence':gaps.length?'Partial coverage':'Complete coverage';
+ const primary=unavailable||stale||gaps[0];
+ return {state,upstreamCause:'unclassified',complete:gaps.length===0,gaps,reason:primary?.detail||'All required supported evidence domains are available. Coverage does not establish investment quality.',next:primary?.action||'Inspect the research disposition and its assumptions.'};
+}
+
 function assess(input={},guide=root.QFResearchGuide30){
  if(!guide?.decisionSummary)throw Error('The existing research assessment engine is unavailable.');
  const result=guide.decisionSummary(input),rules=policy(input.rules),now=input.asOf||new Date().toISOString();
@@ -85,25 +114,31 @@ function assess(input={},guide=root.QFResearchGuide30){
  let label='Investigate',code='research-further',reason='Review the strengths, opposing evidence and assumptions before considering a position.';
  if(rules.errors.length){label='Check research conditions';code='invalid-conditions';reason=rules.errors.join(' ');}
  else if(breaches.length){label=input.held&&finite(weight)&&rules.maxWeight!==null&&weight>rules.maxWeight?'Consider reducing an exposure under your selected rule':'Avoid adding under current risk rules';code='selected-rule-breach';reason=breaches[0];}
- else if(incomplete.length||missing.length){label='Wait for updated evidence';code='evidence-incomplete';reason=missing[0]||'The current assessment is incomplete: '+incomplete.join(', ')+'. Historical facts remain inspectable.';}
- else if(deterioration(input.prediction)){label='Watch model deterioration';code='model-deterioration';reason='Recent held-out error lost its baseline advantage. Reassess the model before relying on its direction.';}
+ else if(incomplete.length||missing.length){label='Wait for evidence';code='evidence-incomplete';reason=missing[0]||'The current assessment is incomplete: '+incomplete.join(', ')+'. Historical facts remain inspectable.';}
+ else if(deterioration(input.prediction)&&input.preferences?.horizon!=='long'){label='Watch model deterioration';code='model-deterioration';reason='Recent held-out error lost its baseline advantage. Reassess the model before relying on its direction.';}
  else if(!comparableEvidence.valid){label='Investigate source comparability';code='financial-comparability';reason=comparableEvidence.reason;}
  else if(!financialPositive){label='Watch';code='financial-cautions';reason='The covered growth, profitability and cash-generation measures do not all support the selected positive-business case.';}
  else if(explicitEntry&&(!quoteFresh||oldMarks)){label='Wait for a current observation';code='execution-observation-stale';reason='Current transaction-quality observations are unavailable. Historical research remains useful; a fresh server preview is required before any virtual transaction.';}
  else if(explicitEntry&&scenario&&observed){label='Consider an entry under specified conditions';code='conditions-met';reason='The dated evidence meets the explicitly selected financial, valuation, drawdown, cash and concentration rules. This is conditional research, not proof of investment merit or an instruction to trade.';}
- const modelLimited=!input.prediction?.ready||input.prediction.qualified!==true;
- const next=missing[0]||({
+ const modelLimited=!input.prediction?.ready||input.prediction.qualified!==true||deterioration(input.prediction);
+ result.model+=' A five-session classifier is supplementary evidence; it cannot independently justify a multi-year entry or exit.';
+ if(deterioration(input.prediction))result.model+=' Recent chronological diagnostics are deteriorating; do not rely on this direction signal.';
+ const research=researchCoverage(input,result);
+ if(code==='evidence-incomplete'){reason=incomplete.length?research.reason:missing[0];}
+ if(code==='research-further')reason=financialPositive?'Reported growth, profitability and cash generation support further research. An attractive purchase price is not established; test valuation assumptions and portfolio limits.':reason;
+ const selectedInvalidation=breaches.length?'Reassess after the breached condition is resolved using compatible dated evidence.':incomplete.length?'Reassess when the listed missing domains are supplied and pass their source/date checks.':explicitEntry?'Reassess if the selected valuation, drawdown, cash or concentration conditions stop passing, or new filings weaken the business case.':'Reassess after a new filing, weaker cash generation, a material price change or a portfolio-exposure change. No scheduled monitoring is implied.';
+ const next=(code==='evidence-incomplete'&&incomplete.length?research.next:null)||missing.find(x=>!x.startsWith('Refresh the incomplete source'))||({
   'invalid-conditions':'Correct the highlighted optional research conditions and calculate again.',
   'selected-rule-breach':'Inspect the breached condition in detailed evidence, then test a smaller hypothetical allocation or compare another issuer. No transaction has been prepared.',
-  'evidence-incomplete':'Load or inspect the missing evidence domains: '+incomplete.join(', ')+'. Rerun the assessment when compatible observations are available.',
+  'evidence-incomplete':research.next,
   'model-deterioration':'Open Models → Prediction → Evaluation and compare recent held-out Brier error with the baseline before using the model.',
   'financial-comparability':'Open the financial-source lineage and reconcile revenue concepts, filing accessions and fiscal periods before comparing ratios.',
   'financial-cautions':'Inspect the latest annual revenue, operating profit and cash-generation trends; read the relevant filing for the weakest reported measure.',
   'execution-observation-stale':'Refresh the dated observations. Any later virtual transaction still needs its own fresh server preview.',
   'conditions-met':'Stress-test growth and discount-rate assumptions, and compare a peer before making an independent investment decision.'
- }[code]||result.next);
+ }[code]||'Inspect the observed-price ratios, then select a valuation ceiling and portfolio limits before testing a hypothetical addition.');
 
- return {...result,next,authoritative:true,schema:'quantforge.current-assessment.v34',policyVersion,
+ return {...result,researchCoverage:research,next,invalidation:selectedInvalidation,authoritative:true,schema:'quantforge.current-assessment.v34',policyVersion,
   snapshot:{symbol:input.financial?.symbol||'',asOf:now,financialPeriod:input.financial?.source?.period||null,marketThrough:input.risk?.last||null,priceTime:value?.priceTime||null,ownerVersion:input.ownerVersion??null,revision:input.revision??null},
   proposal:{label,code,reason,conditions,missing,breaches,scenario,explicitEntry,modelLimited,quoteFresh},
   evidenceKinds:['Observed facts','Derived calculations','Statistical estimates','Scenarios','Research judgment'],
@@ -148,10 +183,8 @@ function briefing({portfolio,valuation,notes=[],rules={},asOf=new Date().toISOSt
  for(const note of notes){const thesis=guide?.decode(note.text);if(!thesis)continue;const key=note.symbol+'|'+thesis.id,old=latest.get(key);if(!old||thesis.revision>old.thesis.revision)latest.set(key,{note,thesis});}
  for(const {note,thesis} of latest.values()){if(thesis.review&&dayAge(thesis.review,asOf)!==null)actions.push({kind:'review-due',symbol:note.symbol,label:'Revisit your thesis',detail:'Your chosen review date '+thesis.review+' has arrived. Inspect new evidence; earlier records remain unchanged.'});}
  if(!marked&&positions.length)actions.unshift({kind:'marks-missing',label:'Refresh dated holding marks',detail:'Current portfolio exposure cannot be inferred from cash and units alone. No values or gains have been fabricated.'});
- if(selected.maxWeight===null&&positions.length)actions.push({kind:'rules-missing',label:'Choose a concentration boundary',detail:'Set an optional personal research limit to identify exposure breaches. Risk tolerance is not inferred from your activity.'});
- if(!actions.length)actions.push({kind:'investigate',label:'Find your next research question',detail:'Screen supported issuers or investigate an investment. No unobserved market changes or favorable candidates are implied.'});
  return {schema:'quantforge.owner-briefing.v34',actions:actions.slice(0,3),positionCount:positions.length,savedTheses:latest.size,asOf,continuousMonitoring:false,accountWrites:0};
 }
-const api=Object.freeze({policy,assess,screen,briefing,comparable,policyVersion});
+const api=Object.freeze({policy,assess,screen,briefing,comparable,researchCoverage,policyVersion});
 root.QFDecision34=api;if(typeof module==='object'&&module.exports)module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);

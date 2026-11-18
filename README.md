@@ -55,7 +55,7 @@ Browser → Cloudflare same-origin proxy → FastAPI / Vercel Hobby (recovered A
 Eligible inputs → retained pure engines → scoped evidence → shared five-section UI
 ```
 
-Native JavaScript avoids a framework rewrite; native MathML avoids an external equation script. The static build retains three CSP-hashed scripts. Provider credentials and owner state stay outside public assets. Optional revision archives and daily FF3 data are bounded, local-to-session inputs; routine research does not require uploads. ETF proxy factors are not official Fama–French factors.
+Native JavaScript avoids a framework rewrite; native MathML avoids an external equation script. The static build retains three CSP-hashed scripts. Provider credentials and owner state stay outside public assets. The hosted UI has no file-upload controls. Independent filing-archive and official daily FF3 engines, parsers and tests remain available offline. ETF proxy factors are not official Fama–French factors.
 
 ## Evaluation and limitations
 
@@ -100,3 +100,5 @@ In Private My Briefing, **Analyze shortlisted companies** runs one to five selec
 Annual earnings multiples require compatible reported net-income lineage. They approximate market capitalization divided by annual net income, not diluted-EPS P/E or intrinsic value. Unverified TTM and the complete enterprise-to-diluted-equity bridge remain explicitly unavailable. Public Home is search-first; Explore highlights precede charts; model interpretation precedes evaluation metrics. Technical depth remains available in supporting evidence and Methods.
 
 Protected HTTP 401/403 responses immediately clear local Private evidence and cancel pending studies through the existing client cleanup. Provider/network failures retain their separate incomplete/failed states. This does not submit server logout or modify owner records. Portfolio charts remeasure visible pane widths without fetching additional prices; selected Methods controls retain readable hover contrast.
+
+The final refinement separates financial screening, research coverage and investment disposition. See [policy evidence and performance limits](docs/current/INVESTMENT_POLICY_EVIDENCE.md) for exact rules and the optional offline forward paper protocol. Investment-policy profitability is not established.

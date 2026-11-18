@@ -12,7 +12,7 @@ function assessmentInput(input,packet,E=root){
  return {financial,observed,risk:observed?E.QFResearchCore20.priceStatistics(prices,crypto?365:252):null,prediction,
   held:Number(input.portfolio?.holdings?.[input.symbol])>0,portfolio:input.portfolio,ownerVersion:input.portfolio?.version,
   healthRow:(E.QFHealthSnapshot30?.companies?.[input.symbol]?.annual||[]).find(r=>r.fiscal_end===financial.source.period)||null,
-  readFailures:input.readFailures||[],valuation:packet.results.value,portfolioImpact:packet.results.candidate?.portfolioImpact,overlap,asOf:input.asOf};
+  readIssueKinds:input.readIssueKinds||{},readFailures:input.readFailures||[],valuation:packet.results.value,portfolioImpact:packet.results.candidate?.portfolioImpact,overlap,asOf:input.asOf};
 }
 async function load({symbol,snapshot,portfolio,read,signal,now=()=>new Date().toISOString()},E=root){
  if(!/^[A-Z][A-Z0-9.]{0,9}$/.test(symbol)||!snapshot?.companies?.some(c=>c.symbol===symbol)||!portfolio||typeof read!=='function')throw Error('A covered eligible issuer and verified owner snapshot are required.');
@@ -21,20 +21,20 @@ async function load({symbol,snapshot,portfolio,read,signal,now=()=>new Date().to
  const symbols=[...new Set([symbol,symbol==='SPY'?'VTI':'SPY',...held])].slice(0,5),quoteNames=[...new Set([symbol,...Object.keys(portfolio.holdings||{})])].slice(0,8);
  const paths=[['prices','private/history-single?'+new URLSearchParams({symbol,days:'365'})],['batch','private/history?'+new URLSearchParams({symbols:symbols.join(','),days:'730'})],['quotes','private/quotes?'+new URLSearchParams({symbols:quoteNames.join(',')})],['capital','private/valuation-capital?'+new URLSearchParams({symbol})],['company','private/sec/company?'+new URLSearchParams({symbol})]];
  const outcomes=await Promise.allSettled(paths.map(([,path])=>read(path,signal)));check();
- if(outcomes.every(r=>r.status==='rejected'))throw Error('No requested evidence could be loaded.');
- const values={},failures=[];outcomes.forEach((r,i)=>{if(r.status==='fulfilled')values[paths[i][0]]=r.value;else failures.push(paths[i][0]);});
+ if(outcomes.every(r=>r.status==='rejected')){const e=Error('No requested evidence could be loaded.');e.code='source-unavailable';throw e;}
+ const values={},failures=[],readIssueKinds={};outcomes.forEach((r,i)=>{if(r.status==='fulfilled')values[paths[i][0]]=r.value;else {failures.push(paths[i][0]);readIssueKinds[paths[i][0]]='unavailable';}});
  const raw=values.prices;
  let assessmentPrices=[];
- if(raw?.licensed_private===true&&raw.symbol===symbol&&raw.ohlcv_available===false){try{assessmentPrices=E.QFResearchCore20.priceSeries(raw.observations);}catch(_){failures.push('prices');}}
- else if(raw)failures.push('prices');
+ if(raw?.licensed_private===true&&raw.symbol===symbol&&raw.ohlcv_available===false){try{assessmentPrices=E.QFResearchCore20.priceSeries(raw.observations);}catch(_){failures.push('prices');readIssueKinds.prices='incompatible';}}
+ else if(raw){failures.push('prices');readIssueKinds['prices']='incompatible';}
  let history={symbols:[symbol],dates:assessmentPrices.map(p=>p.date),closes:{[symbol]:assessmentPrices.map(p=>p.close)},sessions_per_year:252,source:'Incomplete observed study; no synthetic replacement',calendar:'equity_sessions'};
- if(values.batch){try{history={...E.QFResearchB21.fromBatch(values.batch,symbols),sessions_per_year:252,source:values.batch.source||'Authenticated observations',calendar:'equity_sessions'};}catch(_){failures.push('batch');}}
+ if(values.batch){try{history={...E.QFResearchB21.fromBatch(values.batch,symbols),sessions_per_year:252,source:values.batch.source||'Authenticated observations',calendar:'equity_sessions'};}catch(_){failures.push('batch');readIssueKinds.batch='incompatible';}}
  const company=values.company?.symbol===symbol&&Array.isArray(values.company.annual)?values.company:snapshot.companies.find(c=>c.symbol===symbol);
- if(values.company&&!(values.company.symbol===symbol&&Array.isArray(values.company.annual)))failures.push('company');
- if(values.capital&&values.capital.symbol!==symbol)failures.push('capital');
- if(values.quotes&&!Array.isArray(values.quotes.quotes))failures.push('quotes');
+ if(values.company&&!(values.company.symbol===symbol&&Array.isArray(values.company.annual))){failures.push('company');readIssueKinds['company']='incompatible';}
+ if(values.capital&&values.capital.symbol!==symbol){failures.push('capital');readIssueKinds['capital']='incompatible';}
+ if(values.quotes&&!Array.isArray(values.quotes.quotes)){failures.push('quotes');readIssueKinds['quotes']='incompatible';}
  const quotes=Array.isArray(values.quotes?.quotes)?Object.fromEntries(values.quotes.quotes.map(q=>[q.symbol,q])):{};
- return {scope:'company',symbol,company,snapshot,history,origin:'market',asOf:now(),assessmentPrices,assessmentSource:raw?.source||'Unavailable observed history',quote:quotes[symbol]||null,quotes,capital:values.capital?.symbol===symbol?values.capital:null,portfolio,readFailures:[...new Set(failures)]};
+ return {scope:'company',symbol,company,snapshot,history,origin:'market',asOf:now(),assessmentPrices,assessmentSource:raw?.source||'Unavailable observed history',quote:quotes[symbol]||null,quotes,capital:values.capital?.symbol===symbol?values.capital:null,portfolio,readIssueKinds,readFailures:[...new Set(failures)]};
 }
 function study(input,{rules={},revision=0,preferences={horizon:'long'}}={},E=root){
  const packet=E.QFDeepResearch25.run(input),base=assessmentInput(input,packet,E);
@@ -56,12 +56,12 @@ function createBatch({run,valid=()=>true,onChange=()=>{},timeoutMs=60000}={}){
     if(!current())break;const item=rows[i];item.state='Loading evidence';onChange(snapshot());
     const timed=new AbortController(),abort=()=>timed.abort();signal.addEventListener('abort',abort,{once:true});let timer;
     try{
-     const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>{timed.abort();reject(Error('Evidence request timed out.'));},timeoutMs);});
+     const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>{timed.abort();reject(Object.assign(Error('Evidence request timed out.'),{code:'source-unavailable'}));},timeoutMs);});
      const result=await Promise.race([run(item.symbol,context,timed.signal,()=>{if(current()){item.state='Analyzing';onChange(snapshot());}}),timeout]);
      if(!current())break;
-     item.result=result;item.state=result.report.coverage.every(r=>r.status==='covered')?'Completed':'Incomplete';
+     item.result=result;item.coverage=result.report.researchCoverage||null;item.state=result.report.coverage.every(r=>r.status==='covered')?'Completed':'Incomplete';
      if(result.input.readFailures?.length)item.state='Incomplete';
-    }catch(error){if(!current())break;item.state='Failed';item.reason=error.name==='AbortError'?'Evidence request cancelled or timed out.':'Evidence could not be loaded. Other completed results are preserved.';}
+    }catch(error){if(!current())break;item.state='Failed';item.coverage={state:error.code==='source-unavailable'?'Provider unavailable':'Research failed',complete:false,gaps:[]};item.reason=error.code==='source-unavailable'?'Required evidence requests could not be completed. Retry when source access is available. Other results are retained.':'A processing error prevented a defensible result. Other results are retained; retry or inspect the diagnostics.';}
     finally{clearTimeout(timer);signal.removeEventListener('abort',abort);}
     if(current())onChange(snapshot());
    }

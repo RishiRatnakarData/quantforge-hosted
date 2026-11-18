@@ -32,3 +32,14 @@
 
 /* Keep selected worked-method labels readable while the pointer remains over them. */
 .qf27-lab-selector button[aria-pressed=true],.qf27-lab-selector button[aria-pressed=true]:hover{background:#272d32!important;color:#fff!important;border-color:#272d32!important}
+
+/* Targeted refinement: the financial screen and research outcomes have separate roles. */
+.qf36-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.qf36-results .qf35-result{margin:0;padding:22px;border:1px solid #d5dce1;border-radius:10px;min-width:0}
+.qf36-results h3{margin:0 0 16px;font-size:18px;line-height:1.45}
+.qf36-result-fields{display:grid;gap:12px;margin:16px 0}.qf36-result-fields div{display:grid;gap:4px}.qf36-result-fields dt{font-size:13px;color:#56616a}.qf36-result-fields dd{margin:0;font-weight:650}
+.qf34-briefing p{line-height:1.6;margin-block:12px 16px}.qf34-briefing h2{margin-bottom:18px}.qf34-briefing summary{padding:10px 0;min-height:44px}.qf35-selection{min-height:44px}.qf34-briefing .btn{min-height:44px}.qf36-coverage{padding:12px 16px;background:#f3f5f6;border-left:3px solid #aab6bf}
+#qf36-order-description{max-width:78ch}#qf36-history #qf34-reviewed{margin-top:18px}
+/* Shared detail views: modest spacing only; preserve the accepted Public structure. */
+.qf25-panel>p,.qf24-figure figcaption{line-height:1.6}.qf25-panel .qf25-output:not(:empty){margin-top:22px}.qf25-panel>h2{margin-bottom:16px}.qf25-panel>.btn{margin-block:8px 12px}.qf35-report-actions{gap:12px}
+@media(max-width:680px){.qf36-results{grid-template-columns:1fr;gap:18px}.qf36-results .qf35-result{padding:18px}.qf34-shortlist dl>div{flex-wrap:wrap}.qf36-results .btn{width:100%}}

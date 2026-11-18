@@ -39,7 +39,7 @@ async def run():
                 await page.locator("#private-login-submit").click()
                 await expect(page.locator("#qf34-briefing")).to_be_visible()
                 await expect(page.locator("#qf34-universe-status")).to_contain_text(
-                    "transparent financial filter"
+                    "Financial screen ready."
                 )
                 assert 0 < await page.locator(".qf34-shortlist article").count() <= 5
                 assert await page.evaluate("document.documentElement.scrollWidth<=innerWidth")
@@ -71,6 +71,7 @@ async def run():
                 )
                 assert await page.evaluate("qf34CompanyReads") == before + 1
                 await page.locator('[data-qf34-workspace="briefing"]').first.click()
+                await page.locator("#qf36-history > summary").click()
                 await expect(page.locator("#qf34-reviewed")).to_contain_text("MSFT")
                 await page.locator('[data-qf34-workspace="portfolio"]').first.click()
                 await expect(page.locator("#page-portfolio")).to_be_visible()
