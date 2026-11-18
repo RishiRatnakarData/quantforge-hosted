@@ -802,6 +802,9 @@ body.qf31-home-active #qf28-mobile-credit{display:none!important}
 .qf25-panel>p,.qf24-figure figcaption{line-height:1.6}.qf25-panel .qf25-output:not(:empty){margin-top:22px}.qf25-panel>h2{margin-bottom:16px}.qf25-panel>.btn{margin-block:8px 12px}.qf35-report-actions{gap:12px}
 @media(max-width:680px){.qf36-results{grid-template-columns:1fr;gap:18px}.qf36-results .qf35-result{padding:18px}.qf34-shortlist dl>div{flex-wrap:wrap}.qf36-results .btn{width:100%}}
 
+/* Public source references remain keyboard-visible and touch-readable. */
+.qf26-references a{display:block;min-height:44px;overflow-wrap:anywhere;text-underline-offset:3px}.qf24-source:focus-visible,.qf26-references a:focus-visible{outline:2px solid #465761;outline-offset:3px}
+
 
 /* V9 private operating system: public site remains visually unchanged. */
 #private-signed .qf-v9-shell h2{margin:8px 0 10px;font-size:24px}
@@ -2716,7 +2719,7 @@ root.document?.addEventListener('click',e=>{
       files: ['cloud/api.py', 'functions/api/[[path]].js', 'tools/build_unified_site.py'], tests: ['tests/test_hosted_web.py', 'tests/test_valuation_snapshots.py', 'tools/smoke_completion_browser.py'], route: 'methods', formula: null}
   ];
   let chosen = 'data';
-  const reference = (label, files) => '<div class="qf26-references"><strong>' + label + '</strong>' + files.map(file => '<code>' + safe(file) + '</code>').join('') + '</div>';
+  const reference = (label, files) => '<div class="qf26-references"><strong>' + label + '</strong>' + files.map(file => '<a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/' + file.split('/').map(encodeURIComponent).join('/') + '" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><code>' + safe(file) + '</code></a>').join('') + '</div>';
   function detail(ctx) {
     const item = catalog.find(row => row.id === chosen);
     let trace = '';
@@ -4740,8 +4743,8 @@ const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'
 const percent=(x,n=1)=>typeof x==='number'&&Number.isFinite(x)?(x*100).toFixed(n)+'%':'Unavailable';
 const number=(x,n=2)=>typeof x==='number'&&Number.isFinite(x)?x.toFixed(n):'Unavailable';
 const billions=x=>typeof x==='number'&&Number.isFinite(x)?(x<0?'−':'')+'$'+(Math.abs(x)/1e9).toFixed(2)+'B':'Unavailable';
-// Source repository is private: show checked local references without dead public links.
-const source=(file,label)=>'<span class="qf24-source">'+safe(label)+' · <code>'+safe(file)+'</code> (repository access required)</span>';
+// Public evidence links contain static source paths only, never account context.
+const source=(file,label)=>'<a class="qf24-source" href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/'+file.split('/').map(encodeURIComponent).join('/')+'" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">'+safe(label)+' · <code>'+safe(file)+'</code></a>';
 let category='prediction',phase='results',method='overview',stamp='',cached=null;
 const categories=['prediction','risk','valuation','strategy'],phases=['results','evaluation','method'];
 function context(){return root.QFResearch20?.context?.()||null;}

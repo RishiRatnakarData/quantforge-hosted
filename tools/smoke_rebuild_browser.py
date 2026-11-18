@@ -4,6 +4,7 @@ from __future__ import annotations
 import asyncio
 import os
 from pathlib import Path
+from urllib.parse import unquote
 
 from browser_product_contract import PRODUCT_TRADES, pick_compare, virtual_buy
 from playwright.async_api import async_playwright
@@ -72,7 +73,17 @@ async def matrix(page, prefix):
                 if view == 'statistical':
                     assert await page.locator('#qf-c22-method-content math').count() >= 1
                 await capture(page, f'{prefix}-methods-{view}')
-            assert await page.locator('#qf-c22-method-content a[href*="github.com"]').count() == 0
+            links = await page.locator('#qf-c22-method-content a[href*="github.com"]').evaluate_all('(els)=>els.map(e=>({href:e.href,rel:e.rel,target:e.target,referrer:e.referrerPolicy}))')
+            assert len(links) >= 2
+            prefix = 'https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/'
+            for link in links:
+                assert link['href'].startswith(prefix)
+                target = (ROOT / unquote(link['href'][len(prefix):])).resolve()
+                assert target.is_relative_to(ROOT) and target.is_file()
+                assert link['target'] == '_blank'
+                assert 'noopener' in link['rel'] and 'noreferrer' in link['rel']
+                assert link['referrer'] == 'no-referrer'
+
         elif route == 'portfolio':
             for view in ('overview', 'whatif', 'analysis'):
                 await page.locator(f'[data-qf-portfolio="{view}"]').click()

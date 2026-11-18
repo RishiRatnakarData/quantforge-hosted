@@ -7,8 +7,8 @@ const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'
 const percent=(x,n=1)=>typeof x==='number'&&Number.isFinite(x)?(x*100).toFixed(n)+'%':'Unavailable';
 const number=(x,n=2)=>typeof x==='number'&&Number.isFinite(x)?x.toFixed(n):'Unavailable';
 const billions=x=>typeof x==='number'&&Number.isFinite(x)?(x<0?'−':'')+'$'+(Math.abs(x)/1e9).toFixed(2)+'B':'Unavailable';
-// Source repository is private: show checked local references without dead public links.
-const source=(file,label)=>'<span class="qf24-source">'+safe(label)+' · <code>'+safe(file)+'</code> (repository access required)</span>';
+// Public evidence links contain static source paths only, never account context.
+const source=(file,label)=>'<a class="qf24-source" href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/'+file.split('/').map(encodeURIComponent).join('/')+'" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">'+safe(label)+' · <code>'+safe(file)+'</code></a>';
 let category='prediction',phase='results',method='overview',stamp='',cached=null;
 const categories=['prediction','risk','valuation','strategy'],phases=['results','evaluation','method'];
 function context(){return root.QFResearch20?.context?.()||null;}

@@ -43,3 +43,6 @@
 /* Shared detail views: modest spacing only; preserve the accepted Public structure. */
 .qf25-panel>p,.qf24-figure figcaption{line-height:1.6}.qf25-panel .qf25-output:not(:empty){margin-top:22px}.qf25-panel>h2{margin-bottom:16px}.qf25-panel>.btn{margin-block:8px 12px}.qf35-report-actions{gap:12px}
 @media(max-width:680px){.qf36-results{grid-template-columns:1fr;gap:18px}.qf36-results .qf35-result{padding:18px}.qf34-shortlist dl>div{flex-wrap:wrap}.qf36-results .btn{width:100%}}
+
+/* Public source references remain keyboard-visible and touch-readable. */
+.qf26-references a{display:block;min-height:44px;overflow-wrap:anywhere;text-underline-offset:3px}.qf24-source:focus-visible,.qf26-references a:focus-visible{outline:2px solid #465761;outline-offset:3px}

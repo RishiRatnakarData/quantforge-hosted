@@ -43,7 +43,7 @@
       files: ['cloud/api.py', 'functions/api/[[path]].js', 'tools/build_unified_site.py'], tests: ['tests/test_hosted_web.py', 'tests/test_valuation_snapshots.py', 'tools/smoke_completion_browser.py'], route: 'methods', formula: null}
   ];
   let chosen = 'data';
-  const reference = (label, files) => '<div class="qf26-references"><strong>' + label + '</strong>' + files.map(file => '<code>' + safe(file) + '</code>').join('') + '</div>';
+  const reference = (label, files) => '<div class="qf26-references"><strong>' + label + '</strong>' + files.map(file => '<a href="https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/' + file.split('/').map(encodeURIComponent).join('/') + '" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><code>' + safe(file) + '</code></a>').join('') + '</div>';
   function detail(ctx) {
     const item = catalog.find(row => row.id === chosen);
     let trace = '';
