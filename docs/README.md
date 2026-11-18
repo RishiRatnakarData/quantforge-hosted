@@ -8,7 +8,11 @@ The authoritative current set is the [main README](../README.md) and:
 4. [Deployment, security and rollback](current/DEPLOYMENT_SECURITY_ROLLBACK.md)
 5. [Technical learning and interview guide](current/TECHNICAL_INTERVIEW_GUIDE.md)
 6. [Latest release scope and verification](current/RELEASE_STATUS.md)
+7. [Investment-policy evidence and performance limits](current/INVESTMENT_POLICY_EVIDENCE.md)
+8. [Optional forward paper template](current/FORWARD_PAPER_TEMPLATE.md)
 
 All other versioned releases, candidate notes, Render-era deployment descriptions, local-only architecture discussions, previous audits and research protocols in this directory tree are historical development evidence. They preserve algorithms, rationale and prior limitations; they are not current production instructions. Source and tests remain authoritative for implementation. A historical passing fixture is not evidence that current production or a real authenticated account passed.
 
 Current production uses Cloudflare Pages and Vercel Hobby with Supabase and entitled Alpaca data. Do not follow old instructions to restart Render, expose local services, switch providers or remove security controls. Technical specialist documents can supply background, with their historical scope retained.
+
+[Historical release archive](history/releases/README.md) collects the former root-level version notes and audit without deleting them or rewriting Git history. [Public screenshot provenance](images/README.md) identifies the source and scope of the README image.
