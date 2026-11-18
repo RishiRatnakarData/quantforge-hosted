@@ -32,3 +32,25 @@ PRODUCT_TRADES = r'''() => {
   return response({portfolio:qfMockOwner,version:qfMockVersion,paper_only:true});
  };
 }'''
+
+
+async def navigate(page, route):
+    """Follow visible Public destinations or the retained Private specialist paths."""
+    private = await page.locator('body').evaluate("e=>e.classList.contains('qf37-private')")
+    if not private:
+        await page.locator(f'#qf-v20-navigation [data-page="{route}"]').click()
+    elif route == 'portfolio':
+        await page.locator('#qf34-workspace-nav [data-qf34-workspace="portfolio"]').click()
+    elif route == 'explore':
+        await page.locator('[data-qf34-workspace="research"]:visible').click()
+    else:
+        sidebar = page.locator(f'#qf-v20-navigation [data-page="{route}"]')
+        if await sidebar.is_visible():
+            await sidebar.click()
+        elif await page.locator('#qf37-research-home').is_visible():
+            details = page.locator('#qf37-research-home .qf37-advanced')
+            if await details.get_attribute('open') is None:
+                await details.locator('summary').click()
+            await details.locator(f'[data-qf37-route="{route}"]').click()
+        else:
+            await page.locator(f'#qf37-secondary [data-qf37-route="{route}"]').click()

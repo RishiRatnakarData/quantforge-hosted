@@ -5,6 +5,7 @@ import asyncio
 import json
 from pathlib import Path
 
+from browser_product_contract import navigate
 from playwright.async_api import async_playwright, expect
 from smoke_rebuild_browser import FIXTURE
 
@@ -145,7 +146,7 @@ async def journey(browser,engine,width):
     await page.locator('#qf24-home-search').fill('NVIDIA')
     await page.locator('#qf32-home-options [data-qf27-symbol="NVDA"]').click()
     await expect(page.locator('#qf-v20-company')).to_have_text('NVIDIA')
-    await page.locator('#qf-v20-navigation [data-page="models"]').click()
+    await navigate(page, 'models')
     assert await page.evaluate('QFResearch20.context().symbol')=='NVDA'
     await page.locator('#qf-v23-home-button').click()
     await page.locator('#qf24-home-search').fill('Microsoft')
@@ -155,18 +156,18 @@ async def journey(browser,engine,width):
     await page.locator('#private-login-submit').click()
     await expect(page.locator('#qf24-mode-label')).to_contain_text('PRIVATE')
     await page.wait_for_function("QFResearch20.context().origin==='market'")
-    await page.locator('#qf34-workspace-nav [data-qf34-workspace="research"]').click()
+    await page.locator('[data-qf34-workspace="research"]:visible').click()
     await page.locator('[data-qf27-explore="brief"]').click()
     await expect(page.locator('#qf32-summary')).to_be_visible()
     await expect(page.locator('#qf32-summary')).to_contain_text('Brier')
     await expect(page.locator('#qf32-summary')).to_contain_text('Already held')
     await page.locator('#qf35-company-details > summary').click()
     await page.locator('#qf32-horizon').select_option('long')
-    await page.locator('#qf34-workspace-nav [data-qf34-workspace="briefing"]').click()
+    await page.locator('[data-qf34-workspace="discovery"]:visible').click()
     await page.locator('#qf35-assumptions > summary').click()
     await page.locator('[data-qf34-rule="maxDrawdown"]').fill('15')
     await page.locator('#qf34-rules button[type="submit"]').click()
-    await page.locator('#qf34-workspace-nav [data-qf34-workspace="research"]').click()
+    await page.locator('[data-qf34-workspace="research"]:visible').click()
     await expect(page.locator('.qf34-rule-trace')).to_contain_text('Historical drawdown boundary')
     assert await page.evaluate('document.documentElement.scrollWidth<=innerWidth')
     await page.screenshot(path=str(OUT/f'{engine}-{width}-summary-fixture.png'),full_page=True)
@@ -174,7 +175,7 @@ async def journey(browser,engine,width):
     await expect(page.locator('#page-models')).to_be_visible()
     assert await page.locator('[data-qf-c22-phase]').count()==3
     await expect(page.locator('[data-qf-c22-phase="evaluation"]')).to_have_attribute('aria-selected','true')
-    await page.locator('#qf-v20-navigation [data-page="explore"]').click()
+    await navigate(page, 'explore')
     await page.locator('#qf24-switch-mode').click()
     await expect(page.locator('#qf32-summary')).to_be_hidden()
     assert await page.locator('#qf32-summary').inner_text()==''

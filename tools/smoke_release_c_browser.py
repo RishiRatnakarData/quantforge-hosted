@@ -9,6 +9,7 @@ import asyncio
 import os
 from pathlib import Path
 
+from browser_product_contract import navigate
 from playwright.async_api import async_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -19,7 +20,7 @@ async def public(page, width: int) -> None:
     errors = []
     page.on('pageerror', lambda exc: errors.append(str(exc)))
     await page.set_content(HTML, wait_until='load')
-    await page.locator('#qf-v20-navigation [data-page="models"]').click()
+    await navigate(page, 'models')
     assert await page.locator('.tabpage.active').get_attribute('id') == 'page-models'
     assert await page.locator('#page-models [data-qf-model]').count() == 4
     assert await page.locator('#page-models [data-qf-c22-phase]').count() == 3
@@ -44,7 +45,7 @@ async def public(page, width: int) -> None:
     assert await page.locator('#qf-c22-model-output svg').count() >= 1
     assert 'Buy and hold' in await page.locator('#qf-c22-model-output').inner_text()
     assert await page.locator('#page-models details:visible').count() == 0
-    await page.locator('#qf-v20-navigation [data-page="methods"]').click()
+    await navigate(page, 'methods')
     assert await page.locator('.tabpage.active').get_attribute('id') == 'page-methods'
     assert await page.locator('#page-methods [data-qf-c22-method]').count() == 4
     assert 'Why QuantForge exists' in await page.locator('#qf-c22-method-content').inner_text()
@@ -57,10 +58,10 @@ async def public(page, width: int) -> None:
     await page.locator('[data-qf-c22-method="engineering"]').click()
     assert 'MFA' in await page.locator('#qf-c22-method-content').inner_text()
     assert await page.locator('#page-methods details:visible').count() == 0
-    await page.locator('#qf-v20-navigation [data-page="explore"]').click()
+    await navigate(page, 'explore')
     await page.locator('#qf-v20-search').fill('Apple')
     await page.locator('#qf-v20-search-results [data-qf27-symbol="AAPL"]').click()
-    await page.locator('#qf-v20-navigation [data-page="models"]').click()
+    await navigate(page, 'models')
     assert 'Apple (AAPL)' in await page.locator('#qf-v20-model-selected').inner_text()
     assert 'Synthetic' in await page.locator('#qf-c22-model-output').inner_text()
     assert await page.evaluate('document.documentElement.scrollWidth <= innerWidth')
@@ -96,7 +97,7 @@ async def private_mock(page) -> None:
       document.getElementById('private-signed').hidden=false;
     }''')
     await page.wait_for_timeout(250)
-    await page.locator('#qf-v20-navigation [data-page="models"]').click()
+    await navigate(page, 'models')
     assert 'Authenticated historical market observations' in await page.locator('#qf-c22-model-output').inner_text()
     assert 'synthetic' not in (await page.locator('#qf-c22-model-output').inner_text()).lower()
     await page.locator('#page-models [data-qf-model="risk"]').click()
@@ -110,11 +111,11 @@ async def private_mock(page) -> None:
         throw Error('Unexpected '+url);
       };
     }''')
-    await page.locator('#qf-v20-navigation [data-page="explore"]').click()
+    await navigate(page, 'explore')
     await page.locator('#qf-v20-search').fill('Apple')
     await page.locator('#qf-v20-search-results [data-qf27-symbol="AAPL"]').click()
     await page.wait_for_timeout(190)
-    await page.locator('#qf-v20-navigation [data-page="models"]').click()
+    await navigate(page, 'models')
     assert 'Not enough eligible evidence' in await page.locator('#qf-c22-model-output').inner_text()
     assert 'Synthetic' not in await page.locator('#qf-c22-model-output').inner_text()
     assert await page.locator('#qf-v20-financial-kpis').count() == 1

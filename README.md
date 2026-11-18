@@ -1,6 +1,6 @@
-# QuantForge 2.0
+# QuantForge — Financial Research Platform
 
-A financial research application connecting SEC company financials, statistical and fitted-model evaluation, valuation scenarios and a protected virtual portfolio. Built to make the inputs, calculations and limits of an investment research judgment inspectable.
+Full-stack financial research platform integrating SEC data engineering, machine learning, statistical modeling, valuation, and portfolio analytics. Built to make the inputs, calculations and limits of an investment research judgment inspectable.
 
 [Open the application](https://quantforge-648.pages.dev/) · [Product](docs/current/PRODUCT.md) · [Architecture](docs/current/ARCHITECTURE.md) · [Methods](docs/current/METHODOLOGY.md) · [Technical walkthrough](docs/current/TECHNICAL_INTERVIEW_GUIDE.md) · [Release evidence](docs/current/RELEASE_STATUS.md)
 
@@ -24,7 +24,7 @@ A financial research application connecting SEC company financials, statistical 
 | Portfolio | Review a virtual account, test What If? scenarios and inspect constrained allocation, covariance and Monte Carlo results |
 | Methods | Trace sources, calculations, evaluation and software architecture through worked examples and technical evidence |
 
-Private has three primary tasks: **My Briefing**, **Research an Investment** and **My Portfolio**. The briefing explains why companies passed selected financial-health filters and what the ordering measures. **Analyze selected companies** runs 1–5 studies sequentially, with three selected by default. Research coverage is separate from the canonical investment disposition. Missing data stay missing; one failed company does not erase successful studies.
+Private has two primary destinations: **Research** and **Portfolio**. Research opens with authenticated company search, individual analysis and **Discover companies**. Discovery preserves the financial screen and sequential 1–5-company studies (three selected by default). Compare, Models and Methods remain available as secondary tools. Coverage is separate from investment disposition; missing evidence stays missing. Portfolio retains the saved virtual account, dated marks, risk, allocation and secure hypothetical transactions.
 
 The primary assessment presents a conclusion, up to three supporting findings, up to three concerns and a specific next step. Detailed financial, valuation, risk, model, portfolio and source evidence remains expandable. Optional valuation and portfolio constraints are explicit assumptions; the app does not infer suitability or execute decisions.
 

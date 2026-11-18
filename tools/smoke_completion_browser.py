@@ -8,7 +8,7 @@ import math
 import os
 from pathlib import Path
 
-from browser_product_contract import pick_compare
+from browser_product_contract import navigate, pick_compare
 from playwright.async_api import async_playwright, expect
 from smoke_rebuild_browser import FIXTURE, HTML
 
@@ -103,21 +103,21 @@ async def journey(browser, engine, width):
             await expect(page.locator('#qf-v20-source-badge')).to_contain_text('Observed')
             assert await page.locator('#qf-v20-news').count() == 0
         prefix = f'v25-{engine}-{mode}-{width}'
-        await page.locator('#qf-v20-navigation [data-page="explore"]').click()
+        await navigate(page, 'explore')
         await page.locator('#qf27-analyze').click()
         if mode == 'private':
             await page.locator('#qf33-evidence-tab').click()
         await page.locator('#qf25-company table').first.wait_for()
         assert 'undefined' not in await page.locator('#qf25-company').inner_text()
         await capture(page, prefix + '-connected-research')
-        await page.locator('#qf-v20-navigation [data-page="compare"]').click()
+        await navigate(page, 'compare')
         for symbol in ('AAPL', 'NVDA'):
             await pick_compare(page, symbol)
         await page.locator('[data-qf28-compare="financial"]').click()
         await page.locator('#qf25-peers svg').first.wait_for()
         assert 'shared ratios' in await page.locator('#qf25-peers').inner_text()
         await capture(page, prefix + '-financial-peers')
-        await page.locator('#qf-v20-navigation [data-page="models"]').click()
+        await navigate(page, 'models')
         await page.locator('[data-qf-model="strategy"]').click()
         await page.locator('[data-qf25-run="strategy"]').click()
         await page.locator('#qf25-strategy svg[data-qf25-chart]').wait_for()
@@ -138,7 +138,7 @@ async def journey(browser, engine, width):
         else:
             await expect(page.locator('#qf25-valuation')).to_contain_text('authenticated quotes')
         await capture(page, prefix + '-revenue-scenarios')
-        await page.locator('#qf-v20-navigation [data-page="methods"]').click()
+        await navigate(page, 'methods')
         await page.locator('[data-qf-c22-method="data"]').click()
         assert await page.locator('input[type="file"]:visible').count() == 0
         assert await page.locator('#qf25-factor-file, #qf25-archive-file').count() == 0
@@ -154,14 +154,14 @@ async def journey(browser, engine, width):
         assert 'undefined' not in await page.locator('#qf25-data').inner_text()
         assert 'Revision archive replay' in await page.locator('#qf25-data').inner_text()
         await capture(page, prefix + '-filing-revision-audit')
-        await page.locator('#qf-v20-navigation [data-page="models"]').click()
+        await navigate(page, 'models')
         await page.locator('[data-qf-model="risk"]').click()
         await page.locator('[data-qf25-run="factors"]').click()
         await page.locator('#qf25-factors svg').first.wait_for()
         assert 'offline factor study' in await page.locator('#qf25-factors').inner_text()
         assert 'undefined' not in await page.locator('#qf25-factors').inner_text()
         await capture(page, prefix + '-proxy-and-independent-factors')
-        await page.locator('#qf-v20-navigation [data-page="portfolio"]').click()
+        await navigate(page, 'portfolio')
         await page.locator('[data-qf-portfolio="analysis"]').click()
         await page.locator('[data-qf25-run="portfolio"]').click()
         await page.locator('#qf25-portfolio svg').first.wait_for()
@@ -180,7 +180,7 @@ async def journey(browser, engine, width):
             await expect(page.locator('#qf25-account-chart')).to_contain_text('2 recorded marks')
             assert 'paper P&L $0.00' in await page.locator('#qf25-account-chart').inner_text()
             await capture(page, prefix + '-recorded-account-history')
-            await page.locator('#qf-v20-navigation [data-page="explore"]').click()
+            await navigate(page, 'explore')
             await page.locator('[data-qf27-explore="research"]').click()
             await page.locator('#qf-v23-note').fill('Original offline note')
             await page.locator('#qf-v23-save').click()
@@ -191,7 +191,7 @@ async def journey(browser, engine, width):
             await expect(page.locator('#qf-v23-note-list')).to_contain_text('Edited offline note')
             assert await page.evaluate('window.qfMockOwner.notes.length') == 2
             await expect(page.locator('#qf-v23-note-list')).to_contain_text('Original offline note')
-            await page.locator('#qf-v20-navigation [data-page="compare"]').click()
+            await navigate(page, 'compare')
             await page.locator('#qf-v20-compare-search').fill('Offline')
             await expect(page.locator('#qf27-compare-options [data-qf27-symbol="TEST"]')).to_have_count(1)
             await pick_compare(page, 'TEST')
@@ -201,7 +201,7 @@ async def journey(browser, engine, width):
             assert 'Edited offline note' not in await page.locator('body').inner_text()
             assert 'Server-verified valuation recorded.' not in await page.locator('body').inner_text()
         # A career reviewer can trace each claim without private source access.
-        await page.locator('#qf-v20-navigation [data-page="methods"]').click()
+        await navigate(page, 'methods')
         await page.locator('[data-qf-c22-method="overview"]').click()
         await page.locator('#qf-c22-method-content [data-qf26-tour="engineering"]').click()
         await expect(page.locator('.qf26-pipeline li')).to_have_count(4)

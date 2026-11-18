@@ -7,7 +7,7 @@ import asyncio
 import os
 from pathlib import Path
 
-from browser_product_contract import pick_compare
+from browser_product_contract import navigate, pick_compare
 from playwright.async_api import async_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -18,7 +18,7 @@ async def public(page, width: int) -> None:
     errors = []
     page.on('pageerror', lambda exc: errors.append(str(exc)))
     await page.set_content(HTML, wait_until='load')
-    await page.locator('#qf-v20-navigation [data-page="compare"]').click()
+    await navigate(page, 'compare')
     assert await page.locator('.tabpage.active').get_attribute('id') == 'page-compare'
     assert await page.locator('#qf-v20-compare-chips button').count() == 1
     await pick_compare(page, 'AAPL')
@@ -36,7 +36,7 @@ async def public(page, width: int) -> None:
     before = await page.locator('#qf-b21-compare-chart-cursor').inner_text()
     await page.locator('#qf-b21-compare-chart svg').press('ArrowLeft')
     assert await page.locator('#qf-b21-compare-chart-cursor').inner_text() != before
-    await page.locator('#qf-v20-navigation [data-page="portfolio"]').click()
+    await navigate(page, 'portfolio')
     assert await page.locator('#qf-b21-overview-chart svg').count() == 1
     assert await page.locator('#page-portfolio details').count() == 0
     await page.locator('[data-qf-portfolio="whatif"]').click()
@@ -58,7 +58,7 @@ async def public(page, width: int) -> None:
     assert 'Worst observed sample day' in await page.locator('#qf-b21-analysis-stress').inner_text()
     assert await page.evaluate('document.documentElement.scrollWidth <= innerWidth')
     # Any edited universe must invalidate previously calculated prices and leave SEC available.
-    await page.locator('#qf-v20-navigation [data-page="compare"]').click()
+    await navigate(page, 'compare')
     await pick_compare(page, 'NVDA')
     assert await page.locator('#qf-b21-compare-export').is_disabled()
     assert await page.locator('#qf-b21-finance-table tbody tr').count() == 0  # stale SEC rows invalidated
@@ -108,14 +108,14 @@ async def private_mock(page) -> None:
     await page.locator('#private-login-submit').click()
     await page.wait_for_function('window.QFPrivateBridgeV23.ready()')
     await page.wait_for_timeout(190)
-    await page.locator('#qf-v20-navigation [data-page="compare"]').click()
+    await navigate(page, 'compare')
     await pick_compare(page, 'AAPL')
     await page.locator('#qf-v20-compare-run').click()
     await page.wait_for_timeout(160)
     assert await page.locator('#qf-b21-compare-chart svg').count() == 1
     assert 'MOCKED Alpaca' in await page.locator('#qf-b21-compare-provenance').inner_text()
     assert 'synthetic' not in (await page.locator('#qf-b21-compare-provenance').inner_text()).lower()
-    await page.locator('#qf-v20-navigation [data-page="portfolio"]').click()
+    await navigate(page, 'portfolio')
     await page.wait_for_timeout(180)
     assert await page.locator('#qf-b21-owner-account').is_visible()
     assert '1,537.80' in await page.locator('#qf-b21-owner-account-table').inner_text(), await page.locator('#qf-b21-owner-account-table').inner_text()
@@ -133,7 +133,7 @@ async def private_mock(page) -> None:
        throw Error('Unexpected '+url);
       };
     }''')
-    await page.locator('#qf-v20-navigation [data-page="compare"]').click()
+    await navigate(page, 'compare')
     await pick_compare(page, 'NVDA')
     await page.locator('#qf-v20-compare-run').click()
     assert 'History unavailable' in await page.locator('#qf-b21-compare-state').inner_text()

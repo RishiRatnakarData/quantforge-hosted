@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 
+from browser_product_contract import navigate
 from playwright.async_api import async_playwright, expect
 from smoke_final24_browser import CSP, EXTRA, FINAL, FIXTURE, HTML, login
 
@@ -48,7 +49,10 @@ async def journey(browser, engine, width):
     async def click(selector):
         nonlocal actions
         actions += 1
-        await page.locator(selector).click()
+        if selector.startswith('#qf-v20-navigation [data-page='):
+            await navigate(page, selector.split(chr(34))[1])
+        else:
+            await page.locator(selector).click()
 
     await expect(page.locator("#qf27-financial-interpretation")).to_contain_text("Revenue was")
     await capture(page, prefix + "-explore")
@@ -182,7 +186,7 @@ async def delayed_benchmark(browser):
     await page.evaluate(
         """() => {const original=fetch,response=data=>({ok:true,status:200,json:async()=>structuredClone(data)});window.qfHeldStarted=false;window.qfHeldCompleted=false;window.qfHeld=new Promise(r=>window.qfRelease=r);window.fetch=async(url,options)=>{const p=String(url),q=new URLSearchParams(p.split('?')[1]);if(p.includes('private/history?')){const symbols=q.get('symbols').split(','),dates=QFResearchCore20.chartWindow(QFResearchCore20.syntheticPrice(symbols[0]),365).map(r=>r.date);window.qfHeldDates=dates;return response({licensed_private:true,equity_feed:'sip',symbols,dates,closes:Object.fromEntries(symbols.map(s=>[s,dates.map((_,i)=>100+i*.05)])),sessions_per_year:252,source:'Isolated private race fixture'});}if(p.includes('history-single')&&q.get('symbol')==='SPY'){window.qfHeldStarted=true;await qfHeld;window.qfHeldCompleted=true;return response({licensed_private:true,symbol:'SPY',equity_feed:'sip',ohlcv_available:false,observations:qfHeldDates.map((date,i)=>({date,close:100+i})),source:'Isolated delayed private benchmark'});}return original(url,options);};} """
     )
-    await page.locator('#qf-v20-navigation [data-page="portfolio"]').click()
+    await navigate(page, 'portfolio')
     await page.wait_for_function("qfHeldStarted")
     await page.locator("#qf24-switch-mode").click()
     await page.evaluate("QFResearch20.reloadPortfolio()")
@@ -239,13 +243,13 @@ async def feed_alignment(browser):
     await page.evaluate(
         """() => {const original=fetch;window.fetch=async(url,options)=>{const r=await original(url,options),p=String(url);if(p.includes('private/history?')||p.includes('history-single')){const data=structuredClone(await r.json());data.equity_feed=p.includes('history-single')&&p.includes('SPY')?'iex':'sip';return {ok:true,status:200,json:async()=>data};}return r;};QFResearch20.addAssetToCompare(QFResearch20.assetInfo('AAPL'));}"""
     )
-    await page.locator('#qf-v20-navigation [data-page="compare"]').click()
+    await navigate(page, 'compare')
     await page.locator("#qf-v20-compare-run").click()
     await expect(page.locator("#qf-b21-compare-export")).to_be_enabled()
     await expect(page.locator("#qf-b21-compare-provenance")).to_contain_text("compatible feed")
     await expect(page.locator("#qf-b21-compare-chart")).not_to_contain_text("SPY observed")
     await capture(page, "mismatched-feed-benchmark-withheld")
-    await page.locator('#qf-v20-navigation [data-page="explore"]').click()
+    await navigate(page, 'explore')
     await page.evaluate("QFResearch20.choose('MSFT')")
     await expect(page.locator("#qf-v20-source-badge")).to_contain_text("SIP")
     await page.locator('[data-qf27-explore="market"]').click()
@@ -264,7 +268,10 @@ async def beginner_walkthrough(browser):
     actions = []
 
     async def click(selector, label):
-        await page.locator(selector).click()
+        if selector.startswith('#qf-v20-navigation [data-page='):
+            await navigate(page, selector.split(chr(34))[1])
+        else:
+            await page.locator(selector).click()
         actions.append(label)
 
     async def fill(selector, value, label):
@@ -309,7 +316,7 @@ async def beginner_walkthrough(browser):
 
 async def model_source_labels(browser):
     page, errors = await setup(browser, 390)
-    await page.locator('#qf-v20-navigation [data-page="models"]').click()
+    await navigate(page, 'models')
     await page.locator('[data-qf-model="valuation"]').click()
     await expect(page.locator("#qf-c22-model-output .qf-c22-provenance")).to_contain_text(
         "Reported SEC cash flow"
@@ -322,7 +329,7 @@ async def model_source_labels(browser):
     await page.evaluate(EXTRA)
     await page.evaluate(FINAL)
     await login(page)
-    await page.locator('#qf-v20-navigation [data-page="models"]').click()
+    await navigate(page, 'models')
     await expect(page.locator("#qf28-model-search-status")).to_contain_text(
         "Observed history ready"
     )

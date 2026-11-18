@@ -10,6 +10,7 @@ import asyncio
 import os
 from pathlib import Path
 
+from browser_product_contract import navigate
 from playwright.async_api import async_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -44,7 +45,7 @@ async def assert_public(page, width: int) -> None:
     assert await page.locator('#qf-v20-financial-chart .qf26-readout').inner_text() != before
 
     # Regression for the customer-reported legacy Portfolio accordion.
-    await page.locator('#qf-v20-navigation [data-page="portfolio"]').click()
+    await navigate(page, 'portfolio')
     assert await page.locator('.tabpage.active').get_attribute('id') == 'page-portfolio'
     assert await page.locator('#page-portfolio details').count() == 0
     assert await page.locator('#page-portfolio .qf-secondary-details').count() == 0
@@ -53,18 +54,18 @@ async def assert_public(page, width: int) -> None:
     await page.locator('[data-qf-portfolio="whatif"]').click()
     assert await page.locator('#qf-v20-portfolio-whatif').is_visible()
     assert not await page.locator('#qf-v20-portfolio-overview').is_visible()
-    await page.locator('#qf-v20-navigation [data-page="methods"]').click()
+    await navigate(page, 'methods')
     await page.locator('[data-qf-c22-method="statistical"]').click()
     await page.locator('[data-qf27-method="portfolio"]').click()
     await page.locator('#rebalance-submit').click()
     assert await page.locator('#rebalance-result table').count() == 1
-    await page.locator('#qf-v20-navigation [data-page="portfolio"]').click()
+    await navigate(page, 'portfolio')
     await page.locator('[data-qf-portfolio="analysis"]').click()
     assert await page.locator('#qf-v20-portfolio-analysis').is_visible()
     assert await page.locator('#qf-v20-portfolio-hhi').inner_text() != '—'
     assert await page.evaluate('document.documentElement.scrollWidth <= window.innerWidth')
-    await page.locator('#qf-v20-navigation [data-page="explore"]').click()
-    await page.locator('#qf-v20-navigation [data-page="compare"]').click()
+    await navigate(page, 'explore')
+    await navigate(page, 'compare')
     assert await page.locator(".tabpage.active").get_attribute("id") == "page-compare"
     await page.evaluate("history.back()")
     await page.wait_for_timeout(150)

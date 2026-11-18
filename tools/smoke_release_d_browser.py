@@ -5,7 +5,7 @@ import asyncio
 import os
 from pathlib import Path
 
-from browser_product_contract import PRODUCT_TRADES, virtual_buy
+from browser_product_contract import PRODUCT_TRADES, navigate, virtual_buy
 from playwright.async_api import async_playwright
 
 HTML = (Path(__file__).resolve().parents[1] / 'public/index.html').read_text(encoding='utf-8')
@@ -77,7 +77,7 @@ async def run_page(browser, width: int) -> None:
         assert await page.locator('#qf-v20-mode').inner_text() == 'Account'
         await page.evaluate("window.QFNavigate20('private')")
         assert await page.locator('.tabpage.active').get_attribute('id') == 'page-explore'
-        await page.locator('#qf34-workspace-nav [data-qf34-workspace="research"]').click()
+        await page.locator('[data-qf34-workspace="research"]:visible').click()
         await page.locator('#qf27-analyze').click()
         assert await page.locator('[data-qf27-explore="research"]').is_visible()
         await page.locator('[data-qf27-explore="research"]').click()
@@ -88,7 +88,7 @@ async def run_page(browser, width: int) -> None:
         await page.locator('#qf-v23-save').click()
         await page.locator('#qf24-note-status').get_by_text('Research note saved.', exact=True).wait_for()
         assert await page.locator('#qf-v23-note-list .qf-v23-note-entry').count() == 1
-        await page.locator('#qf-v20-navigation [data-page="portfolio"]').click()
+        await navigate(page, 'portfolio')
         await page.locator('[data-qf-portfolio="overview"]').click()
         await virtual_buy(page, 'MSFT', 120)
         assert '$2,380.00' in await page.locator('#qf27-account-summary').inner_text()

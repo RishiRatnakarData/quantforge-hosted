@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 
+from browser_product_contract import navigate
 from playwright.async_api import async_playwright, expect
 from smoke_rebuild_browser import FIXTURE
 
@@ -22,7 +23,7 @@ async def login(page, remember=False):
     await page.locator('#private-password').fill('isolated-fixture')
     await page.locator('#private-login-submit').click()
     await expect(page.locator('#qf24-mode-label')).to_contain_text('PRIVATE')
-    await page.locator('#qf34-workspace-nav [data-qf34-workspace="research"]').click()
+    await page.locator('[data-qf34-workspace="research"]:visible').click()
 
 async def run():
     OUT.mkdir(parents=True,exist_ok=True)
@@ -86,8 +87,8 @@ async def run():
                 await page.add_init_script(script=init_script)
                 await page.reload()
                 await expect(page.locator('#qf24-mode-label')).to_contain_text('PRIVATE')
-                await expect(page.locator('#qf34-briefing')).to_be_visible()
-                await page.locator('#qf34-workspace-nav [data-qf34-workspace="research"]').click()
+                await expect(page.locator('#qf37-research-home')).to_be_visible()
+                await page.locator('[data-qf34-workspace="research"]:visible').click()
                 assert await page.evaluate("localStorage.getItem('qf-restore-verified-private-v1')") == 'yes'
                 await page.locator('[data-qf27-explore="research"]').click()
                 await expect(page.locator('#qf-v23-note-list')).to_contain_text('revision 2')
@@ -109,15 +110,17 @@ async def run():
                 assert 'Fixture thesis' not in await page.locator('body').inner_text()
                 assert await page.locator('[data-qf27-explore="research"]').is_hidden()
                 await page.locator('#qf24-switch-mode').click()
-                await page.locator('#qf-v20-navigation [data-page="portfolio"]').click()
+                await navigate(page, 'portfolio')
                 await expect(page.locator('#qf-b21-owner-account')).to_be_visible()
                 await page.locator('#qf24-switch-mode').click()
                 await expect(page.locator('#qf-b21-owner-account')).to_be_hidden()
                 await page.locator('#qf24-switch-mode').click()
+                await expect(page.locator('#qf37-research-home')).to_be_visible()
+                await navigate(page, 'portfolio')
                 await expect(page.locator('#qf-b21-owner-account')).to_be_visible()
                 await expect(page.locator('#qf-b21-owner-account-table')).to_contain_text('MSFT')
                 await page.locator('#qf24-switch-mode').click()
-                await page.locator('#qf-v20-navigation [data-page="methods"]').click()
+                await navigate(page, 'methods')
                 await page.locator('[data-qf-c22-method="statistical"]').click()
                 assert await page.locator('[data-qf27-method="nlp"]').count()==0
                 assert await page.locator('#qf27-lab-output math').count()>0
