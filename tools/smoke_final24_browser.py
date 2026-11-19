@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 
+from browser_product_contract import navigate
 from playwright.async_api import async_playwright, expect
 from smoke_product_v27 import EXTRA, FIXTURE
 
@@ -55,7 +56,7 @@ async def login(page):
     await page.locator("#private-password").fill("offline-fixture")
     await page.locator("#private-login-submit").click()
     await expect(page.locator("#qf24-mode-label")).to_contain_text("PRIVATE")
-    await page.locator('#qf34-workspace-nav [data-qf34-workspace="research"]').click()
+    await page.locator('[data-qf34-workspace="research"]:visible').click()
 
 
 async def journey(browser, engine, width):
@@ -77,22 +78,22 @@ async def journey(browser, engine, width):
     await page.route("**/*", route)
     await page.goto("https://quantforge.test/")
     await expect(page.locator("#qf-v23-landing")).to_be_visible()
-    await page.locator('#qf-v20-navigation [data-page="explore"]').click()
+    await navigate(page, 'explore')
     await expect(page.locator("#qf27-explore-financials")).to_be_visible()
-    await page.locator('#qf-v20-navigation [data-page="models"]').click()
+    await navigate(page, 'models')
     await page.locator("#qf28-model-search").fill("Apple")
     await page.locator('#qf28-model-search-options [data-qf27-symbol="AAPL"]').click()
     assert await page.evaluate("QFResearch20.context().symbol") == "AAPL"
     await page.locator('[data-qf-c22-phase="evaluation"]').click()
     await capture(page, f"{engine}-{width}-model-selection-evaluation")
-    await page.locator('#qf-v20-navigation [data-page="methods"]').click()
+    await navigate(page, 'methods')
     await page.locator('[data-qf-c22-method="data"]').click()
     await expect(page.locator("#qf28-quality")).to_contain_text("94 issuers")
     await capture(page, f"{engine}-{width}-sec-quality")
     await page.locator('[data-qf-c22-method="statistical"]').click()
     assert await page.locator('[data-qf27-method="nlp"]').count()==0
     await expect(page.locator('#qf27-lab-output')).to_contain_text('Calculation')
-    await page.locator('#qf-v20-navigation [data-page="portfolio"]').click()
+    await navigate(page, 'portfolio')
     await page.locator('[data-qf-portfolio="whatif"]').click()
     before_basket = set(await page.evaluate("QFResearch20.context().universe"))
     await page.locator("#qf28-scenario-search").fill("Adobe")
@@ -115,16 +116,16 @@ async def journey(browser, engine, width):
     await page.evaluate(FINAL)
     await login(page)
     await expect(page.locator("#qf27-explore-market")).to_be_visible()
-    await page.locator('#qf-v20-navigation [data-page="models"]').click()
+    await navigate(page, 'models')
     await page.locator("#qf28-model-search").fill("TEST")
     await page.locator('#qf28-model-search-options [data-qf27-symbol="TEST"]').click()
     await expect(page.locator("#qf-v20-model-selected")).to_contain_text("Deliberately Long")
     await capture(page, f"{engine}-{width}-long-provider-name")
-    await page.locator('#qf-v20-navigation [data-page="explore"]').click()
+    await navigate(page, 'explore')
     await expect(page.locator("#qf27-explore-market")).to_be_visible()
     await page.locator('[data-qf27-explore="financials"]').click()
     await expect(page.locator("#qf-v20-coverage")).to_contain_text("no coverage")
-    await page.locator('#qf-v20-navigation [data-page="portfolio"]').click()
+    await navigate(page, 'portfolio')
     await page.locator('[data-qf-portfolio="overview"]').click()
     await page.evaluate(
         """async()=>{qfMockOwner.trades=Array.from({length:80},(_,i)=>({symbol:'MSFT',side:i%2?'sell':'buy',units:.01,price:300,fee:0,gross:3,cash_impact:i%2?3:-3,venue:'MOCK',observed_at:new Date(Date.UTC(2026,9,1,0,i)).toISOString(),at:new Date(Date.UTC(2026,9,1,0,i)).toISOString()}));qfMockOwner.capital_events=Array.from({length:100},(_,i)=>({action:i%2?'withdraw':'deposit',amount:10,at:new Date(Date.UTC(2026,9,2,0,i)).toISOString()}));qfMockVersion++;await QFPrivateBridgeV23.refresh();dispatchEvent(new Event('qf:owner-state'));}"""
@@ -216,7 +217,7 @@ async def journey(browser, engine, width):
     )
     await page.reload()
     await login(page)
-    await page.locator('#qf-v20-navigation [data-page="portfolio"]').click()
+    await navigate(page, 'portfolio')
     assert await page.evaluate("QFPrivateBridgeV23.snapshot().cash") == saved["state"]["cash"]
     await capture(page, f"{engine}-{width}-isolated-reload-persistence")
     await page.locator("#qf24-switch-mode").click()

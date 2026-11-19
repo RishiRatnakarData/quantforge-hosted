@@ -34,6 +34,34 @@ async def private_journey(browser, engine, width):
     await page.evaluate(FAULTS)
     await enter(page)
     await page.locator('#private-login-submit').click()
+    await expect(page.locator('#qf37-research-home')).to_be_visible()
+    assert await page.locator('#qf34-workspace-nav button').all_text_contents() == ['Research', 'Portfolio']
+    assert await page.locator('#qf37-research-home .qf34-shortlist').count() == 0
+    assert await page.locator('#qf37-research-home [data-qf34-workspace="research"]').count() == 1
+    assert await page.evaluate('qf34UniverseReads') == 0
+    assert await page.evaluate('document.documentElement.scrollWidth<=innerWidth')
+    await page.screenshot(path=str(OUT / f'{engine}-{page.viewport_size["width"]}-research-home.png'), full_page=True)
+    if width == 390:
+        await page.locator('#qf37-company-search').fill('Microsoft')
+        await expect(page.locator('#qf37-company-options [data-qf27-symbol="MSFT"]')).to_be_visible()
+        await page.locator('#qf37-company-search').press('ArrowDown')
+        await page.locator('#qf37-company-search').press('Enter')
+        await expect(page.locator('#qf37-research-home')).to_be_hidden()
+        await expect(page.locator('#qf-v20-symbol')).to_have_text('MSFT')
+        await expect(page.locator('#qf32-summary')).to_contain_text('Investment research summary', timeout=30000)
+        await expect(page.locator('#qf-v20-run-state')).to_contain_text('Calculated for', timeout=30000)
+        before_unsupported = await page.evaluate('qf34CompanyReads')
+        await page.evaluate("QFWorkspace34.research('BTC/USD')")
+        await expect(page.locator('#qf37-research-home')).to_be_visible()
+        await expect(page.locator('#qf37-selection-status')).to_contain_text('BTC/USD')
+        assert await page.evaluate('QFResearch20.context().symbol') == 'MSFT'
+        assert await page.evaluate('qf34CompanyReads') == before_unsupported
+        await page.locator('#qf34-workspace-nav [data-qf34-workspace="portfolio"]').click()
+        await expect(page.locator('#page-portfolio')).to_be_visible()
+        await page.locator('#qf34-workspace-nav [data-qf34-workspace="home"]').click()
+        await expect(page.locator('#qf37-research-home')).to_be_visible()
+        assert await page.evaluate('qf34Writes') == 0
+    await page.locator('[data-qf34-workspace="discovery"]:visible').click()
     await expect(page.locator('#qf34-briefing')).to_be_visible()
     await expect(page.locator('#qf34-universe-status')).to_contain_text('Financial screen ready.')
     assert await page.locator('[data-qf35-select]:checked').count() == 3
@@ -108,14 +136,14 @@ async def private_journey(browser, engine, width):
         assert await page.locator('#qf36-results .qf35-result').count() == 5
         assert await page.evaluate('qf34Writes') == 0
         await page.screenshot(path=str(OUT / f'{engine}-{width}-five-results.png'), full_page=True)
-    await page.locator('[data-qf34-symbol="'+picks[0]+'"]').first.click()
+    await page.locator('[data-qf34-symbol="'+picks[0]+'"]:visible').first.click()
     await expect(page.locator('#qf32-summary')).to_contain_text('Investment research summary', timeout=30000)
     await expect(page.locator('#qf35-company-details')).not_to_have_attribute('open', '')
     assert await page.locator('.qf35-primary-evidence li').count() <= 6
     await page.locator('#qf35-company-details > summary').click()
     await expect(page.locator('#qf35-company-details')).to_contain_text('Coverage of this company assessment')
     await page.screenshot(path=str(OUT / f'{engine}-{width}-assessment-detail.png'), full_page=True)
-    await page.locator('#qf34-workspace-nav [data-qf34-workspace="briefing"]').click()
+    await page.locator('[data-qf34-workspace="discovery"]:visible').click()
     await page.locator('#qf35-assumptions > summary').click()
     await page.locator('[data-qf34-rule="maxWeight"]').fill('20')
     await page.locator('#qf34-rules button[type="submit"]').click()
@@ -129,6 +157,8 @@ async def private_journey(browser, engine, width):
     await page.evaluate('qf35Release()')
     await expect(page.locator('#qf34-briefing')).to_be_hidden()
     await expect(page.locator('#qf34-briefing')).to_be_empty()
+    await expect(page.locator('#qf37-company-options')).to_be_empty()
+    await expect(page.locator('#qf37-selection-status')).to_be_empty()
     assert await page.evaluate('qf34Writes') == 0
     assert not errors, errors
     await page.close()
@@ -140,12 +170,22 @@ async def auth_rejection(browser, engine):
         await page.evaluate(fixture)
     await enter(page)
     await page.locator('#private-login-submit').click()
+    await expect(page.locator('#qf37-research-home')).to_be_visible()
+    assert await page.locator('#qf34-workspace-nav button').all_text_contents() == ['Research', 'Portfolio']
+    assert await page.locator('#qf37-research-home .qf34-shortlist').count() == 0
+    assert await page.locator('#qf37-research-home [data-qf34-workspace="research"]').count() == 1
+    assert await page.evaluate('qf34UniverseReads') == 0
+    assert await page.evaluate('document.documentElement.scrollWidth<=innerWidth')
+    await page.screenshot(path=str(OUT / f'{engine}-{page.viewport_size["width"]}-research-home.png'), full_page=True)
+    await page.locator('[data-qf34-workspace="discovery"]:visible').click()
     await expect(page.locator('#qf34-universe-status')).to_contain_text('Financial screen ready.')
     picks = await page.locator('[data-qf35-select]:checked').evaluate_all('(els)=>els.map(e=>e.dataset.qf35Select)')
     await page.evaluate('(symbol)=>{qf35AuthFailure=symbol;qf35ReadSymbols=[];}', picks[1])
     await page.locator('#qf35-analyze-shortlist').click()
     await page.wait_for_function('() => !QFPrivateBridgeV23.ready()', timeout=90000)
     await expect(page.locator('#qf34-briefing')).to_be_empty()
+    await expect(page.locator('#qf37-company-options')).to_be_empty()
+    await expect(page.locator('#qf37-selection-status')).to_be_empty()
     assert await page.locator('.qf35-result').count() == 0
     assert await page.evaluate('QFPrivateBridgeV23.snapshot()') is None
     await expect(page.locator('#private-positions')).to_be_empty()

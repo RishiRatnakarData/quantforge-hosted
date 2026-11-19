@@ -12,9 +12,9 @@ The shared interface keeps five Public destinations: Explore, Compare, Models, P
 | Portfolio | Saved virtual account, dated marks, contribution-aware bookkeeping, scenario weights, covariance, optimization and chronological experiments |
 | Methods | Data lineage, worked examples, statistics, ML, optimization and engineering explanations linked to real source and tests |
 
-Private opens My Briefing. Research an Investment opens existing company tools, and My Portfolio opens saved virtual records. The original advanced sections remain accessible. No additional account, fund flow or background monitoring service is created.
+Private opens Research with company search, two concise research paths and collapsed current-context recent research. Discover companies contains the existing screen, batch studies and optional conditions. Portfolio is the sole account destination; applicable dated-mark, concentration and thesis-review notices appear there. Compare, Models and Methods remain secondary tools.
 
-My Briefing reports saved positions and research records, latest thesis review dates and concentration breaches only against an explicitly chosen boundary and available dated marks. It does not infer risk tolerance, reconstruct missing returns or claim continuous surveillance. Missing marks lead to Portfolio; missing rules lead to optional research conditions.
+Portfolio shows saved positions and applicable thesis-review or concentration notices only against an explicitly chosen boundary and available dated marks. Research keeps recent assessments compact and collapsed. It does not infer risk tolerance, reconstruct missing returns or claim continuous surveillance. Missing marks lead to Portfolio; missing rules lead to optional research conditions.
 
 The financial shortlist contains at most five principal candidates from the exact supported SEC/provider intersection. It requires nonnegative annual revenue growth by default, positive operating profit and cash-flow proxy, compatible source lineage, a consistent revenue concept and a disclosed 550-day financial review policy. Negative reported equity or margins above 100% require separate investigation. Users can change the growth filter and sort by one disclosed financial quantity; there is no hidden weighted investment score. Zero candidates is valid.
 
@@ -24,11 +24,11 @@ Each individually calculated assessment gives one current proposal with supporti
 
 Observed annual ratios, estimates, scenarios and judgment are distinguished. The valuation display separates instant common shares from annual diluted weighted-average EPS shares; incomplete enterprise claims continue to withhold a full equity/per-share valuation. Model deterioration is described only from adequate chronological held-out evidence; a missing diagnostic is not a positive signal.
 
-Saved thesis revisions and review dates remain genuine persisted records. The briefing reads them without modifying earlier text. Live acceptance is read-only; numerical write and replay tests use isolated fixture accounts.
+Saved thesis revisions and review dates remain genuine persisted records. The workspace reads them without modifying earlier text. Live acceptance is read-only; numerical write and replay tests use isolated fixture accounts.
 
 ## Final company-study workflow
 
-My Briefing orders at most three priorities, companies worth investigating, a concise virtual portfolio overview and collapsed recent research. Financial filters and optional personal research assumptions are disclosures. The batch action accepts one to five shortlist names, defaulting to three, and runs one company at a time. Waiting, Loading evidence and Analyzing are progress states. The visible result separates research coverage (complete, partial, outdated, provider unavailable or processing failure) from the canonical investment disposition. All-source failure is a failure; missing domains remain incomplete. A company failure does not erase other dated results.
+Discovery preserves the financial filters and bounded batch action: one to five shortlist names, defaulting to three, processed sequentially. Progress and research coverage remain separate from canonical disposition. Missing domains and provider failures are explicit; successful dated results survive another company’s failure. Optional assumptions, exclusions and recent records remain collapsed.
 
 Batch cards give the full company name/ticker, disposition, support, caution, financial/market dates and coverage. Open full research selects the requested name and refreshes its evidence. Its primary assessment shows at most three supporting and three opposing findings, a next question and invalidation conditions. Detailed evidence starts collapsed; public guide steps and the thesis form stay directly accessible. No second recommendation engine or navigation destination is added.
 

@@ -5,6 +5,7 @@ import asyncio
 import os
 from pathlib import Path
 
+from browser_product_contract import navigate
 from playwright.async_api import async_playwright, expect
 from smoke_rebuild_browser import FIXTURE
 
@@ -50,7 +51,7 @@ async def journey(browser,engine,width):
     await page.route('**/*',route)
     await page.goto('https://quantforge.test/')
     await expect(page.locator('#qf-v23-landing')).to_be_visible()
-    await page.locator('#qf-v20-navigation [data-page="explore"]').click()
+    await navigate(page, 'explore')
     await expect(page.locator('#qf27-explore-financials')).to_be_visible()
     assert await page.locator('#qf-v20-chart').is_hidden()
     await expect(page.locator('#qf-v20-financial-chart svg')).to_be_visible()
@@ -67,7 +68,7 @@ async def journey(browser,engine,width):
     await page.locator('[data-qf27-explore="financials"]').click()
     await page.locator('[data-qf27-finance="sources"]').click()
     await expect(page.locator('#qf-v20-financial-table')).to_contain_text('Accession')
-    await page.locator('#qf-v20-navigation [data-page="compare"]').click()
+    await navigate(page, 'compare')
     basket_before=await page.locator('#qf-v20-compare-chips').inner_text()
     await page.locator('#qf27-peer-scope').select_option('all')
     expected_percent=await page.evaluate("()=>{const r=QFPublicSECPeers.compare(QFPublishedSEC,'MSFT',{sectorOnly:false});return r.peers[0].values[r.indices[0]].toFixed(3)+'%';}")
@@ -79,7 +80,7 @@ async def journey(browser,engine,width):
         assert await exhibit.evaluate('(svg)=>svg.viewBox.baseVal.width < 400')
         assert await exhibit.locator('text').first.evaluate('(t)=>t.getBoundingClientRect().height >= 12')
     await capture(page,f'{engine}-{width}-peer-scope')
-    await page.locator('#qf-v20-navigation [data-page="methods"]').click()
+    await navigate(page, 'methods')
     for view in ('overview','data','engineering'):
         await page.locator(f'[data-qf-c22-method="{view}"]').click()
         await capture(page,f'{engine}-{width}-methods-{view}')
@@ -102,7 +103,7 @@ async def journey(browser,engine,width):
     await expect(page.locator('[data-qf27-method="tails"]')).to_have_attribute('aria-pressed','true')
     await page.keyboard.press('Home')
     await expect(page.locator('[data-qf27-method="returns"]')).to_have_attribute('aria-pressed','true')
-    await page.locator('#qf-v20-navigation [data-page="explore"]').click()
+    await navigate(page, 'explore')
     await page.evaluate(FIXTURE)
     await page.evaluate(EXTRA)
     await page.locator('#qf-v20-mode').click()
@@ -110,7 +111,7 @@ async def journey(browser,engine,width):
     await page.locator('#private-password').fill('offline-fixture')
     await page.locator('#private-login-submit').click()
     await expect(page.locator('#qf24-mode-label')).to_contain_text('PRIVATE')
-    await page.locator('#qf34-workspace-nav [data-qf34-workspace="research"]').click()
+    await page.locator('[data-qf34-workspace="research"]:visible').click()
     await page.evaluate("""() => {
       const original=fetch;let first=true;
       window.fetch=async(url,options={})=>{
@@ -132,7 +133,7 @@ async def journey(browser,engine,width):
     await page.locator('#qf-v20-search-results [data-qf27-symbol="MSFT"]').click()
     assert await page.locator('#qf-v20-news').count()==0
     assert await page.locator('[data-qf27-explore="context"]').count()==0
-    await page.locator('#qf-v20-navigation [data-page="portfolio"]').click()
+    await navigate(page, 'portfolio')
     await page.locator('[data-qf-portfolio="overview"]').click()
     await page.evaluate("async()=>{qfMockOwner.holdings['BTC/USD']=.25;qfMockVersion++;await QFPrivateBridgeV23.refresh();window.dispatchEvent(new Event('qf:owner-state'));}")
     await page.locator('#qf27-sell').click()
@@ -176,7 +177,7 @@ async def journey(browser,engine,width):
     await page.locator('#qf-v20-mode').click()
     await capture(page,f'{engine}-{width}-account-overview')
     await page.locator('#qf-v23-close').click()
-    await page.locator('#qf-v20-navigation [data-page="methods"]').click()
+    await navigate(page, 'methods')
     await page.locator('[data-qf-c22-method="statistical"]').click()
     await page.locator('[data-qf27-method="uncertainty"]').click()
     await expect(page.locator('#qf27-lab-output')).to_contain_text('Private observed')

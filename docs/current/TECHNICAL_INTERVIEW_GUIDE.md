@@ -12,7 +12,7 @@ Do not claim a profitable trading system, calibrated return forecasts, complete 
 2. Compare compatible companies. Inspect common dates, differences in fiscal year, a return distribution and historical correlation.
 3. Open Models Prediction → Evaluation → Method. Explain the baseline, mature-label training boundary, Brier error and why a model score is not a probability of profitable trading.
 4. Open a valuation sensitivity and portfolio scenario. Change an assumption and explain the mechanism, units and missing claims.
-5. Open Methods Engineering and describe the API/authentication boundary and reproducible tests. An authorized owner can separately show My Briefing, a financial shortlist, saved research and a read-only virtual account.
+5. Open Methods Engineering and describe the API/authentication boundary and reproducible tests. An authorized owner can separately show Research, a financial shortlist, saved research and a read-only virtual account.
 
 Use Public or clearly labeled isolated fixtures for screenshots shared with employers. Never expose owner notes, holdings, email addresses, credentials or entitled market-data exports as career evidence.
 

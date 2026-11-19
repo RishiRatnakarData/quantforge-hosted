@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 from urllib.parse import unquote
 
-from browser_product_contract import PRODUCT_TRADES, pick_compare, virtual_buy
+from browser_product_contract import PRODUCT_TRADES, navigate, pick_compare, virtual_buy
 from playwright.async_api import async_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -46,7 +46,7 @@ async def capture(page, name):
 
 async def matrix(page, prefix):
     for route in ('explore', 'compare', 'models', 'portfolio', 'methods'):
-        await page.locator(f'#qf-v20-navigation [data-page="{route}"]').click()
+        await navigate(page, route)
         if route == 'explore':
             await page.locator('#qf27-analyze').click()
         if route == 'compare':
@@ -133,7 +133,7 @@ async def journey(browser, width):
     await page.wait_for_function('window.QFPrivateBridgeV23.ready()')
     assert 'PRIVATE' in await page.locator('#qf24-mode-label').inner_text()
     assert 'CRYPTO' not in await page.locator('#qf-v20-source-badge').inner_text()
-    await page.locator('#qf34-workspace-nav [data-qf34-workspace="research"]').click()
+    await page.locator('[data-qf34-workspace="research"]:visible').click()
     await page.locator('#qf-v20-search').fill('Offline')
     await page.locator('#qf-v20-search-results [data-qf27-symbol="TEST"]').click()
     assert 'not covered' in await page.locator('#qf-v20-sector').inner_text()
@@ -144,7 +144,7 @@ async def journey(browser, width):
     await page.wait_for_function("window.QFResearch20.context().origin==='market'")
     assert 'FEED NOT SUPPLIED' in await page.locator('#qf-v20-source-badge').inner_text()
     await matrix(page, f'private-{width}')
-    await page.locator('#qf-v20-navigation [data-page="explore"]').click()
+    await navigate(page, 'explore')
     await page.locator('[data-qf27-explore="research"]').click()
     assert await page.locator('#qf24-notes').is_visible()
     assert not await page.locator('#qf-v23-owner-panel').is_visible()
@@ -170,7 +170,7 @@ async def journey(browser, width):
     await page.locator('#qf27-analyze').click()
     assert await page.evaluate('window.qfMockRequests.length') == before
     await page.locator('#qf24-switch-mode').click()
-    await page.locator('#qf-v20-navigation [data-page="portfolio"]').click()
+    await navigate(page, 'portfolio')
     await page.locator('[data-qf-portfolio="overview"]').click()
     await virtual_buy(page, 'TEST', 120)
     await page.wait_for_function('window.qfMockVersion===5')

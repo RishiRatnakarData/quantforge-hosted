@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 
+from browser_product_contract import navigate
 from playwright.async_api import async_playwright, expect
 from smoke_completion_browser import EXTEND
 from smoke_final_release32 import enter, setup
@@ -37,6 +38,11 @@ async def run():
                 await page.evaluate(EXTRA)
                 await enter(page)
                 await page.locator("#private-login-submit").click()
+                await expect(page.locator('#qf37-research-home')).to_be_visible()
+                await page.locator('#qf37-research-home .qf37-advanced > summary').click()
+                await page.locator('#qf37-research-home [data-qf34-configure]').click()
+                await expect(page.locator('[data-qf34-rule="maxWeight"]')).to_be_focused()
+                await page.locator('#qf35-assumptions > summary').click()
                 await expect(page.locator("#qf34-briefing")).to_be_visible()
                 await expect(page.locator("#qf34-universe-status")).to_contain_text(
                     "Financial screen ready."
@@ -52,7 +58,7 @@ async def run():
                 await page.locator('[data-qf34-rule="maxWeight"]').fill("15")
                 await page.locator('#qf34-rules button[type="submit"]').click()
                 assert await page.evaluate("QFWorkspace34.rules().maxWeight") == 0.15
-                await page.locator('[data-qf34-workspace="research"]').first.click()
+                await page.locator('[data-qf34-workspace="research"]:visible').first.click()
                 await expect(page.locator("#qf27-analyze")).to_be_visible()
                 await page.wait_for_function("QFResearch20.context().origin==='market'")
                 await page.locator("#qf27-analyze").click()
@@ -70,7 +76,7 @@ async def run():
                     "Promise.all([QFDeepUI25.execute('company'),QFDeepUI25.execute('company')])"
                 )
                 assert await page.evaluate("qf34CompanyReads") == before + 1
-                await page.locator('[data-qf34-workspace="briefing"]').first.click()
+                await page.locator('[data-qf34-workspace="discovery"]:visible').first.click()
                 await page.locator("#qf36-history > summary").click()
                 await expect(page.locator("#qf34-reviewed")).to_contain_text("MSFT")
                 await page.locator('[data-qf34-workspace="portfolio"]').first.click()
@@ -79,7 +85,7 @@ async def run():
                 await page.locator("#qf24-switch-mode").click()
                 await expect(page.locator("#qf34-workspace-nav")).to_be_hidden()
                 assert await page.evaluate("Object.keys(QFWorkspace34.rules()).length") == 0
-                await page.locator('#qf-v20-navigation [data-page="explore"]').click()
+                await navigate(page, 'explore')
                 await expect(page.locator("#qf-v23-explore-content")).to_be_visible()
                 assert await page.evaluate("qf34Writes") == 0
                 assert not errors, errors

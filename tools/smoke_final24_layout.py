@@ -7,7 +7,7 @@ import json
 import os
 from pathlib import Path
 
-from browser_product_contract import pick_compare
+from browser_product_contract import navigate, pick_compare
 from playwright.async_api import async_playwright
 from smoke_final24_browser import CSP, EXTRA, FINAL, FIXTURE, HTML, login
 
@@ -68,7 +68,7 @@ async def main():
                     }"""))
                     results.append({"case": prefix, "view": name, **finding, "errors": errors[:]})
 
-                await page.locator('#qf-v20-navigation [data-page="explore"]').click()
+                await navigate(page, 'explore')
                 await page.locator("#qf-v20-search").fill("Microsoft")
                 await page.locator('#qf-v20-search-results [data-qf27-symbol="MSFT"]').click()
                 await check("picker-selected")
@@ -89,7 +89,7 @@ async def main():
                             await check("explore-supporting-evidence")
                             await page.locator('#qf33-assessment-tab').click()
 
-                await page.locator('#qf-v20-navigation [data-page="compare"]').click()
+                await navigate(page, 'compare')
                 await pick_compare(page, "AAPL")
                 await page.locator("#qf-v20-compare-run").click()
                 await page.wait_for_function('document.querySelector("#qf-b21-compare-chart svg")')
@@ -97,13 +97,13 @@ async def main():
                 for view in ("financial", "market", "risk"):
                     await page.locator(f'[data-qf28-compare="{view}"]').click()
                     await check("compare-" + view)
-                await page.locator('#qf-v20-navigation [data-page="models"]').click()
+                await navigate(page, 'models')
                 for category in ("prediction", "risk", "valuation", "strategy"):
                     await page.locator(f'#page-models [data-qf-model="{category}"]').click()
                     for phase in ("results", "evaluation", "method"):
                         await page.locator(f'[data-qf-c22-phase="{phase}"]').click()
                         await check("model-" + category + "-" + phase)
-                await page.locator('#qf-v20-navigation [data-page="portfolio"]').click()
+                await navigate(page, 'portfolio')
                 for view in ("overview", "whatif", "analysis"):
                     await page.locator(f'[data-qf-portfolio="{view}"]').click()
                     if not private and view == "overview":
@@ -117,7 +117,7 @@ async def main():
                         await page.locator('#qf-b21-overview-chart').evaluate("e=>e.style.removeProperty('width')")
                         await page.evaluate('QFResearch20.reloadPortfolio()')
                     await check("portfolio-" + view)
-                await page.locator('#qf-v20-navigation [data-page="methods"]').click()
+                await navigate(page, 'methods')
                 for view in ("overview", "data", "statistical", "engineering"):
                     await page.locator(f'[data-qf-c22-method="{view}"]').click()
                     await check("methods-" + view)

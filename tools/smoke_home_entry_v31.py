@@ -5,6 +5,7 @@ import asyncio
 import json
 from pathlib import Path
 
+from browser_product_contract import navigate
 from playwright.async_api import async_playwright
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -42,7 +43,7 @@ async def visit(browser,width):
     assert await page.locator('#qf-v20-company').inner_text()=='Microsoft'
     await page.locator('#qf-v23-home-button').click()
     assert await page.locator('#qf-v23-landing').is_visible()
-    await page.locator('#qf-v20-navigation [data-page="compare"]').click()
+    await navigate(page, 'compare')
     assert await page.locator('#page-compare').is_visible()
     assert await page.locator('#qf-v23-landing').is_hidden()
     assert not errors,errors
