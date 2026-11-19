@@ -24,7 +24,7 @@ Full-stack financial research platform integrating SEC data engineering, machine
 | Portfolio | Review a virtual account, test What If? scenarios and inspect constrained allocation, covariance and Monte Carlo results |
 | Methods | Trace sources, calculations, evaluation and software architecture through worked examples and technical evidence |
 
-Private has two primary destinations: **Research** and **Portfolio**. Research opens with authenticated company search, individual analysis and **Discover companies**. Discovery preserves the financial screen and sequential 1–5-company studies (three selected by default). Compare, Models and Methods remain available as secondary tools. Coverage is separate from investment disposition; missing evidence stays missing. Portfolio retains the saved virtual account, dated marks, risk, allocation and secure hypothetical transactions.
+Private uses the same **Explore, Compare, Models, Portfolio and Methods** navigation as Public. Explore opens the clean Research home with authenticated company search, individual analysis and **Discover companies**. Discovery retains financial screening and sequential 1–5-company studies (three selected by default). Coverage is separate from investment disposition; missing evidence stays missing. Portfolio retains the saved virtual account, dated marks, risk, allocation and secure hypothetical transactions.
 
 The primary assessment presents a conclusion, up to three supporting findings, up to three concerns and a specific next step. Detailed financial, valuation, risk, model, portfolio and source evidence remains expandable. Optional valuation and portfolio constraints are explicit assumptions; the app does not infer suitability or execute decisions.
 
@@ -40,7 +40,7 @@ The primary assessment presents a conclusion, up to three supporting findings, u
 | API and accounting | [FastAPI](cloud/api.py), [same-origin proxy](functions/api/[[path]].js) | [Owner/MFA/API](tests/test_hosted_web.py), [recorded-value accounting](tests/test_valuation_snapshots.py) |
 | Archived experimental NLP | [TF-IDF, cosine topics and lexical tone](cloud/news_intelligence_v180.py) | [Text and endpoint fixtures](tests/test_news_intelligence_v180.py); retired from normal product views |
 
-Local application acceptance passed **651 Python tests, 500 JavaScript tests, all 18 browser scripts and seven offline engine demonstrations**. Browser checks cover Chromium, Firefox and WebKit, five widths, keyboard interactions, session races, partial-source failures and accounting safeguards. Required exact-head CI and actual production checks are separate release gates. See [Actions](https://github.com/RishiRatnakarData/quantforge-hosted/actions/workflows/ci.yml) and [release status](docs/current/RELEASE_STATUS.md) for their scope.
+Local application acceptance passed **651 Python tests, 505 JavaScript tests, all 18 browser scripts and seven offline engine demonstrations**. Browser checks cover Chromium, Firefox and WebKit, five widths, keyboard interactions, session races, partial-source failures and accounting safeguards. Required exact-head CI and actual production checks are separate release gates. See [Actions](https://github.com/RishiRatnakarData/quantforge-hosted/actions/workflows/ci.yml) and [release status](docs/current/RELEASE_STATUS.md) for their scope.
 
 ## Architecture
 

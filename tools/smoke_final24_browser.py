@@ -7,7 +7,7 @@ import json
 import os
 from pathlib import Path
 
-from browser_product_contract import navigate
+from browser_product_contract import navigate, open_company_research
 from playwright.async_api import async_playwright, expect
 from smoke_product_v27 import EXTRA, FIXTURE
 
@@ -56,7 +56,7 @@ async def login(page):
     await page.locator("#private-password").fill("offline-fixture")
     await page.locator("#private-login-submit").click()
     await expect(page.locator("#qf24-mode-label")).to_contain_text("PRIVATE")
-    await page.locator('[data-qf34-workspace="research"]:visible').click()
+    await open_company_research(page)
 
 
 async def journey(browser, engine, width):
@@ -78,7 +78,7 @@ async def journey(browser, engine, width):
     await page.route("**/*", route)
     await page.goto("https://quantforge.test/")
     await expect(page.locator("#qf-v23-landing")).to_be_visible()
-    await navigate(page, 'explore')
+    await open_company_research(page)
     await expect(page.locator("#qf27-explore-financials")).to_be_visible()
     await navigate(page, 'models')
     await page.locator("#qf28-model-search").fill("Apple")
@@ -121,7 +121,7 @@ async def journey(browser, engine, width):
     await page.locator('#qf28-model-search-options [data-qf27-symbol="TEST"]').click()
     await expect(page.locator("#qf-v20-model-selected")).to_contain_text("Deliberately Long")
     await capture(page, f"{engine}-{width}-long-provider-name")
-    await navigate(page, 'explore')
+    await open_company_research(page)
     await expect(page.locator("#qf27-explore-market")).to_be_visible()
     await page.locator('[data-qf27-explore="financials"]').click()
     await expect(page.locator("#qf-v20-coverage")).to_contain_text("no coverage")

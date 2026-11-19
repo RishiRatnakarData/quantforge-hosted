@@ -9,7 +9,7 @@ import asyncio
 import os
 from pathlib import Path
 
-from browser_product_contract import navigate
+from browser_product_contract import navigate, open_company_research
 from playwright.async_api import async_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -58,7 +58,7 @@ async def public(page, width: int) -> None:
     await page.locator('[data-qf-c22-method="engineering"]').click()
     assert 'MFA' in await page.locator('#qf-c22-method-content').inner_text()
     assert await page.locator('#page-methods details:visible').count() == 0
-    await navigate(page, 'explore')
+    await open_company_research(page)
     await page.locator('#qf-v20-search').fill('Apple')
     await page.locator('#qf-v20-search-results [data-qf27-symbol="AAPL"]').click()
     await navigate(page, 'models')
@@ -111,7 +111,7 @@ async def private_mock(page) -> None:
         throw Error('Unexpected '+url);
       };
     }''')
-    await navigate(page, 'explore')
+    await open_company_research(page)
     await page.locator('#qf-v20-search').fill('Apple')
     await page.locator('#qf-v20-search-results [data-qf27-symbol="AAPL"]').click()
     await page.wait_for_timeout(190)

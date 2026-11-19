@@ -6,7 +6,7 @@ import json
 import os
 from pathlib import Path
 
-from browser_product_contract import navigate
+from browser_product_contract import navigate, open_company_research
 from playwright.async_api import async_playwright, expect
 from smoke_rebuild_browser import FIXTURE
 
@@ -23,7 +23,7 @@ async def login(page, remember=False):
     await page.locator('#private-password').fill('isolated-fixture')
     await page.locator('#private-login-submit').click()
     await expect(page.locator('#qf24-mode-label')).to_contain_text('PRIVATE')
-    await page.locator('[data-qf34-workspace="research"]:visible').click()
+    await open_company_research(page)
 
 async def run():
     OUT.mkdir(parents=True,exist_ok=True)
@@ -88,7 +88,7 @@ async def run():
                 await page.reload()
                 await expect(page.locator('#qf24-mode-label')).to_contain_text('PRIVATE')
                 await expect(page.locator('#qf37-research-home')).to_be_visible()
-                await page.locator('[data-qf34-workspace="research"]:visible').click()
+                await open_company_research(page)
                 assert await page.evaluate("localStorage.getItem('qf-restore-verified-private-v1')") == 'yes'
                 await page.locator('[data-qf27-explore="research"]').click()
                 await expect(page.locator('#qf-v23-note-list')).to_contain_text('revision 2')

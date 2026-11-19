@@ -12,7 +12,7 @@ The shared interface keeps five Public destinations: Explore, Compare, Models, P
 | Portfolio | Saved virtual account, dated marks, contribution-aware bookkeeping, scenario weights, covariance, optimization and chronological experiments |
 | Methods | Data lineage, worked examples, statistics, ML, optimization and engineering explanations linked to real source and tests |
 
-Private opens Research with company search, two concise research paths and collapsed current-context recent research. Discover companies contains the existing screen, batch studies and optional conditions. Portfolio is the sole account destination; applicable dated-mark, concentration and thesis-review notices appear there. Compare, Models and Methods remain secondary tools.
+Private Explore opens Research with company search, two concise research paths and collapsed current-context recent research. Discover companies contains the existing screen, batch studies and optional conditions. Portfolio is the sole account destination; applicable dated-mark, concentration and thesis-review notices appear there. Compare, Models and Methods remain directly accessible in the shared menu.
 
 Portfolio shows saved positions and applicable thesis-review or concentration notices only against an explicitly chosen boundary and available dated marks. Research keeps recent assessments compact and collapsed. It does not infer risk tolerance, reconstruct missing returns or claim continuous surveillance. Missing marks lead to Portfolio; missing rules lead to optional research conditions.
 

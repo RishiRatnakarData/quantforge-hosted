@@ -8,7 +8,7 @@ import math
 import os
 from pathlib import Path
 
-from browser_product_contract import navigate, pick_compare
+from browser_product_contract import navigate, open_company_research, pick_compare
 from playwright.async_api import async_playwright, expect
 from smoke_rebuild_browser import FIXTURE, HTML
 
@@ -103,7 +103,7 @@ async def journey(browser, engine, width):
             await expect(page.locator('#qf-v20-source-badge')).to_contain_text('Observed')
             assert await page.locator('#qf-v20-news').count() == 0
         prefix = f'v25-{engine}-{mode}-{width}'
-        await navigate(page, 'explore')
+        await open_company_research(page)
         await page.locator('#qf27-analyze').click()
         if mode == 'private':
             await page.locator('#qf33-evidence-tab').click()
@@ -180,7 +180,7 @@ async def journey(browser, engine, width):
             await expect(page.locator('#qf25-account-chart')).to_contain_text('2 recorded marks')
             assert 'paper P&L $0.00' in await page.locator('#qf25-account-chart').inner_text()
             await capture(page, prefix + '-recorded-account-history')
-            await navigate(page, 'explore')
+            await open_company_research(page)
             await page.locator('[data-qf27-explore="research"]').click()
             await page.locator('#qf-v23-note').fill('Original offline note')
             await page.locator('#qf-v23-save').click()

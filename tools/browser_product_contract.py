@@ -35,22 +35,70 @@ PRODUCT_TRADES = r'''() => {
 
 
 async def navigate(page, route):
-    """Follow visible Public destinations or the retained Private specialist paths."""
-    private = await page.locator('body').evaluate("e=>e.classList.contains('qf37-private')")
-    if not private:
-        await page.locator(f'#qf-v20-navigation [data-page="{route}"]').click()
-    elif route == 'portfolio':
-        await page.locator('#qf34-workspace-nav [data-qf34-workspace="portfolio"]').click()
-    elif route == 'explore':
-        await page.locator('[data-qf34-workspace="research"]:visible').click()
-    else:
-        sidebar = page.locator(f'#qf-v20-navigation [data-page="{route}"]')
-        if await sidebar.is_visible():
-            await sidebar.click()
-        elif await page.locator('#qf37-research-home').is_visible():
-            details = page.locator('#qf37-research-home .qf37-advanced')
-            if await details.get_attribute('open') is None:
-                await details.locator('summary').click()
-            await details.locator(f'[data-qf37-route="{route}"]').click()
-        else:
-            await page.locator(f'#qf37-secondary [data-qf37-route="{route}"]').click()
+    """Use the same visible persistent navigation in both data modes."""
+    control = page.locator(f'#qf-v20-navigation [data-page="{route}"]')
+    await expect(control).to_be_visible()
+    await control.click()
+    await expect(page.locator(f'#page-{route}')).to_be_visible()
+    await expect(control).to_have_attribute('aria-current', 'page')
+
+
+async def open_company_research(page):
+    """Open Explore, then explicitly enter its Private company workflow."""
+    await navigate(page, 'explore')
+    if await page.locator('body').evaluate("e=>e.classList.contains('qf37-private')"):
+        await expect(page.locator('#qf37-research-home')).to_be_visible()
+        await page.locator('#qf37-research-home [data-qf34-workspace="research"]').click()
+
+
+async def audit_shared_navigation(page, mode, engine, width, out):
+    """Rendered visibility, operation, focus, active state and history in each mode."""
+    routes = ['explore', 'compare', 'models', 'portfolio', 'methods']
+    controls = page.locator('#qf-v20-navigation [data-page]')
+    assert await controls.all_text_contents() == ['Explore', 'Compare', 'Models', 'Portfolio', 'Methods']
+    saved = await page.evaluate('JSON.stringify({owner:qfMockOwner,version:qfMockVersion})')
+    rows = []
+    for route in routes:
+        await navigate(page, route)
+        assert await page.locator('#qf-v20-navigation [aria-current="page"]').count() == 1
+        assert await page.locator('#qf-v20-navigation .active').count() == 1
+        for i in range(5):
+            control = controls.nth(i)
+            await expect(control).to_be_visible()
+            await expect(control).to_be_enabled()
+            await expect(control).to_be_in_viewport()
+            bounds = await control.evaluate('e=>{const r=e.getBoundingClientRect(),s=getComputedStyle(e);return {display:s.display,visibility:s.visibility,opacity:Number(s.opacity),left:r.left,right:r.right,width:r.width,height:r.height,viewport:innerWidth,clipped:e.scrollWidth>e.clientWidth+2}}')
+            assert bounds['display'] != 'none' and bounds['visibility'] == 'visible' and bounds['opacity'] > 0, bounds
+            assert bounds['height'] >= 44 and bounds['left'] >= 0 and bounds['right'] <= bounds['viewport'] + 1, bounds
+            assert not bounds['clipped'], bounds
+        assert await page.evaluate('document.documentElement.scrollWidth<=innerWidth')
+        if mode == 'private' and route == 'explore':
+            await expect(page.locator('#qf37-research-home')).to_be_visible()
+        if mode == 'private' and route == 'portfolio':
+            await expect(page.locator('#qf24-transactions')).to_be_visible()
+        await page.screenshot(path=str(out / f'{engine}-{width}-{mode}-nav-{route}.png'))
+        rows.append({'route':route,'allFiveVisible':True,'correctActiveState':True,'pageVisible':True})
+    await controls.first.focus()
+    for i in range(5):
+        await expect(controls.nth(i)).to_be_focused()
+        if i < 4:
+            await page.keyboard.press('Tab')
+    await navigate(page, 'compare')
+    await navigate(page, 'models')
+    await page.go_back()
+    await expect(page.locator('#page-compare')).to_be_visible()
+    await expect(page.locator('#qf-v20-navigation [data-page="compare"]')).to_have_attribute('aria-current', 'page')
+    await page.go_forward()
+    await expect(page.locator('#page-models')).to_be_visible()
+    await expect(page.locator('#qf-v20-navigation [data-page="models"]')).to_have_attribute('aria-current', 'page')
+    for origin in ['explore', 'compare', 'models']:
+        await navigate(page, origin)
+        await navigate(page, 'portfolio')
+        if mode == 'private':
+            await expect(page.locator('#qf24-transactions')).to_be_visible()
+        await navigate(page, 'explore')
+        if mode == 'private':
+            await expect(page.locator('#qf37-research-home')).to_be_visible()
+    assert await page.evaluate('JSON.stringify({owner:qfMockOwner,version:qfMockVersion})') == saved
+    assert await page.locator('#qf34-workspace-nav, #qf37-secondary').count() == 0
+    return {'engine':engine,'width':width,'mode':mode,'routes':rows,'keyboardOrder':True,'backForward':True,'ownerUnchanged':True,'portfolioEntryFromExploreCompareModels':True}

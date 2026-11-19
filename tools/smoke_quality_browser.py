@@ -7,7 +7,7 @@ import json
 import os
 from pathlib import Path
 
-from browser_product_contract import navigate
+from browser_product_contract import navigate, open_company_research
 from playwright.async_api import async_playwright, expect
 from smoke_final24_browser import CSP, EXTRA, FINAL, FIXTURE, HTML, login
 
@@ -130,7 +130,7 @@ async def journey(browser, engine, width):
     await page.evaluate("qfHistoryFails=false")
     await click("#qf-v20-compare-run")
     await expect(page.locator("#qf-b21-compare-export")).to_be_enabled()
-    await click('#qf-v20-navigation [data-page="explore"]')
+    await open_company_research(page)
     await click('[data-qf-range="30"]')
     ticks = page.locator(".qf29-price-tick")
     assert 2 <= await ticks.count() <= 5
@@ -249,7 +249,7 @@ async def feed_alignment(browser):
     await expect(page.locator("#qf-b21-compare-provenance")).to_contain_text("compatible feed")
     await expect(page.locator("#qf-b21-compare-chart")).not_to_contain_text("SPY observed")
     await capture(page, "mismatched-feed-benchmark-withheld")
-    await navigate(page, 'explore')
+    await open_company_research(page)
     await page.evaluate("QFResearch20.choose('MSFT')")
     await expect(page.locator("#qf-v20-source-badge")).to_contain_text("SIP")
     await page.locator('[data-qf27-explore="market"]').click()

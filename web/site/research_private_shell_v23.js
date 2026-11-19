@@ -71,7 +71,7 @@ async function open(name){
  if(!signed()){window.QFNavigate20('private');return;}
  if(!privateMode())window.QFResearch20.switchMode('private');
  if(name==='portfolio'){window.QFNavigate20('portfolio');document.querySelector('[data-qf-portfolio="overview"]').click();account.scrollIntoView({block:'start'});}
- else{home(false);window.QFNavigate20('explore');window.QFExplore27?.show('research');notes.scrollIntoView({block:'start'});$('qf-v23-note').focus();}
+ else{home(false);if(window.QFWorkspace34)window.QFWorkspace34.choose('research');else window.QFNavigate20('explore');window.QFExplore27?.show('research');notes.scrollIntoView({block:'start'});$('qf-v23-note').focus();}
  await refresh();
 }
 $('qf24-switch-mode').addEventListener('click',()=>{close();window.QFResearch20.switchMode(privateMode()?'public':'private');sync();});
