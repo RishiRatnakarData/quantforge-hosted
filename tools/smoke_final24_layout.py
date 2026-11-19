@@ -73,6 +73,8 @@ async def main():
                     results.append({"case": prefix, "view": name, **finding, "errors": errors[:]})
 
                 if private:
+                    await navigate(page, 'explore')
+                    assert await page.locator('#qf37-research-home').is_visible()
                     await check('research-home')
                 await open_company_research(page)
                 await page.locator("#qf-v20-search").fill("Microsoft")
