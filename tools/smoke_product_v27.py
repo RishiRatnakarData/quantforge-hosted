@@ -92,6 +92,14 @@ async def journey(browser,engine,width):
     for method in ('returns','regression','portfolio','tails','drawdown','uncertainty','logistic','brier','ratios','dcf','walk'):
         await page.locator(f'[data-qf27-method="{method}"]').click()
         assert await page.locator('#qf27-lab-output math').count() >= 1
+        references = page.locator('#qf27-lab-output .qf26-references a')
+        await expect(references).to_have_count(2)
+        for link in await references.all():
+            await expect(link).to_be_visible()
+            href = await link.get_attribute('href')
+            prefix = 'https://github.com/RishiRatnakarData/quantforge-hosted/blob/main/'
+            assert href.startswith(prefix) and (ROOT / href[len(prefix):]).is_file()
+        assert 'Repository access is restricted' not in await page.locator('#page-methods').inner_text()
         await capture(page,f'{engine}-{width}-method-{method}')
     await page.locator('[data-qf27-method="portfolio"]').click()
     await page.locator('#qf27-lab-value').fill('60')
