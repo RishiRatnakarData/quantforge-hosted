@@ -7,7 +7,7 @@ import json
 import os
 from pathlib import Path
 
-from browser_product_contract import navigate, pick_compare
+from browser_product_contract import navigate, open_company_research, pick_compare
 from playwright.async_api import async_playwright
 from smoke_final24_browser import CSP, EXTRA, FINAL, FIXTURE, HTML, login
 
@@ -68,7 +68,7 @@ async def main():
                     }"""))
                     results.append({"case": prefix, "view": name, **finding, "errors": errors[:]})
 
-                await navigate(page, 'explore')
+                await open_company_research(page)
                 await page.locator("#qf-v20-search").fill("Microsoft")
                 await page.locator('#qf-v20-search-results [data-qf27-symbol="MSFT"]').click()
                 await check("picker-selected")

@@ -188,7 +188,7 @@ jobs:
         if: ${{ matrix.group == 'research' }}
         run: python tools/smoke_master_quality_v33.py
 
-      - name: Owner briefing universe comparability and current-assessment acceptance
+      - name: Shared five-section navigation, research home and current-assessment acceptance
         if: ${{ matrix.group == 'research' }}
         run: python tools/smoke_consolidation_v34.py
 

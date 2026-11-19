@@ -5,7 +5,7 @@ import asyncio
 import os
 from pathlib import Path
 
-from browser_product_contract import navigate
+from browser_product_contract import navigate, open_company_research
 from playwright.async_api import async_playwright, expect
 from smoke_rebuild_browser import FIXTURE
 
@@ -51,7 +51,7 @@ async def journey(browser,engine,width):
     await page.route('**/*',route)
     await page.goto('https://quantforge.test/')
     await expect(page.locator('#qf-v23-landing')).to_be_visible()
-    await navigate(page, 'explore')
+    await open_company_research(page)
     await expect(page.locator('#qf27-explore-financials')).to_be_visible()
     assert await page.locator('#qf-v20-chart').is_hidden()
     await expect(page.locator('#qf-v20-financial-chart svg')).to_be_visible()
@@ -103,7 +103,7 @@ async def journey(browser,engine,width):
     await expect(page.locator('[data-qf27-method="tails"]')).to_have_attribute('aria-pressed','true')
     await page.keyboard.press('Home')
     await expect(page.locator('[data-qf27-method="returns"]')).to_have_attribute('aria-pressed','true')
-    await navigate(page, 'explore')
+    await open_company_research(page)
     await page.evaluate(FIXTURE)
     await page.evaluate(EXTRA)
     await page.locator('#qf-v20-mode').click()
@@ -111,7 +111,7 @@ async def journey(browser,engine,width):
     await page.locator('#private-password').fill('offline-fixture')
     await page.locator('#private-login-submit').click()
     await expect(page.locator('#qf24-mode-label')).to_contain_text('PRIVATE')
-    await page.locator('[data-qf34-workspace="research"]:visible').click()
+    await open_company_research(page)
     await page.evaluate("""() => {
       const original=fetch;let first=true;
       window.fetch=async(url,options={})=>{

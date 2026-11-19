@@ -24,7 +24,7 @@ Full-stack financial research platform integrating SEC data engineering, machine
 | Portfolio | Review a virtual account, test What If? scenarios and inspect constrained allocation, covariance and Monte Carlo results |
 | Methods | Trace sources, calculations, evaluation and software architecture through worked examples and technical evidence |
 
-Private has two primary destinations: **Research** and **Portfolio**. Research opens with authenticated company search, individual analysis and **Discover companies**. Discovery preserves the financial screen and sequential 1–5-company studies (three selected by default). Compare, Models and Methods remain available as secondary tools. Coverage is separate from investment disposition; missing evidence stays missing. Portfolio retains the saved virtual account, dated marks, risk, allocation and secure hypothetical transactions.
+Private uses the same **Explore, Compare, Models, Portfolio and Methods** navigation as Public. Explore opens the clean Research home with authenticated company search, individual analysis and **Discover companies**. Discovery retains financial screening and sequential 1–5-company studies (three selected by default). Coverage is separate from investment disposition; missing evidence stays missing. Portfolio retains the saved virtual account, dated marks, risk, allocation and secure hypothetical transactions.
 
 The primary assessment presents a conclusion, up to three supporting findings, up to three concerns and a specific next step. Detailed financial, valuation, risk, model, portfolio and source evidence remains expandable. Optional valuation and portfolio constraints are explicit assumptions; the app does not infer suitability or execute decisions.
 

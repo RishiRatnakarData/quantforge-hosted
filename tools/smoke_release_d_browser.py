@@ -5,7 +5,7 @@ import asyncio
 import os
 from pathlib import Path
 
-from browser_product_contract import PRODUCT_TRADES, navigate, virtual_buy
+from browser_product_contract import PRODUCT_TRADES, navigate, open_company_research, virtual_buy
 from playwright.async_api import async_playwright
 
 HTML = (Path(__file__).resolve().parents[1] / 'public/index.html').read_text(encoding='utf-8')
@@ -77,7 +77,7 @@ async def run_page(browser, width: int) -> None:
         assert await page.locator('#qf-v20-mode').inner_text() == 'Account'
         await page.evaluate("window.QFNavigate20('private')")
         assert await page.locator('.tabpage.active').get_attribute('id') == 'page-explore'
-        await page.locator('[data-qf34-workspace="research"]:visible').click()
+        await open_company_research(page)
         await page.locator('#qf27-analyze').click()
         assert await page.locator('[data-qf27-explore="research"]').is_visible()
         await page.locator('[data-qf27-explore="research"]').click()

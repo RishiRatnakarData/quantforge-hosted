@@ -10,7 +10,7 @@ import asyncio
 import os
 from pathlib import Path
 
-from browser_product_contract import navigate
+from browser_product_contract import navigate, open_company_research
 from playwright.async_api import async_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -64,7 +64,7 @@ async def assert_public(page, width: int) -> None:
     assert await page.locator('#qf-v20-portfolio-analysis').is_visible()
     assert await page.locator('#qf-v20-portfolio-hhi').inner_text() != '—'
     assert await page.evaluate('document.documentElement.scrollWidth <= window.innerWidth')
-    await navigate(page, 'explore')
+    await open_company_research(page)
     await navigate(page, 'compare')
     assert await page.locator(".tabpage.active").get_attribute("id") == "page-compare"
     await page.evaluate("history.back()")

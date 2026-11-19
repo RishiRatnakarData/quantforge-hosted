@@ -98,7 +98,7 @@ Source: [valuation extraction](../../cloud/valuation_market_v73.py), [ratio calc
 
 **Advanced defense:** Financial filters are disclosed deterministic judgments; they have no demonstrated out-of-sample excess-return advantage. We order by one visible quantity rather than claiming a statistically justified composite score. Per-company evidence is keyed by company revision and owner version. Repeated identical in-flight studies share work; stale responses cannot overwrite a new context. Rules are tab-local, clear on mode exit and never infer suitability.
 
-**Test/limitation:** Tests cover strong-but-expensive, price momentum with weak fundamentals, drawdown and concentration breaches, unknown fund evidence, stale observations, malformed deterioration flags, incomplete correlation, zero candidates and changed filing concepts. Browser tests verify default briefing, navigation, private cleanup and zero account mutations across three engines and five widths.
+**Test/limitation:** Tests cover strong-but-expensive, price momentum with weak fundamentals, drawdown and concentration breaches, unknown fund evidence, stale observations, malformed deterioration flags, incomplete correlation, zero candidates and changed filing concepts. Browser tests verify the Research home, shared five-section navigation, private cleanup and zero account mutations across three engines and five widths.
 
 Source: [decision engine](../../web/site/research_decision_v34.js), [workspace](../../web/site/research_workspace_v34.js), [browser acceptance](../../tools/smoke_consolidation_v34.py).
 

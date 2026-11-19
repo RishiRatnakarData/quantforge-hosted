@@ -5,7 +5,7 @@ import asyncio
 import json
 from pathlib import Path
 
-from browser_product_contract import navigate
+from browser_product_contract import navigate, open_company_research
 from playwright.async_api import async_playwright, expect
 from smoke_rebuild_browser import FIXTURE
 
@@ -156,7 +156,7 @@ async def journey(browser,engine,width):
     await page.locator('#private-login-submit').click()
     await expect(page.locator('#qf24-mode-label')).to_contain_text('PRIVATE')
     await page.wait_for_function("QFResearch20.context().origin==='market'")
-    await page.locator('[data-qf34-workspace="research"]:visible').click()
+    await open_company_research(page)
     await page.locator('[data-qf27-explore="brief"]').click()
     await expect(page.locator('#qf32-summary')).to_be_visible()
     await expect(page.locator('#qf32-summary')).to_contain_text('Brier')
@@ -167,7 +167,7 @@ async def journey(browser,engine,width):
     await page.locator('#qf35-assumptions > summary').click()
     await page.locator('[data-qf34-rule="maxDrawdown"]').fill('15')
     await page.locator('#qf34-rules button[type="submit"]').click()
-    await page.locator('[data-qf34-workspace="research"]:visible').click()
+    await open_company_research(page)
     await expect(page.locator('.qf34-rule-trace')).to_contain_text('Historical drawdown boundary')
     assert await page.evaluate('document.documentElement.scrollWidth<=innerWidth')
     await page.screenshot(path=str(OUT/f'{engine}-{width}-summary-fixture.png'),full_page=True)
@@ -175,7 +175,7 @@ async def journey(browser,engine,width):
     await expect(page.locator('#page-models')).to_be_visible()
     assert await page.locator('[data-qf-c22-phase]').count()==3
     await expect(page.locator('[data-qf-c22-phase="evaluation"]')).to_have_attribute('aria-selected','true')
-    await navigate(page, 'explore')
+    await open_company_research(page)
     await page.locator('#qf24-switch-mode').click()
     await expect(page.locator('#qf32-summary')).to_be_hidden()
     assert await page.locator('#qf32-summary').inner_text()==''

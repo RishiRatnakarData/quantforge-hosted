@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "quantforge-financial-research"
 version = "5.6.1"
-description = "Private single-user investment desk with transparent finance analysis, portfolio math and paper trading"
+description = "Financial research platform with SEC provenance, statistical models and a protected virtual portfolio"
 readme = "README.md"
 requires-python = ">=3.11,<3.14"
 authors = [{name = "Rishi Ratnakar"}]

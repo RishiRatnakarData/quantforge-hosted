@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 
+from browser_product_contract import navigate
 from playwright.async_api import async_playwright, expect
 from smoke_completion_browser import EXTEND
 from smoke_consolidation_v34 import EXTRA
@@ -35,7 +36,8 @@ async def private_journey(browser, engine, width):
     await enter(page)
     await page.locator('#private-login-submit').click()
     await expect(page.locator('#qf37-research-home')).to_be_visible()
-    assert await page.locator('#qf34-workspace-nav button').all_text_contents() == ['Research', 'Portfolio']
+    assert await page.locator('#qf-v20-navigation [data-page]').all_text_contents() == ['Explore', 'Compare', 'Models', 'Portfolio', 'Methods']
+    assert await page.locator('#qf34-workspace-nav, #qf37-secondary').count() == 0
     assert await page.locator('#qf37-research-home .qf34-shortlist').count() == 0
     assert await page.locator('#qf37-research-home [data-qf34-workspace="research"]').count() == 1
     assert await page.evaluate('qf34UniverseReads') == 0
@@ -56,9 +58,9 @@ async def private_journey(browser, engine, width):
         await expect(page.locator('#qf37-selection-status')).to_contain_text('BTC/USD')
         assert await page.evaluate('QFResearch20.context().symbol') == 'MSFT'
         assert await page.evaluate('qf34CompanyReads') == before_unsupported
-        await page.locator('#qf34-workspace-nav [data-qf34-workspace="portfolio"]').click()
+        await navigate(page, 'portfolio')
         await expect(page.locator('#page-portfolio')).to_be_visible()
-        await page.locator('#qf34-workspace-nav [data-qf34-workspace="home"]').click()
+        await navigate(page, 'explore')
         await expect(page.locator('#qf37-research-home')).to_be_visible()
         assert await page.evaluate('qf34Writes') == 0
     await page.locator('[data-qf34-workspace="discovery"]:visible').click()
@@ -171,7 +173,8 @@ async def auth_rejection(browser, engine):
     await enter(page)
     await page.locator('#private-login-submit').click()
     await expect(page.locator('#qf37-research-home')).to_be_visible()
-    assert await page.locator('#qf34-workspace-nav button').all_text_contents() == ['Research', 'Portfolio']
+    assert await page.locator('#qf-v20-navigation [data-page]').all_text_contents() == ['Explore', 'Compare', 'Models', 'Portfolio', 'Methods']
+    assert await page.locator('#qf34-workspace-nav, #qf37-secondary').count() == 0
     assert await page.locator('#qf37-research-home .qf34-shortlist').count() == 0
     assert await page.locator('#qf37-research-home [data-qf34-workspace="research"]').count() == 1
     assert await page.evaluate('qf34UniverseReads') == 0

@@ -708,7 +708,7 @@ body.qf31-home-active #qf28-mobile-credit{display:none!important}
 
 /* V31 visual QA: five navigation destinations need two legible rows at phone widths. */
 @media(max-width:420px){
- #qf-v20-navigation{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:6px!important}
+ #qf-v20-navigation{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:6px!important}
  #qf-v20-navigation .nav-btn{min-width:0;min-height:44px!important;padding:8px 4px!important;text-align:center;font-size:12px!important;white-space:normal}
  #qf-v20-navigation .nav-btn:nth-child(-n+3){grid-column:span 2}
  #qf-v20-navigation .nav-btn:nth-child(n+4){grid-column:span 3}
@@ -762,19 +762,16 @@ body.qf31-home-active #qf28-mobile-credit{display:none!important}
 .qf33-evidence-tabs button[aria-selected=true]{background:#29313a;color:#fff;border-color:#29313a}
 #qf33-evidence-details .qf-v20-findings{margin-bottom:24px}
 
-#qf34-workspace-nav{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0 28px;padding-bottom:18px;border-bottom:1px solid #d9dde0}
-#qf34-workspace-nav[hidden],#qf34-briefing[hidden]{display:none!important}
-#qf34-workspace-nav [aria-current="page"]{background:#272d32;color:#fff}
+#qf34-briefing[hidden]{display:none!important}
 .qf34-briefing{max-width:1160px;margin:auto}.qf34-briefing>header{max-width:800px;margin-bottom:28px}.qf34-briefing h1{font-size:clamp(30px,4vw,42px);letter-spacing:-.035em}
 .qf34-overview{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;border-block:1px solid #dce0e3;margin:24px 0 32px;padding:18px 0}.qf34-overview p{margin:0}.qf34-overview strong{display:block;font-size:27px;color:#252b30}.qf34-overview span{font-size:14px;color:#626c74}
 .qf34-briefing .pane{margin-bottom:28px;padding:26px}.qf34-priorities,.qf34-shortlist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin:22px 0}.qf34-priorities article,.qf34-shortlist article{min-width:0;border-top:2px solid #bdc6cd;padding:20px 0}.qf34-priorities h3,.qf34-shortlist h3{margin-top:0}.qf34-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:20px 0}.qf34-controls label{display:flex;flex-direction:column;gap:8px;font-size:14px;min-width:0}.qf34-controls input,.qf34-controls select{width:100%;min-height:44px;min-width:0}.qf34-shortlist dl{display:grid;gap:8px;margin:16px 0}.qf34-shortlist dl>div{display:flex;justify-content:space-between;gap:15px;border-bottom:1px solid #e2e6e9;padding-bottom:7px}.qf34-shortlist dd{margin:0;font-variant-numeric:tabular-nums}.qf34-briefing details{margin-top:24px}.qf34-briefing summary{cursor:pointer;font-weight:650}.qf34-rule-trace{border-top:1px solid #d8dde1;padding-top:20px;margin-top:24px}.qf34-briefing p,.qf34-briefing li{overflow-wrap:anywhere}.qf34-briefing button{white-space:normal}
-@media(max-width:680px){.qf34-priorities,.qf34-shortlist,.qf34-controls{grid-template-columns:1fr}.qf34-briefing .pane{padding:18px}.qf34-overview{gap:10px}.qf34-overview strong{font-size:23px}#qf34-workspace-nav{gap:8px}#qf34-workspace-nav button{flex:1 1 120px}}
+@media(max-width:680px){.qf34-priorities,.qf34-shortlist,.qf34-controls{grid-template-columns:1fr}.qf34-briefing .pane{padding:18px}.qf34-overview{gap:10px}.qf34-overview strong{font-size:23px}}
 
 .qf31-home-steps{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media(max-width:680px){.qf31-home-steps{grid-template-columns:1fr}}
 
 /* Focused final hierarchy; existing grayscale controls and charts are retained. */
-#qf34-workspace-nav [aria-current="page"]{background:#272d32!important;color:#fff!important;border-color:#272d32!important}
 .qf34-priorities{margin:12px 0;gap:18px}.qf34-priorities article{padding:14px 0}.qf34-briefing>header{margin-bottom:20px}.qf34-briefing .pane{margin-bottom:22px}
 .qf35-batch-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:22px 0 12px}.qf35-batch-actions>span{font-size:13px;color:#5f6972}.qf35-selection{display:flex!important;align-items:center;gap:8px;font-size:13px;margin-bottom:12px}.qf35-selection input[type=checkbox]{width:18px!important;height:18px!important;min-height:18px!important;flex:0 0 18px}.qf35-result{border-top:1px solid #d4dade;padding-top:15px;margin-top:15px}.qf35-status{font-weight:700}.qf35-assumptions{display:block;margin-top:24px}.qf35-assumptions summary{font-size:18px;min-height:44px;padding:10px 0}.qf35-assumptions .qf34-controls small{font-weight:400;color:#5f6972;font-size:13px;line-height:1.5}
 #qf34-reviewed article+article{margin-top:20px;padding-top:20px;border-top:1px solid #dce0e3}#qf35-company-details{border-top:1px solid #d7dde1;margin-top:24px;padding-top:16px}#qf35-company-details>summary{font-weight:700;font-size:17px;cursor:pointer;min-height:44px}.qf35-primary-evidence{margin-top:20px}.qf35-next-action{border-top:1px solid #d7dde1;padding-top:20px;margin-top:20px}.qf35-next-action h3{font-size:18px}
@@ -811,16 +808,18 @@ body.qf31-home-active #qf28-mobile-credit{display:none!important}
 /* Public source references remain keyboard-visible and touch-readable. */
 .qf26-references a{display:block;min-height:44px;overflow-wrap:anywhere;text-underline-offset:3px}.qf24-source:focus-visible,.qf26-references a:focus-visible{outline:2px solid #465761;outline-offset:3px}
 
-/* Private information architecture: two primary destinations, existing tools below. */
-.qf37-private #qf-v20-navigation [data-page="explore"],.qf37-private #qf-v20-navigation [data-page="portfolio"]{display:none}.qf37-private #qf-v20-navigation{border-top:1px solid #d9dde0;padding-top:18px}.qf37-private #qf-v20-navigation:before{content:"Research tools";display:block;font-size:12px;color:#626c74;padding:0 14px 10px}.qf37-private #qf-v20-navigation .nav-btn{font-size:14px}
-#qf37-research-home[hidden],#qf37-secondary[hidden],#qf37-portfolio-notices[hidden]{display:none!important}
+/* Private Explore presentation; primary navigation is shared with Public. */
+#qf37-research-home[hidden],#qf37-portfolio-notices[hidden]{display:none!important}
 .qf37-research-home{max-width:1040px;margin:auto}.qf37-research-home header{max-width:76ch;margin-bottom:28px}.qf37-research-home h1{font-size:clamp(30px,4vw,42px);letter-spacing:-.035em;margin:0 0 14px}.qf37-research-home p{line-height:1.6;margin:12px 0 16px}
 .qf37-search{position:relative;max-width:800px;margin-bottom:28px}.qf37-search label{display:block;font-weight:650;margin-bottom:10px}.qf37-search input{width:100%;min-height:50px;font-size:16px}.qf37-search [role=listbox]{position:relative;max-height:360px;overflow:auto}
 .qf37-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin:28px 0}.qf37-choices section{border-top:2px solid #b9c2c9;padding:24px 0;min-width:0}.qf37-choices h2{font-size:22px;margin:0 0 14px}.qf37-choices .btn{min-height:44px;margin-top:8px}.qf37-research-home details{border-top:1px solid #d9dde0;margin-top:24px;padding-top:12px}.qf37-research-home summary{font-weight:650;cursor:pointer;min-height:44px;padding:10px 0}
-#qf37-secondary{display:flex;flex-wrap:wrap;gap:12px;margin:-10px 0 28px}#qf37-secondary .btn{min-height:44px}#qf37-portfolio-notices{margin-bottom:28px;padding:24px}#qf37-portfolio-notices article+article{border-top:1px solid #d9dde0;margin-top:20px;padding-top:20px}#qf37-portfolio-notices h3{font-size:18px;margin:16px 0 12px}
-@media(max-width:680px){.qf37-choices{grid-template-columns:1fr;gap:4px;margin:20px 0}.qf37-choices section{padding:20px 0}.qf37-choices .btn{width:100%}.qf37-research-home header{margin-bottom:24px}#qf37-secondary{gap:10px}#qf37-secondary .btn{flex:1 1 120px}}
+#qf37-portfolio-notices{margin-bottom:28px;padding:24px}#qf37-portfolio-notices article+article{border-top:1px solid #d9dde0;margin-top:20px;padding-top:20px}#qf37-portfolio-notices h3{font-size:18px;margin:16px 0 12px}
+@media(max-width:680px){.qf37-choices{grid-template-columns:1fr;gap:4px;margin:20px 0}.qf37-choices section{padding:20px 0}.qf37-choices .btn{width:100%}.qf37-research-home header{margin-bottom:24px}}
 
-@media(max-width:800px){.qf37-private #qf-v20-navigation{display:none!important}.qf37-private .side{padding-bottom:12px}}
+
+/* Only Explore has contextual return/discovery actions; main navigation is shared. */
+#qf38-explore-context{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0 28px}#qf38-explore-context[hidden]{display:none!important}#qf38-explore-context .btn{min-height:44px}
+@media(max-width:680px){#qf38-explore-context .btn{flex:1 1 140px}}
 
 
 /* V9 private operating system: public site remains visually unchanged. */
@@ -11371,7 +11370,7 @@ async function open(name){
  if(!signed()){window.QFNavigate20('private');return;}
  if(!privateMode())window.QFResearch20.switchMode('private');
  if(name==='portfolio'){window.QFNavigate20('portfolio');document.querySelector('[data-qf-portfolio="overview"]').click();account.scrollIntoView({block:'start'});}
- else{home(false);window.QFNavigate20('explore');window.QFExplore27?.show('research');notes.scrollIntoView({block:'start'});$('qf-v23-note').focus();}
+ else{home(false);if(window.QFWorkspace34)window.QFWorkspace34.choose('research');else window.QFNavigate20('explore');window.QFExplore27?.show('research');notes.scrollIntoView({block:'start'});$('qf-v23-note').focus();}
  await refresh();
 }
 $('qf24-switch-mode').addEventListener('click',()=>{close();window.QFResearch20.switchMode(privateMode()?'public':'private');sync();});
@@ -12052,7 +12051,7 @@ function drawSummary(c){
  const ruleLabel=id=>({'single-name-limit':'Maximum single-name weight','historical-drawdown-limit':'Historical drawdown boundary','price-cash-flow-limit':'Price / cash-flow ceiling','observed-held-correlation-limit':'Held-position correlation ceiling'})[id]||id;
  const ruleValue=(id,value)=>value===null?'Unavailable':id==='price-cash-flow-limit'?value.toFixed(1)+'×':id==='observed-held-correlation-limit'?value.toFixed(2):pct(value);
  const trace=document.createElement('section');trace.className='qf34-rule-trace';
- trace.innerHTML='<h3>Your selected conditions</h3><p>Conditions are optional assumptions for this research session, not an inferred risk profile. Configure them in Research → Advanced research → Research conditions.</p>'+(d.proposal.conditions.length?'<div class="table-wrap"><table><caption>Current rule evaluation · '+safe(d.policyVersion)+'</caption><thead><tr><th>Condition</th><th>Selected</th><th>Observed</th></tr></thead><tbody>'+d.proposal.conditions.map(r=>'<tr><th scope="row">'+safe(ruleLabel(r.id))+'</th><td>'+safe(ruleValue(r.id,r.selected))+'</td><td>'+safe(ruleValue(r.id,r.measured))+'</td></tr>').join('')+'</tbody></table></div>':'<p>No numeric conditions selected. A conditional entry assessment is withheld.</p>')+list([...d.proposal.missing,...d.proposal.breaches],'No additional selected-condition gaps detected.')+(d.proposal.scenario?'<p>Illustrative amount '+safe(money(d.proposal.scenario.amount))+'; proposed single-name weight '+pct(d.proposal.scenario.proposedWeight)+'. '+safe(d.proposal.scenario.assumption)+'</p>':'')+'<p class="tiny">Observed facts, derived calculations, statistical estimates, scenarios and research judgment are distinct. No validated investment-performance advantage is claimed.</p>';
+ trace.innerHTML='<h3>Your selected conditions</h3><p>Conditions are optional assumptions for this research session, not an inferred risk profile. Open Explore → Advanced research to configure conditions.</p>'+(d.proposal.conditions.length?'<div class="table-wrap"><table><caption>Current rule evaluation · '+safe(d.policyVersion)+'</caption><thead><tr><th>Condition</th><th>Selected</th><th>Observed</th></tr></thead><tbody>'+d.proposal.conditions.map(r=>'<tr><th scope="row">'+safe(ruleLabel(r.id))+'</th><td>'+safe(ruleValue(r.id,r.selected))+'</td><td>'+safe(ruleValue(r.id,r.measured))+'</td></tr>').join('')+'</tbody></table></div>':'<p>No numeric conditions selected. A conditional entry assessment is withheld.</p>')+list([...d.proposal.missing,...d.proposal.breaches],'No additional selected-condition gaps detected.')+(d.proposal.scenario?'<p>Illustrative amount '+safe(money(d.proposal.scenario.amount))+'; proposed single-name weight '+pct(d.proposal.scenario.proposedWeight)+'. '+safe(d.proposal.scenario.assumption)+'</p>':'')+'<p class="tiny">Observed facts, derived calculations, statistical estimates, scenarios and research judgment are distinct. No validated investment-performance advantage is claimed.</p>';
  summary.querySelector('#qf35-company-details').append(trace);
  root.dispatchEvent(new CustomEvent('qf:canonical-assessment',{detail:{report:d,reviewed:calculated&&Boolean(evidence)}}));
  if(summary.previousElementSibling!==assessmentTabs)assessmentTabs.after(summary);
@@ -12119,7 +12118,7 @@ function migrate(){if(/^#(?:(?:explore|private)[\/-])?(?:news|context|sentiment|
 root.addEventListener('hashchange',migrate);migrate();clear();sync();root.QFGuideUI30=Object.freeze({renderHealth});
 })(window);
 
-/* Two owner destinations. Bounded discovery research; no account writes. */
+/* Private Explore workflows inside the shared five-section navigation. Bounded discovery research; no account writes. */
 (function(root){
 'use strict';
 const $=id=>document.getElementById(id),bridge=()=>root.QFPrivateBridgeV23,context=()=>root.QFResearch20.context();
@@ -12127,15 +12126,12 @@ const active=()=>bridge()?.ready()&&context().mode==='private';
 const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pct=v=>Number.isFinite(v)?(v*100).toFixed(1)+'%':'Unavailable',money=root.QFReadout29.money;
 const date=v=>Number.isFinite(Date.parse(v))?new Date(v).toISOString().replace('T',' ').slice(0,16)+' UTC':'Unavailable';
-let task='home',wasPrivate=false,eligible=null,loading=false,failure='',generation=0,valuation=null,valuationVersion=null,selectedRules={},minGrowth=0,order='cashMargin',selected=new Set(),selectionKey='',refreshed=null;
+let internalNavigation=false,task='home',wasPrivate=false,eligible=null,loading=false,failure='',generation=0,valuation=null,valuationVersion=null,selectedRules={},minGrowth=0,order='cashMargin',selected=new Set(),selectionKey='',refreshed=null;
 const reports=new Map();
-const nav=document.createElement('nav');nav.id='qf34-workspace-nav';nav.setAttribute('aria-label','Private workspace tasks');
-nav.innerHTML=[['home','Research'],['portfolio','Portfolio']].map(([key,label])=>'<button type="button" class="btn" data-qf34-workspace="'+key+'">'+label+'</button>').join('');
-$('qf24-mode-bar').after(nav);
 const host=document.createElement('section');host.id='qf34-briefing';host.className='qf34-briefing';$('qf-v23-explore-content').before(host);
 const home=document.createElement('section');home.id='qf37-research-home';home.className='qf37-research-home';host.before(home);
-home.innerHTML='<header><h1>Research</h1><p>Explore companies, evaluate financial evidence, and investigate investment opportunities.</p></header><div class="qf37-search"><label for="qf37-company-search">Search company name or ticker</label><input id="qf37-company-search" type="search" autocomplete="off" placeholder="Company name or ticker"><div id="qf37-company-options"></div></div><p id="qf37-selection-status" role="status" hidden></p><div class="qf37-choices"><section><h2>Analyze a company</h2><p>Review financials, valuation, historical risk and model evidence.</p><button type="button" class="btn primary" data-qf34-workspace="research">Analyze company</button></section><section><h2>Discover companies</h2><p>Screen eligible companies and research up to five financial matches.</p><button type="button" class="btn" data-qf34-workspace="discovery">Discover companies</button></section></div><details id="qf37-recent"><summary>Recent research and saved records</summary><div id="qf37-recent-content"></div></details><details class="qf37-advanced"><summary>Advanced research</summary><div class="qf27-action-row"><button type="button" class="btn" data-qf37-route="compare">Compare companies</button><button type="button" class="btn" data-qf37-route="models">Models</button><button type="button" class="btn" data-qf37-route="methods">Methods &amp; engineering</button><button type="button" class="btn" data-qf34-configure>Research conditions</button></div></details>';
-const secondary=document.createElement('nav');secondary.id='qf37-secondary';secondary.setAttribute('aria-label','Research tools');secondary.innerHTML='<button type="button" class="btn" data-qf34-workspace="research">Company research</button><button type="button" class="btn" data-qf34-workspace="discovery">Discover companies</button><button type="button" class="btn" data-qf37-route="compare">Compare</button><button type="button" class="btn" data-qf37-route="models">Models</button><button type="button" class="btn" data-qf37-route="methods">Methods</button>';nav.after(secondary);
+home.innerHTML='<header><h1>Research</h1><p>Explore companies, evaluate financial evidence, and investigate investment opportunities.</p></header><div class="qf37-search"><label for="qf37-company-search">Search company name or ticker</label><input id="qf37-company-search" type="search" autocomplete="off" placeholder="Company name or ticker"><div id="qf37-company-options"></div></div><p id="qf37-selection-status" role="status" hidden></p><div class="qf37-choices"><section><h2>Analyze a company</h2><p>Review financials, valuation, historical risk and model evidence.</p><button type="button" class="btn primary" data-qf34-workspace="research">Analyze company</button></section><section><h2>Discover companies</h2><p>Screen eligible companies and research up to five financial matches.</p><button type="button" class="btn" data-qf34-workspace="discovery">Discover companies</button></section></div><details id="qf37-recent"><summary>Recent research and saved records</summary><div id="qf37-recent-content"></div></details><details class="qf37-advanced"><summary>Advanced research</summary><div class="qf27-action-row"><button type="button" class="btn" data-qf34-configure>Research conditions</button></div></details>';
+const trail=document.createElement('nav');trail.id='qf38-explore-context';trail.setAttribute('aria-label','Explore research workflow');trail.innerHTML='<button type="button" class="btn" data-qf34-workspace="home">Back to Research</button><button type="button" class="btn" data-qf34-workspace="discovery">Discover companies</button>';$('qf-v23-explore-content').before(trail);
 const notices=document.createElement('section');notices.id='qf37-portfolio-notices';notices.className='pane';$('qf-v20-portfolio-overview').prepend(notices);
 const picker=root.QFInvestmentPicker27.mount({input:$('qf37-company-search'),panel:$('qf37-company-options'),mode:()=>context().mode,search:root.QFResearch20.searchAssets,published:root.QFPublishedSEC.companies,onSelect:asset=>{if(!active())return;choose('research');root.QFResearch20.chooseAsset(asset);root.QFExplore27?.show('brief');void root.QFResearch20.analyze();}});
 const currentScreen=()=>eligible?root.QFDecision34.screen({snapshot:root.QFPublishedSEC,health:root.QFHealthSnapshot30,eligible,filters:{minGrowth,order}}):null;
@@ -12153,7 +12149,7 @@ function choose(next){
  $('qf37-selection-status').hidden=true;$('qf37-selection-status').textContent='';
  task=next==='briefing'?'home':next;
  if(!['home','research','discovery','portfolio'].includes(task))task='home';
- root.QFNavigate20(task==='portfolio'?'portfolio':'explore');sync();
+ internalNavigation=true;try{root.QFNavigate20(task==='portfolio'?'portfolio':'explore');}finally{internalNavigation=false;}sync();
  if(task==='home')$('qf37-company-search').focus({preventScroll:true});
 }
 
@@ -12212,25 +12208,22 @@ async function loadUniverse(){
  finally{if(token===generation){loading=false;render();}}
 }
 function sync(){
- const enabled=active();nav.hidden=!enabled;secondary.hidden=!enabled||task==='home';document.body.classList.toggle('qf37-private',Boolean(enabled));$('qf-v20-navigation').setAttribute('aria-label',enabled?'Specialist research tools':'QuantForge research sections');
+ const enabled=active();trail.hidden=true;document.body.classList.toggle('qf37-private',Boolean(enabled));$('qf-v20-navigation').setAttribute('aria-label','QuantForge research sections');
  if(!enabled){if(wasPrivate){invalidate();eligible=null;loading=false;failure='';selectedRules={};valuation=null;valuationVersion=null;selected.clear();selectionKey='';refreshed=null;task='home';}host.hidden=true;host.replaceChildren();home.hidden=true;$('qf37-selection-status').hidden=true;$('qf37-selection-status').textContent='';$('qf37-recent-content').replaceChildren();notices.hidden=true;notices.replaceChildren();picker.reset();$('qf37-company-search').value='';wasPrivate=false;$('qf-v23-explore-content').hidden=Boolean(root.QFUnifiedPrivate23?.state?.().landing);return;}
  if(!wasPrivate){task='home';wasPrivate=true;if(!$('page-explore').classList.contains('active')){root.QFNavigate20('explore');return;}}
- const explore=$('page-explore').classList.contains('active');host.hidden=!explore||task!=='discovery';home.hidden=!explore||task!=='home';
+ const explore=$('page-explore').classList.contains('active');trail.hidden=!explore||task!=='research';host.hidden=!explore||task!=='discovery';home.hidden=!explore||task!=='home';
  if(explore){$('qf-v23-landing').hidden=true;$('qf-v23-explore-content').hidden=task!=='research';document.body.classList.remove('qf31-home-active');}
- nav.querySelectorAll('button').forEach(b=>b.setAttribute('aria-current',b.dataset.qf34Workspace===(task==='portfolio'?'portfolio':'home')?'page':'false'));
  render();if(task==='discovery'&&!eligible&&!loading&&!failure)void loadUniverse();
 }
 document.addEventListener('click',event=>{
  if(!active())return;
  if(event.target.closest('[data-qf34-configure]')){event.preventDefault();choose('discovery');$('qf35-assumptions').open=true;$('qf34-rules').scrollIntoView({block:'center'});$('qf34-rules').querySelector('input').focus();return;}
- const route=event.target.closest('[data-qf37-route]')?.dataset.qf37Route;if(route){task='research';root.QFNavigate20(route);return;}
  const target=event.target.closest('[data-qf34-workspace]');if(target){choose(target.dataset.qf34Workspace);return;}
  if(event.target.closest('[data-qf-v23-open="notes"]')){choose('research');root.QFExplore27?.show('research');return;}
  const symbol=event.target.closest('[data-qf34-symbol]')?.dataset.qf34Symbol;if(symbol){void research(symbol);return;}
  if(event.target.closest('[data-qf34-refresh]')){invalidate();eligible=null;failure='';selectionKey='';void loadUniverse();return;}
  if(event.target.closest('#qf35-cancel-batch')){batch.cancel();return;}
  if(event.target.closest('#qf35-analyze-shortlist')){const screen=currentScreen(),candidates=screen?.shortlist.filter(r=>selected.has(r.symbol))||[];if(!candidates.length)return;const c={generation,ownerVersion:bridge().snapshot().version,rules:{...selectedRules},key:'batch-'+generation+'-'+Date.now()};void batch.start(candidates,c);return;}
- if(event.target.closest('#qf-v20-navigation [data-page="explore"]')){choose('home');}
 });
 $('qf-v23-home-button').addEventListener('click',()=>{if(active())choose('home');});
 host.addEventListener('change',event=>{
@@ -12244,7 +12237,7 @@ root.addEventListener('qf:owner-valuation',event=>{if(!active()||event.detail?.v
 root.addEventListener('qf:owner-state',()=>{invalidate();valuation=null;valuationVersion=null;sync();});
 root.addEventListener('qf:research-universe',()=>{if(active()){invalidate();render();}});
 for(const name of ['qf:research-context','qf:data-mode','qf:owner-auth-ready','qf:owner-auth-ended'])root.addEventListener(name,sync);
-root.addEventListener('qf:route-change',event=>{if(event.detail?.route==='portfolio')task='portfolio';else if(['compare','models','methods'].includes(event.detail?.route))task='research';else if(event.detail?.route==='explore'&&task==='portfolio')task='home';sync();});
+root.addEventListener('qf:route-change',event=>{if(event.detail?.route==='portfolio')task='portfolio';else if(['compare','models','methods'].includes(event.detail?.route))task='research';else if(event.detail?.route==='explore'&&!internalNavigation)task='home';sync();});
 function legacyRoute(){if(active()&&/^#(?:briefing|research|discover|private\/(?:briefing|research|discover))$/.test(location.hash)){const discovery=location.hash.endsWith('discover');history.replaceState(null,'','#explore');choose(discovery?'discovery':'home');}}
 root.addEventListener('qf:owner-auth-ready',legacyRoute);root.addEventListener('hashchange',legacyRoute);root.addEventListener('popstate',()=>{if(active()&&location.hash==='#explore')choose('home');legacyRoute();});
 root.QFWorkspace34=Object.freeze({rules:()=>({...selectedRules}),choose,research});sync();legacyRoute();

@@ -4,7 +4,7 @@ import json
 import os
 from pathlib import Path
 
-from browser_product_contract import navigate
+from browser_product_contract import navigate, open_company_research
 from playwright.async_api import async_playwright, expect
 from smoke_completion_browser import EXTEND
 from smoke_final_release32 import enter, setup
@@ -46,7 +46,7 @@ async def run():
                 await enter(page)
                 await page.locator('#private-login-submit').click()
                 await page.wait_for_function("QFPrivateBridgeV23.ready()&&QFResearch20.context().origin==='market'")
-                await page.locator('[data-qf34-workspace="research"]:visible').click()
+                await open_company_research(page)
                 await page.locator('[data-qf27-explore="brief"]').click()
                 await page.locator('#qf27-analyze').click()
                 await expect(page.locator('#qf32-summary')).to_contain_text('Price / annual cash-flow proxy:', timeout=30000)
@@ -77,7 +77,7 @@ async def run():
                 assert await page.evaluate('previewOnlyCalls===1&&forbiddenTradeCalls===0')
                 await page.locator('#qf27-trade-status').scroll_into_view_if_needed()
                 await page.screenshot(path=str(OUT/f'{engine}-{width}-stale-preview.png'), full_page=True)
-                await navigate(page, 'explore')
+                await open_company_research(page)
                 await page.locator('#qf24-switch-mode').click()
                 assert await page.locator('#qf32-summary').inner_text() == ''
                 assert not errors, errors

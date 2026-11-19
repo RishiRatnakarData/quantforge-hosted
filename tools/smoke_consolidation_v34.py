@@ -5,7 +5,7 @@ import json
 import os
 from pathlib import Path
 
-from browser_product_contract import navigate
+from browser_product_contract import audit_shared_navigation, navigate, open_company_research
 from playwright.async_api import async_playwright, expect
 from smoke_completion_browser import EXTEND
 from smoke_final_release32 import enter, setup
@@ -28,6 +28,7 @@ EXTRA = r"""() => {
 async def run():
     OUT.mkdir(parents=True, exist_ok=True)
     results = []
+    navigation_results = []
     async with async_playwright() as pw:
         for engine in ("chromium", "firefox", "webkit"):
             browser = await getattr(pw, engine).launch()
@@ -36,9 +37,11 @@ async def run():
                 await page.evaluate(EXTEND)
                 await page.evaluate(FIXED)
                 await page.evaluate(EXTRA)
+                navigation_results.append(await audit_shared_navigation(page, 'public', engine, width, OUT))
                 await enter(page)
                 await page.locator("#private-login-submit").click()
                 await expect(page.locator('#qf37-research-home')).to_be_visible()
+                navigation_results.append(await audit_shared_navigation(page, 'private', engine, width, OUT))
                 await page.locator('#qf37-research-home .qf37-advanced > summary').click()
                 await page.locator('#qf37-research-home [data-qf34-configure]').click()
                 await expect(page.locator('[data-qf34-rule="maxWeight"]')).to_be_focused()
@@ -58,7 +61,7 @@ async def run():
                 await page.locator('[data-qf34-rule="maxWeight"]').fill("15")
                 await page.locator('#qf34-rules button[type="submit"]').click()
                 assert await page.evaluate("QFWorkspace34.rules().maxWeight") == 0.15
-                await page.locator('[data-qf34-workspace="research"]:visible').first.click()
+                await open_company_research(page)
                 await expect(page.locator("#qf27-analyze")).to_be_visible()
                 await page.wait_for_function("QFResearch20.context().origin==='market'")
                 await page.locator("#qf27-analyze").click()
@@ -79,13 +82,13 @@ async def run():
                 await page.locator('[data-qf34-workspace="discovery"]:visible').first.click()
                 await page.locator("#qf36-history > summary").click()
                 await expect(page.locator("#qf34-reviewed")).to_contain_text("MSFT")
-                await page.locator('[data-qf34-workspace="portfolio"]').first.click()
+                await navigate(page, 'portfolio')
                 await expect(page.locator("#page-portfolio")).to_be_visible()
                 assert await page.evaluate("document.documentElement.scrollWidth<=innerWidth")
                 await page.locator("#qf24-switch-mode").click()
-                await expect(page.locator("#qf34-workspace-nav")).to_be_hidden()
+                assert await page.locator("#qf34-workspace-nav, #qf37-secondary").count() == 0
                 assert await page.evaluate("Object.keys(QFWorkspace34.rules()).length") == 0
-                await navigate(page, 'explore')
+                await open_company_research(page)
                 await expect(page.locator("#qf-v23-explore-content")).to_be_visible()
                 assert await page.evaluate("qf34Writes") == 0
                 assert not errors, errors
@@ -94,7 +97,7 @@ async def run():
                         "engine": engine,
                         "width": width,
                         "writes": 0,
-                        "defaultBriefing": True,
+                        "researchHome": True,
                         "exactUniverse": True,
                         "canonicalAssessment": True,
                         "ruleReset": True,
@@ -102,6 +105,7 @@ async def run():
                 )
                 await page.close()
             await browser.close()
+    (OUT / "navigation-results.json").write_text(json.dumps(navigation_results, indent=2))
     (OUT / "results.json").write_text(json.dumps(results, indent=2))
     print(json.dumps({"journeys": len(results), "writes": 0, "passed": True}))
 
