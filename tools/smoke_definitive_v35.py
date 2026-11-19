@@ -49,6 +49,13 @@ async def private_journey(browser, engine, width):
         await expect(page.locator('#qf37-research-home')).to_be_hidden()
         await expect(page.locator('#qf-v20-symbol')).to_have_text('MSFT')
         await expect(page.locator('#qf32-summary')).to_contain_text('Investment research summary', timeout=30000)
+        await expect(page.locator('#qf-v20-run-state')).to_contain_text('Calculated for', timeout=30000)
+        before_unsupported = await page.evaluate('qf34CompanyReads')
+        await page.evaluate("QFWorkspace34.research('BTC/USD')")
+        await expect(page.locator('#qf37-research-home')).to_be_visible()
+        await expect(page.locator('#qf37-selection-status')).to_contain_text('BTC/USD')
+        assert await page.evaluate('QFResearch20.context().symbol') == 'MSFT'
+        assert await page.evaluate('qf34CompanyReads') == before_unsupported
         await page.locator('#qf34-workspace-nav [data-qf34-workspace="portfolio"]').click()
         await expect(page.locator('#page-portfolio')).to_be_visible()
         await page.locator('#qf34-workspace-nav [data-qf34-workspace="home"]').click()
@@ -151,6 +158,7 @@ async def private_journey(browser, engine, width):
     await expect(page.locator('#qf34-briefing')).to_be_hidden()
     await expect(page.locator('#qf34-briefing')).to_be_empty()
     await expect(page.locator('#qf37-company-options')).to_be_empty()
+    await expect(page.locator('#qf37-selection-status')).to_be_empty()
     assert await page.evaluate('qf34Writes') == 0
     assert not errors, errors
     await page.close()
@@ -177,6 +185,7 @@ async def auth_rejection(browser, engine):
     await page.wait_for_function('() => !QFPrivateBridgeV23.ready()', timeout=90000)
     await expect(page.locator('#qf34-briefing')).to_be_empty()
     await expect(page.locator('#qf37-company-options')).to_be_empty()
+    await expect(page.locator('#qf37-selection-status')).to_be_empty()
     assert await page.locator('.qf35-result').count() == 0
     assert await page.evaluate('QFPrivateBridgeV23.snapshot()') is None
     await expect(page.locator('#private-positions')).to_be_empty()
