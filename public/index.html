@@ -4226,7 +4226,8 @@ function renderPriceData(){
  $('qf-v20-price-table').innerHTML='<p>Underlying dated closes · '+(price.length>10?'first 2 and latest 8 shown; export for all':'all available observations')+'</p><div class="table-wrap"><table><thead><tr><th>Date</th><th>'+(real?'Close (USD)':'Illustrative index')+'</th></tr></thead><tbody>'+sampled.map(p=>'<tr><td>'+esc(p.date)+'</td><td>'+esc(real?usd(p.close):value(p.close,2)+' index')+'</td></tr>').join('')+'</tbody></table></div>';
 }
 function drawPriceChart(price,benchmark,real){
- const W=Math.max(210,$('qf-v20-chart').clientWidth||720),H=292,left=55,right=W-26,top=20,bottom=247;
+ const measured=$('qf-v20-chart').clientWidth;
+ const W=Math.max(210,measured>=210?measured:Math.min(870,window.innerWidth-112)),H=292,left=55,right=W-26,top=20,bottom=247;
  let series=price,bench=null,normalized=false;
  if(benchmark?.length){
   const matches=new Map(benchmark.map(r=>[r.date,r.close]));
@@ -4696,6 +4697,21 @@ function init(){
    queued=true;requestAnimationFrame(()=>{queued=false;if(state.portfolioData&&$('page-portfolio').classList.contains('active'))renderPortfolioResearch();});
   });
   for(const id of ['qf-b21-overview-chart','qf-b21-whatif-chart'])observer.observe($(id));
+ }
+ // Selection can load closes while Company briefing hides the market pane.
+ // Repaint from current authorized state when the price chart becomes visible.
+ if(window.ResizeObserver){
+  let lastWidth=0,queued=false;
+  const chart=$('qf-v20-chart');
+  new ResizeObserver(entries=>{
+   const width=Math.round(entries[0].contentRect.width);
+   if(width===lastWidth)return;lastWidth=width;
+   if(width<210||queued)return;
+   queued=true;requestAnimationFrame(()=>{
+    queued=false;
+    if(chart.clientWidth>=210&&state.price&&state.priceSource&&$('page-explore').classList.contains('active'))renderPriceData();
+   });
+  }).observe(chart);
  }
  selectCompany(state.symbol);renderCompareChips();authUpdate();
 }
