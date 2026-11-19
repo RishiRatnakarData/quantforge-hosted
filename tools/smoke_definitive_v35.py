@@ -150,6 +150,7 @@ async def private_journey(browser, engine, width):
     await page.evaluate('qf35Release()')
     await expect(page.locator('#qf34-briefing')).to_be_hidden()
     await expect(page.locator('#qf34-briefing')).to_be_empty()
+    await expect(page.locator('#qf37-company-options')).to_be_empty()
     assert await page.evaluate('qf34Writes') == 0
     assert not errors, errors
     await page.close()
@@ -175,6 +176,7 @@ async def auth_rejection(browser, engine):
     await page.locator('#qf35-analyze-shortlist').click()
     await page.wait_for_function('() => !QFPrivateBridgeV23.ready()', timeout=90000)
     await expect(page.locator('#qf34-briefing')).to_be_empty()
+    await expect(page.locator('#qf37-company-options')).to_be_empty()
     assert await page.locator('.qf35-result').count() == 0
     assert await page.evaluate('QFPrivateBridgeV23.snapshot()') is None
     await expect(page.locator('#private-positions')).to_be_empty()
