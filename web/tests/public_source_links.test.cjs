@@ -42,3 +42,13 @@ test('Methods ledger shows the latest dated operating income, retaining negative
   }
  }finally{globalThis.QFPublishedSEC=original;}
 });
+
+test('variance teaching plot labels its square-root values as annualized volatility',()=>{
+ const r=globalThis.QFMethods27.calculate('portfolio',50,{},0);
+ assert.ok(Math.abs(r.variance-.0325)<1e-12);
+ assert.ok(Math.abs(r.values[5]-Math.sqrt(.0325))<1e-12);
+ const html=globalThis.QFMethods27.statistical({});
+ assert.match(html,/Annualized volatility: 20[.]0%/);
+ assert.doesNotMatch(html,/Portfolio variance: 20[.]0%/);
+ assert.doesNotMatch(html,/inspect dates|every dated observation/);
+});

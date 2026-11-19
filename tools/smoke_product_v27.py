@@ -92,6 +92,9 @@ async def journey(browser,engine,width):
     for method in ('returns','regression','portfolio','tails','drawdown','uncertainty','logistic','brier','ratios','dcf','walk'):
         await page.locator(f'[data-qf27-method="{method}"]').click()
         assert await page.locator('#qf27-lab-output math').count() >= 1
+        if method == 'portfolio':
+            await expect(page.locator('#qf27-lab-output .qf26-readout')).to_contain_text('Annualized volatility')
+            await expect(page.locator('#qf27-lab-output .qf26-readout')).not_to_contain_text('Portfolio variance:')
         references = page.locator('#qf27-lab-output .qf26-references a')
         await expect(references).to_have_count(2)
         for link in await references.all():
