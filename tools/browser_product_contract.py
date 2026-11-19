@@ -48,7 +48,10 @@ async def open_company_research(page):
     await navigate(page, 'explore')
     if await page.locator('body').evaluate("e=>e.classList.contains('qf37-private')"):
         await expect(page.locator('#qf37-research-home')).to_be_visible()
-        await page.locator('#qf37-research-home [data-qf34-workspace="research"]').click()
+        symbol = await page.evaluate('QFResearch20.context().symbol')
+        await page.locator('#qf37-company-search').fill(symbol)
+        await page.locator(f'#qf37-company-options [data-qf27-symbol="{symbol}"]').click()
+        await expect(page.locator('#qf37-research-home')).to_be_hidden()
 
 
 async def audit_shared_navigation(page, mode, engine, width, out):

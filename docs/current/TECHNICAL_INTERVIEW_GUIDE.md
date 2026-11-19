@@ -131,6 +131,6 @@ Defend the annual earnings multiple precisely: price × dated instant common sha
 
 A concrete UI engineering regression is a chart calculated in a transient 1-pixel pane: its old 210-pixel SVG grew to roughly 1,393 pixels tall after reopening. A safe fallback plus visible-width observation redraws from current state, preserving the numerical series and avoiding extra provider calls. The rendered regression checks chart bounds, orphan sections and selected-method contrast. For security, explain why a protected authorization rejection clears client evidence immediately, while an upstream 503 must not silently revoke a valid owner session.
 
-### November 18 refinement
+### Research evidence and coverage
 
 The current UI separates financial-health screening from research coverage and canonical disposition. Source mismatches, stale evidence, unavailable reads and processing failures have distinct explanations. Five-session ML is supplementary for long-term research. Hosted archive/factor file controls are removed; underlying offline engines remain tested. See [investment policy evidence](INVESTMENT_POLICY_EVIDENCE.md) for rule precedence, the inconclusive economic-performance verdict and a forward paper protocol.

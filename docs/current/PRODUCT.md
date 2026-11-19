@@ -12,7 +12,7 @@ The shared interface keeps five Public destinations: Explore, Compare, Models, P
 | Portfolio | Saved virtual account, dated marks, contribution-aware bookkeeping, scenario weights, covariance, optimization and chronological experiments |
 | Methods | Data lineage, worked examples, statistics, ML, optimization and engineering explanations linked to real source and tests |
 
-Private Explore opens Research with company search, two concise research paths and collapsed current-context recent research. Discover companies contains the existing screen, batch studies and optional conditions. Portfolio is the sole account destination; applicable dated-mark, concentration and thesis-review notices appear there. Compare, Models and Methods remain directly accessible in the shared menu.
+Private Explore opens Research with a full-width workspace: company search and analysis share one panel, discovery is adjacent on wide screens, and recent research stays compact below. Selecting a matching listing starts its assessment; the search action never silently analyzes a previously selected company. Discover companies contains the existing screen, batch studies and optional conditions. Portfolio is the sole account destination; applicable dated-mark, concentration and thesis-review notices appear there. Compare, Models and Methods remain directly accessible in the shared menu.
 
 Portfolio shows saved positions and applicable thesis-review or concentration notices only against an explicitly chosen boundary and available dated marks. Research keeps recent assessments compact and collapsed. It does not infer risk tolerance, reconstruct missing returns or claim continuous surveillance. Missing marks lead to Portfolio; missing rules lead to optional research conditions.
 
@@ -26,7 +26,7 @@ Observed annual ratios, estimates, scenarios and judgment are distinguished. The
 
 Saved thesis revisions and review dates remain genuine persisted records. The workspace reads them without modifying earlier text. Live acceptance is read-only; numerical write and replay tests use isolated fixture accounts.
 
-## Final company-study workflow
+## Company-study workflow
 
 Discovery preserves the financial filters and bounded batch action: one to five shortlist names, defaulting to three, processed sequentially. Progress and research coverage remain separate from canonical disposition. Missing domains and provider failures are explicit; successful dated results survive another company’s failure. Optional assumptions, exclusions and recent records remain collapsed.
 

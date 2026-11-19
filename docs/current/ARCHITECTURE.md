@@ -37,6 +37,6 @@ The sequential batch controller guards generation, owner version, per-company ab
 
 The existing complete local Private cleanup is shared by explicit sign-out and protected authorization rejection. Rejection invalidates browser epochs, clears imported/cached evidence and hides the owner workspace without submitting server revocation or record writes. Explicit sign-out retains its pending-auth wait and server-revocation sequence. Portfolio ResizeObserver callbacks store only widths and redraw from current authorized state; they retain no additional series cache and issue no provider requests.
 
-### November 18 refinement
+### Research evidence and coverage
 
 The current UI separates financial-health screening from research coverage and canonical disposition. Source mismatches, stale evidence, unavailable reads and processing failures have distinct explanations. Five-session ML is supplementary for long-term research. Hosted archive/factor file controls are removed; underlying offline engines remain tested. See [investment policy evidence](INVESTMENT_POLICY_EVIDENCE.md) for rule precedence, the inconclusive economic-performance verdict and a forward paper protocol.

@@ -42,6 +42,6 @@ The annual FCF proxy requires compatible CFO/capex source accessions, periods an
 
 Prediction Results identify L2 logistic classification, the existing five features, five-session outcome, actual training-feature dates and latest matured outcome. Interpretation distinguishes insufficient, exploratory, historically favorable and deteriorating evidence. Evaluation still reports chronological held-out results, baseline and Brier loss. A favorable historical diagnostic cannot establish calibrated profit probability or a multi-year investment edge.
 
-### November 18 refinement
+### Research evidence and coverage
 
 The current UI separates financial-health screening from research coverage and canonical disposition. Source mismatches, stale evidence, unavailable reads and processing failures have distinct explanations. Five-session ML is supplementary for long-term research. Hosted archive/factor file controls are removed; underlying offline engines remain tested. See [investment policy evidence](INVESTMENT_POLICY_EVIDENCE.md) for rule precedence, the inconclusive economic-performance verdict and a forward paper protocol.

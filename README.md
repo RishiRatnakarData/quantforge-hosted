@@ -2,7 +2,7 @@
 
 Full-stack financial research platform integrating SEC data engineering, machine learning, statistical modeling, valuation, and portfolio analytics. Built to make the inputs, calculations and limits of an investment research judgment inspectable.
 
-[Open the application](https://quantforge-648.pages.dev/) · [Product](docs/current/PRODUCT.md) · [Architecture](docs/current/ARCHITECTURE.md) · [Methods](docs/current/METHODOLOGY.md) · [Technical walkthrough](docs/current/TECHNICAL_INTERVIEW_GUIDE.md) · [Release evidence](docs/current/RELEASE_STATUS.md)
+[Open the application](https://quantforge-648.pages.dev/) · [Product](docs/current/PRODUCT.md) · [Architecture](docs/current/ARCHITECTURE.md) · [Methods](docs/current/METHODOLOGY.md) · [Technical walkthrough](docs/current/TECHNICAL_INTERVIEW_GUIDE.md) · [Validation](docs/current/RELEASE_STATUS.md)
 
 ## Two clear data modes
 
