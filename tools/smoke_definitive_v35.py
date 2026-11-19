@@ -41,6 +41,15 @@ async def private_journey(browser, engine, width):
     assert await page.locator('#qf37-research-home .qf34-shortlist').count() == 0
     assert await page.locator('#qf37-research-home [data-qf34-workspace="research"]').count() == 1
     assert await page.evaluate('qf34UniverseReads') == 0
+    reads_before_selection = await page.evaluate('qf34CompanyReads')
+    await page.locator('#qf37-research-home [data-qf34-workspace="research"]').click()
+    await expect(page.locator('#qf37-company-search')).to_be_focused()
+    await expect(page.locator('#qf37-research-home')).to_be_visible()
+    await expect(page.locator('#qf37-selection-status')).to_contain_text('select the matching listing')
+    assert await page.evaluate('qf34CompanyReads') == reads_before_selection
+    home_bounds = await page.locator('#qf37-research-home').bounding_box()
+    content_bounds = await page.locator('#page-explore').bounding_box()
+    assert home_bounds['width'] >= content_bounds['width'] - 4
     assert await page.evaluate('document.documentElement.scrollWidth<=innerWidth')
     await page.screenshot(path=str(OUT / f'{engine}-{page.viewport_size["width"]}-research-home.png'), full_page=True)
     if width == 390:
@@ -178,6 +187,15 @@ async def auth_rejection(browser, engine):
     assert await page.locator('#qf37-research-home .qf34-shortlist').count() == 0
     assert await page.locator('#qf37-research-home [data-qf34-workspace="research"]').count() == 1
     assert await page.evaluate('qf34UniverseReads') == 0
+    reads_before_selection = await page.evaluate('qf34CompanyReads')
+    await page.locator('#qf37-research-home [data-qf34-workspace="research"]').click()
+    await expect(page.locator('#qf37-company-search')).to_be_focused()
+    await expect(page.locator('#qf37-research-home')).to_be_visible()
+    await expect(page.locator('#qf37-selection-status')).to_contain_text('select the matching listing')
+    assert await page.evaluate('qf34CompanyReads') == reads_before_selection
+    home_bounds = await page.locator('#qf37-research-home').bounding_box()
+    content_bounds = await page.locator('#page-explore').bounding_box()
+    assert home_bounds['width'] >= content_bounds['width'] - 4
     assert await page.evaluate('document.documentElement.scrollWidth<=innerWidth')
     await page.screenshot(path=str(OUT / f'{engine}-{page.viewport_size["width"]}-research-home.png'), full_page=True)
     await page.locator('[data-qf34-workspace="discovery"]:visible').click()

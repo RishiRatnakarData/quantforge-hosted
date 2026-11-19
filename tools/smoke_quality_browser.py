@@ -131,6 +131,7 @@ async def journey(browser, engine, width):
     await click("#qf-v20-compare-run")
     await expect(page.locator("#qf-b21-compare-export")).to_be_enabled()
     await open_company_research(page)
+    await click('[data-qf27-explore="market"]')
     await click('[data-qf-range="30"]')
     ticks = page.locator(".qf29-price-tick")
     assert 2 <= await ticks.count() <= 5

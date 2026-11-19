@@ -18,6 +18,7 @@ OUT = Path(os.environ.get("QF_LAYOUT_SCREENSHOT_DIR", str(ROOT / "outputs/final2
 async def main():
     OUT.mkdir(parents=True, exist_ok=True)
     results = []
+    rendered_text = []
     async with async_playwright() as pw:
         browser = await pw.chromium.launch()
         cases = [
@@ -54,6 +55,9 @@ async def main():
                     await login(page)
 
                 async def check(name, page=page, prefix=prefix, errors=errors):
+                    visible_text = await page.locator('main').inner_text()
+                    assert '[object Object]' not in visible_text
+                    rendered_text.append({'case': prefix, 'view': name, 'text': visible_text})
                     await page.evaluate("window.scrollTo(0,0)")
                     await page.screenshot(
                         path=str(OUT / (prefix + "-" + name + ".png")), full_page=True
@@ -68,6 +72,10 @@ async def main():
                     }"""))
                     results.append({"case": prefix, "view": name, **finding, "errors": errors[:]})
 
+                if private:
+                    await navigate(page, 'explore')
+                    assert await page.locator('#qf37-research-home').is_visible()
+                    await check('research-home')
                 await open_company_research(page)
                 await page.locator("#qf-v20-search").fill("Microsoft")
                 await page.locator('#qf-v20-search-results [data-qf27-symbol="MSFT"]').click()
@@ -145,6 +153,7 @@ async def main():
     (OUT / "component-results.json").write_text(
         json.dumps(results, indent=2) + "\n", encoding="utf-8"
     )
+    (OUT / 'rendered-text.json').write_text(json.dumps(rendered_text, indent=2), encoding='utf-8')
     failures = [
         r
         for r in results
