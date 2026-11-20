@@ -70,15 +70,19 @@ async def audit_shared_navigation(page, mode, engine, width, out):
             await expect(control).to_be_visible()
             await expect(control).to_be_enabled()
             await expect(control).to_be_in_viewport()
-            bounds = await control.evaluate('e=>{const r=e.getBoundingClientRect(),s=getComputedStyle(e);return {display:s.display,visibility:s.visibility,opacity:Number(s.opacity),left:r.left,right:r.right,width:r.width,height:r.height,viewport:innerWidth,clipped:e.scrollWidth>e.clientWidth+2}}')
+            bounds = await control.evaluate('e=>{const r=e.getBoundingClientRect(),s=getComputedStyle(e);return {text:e.textContent.trim(),font:s.font,scrollWidth:e.scrollWidth,clientWidth:e.clientWidth,display:s.display,visibility:s.visibility,opacity:Number(s.opacity),left:r.left,right:r.right,width:r.width,height:r.height,viewport:innerWidth,clipped:e.scrollWidth>e.clientWidth+2}}')
             assert bounds['display'] != 'none' and bounds['visibility'] == 'visible' and bounds['opacity'] > 0, bounds
             assert bounds['height'] >= 44 and bounds['left'] >= 0 and bounds['right'] <= bounds['viewport'] + 1, bounds
             assert not bounds['clipped'], bounds
         assert await page.evaluate('document.documentElement.scrollWidth<=innerWidth')
         if width <= 800:
             nav_rows = await controls.evaluate_all('(nodes)=>nodes.map(e=>Math.round(e.getBoundingClientRect().top))')
-            assert max(nav_rows) - min(nav_rows) <= 1, nav_rows
-            assert await page.locator('.side').evaluate('e=>e.getBoundingClientRect().height') <= 160
+            if width <= 420:
+                assert len(set(nav_rows)) == 2 and nav_rows[:3] == [nav_rows[0]] * 3 and nav_rows[3:] == [nav_rows[3]] * 2, nav_rows
+                assert await page.locator('.side').evaluate('e=>e.getBoundingClientRect().height') <= 180
+            else:
+                assert max(nav_rows) - min(nav_rows) <= 1, nav_rows
+                assert await page.locator('.side').evaluate('e=>e.getBoundingClientRect().height') <= 160
         if mode == 'private' and route == 'explore':
             await expect(page.locator('#qf37-research-home')).to_be_visible()
         if mode == 'private' and route == 'portfolio':
