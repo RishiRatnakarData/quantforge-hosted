@@ -52,11 +52,11 @@ body.qf31-home-active #qf28-mobile-credit{display:none!important}
 
 /* Compact mobile header: one brand/account row and five visible destinations. */
 @media(max-width:800px){
- .side{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"brand account" "navigation navigation";gap:12px;padding:12px 16px;height:auto}
+ .side{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"brand account" "navigation navigation";gap:12px;padding:12px;height:auto}
  .side #qf-v23-home-button{grid-area:brand;min-width:0;justify-content:flex-start}
  .side .qf-v20-account{grid-area:account;align-self:center;margin:0;padding:0;border:0}
  .side #qf-v20-mode{min-height:44px;padding:8px 12px}
- .side #qf-v20-navigation{grid-area:navigation;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin:0;padding:0;overflow:visible}
+ .side #qf-v20-navigation{grid-area:navigation;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;margin:0;padding:0;overflow:visible}
  .side #qf-v20-navigation .nav-btn{grid-column:auto;min-width:0;min-height:44px;padding:10px 2px;font-size:13px;text-align:center;white-space:normal}
 }
 
