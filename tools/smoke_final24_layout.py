@@ -75,6 +75,12 @@ async def main():
                       const rgb=s=>(s.match(/[0-9.]+/g)||[]).slice(0,3).map(Number),lum=c=>c.map(v=>{v/=255;return v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4);}).reduce((a,v,i)=>a+v*[.2126,.7152,.0722][i],0);
                       return {unevenMetricRows,touchingNarratives,oversizedPriceCharts:[...document.querySelectorAll('.tabpage.active .qf-b21-chart svg,.tabpage.active .qf-b21-chart-sm svg')].filter(e=>e.getBoundingClientRect().height>640).map(e=>e.parentElement.id),lowContrastSelections:[...document.querySelectorAll('.qf27-lab-selector button[aria-pressed=true]')].filter(e=>{if(!e.getBoundingClientRect().width)return false;const s=getComputedStyle(e),a=lum(rgb(s.color)),b=lum(rgb(s.backgroundColor));return (Math.max(a,b)+.05)/(Math.min(a,b)+.05)<4.5;}).map(e=>e.textContent)};
                     }"""))
+                    finding['narrowCardCopy'] = await page.evaluate("""()=>[...document.querySelectorAll('.tabpage.active .pane > p,#qf-c22-model-output .pane > p,#qf-c22-method-content .pane > p,.qf37-search > p,.qf31-home-lead')].filter(e=>{
+                      const r=e.getBoundingClientRect(),p=e.parentElement,s=getComputedStyle(p),er=getComputedStyle(e);
+                      if(!r.width||!r.height||er.display!=='block'||!['block','flow-root'].includes(s.display))return false;
+                      const available=p.clientWidth-parseFloat(s.paddingLeft)-parseFloat(s.paddingRight)-parseFloat(er.marginLeft)-parseFloat(er.marginRight);
+                      return r.width < available-3;
+                    }).map(e=>({text:e.textContent.slice(0,80),width:e.getBoundingClientRect().width,parent:e.parentElement.className}))""")
                     results.append({"case": prefix, "view": name, **finding, "errors": errors[:]})
 
                 if private:
@@ -180,6 +186,7 @@ async def main():
         or r["errors"]
         or r["unevenMetricRows"]
         or r["touchingNarratives"]
+        or r["narrowCardCopy"]
     ]
     (OUT / "component-failures.json").write_text(
         json.dumps(failures, indent=2) + "\n", encoding="utf-8"
