@@ -23,7 +23,7 @@ async def main():
         browser = await pw.chromium.launch()
         cases = [
             (int(width), 1, "100")
-            for width in os.environ.get("QF_LAYOUT_WIDTHS", "320,390,768,1024,1440").split(",")
+            for width in os.environ.get("QF_LAYOUT_WIDTHS", "320,390,768,1024,1440,1920").split(",")
         ] + [(720, 2, "200-equivalent")]
         for width, density, zoom in cases:
             page = await browser.new_page(
@@ -67,8 +67,13 @@ async def main():
                     )
                     assert await page.locator('input[type="file"]:visible').count() == 0
                     finding.update(await page.evaluate("""()=>{
+                      const rowGroups=new Map();
+                      for(const e of document.querySelectorAll('.qf27-account-kpis>div')){const r=e.getBoundingClientRect();if(!r.width||!r.height)continue;const key=Math.round(r.top);if(!rowGroups.has(key))rowGroups.set(key,[]);rowGroups.get(key).push(r.height);}
+                      const unevenMetricRows=[...rowGroups].filter(([,values])=>Math.max(...values)-Math.min(...values)>2).map(([top,heights])=>({top,heights}));
+                      const touchingNarratives=[...document.querySelectorAll('#qf-c22-model-output>.pane>p+p,#qf-c22-method-content>.pane>p+p')].filter(e=>e.getBoundingClientRect().width&&e.getBoundingClientRect().height&&parseFloat(getComputedStyle(e).marginTop)<8).map(e=>e.textContent.slice(0,80));
+
                       const rgb=s=>(s.match(/[0-9.]+/g)||[]).slice(0,3).map(Number),lum=c=>c.map(v=>{v/=255;return v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4);}).reduce((a,v,i)=>a+v*[.2126,.7152,.0722][i],0);
-                      return {oversizedPriceCharts:[...document.querySelectorAll('.tabpage.active .qf-b21-chart svg,.tabpage.active .qf-b21-chart-sm svg')].filter(e=>e.getBoundingClientRect().height>640).map(e=>e.parentElement.id),lowContrastSelections:[...document.querySelectorAll('.qf27-lab-selector button[aria-pressed=true]')].filter(e=>{if(!e.getBoundingClientRect().width)return false;const s=getComputedStyle(e),a=lum(rgb(s.color)),b=lum(rgb(s.backgroundColor));return (Math.max(a,b)+.05)/(Math.min(a,b)+.05)<4.5;}).map(e=>e.textContent)};
+                      return {unevenMetricRows,touchingNarratives,oversizedPriceCharts:[...document.querySelectorAll('.tabpage.active .qf-b21-chart svg,.tabpage.active .qf-b21-chart-sm svg')].filter(e=>e.getBoundingClientRect().height>640).map(e=>e.parentElement.id),lowContrastSelections:[...document.querySelectorAll('.qf27-lab-selector button[aria-pressed=true]')].filter(e=>{if(!e.getBoundingClientRect().width)return false;const s=getComputedStyle(e),a=lum(rgb(s.color)),b=lum(rgb(s.backgroundColor));return (Math.max(a,b)+.05)/(Math.min(a,b)+.05)<4.5;}).map(e=>e.textContent)};
                     }"""))
                     results.append({"case": prefix, "view": name, **finding, "errors": errors[:]})
 
@@ -110,6 +115,8 @@ async def main():
                     await page.locator(f'#page-models [data-qf-model="{category}"]').click()
                     for phase in ("results", "evaluation", "method"):
                         await page.locator(f'[data-qf-c22-phase="{phase}"]').click()
+                        if category == 'prediction' and phase == 'results':
+                            assert 'Held-out tests:' in await page.locator('#qf-c22-model-output').inner_text()
                         await check("model-" + category + "-" + phase)
                 await navigate(page, 'portfolio')
                 for view in ("overview", "whatif", "analysis"):
@@ -164,6 +171,8 @@ async def main():
         or r["oversizedPriceCharts"]
         or r["lowContrastSelections"]
         or r["errors"]
+        or r["unevenMetricRows"]
+        or r["touchingNarratives"]
     ]
     (OUT / "component-failures.json").write_text(
         json.dumps(failures, indent=2) + "\n", encoding="utf-8"

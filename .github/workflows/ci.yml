@@ -158,12 +158,12 @@ jobs:
       - name: Final audit account and research workflows in three browsers
         if: ${{ matrix.group == 'core' }}
         env:
-          QF_FINAL_WIDTHS: 320,390,768,1024,1440
+          QF_FINAL_WIDTHS: 320,390,768,1024,1440,1920
         run: python tools/smoke_final24_browser.py
       - name: Independent quality, keyboard, reload and context-race regressions
         if: ${{ matrix.group == 'core' }}
         run: python tools/smoke_quality_browser.py
-      - name: All named views and component readability at five widths and zoom reflow
+      - name: All named views and component readability at six widths and zoom reflow
         if: ${{ matrix.group == 'research' }}
         run: python tools/smoke_final24_layout.py
 

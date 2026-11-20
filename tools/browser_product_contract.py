@@ -75,6 +75,10 @@ async def audit_shared_navigation(page, mode, engine, width, out):
             assert bounds['height'] >= 44 and bounds['left'] >= 0 and bounds['right'] <= bounds['viewport'] + 1, bounds
             assert not bounds['clipped'], bounds
         assert await page.evaluate('document.documentElement.scrollWidth<=innerWidth')
+        if width <= 800:
+            nav_rows = await controls.evaluate_all('(nodes)=>nodes.map(e=>Math.round(e.getBoundingClientRect().top))')
+            assert max(nav_rows) - min(nav_rows) <= 1, nav_rows
+            assert await page.locator('.side').evaluate('e=>e.getBoundingClientRect().height') <= 160
         if mode == 'private' and route == 'explore':
             await expect(page.locator('#qf37-research-home')).to_be_visible()
         if mode == 'private' and route == 'portfolio':

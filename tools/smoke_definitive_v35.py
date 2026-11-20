@@ -47,12 +47,23 @@ async def private_journey(browser, engine, width):
     await expect(page.locator('#qf37-research-home')).to_be_visible()
     await expect(page.locator('#qf37-selection-status')).to_contain_text('select the matching listing')
     assert await page.evaluate('qf34CompanyReads') == reads_before_selection
+    await expect(page.locator('#qf37-company-options')).to_be_visible()
+    geometry = await page.locator('.qf37-search-row').evaluate("""e=>{
+      const box=n=>{const r=n.getBoundingClientRect();return {width:r.width,height:r.height,top:r.top,bottom:r.bottom,right:r.right}};
+      const panel=e.querySelector('[role=listbox]');
+      return {row:box(e),input:box(e.querySelector('input')),button:box(e.querySelector('button')),panel:box(panel),position:getComputedStyle(panel).position,viewport:innerWidth};
+    }""")
+    assert geometry['position'] == 'absolute', geometry
+    assert geometry['input']['width'] >= geometry['row']['width'] * .5, geometry
+    assert 44 <= geometry['button']['height'] <= 56, geometry
+    assert geometry['panel']['top'] >= geometry['row']['bottom'], geometry
+    assert geometry['panel']['right'] <= geometry['viewport'] + 1, geometry
     home_bounds = await page.locator('#qf37-research-home').bounding_box()
     content_bounds = await page.locator('#page-explore').bounding_box()
     assert home_bounds['width'] >= content_bounds['width'] - 4
     assert await page.evaluate('document.documentElement.scrollWidth<=innerWidth')
     await page.screenshot(path=str(OUT / f'{engine}-{page.viewport_size["width"]}-research-home.png'), full_page=True)
-    if width == 390:
+    if width in (390, 1920):
         await page.locator('#qf37-company-search').fill('Microsoft')
         await expect(page.locator('#qf37-company-options [data-qf27-symbol="MSFT"]')).to_be_visible()
         await page.locator('#qf37-company-search').press('ArrowDown')
@@ -139,7 +150,7 @@ async def private_journey(browser, engine, width):
     assert await page.evaluate('document.documentElement.scrollWidth<=innerWidth')
     await page.screenshot(path=str(OUT / f'{engine}-{width}-batch-partial.png'), full_page=True)
     await page.evaluate('window.qf35Failed="";window.qf35Partial=""')
-    if width == 390:
+    if width in (390, 1920):
         for i in range(5):
             await page.locator('[data-qf35-select]').nth(i).check()
         await page.locator('#qf35-analyze-shortlist').click()
@@ -193,6 +204,17 @@ async def auth_rejection(browser, engine):
     await expect(page.locator('#qf37-research-home')).to_be_visible()
     await expect(page.locator('#qf37-selection-status')).to_contain_text('select the matching listing')
     assert await page.evaluate('qf34CompanyReads') == reads_before_selection
+    await expect(page.locator('#qf37-company-options')).to_be_visible()
+    geometry = await page.locator('.qf37-search-row').evaluate("""e=>{
+      const box=n=>{const r=n.getBoundingClientRect();return {width:r.width,height:r.height,top:r.top,bottom:r.bottom,right:r.right}};
+      const panel=e.querySelector('[role=listbox]');
+      return {row:box(e),input:box(e.querySelector('input')),button:box(e.querySelector('button')),panel:box(panel),position:getComputedStyle(panel).position,viewport:innerWidth};
+    }""")
+    assert geometry['position'] == 'absolute', geometry
+    assert geometry['input']['width'] >= geometry['row']['width'] * .5, geometry
+    assert 44 <= geometry['button']['height'] <= 56, geometry
+    assert geometry['panel']['top'] >= geometry['row']['bottom'], geometry
+    assert geometry['panel']['right'] <= geometry['viewport'] + 1, geometry
     home_bounds = await page.locator('#qf37-research-home').bounding_box()
     content_bounds = await page.locator('#page-explore').bounding_box()
     assert home_bounds['width'] >= content_bounds['width'] - 4
@@ -226,7 +248,7 @@ async def run():
     async with async_playwright() as pw:
         for engine in os.environ.get('QF_TEST_BROWSERS', 'chromium,firefox,webkit').split(','):
             browser = await getattr(pw, engine).launch()
-            for width in [int(x) for x in os.environ.get('QF_DEFINITIVE_WIDTHS', '320,390,768,1024,1440').split(',')]:
+            for width in [int(x) for x in os.environ.get('QF_DEFINITIVE_WIDTHS', '320,390,768,1024,1440,1920').split(',')]:
                 rows.append(await private_journey(browser, engine, width))
                 print(engine, width, 'isolated shortlist / partial failure / assessment / rules / cancellation PASS', flush=True)
             rows.append(await auth_rejection(browser, engine))

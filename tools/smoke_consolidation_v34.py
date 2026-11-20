@@ -32,7 +32,7 @@ async def run():
     async with async_playwright() as pw:
         for engine in ("chromium", "firefox", "webkit"):
             browser = await getattr(pw, engine).launch()
-            for width in (320, 390, 768, 1024, 1440):
+            for width in (320, 390, 768, 1024, 1440, 1920):
                 page, errors = await setup(browser, width)
                 await page.evaluate(EXTEND)
                 await page.evaluate(FIXED)

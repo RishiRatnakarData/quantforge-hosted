@@ -243,7 +243,7 @@ async def main():
             browser = await getattr(pw, engine).launch()
             try:
                 for width in [
-                    int(x) for x in os.environ.get("QF_FINAL_WIDTHS", "1440,390").split(",")
+                    int(x) for x in os.environ.get("QF_FINAL_WIDTHS", "320,390,768,1024,1440,1920").split(",")
                 ]:
                     await journey(browser, engine, width)
             finally:
