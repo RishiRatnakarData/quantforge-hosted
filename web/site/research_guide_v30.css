@@ -19,23 +19,23 @@
 /* V31: evidence-first Home presentation. Only changes the brand-click landing view. */
 .qf31-home{max-width:1320px!important;padding:clamp(24px,3.5vw,46px)!important}
 .qf31-home-hero{display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(24px,4vw,54px);align-items:center}
-.qf31-home h1{font-size:clamp(30px,3.7vw,49px);line-height:1.12;letter-spacing:-.045em;max-width:22ch;margin:10px 0 16px}
-.qf31-home .qf31-home-lead{font-size:clamp(15px,1.2vw,17px);line-height:1.65;max-width:53ch;color:#535e67;margin:0}
+.qf31-home h1{font-size:clamp(30px,3.7vw,49px);line-height:1.12;letter-spacing:-.045em;max-width:none;margin:10px 0 16px}
+.qf31-home .qf31-home-lead{font-size:clamp(15px,1.2vw,17px);line-height:1.65;max-width:none;color:#535e67;margin:0}
 .qf31-home-search{margin-top:26px}.qf31-home-search label{display:block;font-weight:700;font-size:14px;margin-bottom:10px;color:#323a41}
 .qf31-home-search-row{display:flex;gap:10px;align-items:stretch}.qf31-home-search-row input{flex:1 1 220px;min-width:0;min-height:48px;padding:12px 14px;border:1px solid #b9c2ca;border-radius:10px;background:white;font-size:16px}
 .qf31-home-search-row button{min-height:48px;flex:0 0 auto;padding:12px 19px;border-radius:10px}
 .qf31-home-hint{font-size:13px!important;color:#68727c;margin:9px 0 0!important;line-height:1.5}
 .qf31-home-case-link{display:inline-block;margin-top:19px;font-size:14px;font-weight:650;color:#303b46;text-underline-offset:3px}
-.qf31-home-route-intro{border-top:1px solid #e3e7e9;padding-top:26px;margin-top:32px}.qf31-home-route-intro h2{font-size:19px;margin:0 0 5px}.qf31-home-route-intro p{font-size:14px!important;color:#606a73;max-width:75ch;margin:0!important}
+.qf31-home-route-intro{border-top:1px solid #e3e7e9;padding-top:26px;margin-top:32px}.qf31-home-route-intro h2{font-size:19px;margin:0 0 5px}.qf31-home-route-intro p{font-size:14px!important;color:#606a73;max-width:none;margin:0!important}
 .qf31-home-steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:17px}
 .qf31-home-steps>div{min-width:0;padding:15px 13px;border:1px solid #e3e6e9;border-radius:10px;background:#fbfcfc;display:flex;flex-direction:column;gap:7px}
 .qf31-home-steps strong{font-size:14px;color:#252d34}.qf31-home-steps span{font-size:12px;color:#626d76;line-height:1.55}
-.qf31-home-disclosure{font-size:13px!important;color:#68737b;line-height:1.6;max-width:100ch!important;margin:24px 0 0!important}
+.qf31-home-disclosure{font-size:13px!important;color:#68737b;line-height:1.6;max-width:none;margin:24px 0 0!important}
 
 /* Private session restoration choice: a preference only, never a credential store. */
 .qf31-remember-option{display:flex;align-items:flex-start;gap:10px;margin:18px 0 4px;font-size:15px;line-height:1.5;font-weight:600;color:#26323b;cursor:pointer}
 .qf31-remember-option input[type="checkbox"]{flex:0 0 auto;margin:3px 0 0;width:18px;height:18px;accent-color:#44535f}
-.qf31-remember-note{font-size:13px;line-height:1.55;color:#596670;max-width:68ch;margin:0 0 16px}
+.qf31-remember-note{font-size:13px;line-height:1.55;color:#596670;max-width:none;margin:0 0 16px}
 
 /* V31 screenshot review: prevent vertical flex-basis stretch, unclutter Home. */
 body.qf31-home-active #qf24-mode-bar{display:none}
@@ -68,7 +68,7 @@ body.qf31-home-active #qf28-mobile-credit{display:none!important}
 }
 
 /* Final Home: one search, no charts; research retains its evidence views. */
-.qf31-home-main{max-width:840px}.qf31-home-search{max-width:720px}
+.qf31-home-main{max-width:none;}.qf31-home-search{max-width:720px}
 .qf31-home #qf24-home-search{width:auto;margin:0;display:block}
 .qf31-home-route-intro{margin-top:38px;padding-top:26px}.qf31-home-steps{gap:14px}
 .qf31-home-steps>div{background:transparent;border:0;border-top:2px solid #c9cfd5;border-radius:0;padding:18px 0}
@@ -93,8 +93,8 @@ body.qf31-home-active #qf28-mobile-credit{display:none!important}
 
 /* Home establishes the research process without decorative price charts. */
 .qf31-home-hero{grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);align-items:start;gap:40px}
-.qf31-home-main{min-width:0}.qf31-home h1{max-width:19ch;font-size:clamp(32px,3.6vw,50px);line-height:1.12}
-.qf33-home-data{font-size:13px!important;line-height:1.6!important;color:#5a636c;margin-top:20px!important;max-width:65ch}
+.qf31-home-main{min-width:0}.qf31-home h1{max-width:none;font-size:clamp(32px,3.6vw,50px);line-height:1.12}
+.qf33-home-data{font-size:13px!important;line-height:1.6!important;color:#5a636c;margin-top:20px!important;max-width:none;}
 .qf33-home-proof{background:#f2f3f4;border:1px solid #d8dce0;border-radius:12px;padding:26px;min-width:0}
 .qf33-home-proof h2{font-size:26px;line-height:1.2;margin:10px 0 24px}.qf33-home-proof ol{padding-left:22px;margin:0 0 22px}
 .qf33-home-proof li{padding:0 0 18px 6px}.qf33-home-proof li:last-child{padding-bottom:0}
@@ -105,7 +105,7 @@ body.qf31-home-active #qf28-mobile-credit{display:none!important}
 .qf31-home-steps .qf33-home-route span{font-size:19px}.qf31-home-steps>div{padding-top:12px}.qf31-home-steps>div>span{font-size:14px;line-height:1.65}
 .qf-c22-metric strong,.qf-v20-kpis strong,.qf27-account-kpis strong{font-variant-numeric:tabular-nums}
 @media(max-width:1100px){.qf31-home-hero{grid-template-columns:minmax(0,1fr)}.qf33-home-proof{padding:22px}.qf33-home-proof ol{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}}
-@media(max-width:680px){.qf33-home-proof ol{display:block}.qf33-home-proof{padding:20px}.qf31-home h1{max-width:18ch}.qf31-home-hero{gap:28px}.qf33-home-route{font-size:16px}}
+@media(max-width:680px){.qf33-home-proof ol{display:block}.qf33-home-proof{padding:20px}.qf31-home h1{max-width:none;}.qf31-home-hero{gap:28px}.qf33-home-route{font-size:16px}}
 
 .qf-v20-findings #qf-v20-analyze[hidden]{display:none!important}
 #qf-release-availability[hidden]{display:none!important}
