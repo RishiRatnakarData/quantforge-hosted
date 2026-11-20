@@ -21,7 +21,7 @@ function section(scope,title,description){
 }
 function modelSection(category,phase){
  if(category==='risk')return section('factors','Market sensitivity and factor evidence','Compare this company with independently loaded broad-market and style ETF histories. This is historical co-movement, not a future return model.');
- if(category==='strategy')return section('strategy','Strategy stability and robustness','The original constrained optimizer, walk-forward, passive benchmark and leave-one-window-out diagnostics use the same evaluation dates.');
+ if(category==='strategy')return section('strategy','Strategy stability and robustness','Compare constrained optimization with a passive benchmark on the same evaluation dates, then inspect sensitivity across windows.');
  if(category==='valuation')return section('valuation','Observed-price financial ratios','Authenticated quotes and dated SEC shares support observed market-cap multiples. Missing capital or stale inputs withhold ratios; this is separate from the hypothetical cash-flow model.')+'<section class="pane qf25-panel"><h2>Revenue and cash-generation scenarios</h2><p>Start from the selected company’s SEC annual revenue. Growth and cash-flow margin below are explicit assumptions, not estimates learned from future results.</p><div class="qf24-assumptions"><label>Assumed annual growth (%)<input id="qf25-growth" type="number" min="-30" max="40" value="6"></label><label>Assumed cash-flow margin (%)<input id="qf25-margin" type="number" min="-25" max="60" value="12"></label><button class="btn primary" id="qf25-forecast-run">Build scenarios</button></div><div id="qf25-forecast" aria-live="polite"></div></section>';
  return '';
 }

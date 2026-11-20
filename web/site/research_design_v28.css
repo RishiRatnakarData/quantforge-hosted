@@ -1,7 +1,7 @@
 /* Component layout contract: source hierarchy, readable controls and reflow. */
 body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 button,input,select,textarea{font-family:inherit}h1,h2,h3,h4,p,button,label{overflow-wrap:break-word}
-.qf-v20-intro .eyebrow{display:none}.qf-v20-intro{margin-bottom:22px}.qf-v20-intro h1{font-size:clamp(25px,3vw,34px);line-height:1.2;margin-top:0}
+.qf-v20-intro .eyebrow{display:none}.qf-v20-intro{margin-bottom:22px}.qf-v20-intro h1{font-size:var(--qf-title-size);line-height:1.2;margin-top:0}
 #qf24-mode-bar{padding:12px 16px!important;margin-bottom:22px!important;border-radius:8px!important;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
 #qf24-mode-label{font-size:13px;line-height:1.6;letter-spacing:.015em}#qf24-switch-mode{font-size:14px;white-space:normal}
 .qf28-context-picker{margin:20px 0}.qf28-context-picker label{display:block;font-size:15px;margin-bottom:10px}.qf28-context-picker input{width:100%;padding:13px;border:1px solid #aeb8c6;border-radius:8px}.qf28-context-picker p{font-size:14px;line-height:1.7;margin-bottom:0}
@@ -17,7 +17,7 @@ button,input,select,textarea{font-family:inherit}h1,h2,h3,h4,p,button,label{over
 @media(max-width:600px){main{padding:18px 12px!important}.pane,.qf24-context{padding:18px 14px!important}.qf27-identity{padding:18px 14px!important}.qf27-view-tabs{gap:8px;margin:16px 0}.qf27-view-tabs .btn{flex:1 1 130px;font-size:14px;min-width:0}.qf27-preview-grid{grid-template-columns:minmax(0,1fr)}.qf27-account-kpis{gap:10px}.qf27-account-kpis>div{padding:14px}.qf28-context-picker{margin:16px 0}.qf27-lab-inputs{padding:14px}.qf27-lab-inputs label{max-width:100%;min-width:0}.qf27-method-math{max-width:100%;overflow-x:auto}.qf27-ledger table{min-width:720px}.qf27-action-row>button{min-width:min(100%,160px)}.qf-v20-company,.qf-v20-heading{min-width:0}}
 @media(max-width:350px){.qf27-account-kpis{grid-template-columns:minmax(0,1fr)}.qf27-account-kpis strong{font-size:22px}.qf-v20-metric-tabs{display:flex;flex-wrap:wrap;gap:8px}.qf-v20-metric-tabs button{flex:1 1 100%;min-width:0}.qf27-view-tabs .btn{flex-basis:100%}.qf27-lab-selector button{min-width:0}.qf27-code{font-size:13px;padding:14px}}
 
-.qf28-table-hint{font-size:13px!important;color:#536173;line-height:1.7;margin:10px 0 18px}.table-wrap th:first-child,.table-wrap td:first-child{min-width:110px}.qf-v20-subnav{flex-wrap:wrap}
+.qf28-table-hint{font-size:13px!important;color:#536173;line-height:1.7;margin:10px 0 18px}.table-wrap th:first-child,.table-wrap td:first-child{min-width:110px}.qf-v20-subnav{flex-wrap:wrap}.qf-b21-compare-controls .field label{display:block;font-size:14px;line-height:1.5;margin-bottom:var(--qf-field-gap)}
 @media(min-width:900px){.qf28-table-hint{display:none}}
 @media(max-width:420px){.qf-c22-metrics,.qf-b21-kpi-row,.qf-v20-kpis,.qf-v20-financial-kpis{grid-template-columns:minmax(0,1fr)!important}.qf-c22-metric strong{word-break:normal;overflow-wrap:normal}.qf27-trade-fields input{max-width:100%}}
 
@@ -33,7 +33,7 @@ button,input,select,textarea{font-family:inherit}h1,h2,h3,h4,p,button,label{over
 /* Shared research density: selection -> finding -> evidence. */
 :root{--qf-space-sm:12px;--qf-space-md:20px;--qf-space-lg:28px;--qf-muted:#526173}
 .qf-v20-intro>div>p:not(.tiny){display:block!important;color:var(--qf-muted);font-size:15px;line-height:1.6;margin:10px 0 0;max-width:850px}
-.qf27-identity{display:grid;grid-template-columns:minmax(250px,1.1fr) minmax(250px,1fr);align-items:center;gap:var(--qf-space-lg);padding:var(--qf-space-md) var(--qf-space-lg)!important}
+.qf27-identity{display:grid;grid-template-columns:minmax(250px,1.1fr) minmax(250px,1fr);align-items:center;gap:var(--qf-space-md);padding:var(--qf-space-md) var(--qf-space-lg)!important}
 .qf27-identity .qf-v20-search-area{margin:0}.qf27-identity .qf-v20-heading{margin:0;gap:var(--qf-space-sm);align-items:center}.qf27-identity .qf-v20-heading h2{font-size:24px;margin:2px 0}.qf27-identity .qf-v20-heading p{margin:4px 0 0}.qf27-identity .qf-v20-source-badge{max-width:150px;white-space:normal}
 .qf28-context-picker{padding:var(--qf-space-md)!important;display:grid;grid-template-columns:minmax(190px,.8fr) minmax(240px,1.8fr);align-items:center;gap:8px var(--qf-space-md)}.qf28-context-picker label{margin:0}.qf28-context-picker p{grid-column:1/-1;margin:0}.qf28-context-picker [id$="-options"]{grid-column:1/-1}.qf28-context-picker [id$="-options"]:empty,.qf28-context-picker p:empty{display:none}
 #qf27-financial-interpretation{margin:var(--qf-space-md) 0}#qf27-financial-interpretation p{max-width:900px;margin:8px 0;line-height:1.65}.qf29-finding{font-size:17px}#qf-v20-financial-kpis{margin-top:var(--qf-space-md)}

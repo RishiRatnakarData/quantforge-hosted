@@ -6,7 +6,7 @@ Explore, Compare, Models, Portfolio and Methods remain visible in both modes; Pr
 
 Preserved: five Public sections, SEC provenance, Alpaca eligibility, Supabase/MFA, owner/mode/version invalidation, fees, replay protection, session protections and all numerical engines. Backend runtime inputs remain unchanged and need no redeployment.
 
-Release gates: full Python and JavaScript suites, all 18 browser scripts, five-width/three-engine acceptance, strict CSP, syntax, deterministic build, publication preflight and actual production checks. Do not confuse isolated fixture acceptance with live owner verification. Read-only owner inspection cannot establish a fresh password/MFA flow without user participation.
+Release gates: full Python and JavaScript suites, all 18 browser scripts, six-width/three-engine acceptance, strict CSP, syntax, deterministic build, publication preflight and actual production checks. Do not confuse isolated fixture acceptance with live owner verification. Read-only owner inspection cannot establish a fresh password/MFA flow without user participation.
 
 Limits: no guaranteed investment performance, unsupported market values remain withheld, missing legacy basis remains missing, model evaluation is historical, and public market experiments remain explicitly synthetic. The snapshot cannot establish a historical market-beating selection policy. Hosting is free-plan best effort. No owner record writes are permitted during live verification.
 

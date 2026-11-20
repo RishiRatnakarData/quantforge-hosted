@@ -356,7 +356,7 @@ async def main():
         for engine in os.environ.get("QF_QUALITY_ENGINES", "chromium,firefox,webkit").split(","):
             browser = await getattr(pw, engine).launch()
             for width in map(
-                int, os.environ.get("QF_QUALITY_WIDTHS", "320,390,768,1024,1440").split(",")
+                int, os.environ.get("QF_QUALITY_WIDTHS", "320,390,768,1024,1440,1920").split(",")
             ):
                 results.append(await journey(browser, engine, width))
                 print(engine, width, "independent quality PASS", flush=True)

@@ -32,7 +32,7 @@ async def run():
     async with async_playwright() as pw:
         for engine in ("chromium", "firefox", "webkit"):
             browser = await getattr(pw, engine).launch()
-            for width in (320, 390, 768, 1024, 1440):
+            for width in (320, 390, 768, 1024, 1440, 1920):
                 page, errors = await setup(browser, width)
                 await page.evaluate(EXTEND)
                 await page.evaluate(FIXED)
@@ -74,11 +74,15 @@ async def run():
                 )
                 # Rapid identical calculations share one provider read. No duplicate API fan-out.
                 assert await page.evaluate("document.documentElement.scrollWidth<=innerWidth")
+                # Settle the preceding analysis before measuring a new concurrent pair.
+                # Joining an already pending read correctly creates no additional request.
+                await page.evaluate("QFDeepUI25.execute('company')")
                 before = await page.evaluate("qf34CompanyReads")
                 await page.evaluate(
                     "Promise.all([QFDeepUI25.execute('company'),QFDeepUI25.execute('company')])"
                 )
-                assert await page.evaluate("qf34CompanyReads") == before + 1
+                after = await page.evaluate("qf34CompanyReads")
+                assert after == before + 1, {"engine": engine, "width": width, "before": before, "after": after}
                 await page.locator('[data-qf34-workspace="discovery"]:visible').first.click()
                 await page.locator("#qf36-history > summary").click()
                 await expect(page.locator("#qf34-reviewed")).to_contain_text("MSFT")
