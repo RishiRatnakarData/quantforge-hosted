@@ -131,6 +131,13 @@ async def main():
                             assert float(chart_width.split()[2])>210,chart_width
                         await page.locator('#qf-b21-overview-chart').evaluate("e=>e.style.removeProperty('width')")
                         await page.evaluate('QFResearch20.reloadPortfolio()')
+                    if view == "analysis":
+                        assert await page.locator('.qf38-public-portfolio-example').is_visible() == (not private)
+                        assert await page.locator('.qf38-private-portfolio-scope').is_visible() == private
+                        if private:
+                            visible = await page.locator('#qf-v20-portfolio-analysis').inner_text()
+                            assert 'Cash share of sample' not in visible
+                            assert 'Review Overview for saved cash' in visible
                     await check("portfolio-" + view)
                 await navigate(page, 'methods')
                 for view in ("overview", "data", "statistical", "engineering"):

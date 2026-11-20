@@ -60,3 +60,6 @@
 /* Only Explore has contextual return/discovery actions; main navigation is shared. */
 #qf38-explore-context{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0 28px}#qf38-explore-context[hidden]{display:none!important}#qf38-explore-context .btn{min-height:44px}
 @media(max-width:680px){#qf38-explore-context .btn{flex:1 1 140px}}
+
+/* Public teaching holdings must never read as saved Private account exposure. */
+.qf38-private-portfolio-scope{display:none}body.qf37-private .qf38-public-portfolio-example{display:none}body.qf37-private .qf38-private-portfolio-scope{display:block}
